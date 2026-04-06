@@ -65,7 +65,6 @@
         }
         .screen.active { display: flex; }
 
-        /* Ocultar scrollbar pero mantener funcionalidad */
         .screen::-webkit-scrollbar { display: none; }
         .screen { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -197,7 +196,7 @@
         }
 
         .countdown-text { font-size: 10px; color: var(--accent); margin-top: 5px; }
-        input {
+        input, textarea {
             width: 100%;
             padding: 12px;
             border-radius: 20px;
@@ -206,6 +205,7 @@
             margin: 8px 0;
             background: white;
         }
+        textarea { resize: none; font-size: 12px; }
         .history-item {
             display: flex;
             justify-content: space-between;
@@ -218,6 +218,32 @@
             font-weight: 600;
             margin: 15px 0 10px 0;
             color: var(--accent);
+        }
+        .ccwallet-info {
+            background: #e8f0fe;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 12px;
+            text-align: left;
+        }
+        .ccwallet-info a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .code-input-group {
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .code-input-group input {
+            flex: 1;
+            margin: 0;
+        }
+        .code-input-group button {
+            width: auto;
+            padding: 12px 16px;
+            margin: 0;
         }
     </style>
 </head>
@@ -257,6 +283,9 @@
             <button class="btn-game" id="withdrawNavBtn">
                 <span><i class="fas fa-coins"></i> Mi Cosecha</span> <i class="fas fa-chevron-right"></i>
             </button>
+            <button class="btn-game" id="redeemNavBtn">
+                <span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i>
+            </button>
             <button class="btn-game" id="leaderboardNavBtn">
                 <span><i class="fas fa-trophy"></i> Top Usuarios</span> <i class="fas fa-chevron-right"></i>
             </button>
@@ -289,19 +318,42 @@
         </div>
     </div>
 
-    <!-- WITHDRAW SCREEN CON HISTORIAL DENTRO -->
+    <!-- WITHDRAW SCREEN CON CCWALLET -->
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-wallet" style="font-size: 40px; color: #2ecc71;"></i>
-            <h3 style="margin: 10px 0;">Retirar</h3>
-            <input type="text" id="wallet-address" placeholder="0x...">
-            <button class="btn-game btn-primary" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Pago</button>
-            <p style="margin-top: 10px; font-size: 11px; opacity: 0.6;">Minimo 10.00 USDT</p>
+            <h3 style="margin: 10px 0;">Retirar con CCWallet</h3>
+            
+            <div class="ccwallet-info">
+                <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
+                <a href="#" onclick="openCCWallet(); return false;">Crear cuenta aquí</a><br>
+                <small>Tu retiro se enviará automáticamente al bot @cctip_bot</small>
+            </div>
 
-            <!-- Historial dentro de la sección de retiro -->
+            <textarea id="ccwallet-id" rows="2" placeholder="Tu ID de CCWallet o nombre de usuario"></textarea>
+            <button class="btn-game btn-primary" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Retiro</button>
+            <p style="margin-top: 10px; font-size: 11px; opacity: 0.6;">Minimo 0.01 USDT | Pago via @cctip_bot</p>
+
             <div class="history-title"><i class="fas fa-clock"></i> Historial de retiros</div>
             <div id="history-list" style="max-height: 200px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- REDEEM SCREEN -->
+    <div id="redeem-screen" class="screen">
+        <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <i class="fas fa-ticket-alt" style="font-size: 40px; color: var(--accent);"></i>
+            <h3 style="margin: 10px 0;">Canjear Código</h3>
+            <p style="font-size: 13px;">Ingresa tu código de regalo</p>
+            
+            <div class="code-input-group">
+                <input type="text" id="redeem-code" placeholder="Ej: GIFT-XXXX-YYYY">
+                <button class="btn-game btn-primary" id="redeemSubmitBtn" style="width: auto;">Canjear</button>
+            </div>
+
+            <div id="redeem-message" style="margin-top: 15px; font-size: 12px; text-align: center;"></div>
         </div>
     </div>
 
@@ -350,7 +402,7 @@
         { msg: "Cada bono diario te acerca a tu primer retiro", sub: "7 días seguidos = bono extra" },
         { msg: "Invitando amigos multiplicas tus ganancias", sub: "15% de por vida" },
         { msg: "Llevas una racha activa. No la rompas", sub: "Cada día suma" },
-        { msg: "Estás a solo unos pasos de tu primer retiro", sub: "Meta: 10.00 USDT" }
+        { msg: "Estás a solo unos pasos de tu primer retiro", sub: "Meta: 0.01 USDT" }
     ];
     let motivationIndex = 0;
     function rotateMotivationMessage() {
@@ -407,6 +459,11 @@
         if(screenId === 'withdraw-screen') loadHistory();
     }
 
+    function openCCWallet() {
+        tg.openTelegramLink('https://t.me/cctip_bot');
+        showToast('Abriendo @cctip_bot');
+    }
+
     async function initUser() {
         if(!userId) return;
         const userRef = db.collection("usuarios").doc(userId);
@@ -433,8 +490,9 @@
                 referidos: 0,
                 streak: 0,
                 lastBonus: 0,
-                wallet: "",
+                ccwallet_id: "",
                 withdrawHistory: [],
+                redeemedCodes: [],
                 id: userId
             });
         }
@@ -459,11 +517,11 @@
         document.getElementById('streak-count').innerText = currentUserData.streak || 0;
         document.getElementById('referidos-count').innerText = currentUserData.referidos || 0;
 
-        const progress = Math.min((currentUserData.balance / 10) * 100, 100);
+        const progress = Math.min((currentUserData.balance / 0.01) * 100, 100);
         document.getElementById('progress-fill').style.width = progress + "%";
 
-        if(currentUserData.wallet) {
-            document.getElementById('wallet-address').value = currentUserData.wallet;
+        if(currentUserData.ccwallet_id) {
+            document.getElementById('ccwallet-id').value = currentUserData.ccwallet_id;
         }
         updateBonusTimer();
     }
@@ -596,46 +654,96 @@
 
     async function handleWithdraw() {
         if(!userId) return;
-        const addr = document.getElementById('wallet-address').value.trim();
-        if(!addr.startsWith('0x') || addr.length !== 42) { showToast("Direccion invalida"); return; }
-        const doc = await db.collection("usuarios").doc(userId).get();
-        if(doc.data().balance < 10) { showToast("Minimo 10.00 USDT"); return; }
+        const ccwalletId = document.getElementById('ccwallet-id').value.trim();
+        if(ccwalletId.length < 3) { showToast("ID de CCWallet invalido"); return; }
         
-        const amount = doc.data().balance;
-        const now = new Date();
-        const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}`;
+        const doc = await db.collection("usuarios").doc(userId).get();
+        const balance = doc.data().balance;
+        
+        if(balance < 0.01) { showToast("Minimo 0.01 USDT"); return; }
         
         await db.collection("usuarios").doc(userId).update({
-            wallet: addr,
+            ccwallet_id: ccwalletId,
             balance: 0,
             withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
-                amount: amount.toFixed(2),
-                date: dateStr,
-                status: "Completado"
+                amount: balance.toFixed(4),
+                date: new Date().toLocaleDateString(),
+                status: "Enviado a @cctip_bot",
+                ccwallet: ccwalletId
             })
         });
         
+        tg.openTelegramLink(`https://t.me/cctip_bot`);
         playSound('success');
         canvasConfetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
-        showToast("Solicitud enviada");
+        showToast(`${balance.toFixed(4)} USDT enviado a @cctip_bot`);
         await updateUI();
         await loadHistory();
         navigate('withdraw-screen');
+    }
+
+    // Códigos de regalo predefinidos
+    const giftCodes = {
+        "BIENVENIDA25": 0.25,
+        "EXTRA10": 0.10,
+        "BONO05": 0.05
+    };
+
+    async function handleRedeem() {
+        if(!userId) return;
+        const code = document.getElementById('redeem-code').value.trim().toUpperCase();
+        const msgDiv = document.getElementById('redeem-message');
+        
+        if(!code) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Ingresa un código</span>';
+            return;
+        }
+        
+        const userRef = db.collection("usuarios").doc(userId);
+        const userDoc = await userRef.get();
+        const redeemed = userDoc.data().redeemedCodes || [];
+        
+        if(redeemed.includes(code)) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Código ya usado</span>';
+            return;
+        }
+        
+        const amount = giftCodes[code];
+        if(!amount) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Código invalido</span>';
+            return;
+        }
+        
+        await userRef.update({
+            balance: firebase.firestore.FieldValue.increment(amount),
+            redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+        });
+        
+        playSound('coin');
+        canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        msgDiv.innerHTML = `<span style="color: #27ae60;">+${amount.toFixed(2)} USDT canjeado</span>`;
+        document.getElementById('redeem-code').value = '';
+        await updateUI();
+        
+        setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
     }
 
     // Event listeners
     document.getElementById('bonusBtn').onclick = claimDailyBonus;
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => { navigate('withdraw-screen'); loadHistory(); };
+    document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
     document.getElementById('leaderboardNavBtn').onclick = () => navigate('leaderboard-screen');
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
     document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
     document.getElementById('backHomeLeader').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
     document.getElementById('backToInvite').onclick = () => navigate('invite-screen');
     document.getElementById('claimCommBtn').onclick = claimCommissions;
     document.getElementById('shareRefBtn').onclick = copyRefLink;
     document.getElementById('viewInvitesBtn').onclick = () => navigate('invites-list-screen');
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
+    document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
 
     initUser();
 </script>
