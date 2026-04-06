@@ -2,338 +2,333 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDT GIFT K - Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
         :root {
-            --bg-gradient: linear-gradient(180deg, #fdfcfb 0%, #e2d1c3 100%);
-            --accent-brown: #7b5b4a;
-            --soft-beige: #f4ece4;
-            --deep-copper: #bb7457;
-            --text-main: #4a372d;
-            --text-secondary: #9e8a7f;
-            --shadow-sm: 0 4px 12px rgba(123, 91, 74, 0.08);
+            --bg-color: #fdf5e6;
+            --primary-accent: #d2a679;
+            --secondary-accent: #e6b8a2;
+            --text-main: #5d4037;
+            --btn-orange: #d37a5a;
+            --btn-cream: #f3d5b5;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top left, #f3d5b5 0%, transparent 20%),
+                              radial-gradient(circle at bottom right, #e6b8a2 0%, transparent 20%);
             color: var(--text-main);
-            height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
             overflow: hidden;
         }
 
-        /* Header & Bonus Icon */
-        .header {
-            padding: 25px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        #dailyBonusBtn {
-            width: 44px;
-            height: 44px;
-            background: var(--soft-beige);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: 1px solid rgba(123, 91, 74, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        #dailyBonusBtn:active { transform: scale(0.95); background: #eee5dc; }
-
-        .bonus-icon-svg { width: 20px; fill: var(--accent-brown); }
-
-        #bonusTimer {
-            position: absolute;
-            bottom: -20px;
-            right: 0;
-            font-size: 10px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            font-weight: 500;
-        }
-
-        /* Main Balance Area */
-        .balance-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        #userBalance {
-            font-family: "Didot", "Bodoni MT", "Cormorant Garamond", serif;
-            font-size: 84px;
-            font-weight: 300;
-            margin: 0;
-            letter-spacing: -2px;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .currency-label {
-            font-size: 18px;
-            letter-spacing: 4px;
-            color: var(--text-secondary);
-            margin-top: -10px;
-            text-transform: uppercase;
-        }
-
-        .floating-increment {
-            position: absolute;
-            color: var(--deep-copper);
-            font-weight: 600;
-            animation: floatUp 1.2s ease-out forwards;
-            pointer-events: none;
-        }
-
-        /* Action Buttons */
-        .actions-grid {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding-bottom: 50px;
-        }
-
-        .btn-premium {
+        #app-container {
             width: 100%;
-            padding: 18px;
-            border-radius: 16px;
-            border: none;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
+            max-width: 450px;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Pantallas */
+        .screen {
+            position: absolute;
+            top: 20px;
+            width: calc(100% - 40px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estética de la Imagen */
+        .header-deco {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .lang-badge {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            font-size: 14px;
+        }
+
+        .bonus-badge {
+            background: #fff;
+            border: 2px dashed var(--primary-accent);
+            padding: 10px;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            font-size: 8px;
+            text-align: center;
+            justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+        }
+
+        .balance-section {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .balance-amount {
+            font-size: 64px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .balance-label {
+            font-size: 20px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        /* Botones Estilo Píldora */
+        .menu-buttons { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+
+        .btn-custom {
+            border: none;
+            padding: 18px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
         }
 
-        .btn-light { background: var(--soft-beige); color: var(--accent-brown); }
-        .btn-dark { background: var(--deep-copper); color: white; box-shadow: var(--shadow-sm); }
-        
-        .btn-premium:active { transform: translateY(2px); opacity: 0.9; }
+        .btn-custom:active { transform: scale(0.98); }
 
-        /* Toast & Status */
-        #toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(74, 55, 45, 0.9);
-            color: white;
-            padding: 10px 24px;
+        .btn-cream { background-color: var(--btn-cream); color: var(--text-main); }
+        .btn-orange { background-color: var(--btn-orange); color: white; }
+
+        /* Decoración de hojas */
+        .leaf-icon { position: absolute; opacity: 0.2; z-index: -1; }
+
+        /* Pantallas de Detalle */
+        .detail-card {
+            background: white;
+            padding: 30px;
             border-radius: 30px;
-            font-size: 13px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 1000;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
         }
 
-        .footer-status {
-            padding-bottom: 20px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .back-btn {
+            margin-top: 20px;
+            background: none;
+            border: 1px solid var(--primary-accent);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: var(--primary-accent);
+            cursor: pointer;
         }
 
-        @keyframes floatUp {
-            0% { opacity: 0; transform: translateY(0); }
-            20% { opacity: 1; }
-            100% { opacity: 0; transform: translateY(-50px); }
+        .input-elegant {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #ddd;
+            margin: 15px 0;
+            outline: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div id="dailyBonusBtn">
-            <svg class="bonus-icon-svg" viewBox="0 0 24 24"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"/></svg>
-            <span id="bonusTimer">00:00:00</span>
+<div id="app-container">
+    
+    <div id="home-screen" class="screen active">
+        <div class="header-deco">
+            <div class="lang-badge">A / 文 <br><small>Traducir</small></div>
+            <div class="bonus-badge" onclick="claimBonus()">
+                <i class="fas fa-gift" style="font-size: 20px;"></i>
+                Bono Diario
+            </div>
+        </div>
+
+        <div class="balance-section">
+            <div class="balance-amount" id="user-balance">0.00</div>
+            <div class="balance-label">USDT</div>
+        </div>
+
+        <div class="menu-buttons">
+            <button class="btn-custom btn-cream" onclick="claimBonus()">
+                <i class="fas fa-certificate"></i> Recordatorio diario
+            </button>
+            <button class="btn-custom btn-orange" onclick="showScreen('invite-screen')">
+                <i class="fas fa-seedling"></i> Invitar a un amigo
+            </button>
+            <button class="btn-custom btn-cream" onclick="showScreen('withdraw-screen')">
+                <i class="fas fa-coffee"></i> Retirar USDT
+            </button>
+            <button class="btn-custom btn-orange" onclick="showScreen('gift-screen')">
+                <i class="fas fa-box-open"></i> Canjea código de regalo
+            </button>
+        </div>
+        
+        <div id="status" style="margin-top: 30px; font-size: 10px; opacity: 0.5;">Cargando...</div>
+    </div>
+
+    <div id="invite-screen" class="screen">
+        <div class="detail-card">
+            <i class="fas fa-users" style="font-size: 40px; color: var(--btn-orange);"></i>
+            <h2 style="margin: 15px 0;">Mis Invitados</h2>
+            <div style="font-size: 30px; font-weight: bold;" id="ref-count">0</div>
+            <p style="font-size: 14px; opacity: 0.7;">Gana 0.50 USDT por cada referido.</p>
+            <button class="btn-custom btn-orange" style="margin-top: 20px; width: 100%;" onclick="shareRef()">
+                Copiar Link de Invitación
+            </button>
+            <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
         </div>
     </div>
 
-    <div class="balance-container" id="balanceWrapper">
-        <h1 id="userBalance">0.00</h1>
-        <span class="currency-label">USDT</span>
+    <div id="withdraw-screen" class="screen">
+        <div class="detail-card">
+            <i class="fas fa-wallet" style="font-size: 40px; color: var(--primary-accent);"></i>
+            <h2 style="margin: 15px 0;">Retirar Fondos</h2>
+            <p>Mínimo de retiro: 10.00 USDT</p>
+            <input type="text" class="input-elegant" placeholder="Dirección de billetera USDT (BEP20)">
+            <button class="btn-custom btn-cream" style="width: 100%;" onclick="requestWithdraw()">Solicitar Pago</button>
+            <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
+        </div>
     </div>
 
-    <div class="actions-grid">
-        <button id="inviteBtn" class="btn-premium btn-dark">Invitar usuario</button>
-        <button id="withdrawBtn" class="btn-premium btn-light">Retirar fondos</button>
-        <button id="redeemBtn" class="btn-premium btn-light">Canjear código</button>
+    <div id="gift-screen" class="screen">
+        <div class="detail-card">
+            <i class="fas fa-tags" style="font-size: 40px; color: var(--btn-orange);"></i>
+            <h2 style="margin: 15px 0;">Código de Regalo</h2>
+            <input type="text" class="input-elegant" placeholder="Ingresa tu código aquí">
+            <button class="btn-custom btn-orange" style="width: 100%;" onclick="tg.showAlert('Código no válido')">Canjear</button>
+            <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
+        </div>
     </div>
 
-    <div class="footer-status" id="connectionStatus">Sincronizado</div>
-    <div id="toast">Acción completada</div>
+</div>
 
-    <script>
-        // Configuración Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
-            authDomain: "usdt-8b129.firebaseapp.com",
-            projectId: "usdt-8b129",
-            storageBucket: "usdt-8b129.firebasestorage.app",
-            messagingSenderId: "816855613636",
-            appId: "1:816855613636:web:7891ba3996acef2c91c991"
-        };
+<script>
+    // --- CONFIGURACIÓN FIREBASE (Mantenemos la suya original) ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
+        authDomain: "usdt-8b129.firebaseapp.com",
+        projectId: "usdt-8b129",
+        storageBucket: "usdt-8b129.firebasestorage.app",
+        messagingSenderId: "816855613636",
+        appId: "1:816855613636:web:7891ba3996acef2c91c991"
+    };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    const user = tg.initDataUnsafe?.user;
+    const startParam = tg.initDataUnsafe?.start_param;
 
-        // Variables de Elementos UI
-        const dailyBonusBtn = document.getElementById('dailyBonusBtn');
-        const inviteBtn     = document.getElementById('inviteBtn');
-        const withdrawBtn   = document.getElementById('withdrawBtn');
-        const redeemBtn     = document.getElementById('redeemBtn');
-        const balanceEl     = document.getElementById('userBalance');
-        const bonusTimer    = document.getElementById('bonusTimer');
-        const statusEl      = document.getElementById('connectionStatus');
+    // Lógica de Navegación entre pantallas
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
 
-        let currentUserData = null;
-
-        // Toast Profesional
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+    // CARGAR DATOS
+    async function loadData() {
+        if (!user) {
+            document.getElementById('status').innerText = "Abre desde Telegram";
+            // Para pruebas en PC descomenta la linea de abajo:
+            // return; 
         }
 
-        // Animación de Incremento
-        function animateIncrement(amount) {
-            const inc = document.createElement('div');
-            inc.className = 'floating-increment';
-            inc.innerText = `+${amount.toFixed(2)}`;
-            document.getElementById('balanceWrapper').appendChild(inc);
-            setTimeout(() => inc.remove(), 1200);
-            
-            balanceEl.style.transform = 'scale(1.05)';
-            setTimeout(() => { balanceEl.style.transform = 'scale(1)'; }, 200);
-        }
+        const userRef = db.collection("usuarios").doc(user.id.toString());
+        let doc = await userRef.get();
 
-        // Gestión de Tiempo (24h)
-        function updateTimer(lastTimestamp) {
-            const now = Date.now();
-            const nextBonus = lastTimestamp + (24 * 60 * 60 * 1000);
-            const diff = nextBonus - now;
-
-            if (diff <= 0) {
-                bonusTimer.innerText = "Disponible";
-                dailyBonusBtn.style.opacity = "1";
-                return true;
-            } else {
-                const hours = Math.floor(diff / 3600000);
-                const minutes = Math.floor((diff % 3600000) / 60000);
-                const seconds = Math.floor((diff % 60000) / 1000);
-                bonusTimer.innerText = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-                dailyBonusBtn.style.opacity = "0.6";
-                return false;
-            }
-        }
-
-        async function loadAppData() {
-            const user = tg.initDataUnsafe?.user;
-            if (!user) return;
-
-            const userRef = db.collection("usuarios").doc(user.id.toString());
-            const doc = await userRef.get();
-
-            if (doc.exists) {
-                currentUserData = doc.data();
-                balanceEl.innerText = currentUserData.balance.toFixed(2);
-                
-                // Iniciar contador
-                setInterval(() => {
-                    if (currentUserData.lastDailyBonus) {
-                        updateTimer(currentUserData.lastDailyBonus);
-                    } else {
-                        bonusTimer.innerText = "Disponible";
-                    }
-                }, 1000);
-            } else {
-                // Registro inicial
-                const startParam = tg.initDataUnsafe?.start_param;
-                if (startParam && startParam !== user.id.toString()) {
-                    await db.collection("usuarios").doc(startParam).update({
-                        balance: firebase.firestore.FieldValue.increment(0.50),
-                        referidos: firebase.firestore.FieldValue.increment(1)
-                    });
-                }
-                await userRef.set({
-                    id: user.id,
-                    balance: 0.00,
-                    lastDailyBonus: 0,
-                    referidos: 0
-                });
-                loadAppData();
-            }
-            statusEl.innerText = "Actualizado";
-        }
-
-        // Lógica de Botones
-        dailyBonusBtn.onclick = async () => {
-            const isAvailable = updateTimer(currentUserData.lastDailyBonus || 0);
-            if (!isAvailable) {
-                showToast("No disponible");
-                return;
+        if (!doc.exists) {
+            if (startParam && startParam !== user.id.toString()) {
+                const inviterRef = db.collection("usuarios").doc(startParam);
+                await inviterRef.update({
+                    balance: firebase.firestore.FieldValue.increment(0.50),
+                    referidos: firebase.firestore.FieldValue.increment(1)
+                }).catch(() => console.log("Inviter no existe"));
             }
 
-            const now = Date.now();
-            await db.collection("usuarios").doc(tg.initDataUnsafe.user.id.toString()).update({
-                balance: firebase.firestore.FieldValue.increment(0.05),
-                lastDailyBonus: now
+            await userRef.set({
+                nombre: user.first_name,
+                balance: 0.00,
+                referidos: 0,
+                id: user.id
             });
-            
-            animateIncrement(0.05);
-            currentUserData.balance += 0.05;
-            currentUserData.lastDailyBonus = now;
-            balanceEl.innerText = currentUserData.balance.toFixed(2);
-            showToast("Completado");
-        };
+            doc = await userRef.get();
+        }
 
-        inviteBtn.onclick = () => {
-            const refLink = `https://t.me/USDTGIFTKBot?startapp=${tg.initDataUnsafe.user.id}`;
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=Acceso al terminal USDT`);
-            showToast("Enlace generado");
-        };
+        const data = doc.data();
+        document.getElementById('user-balance').innerText = data.balance.toFixed(2);
+        document.getElementById('ref-count').innerText = data.referidos;
+        document.getElementById('status').innerText = "Conectado como " + user.first_name;
+    }
 
-        withdrawBtn.onclick = () => {
-            if (currentUserData.balance >= 10) {
-                showToast("Procesando solicitud");
-            } else {
-                showToast("Mínimo: 10.00");
-            }
-        };
+    // FUNCIÓN BONO
+    async function claimBonus() {
+        const userRef = db.collection("usuarios").doc(user.id.toString());
+        await userRef.update({ balance: firebase.firestore.FieldValue.increment(0.05) });
+        tg.showAlert("¡Has recibido 0.05 USDT!");
+        loadData();
+    }
 
-        redeemBtn.onclick = () => {
-            showToast("Función restringida");
-        };
+    // FUNCIÓN RETIRO
+    async function requestWithdraw() {
+        const userRef = db.collection("usuarios").doc(user.id.toString());
+        const doc = await userRef.get();
+        const balance = doc.data().balance;
 
-        loadAppData();
-    </script>
+        if (balance >= 10) {
+            tg.showConfirm("¿Confirmas el retiro de tus fondos?", (confirmed) => {
+                if(confirmed) tg.showAlert("Solicitud enviada a revisión.");
+            });
+        } else {
+            tg.showAlert("Necesitas al menos 10.00 USDT.");
+        }
+    }
+
+    // INVITAR
+    function shareRef() {
+        const refLink = `https://t.me/USDTGIFTKBot?startapp=${user.id}`;
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=🎁 Regístrate y gana USDT gratis`);
+    }
+
+    loadData();
+</script>
 </body>
 </html>
