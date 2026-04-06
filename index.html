@@ -3,517 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT GIFT K - Ultra Premium</title>
-    
+    <title>USDT GIFT K</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        :root {
-            --gold: #ffcc00;
-            --orange-gradient: linear-gradient(135deg, #d37a5a 0%, #e68d71 100%);
-            --bg-color: #fdf5e6;
-            --text-main: #5d4037;
-            --accent: #d37a5a;
-        }
-
+        :root { --accent: #d37a5a; --bg: #fdf5e6; --text: #5d4037; --glass: rgba(255,255,255,0.85); }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #fdf5e6;
-            color: var(--text-main);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* Fondo Animado */
-        #gradient-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, #fdf5e6, #fff5ea, #ffedd8, #fdf5e6);
-            background-size: 400% 400%;
-            z-index: -1;
-            animation: gradientMove 15s ease infinite;
-        }
-        @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-
-        #app-container {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            z-index: 1;
-        }
-
-        /* Pantallas */
-        .screen {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            left: 0; top: 0;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .screen.active { display: flex; }
-
-        /* Header UI */
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .streak-badge {
-            background: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: 800;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex; align-items: center; gap: 8px;
-            color: var(--accent);
-        }
-
-        /* Balance con efecto Pop */
-        .balance-card {
-            text-align: center;
-            margin: 40px 0;
-            perspective: 1000px;
-        }
-        #user-balance {
-            font-size: 70px;
-            font-weight: 800;
-            display: inline-block;
-            transition: transform 0.1s ease;
-        }
-        .balance-label {
-            font-size: 14px;
-            letter-spacing: 5px;
-            opacity: 0.6;
-            margin-top: -10px;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            height: 12px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-        #progress-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--orange-gradient);
-            border-radius: 10px;
-            transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* Botones Gamificados */
-        .menu-grid {
-            display: grid;
-            gap: 15px;
-            width: 100%;
-        }
-
-        .btn-game {
-            background: white;
-            border: none;
-            padding: 22px;
-            border-radius: 24px;
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Efecto Shimmer */
-        .btn-game::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
-            transform: rotate(45deg);
-            transition: 0.5s;
-            pointer-events: none;
-        }
-        .btn-game:active::after { left: 100%; }
-
-        .btn-primary {
-            background: var(--orange-gradient);
-            color: white;
-        }
-
-        .floating-bonus {
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* Detail Cards */
-        .glass-card {
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 35px;
-            padding: 30px;
-            border: 1px solid white;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-            margin-top: 40px;
-            text-align: center;
-        }
-
-        .back-circle {
-            width: 50px; height: 50px;
-            background: white;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; justify-content: center; }
+        #app-container { width: 100%; max-width: 450px; padding: 20px; z-index: 1; position: relative; }
+        .screen { display: none; flex-direction: column; width: 100%; height: 100%; position: absolute; left: 0; top: 0; padding: 20px; overflow-y: auto; opacity: 0; }
+        .screen.active { display: flex; opacity: 1; }
+        .top-nav { display: flex; justify-content: space-between; margin-top: 10px; }
+        .badge { background: white; padding: 8px 14px; border-radius: 15px; font-weight: 700; font-size: 13px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 6px; color: var(--text); }
+        .balance-card { text-align: center; margin: 40px 0; }
+        #user-balance { font-size: 64px; font-weight: 700; letter-spacing: -2px; }
+        .balance-label { font-size: 12px; letter-spacing: 3px; opacity: 0.5; font-weight: 700; margin-top: -5px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(0,0,0,0.05); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 1s ease; }
+        .menu-grid { display: grid; gap: 12px; width: 100%; }
+        .btn { background: white; border: none; padding: 20px; border-radius: 20px; font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); background: #fafafa; }
+        .btn-main { background: var(--accent); color: white; }
+        .btn-main:active { background: #bc6a4d; }
+        .glass-card { background: var(--glass); backdrop-filter: blur(10px); border-radius: 30px; padding: 25px; border: 1px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.04); margin-top: 20px; text-align: center; }
+        .input-field { width: 100%; padding: 18px; border-radius: 15px; border: 1.5px solid #eee; margin-bottom: 15px; font-family: inherit; font-size: 14px; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: var(--accent); }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 25px; border-radius: 25px; font-size: 14px; font-weight: 600; z-index: 1000; display: none; }
+        .back-btn { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        #audio-unlock { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
 
-<div id="gradient-bg"></div>
+<div id="audio-unlock">
+    <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: var(--accent); margin-bottom: 20px;"></i>
+    <h2 style="margin-bottom: 10px;">Verificación de Seguridad</h2>
+    <p style="font-size: 14px; opacity: 0.6; margin-bottom: 30px;">Pulse para sincronizar la interfaz y habilitar alertas sonoras.</p>
+    <button class="btn btn-main" style="width: 200px; justify-content: center;" onclick="unlockApp()">Sincronizar</button>
+</div>
+
+<div id="toast"></div>
 
 <div id="app-container">
-
     <div id="home-screen" class="screen active">
         <div class="top-nav">
-            <div class="streak-badge">
-                <i class="fas fa-fire animate__animated animate__pulse animate__infinite"></i>
-                <span id="streak-count">0</span> DÍAS
-            </div>
-            <div class="streak-badge" style="color: #2ecc71;">
-                <i class="fas fa-users"></i>
-                <span id="active-users">...</span>
-            </div>
+            <div class="badge"><i class="fa-solid fa-calendar-day"></i> <span id="streak-val">0</span> DÍAS</div>
+            <div class="badge" style="color: #2ecc71;"><i class="fa-solid fa-circle-nodes"></i> <span id="active-users">0</span></div>
         </div>
-
         <div class="balance-card">
             <div id="user-balance">0.00</div>
-            <div class="balance-label">USDT DISPONIBLE</div>
-            
-            <div style="margin-top: 20px;">
-                <small id="motivational-text" style="font-weight: 600; color: var(--accent);"></small>
-            </div>
-
-            <div class="progress-container">
-                <div id="progress-fill"></div>
-            </div>
-            <small style="opacity: 0.5;">META DE RETIRO: 10.00 USDT</small>
+            <div class="balance-label">USDT BALANCE</div>
+            <div style="margin-top: 15px;"><small id="promo-text" style="font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;"></small></div>
+            <div class="progress-bar"><div id="progress-fill"></div></div>
+            <small style="opacity: 0.4; font-weight: 700;">UMBRAL DE RETIRO: 10.00</small>
         </div>
-
         <div class="menu-grid">
-            <button class="btn-game btn-primary floating-bonus" onclick="claimDailyBonus()">
-                <span><i class="fas fa-gift"></i> Bono Diario</span>
-                <i class="fas fa-arrow-right"></i>
-            </button>
-            <button class="btn-game" onclick="navigate('invite-screen')">
-                <span><i class="fas fa-heart"></i> Crecer Equipo</span>
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <button class="btn-game" onclick="navigate('withdraw-screen')">
-                <span><i class="fas fa-coins"></i> Mi Cosecha</span>
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <button class="btn-game" onclick="navigate('leaderboard-screen')">
-                <span><i class="fas fa-trophy"></i> Top Usuarios</span>
-                <i class="fas fa-chevron-right"></i>
-            </button>
+            <button class="btn btn-main" onclick="claimBonus()"><span><i class="fa-solid fa-bolt-lightning"></i> Bono Disponible</span><span id="cooldown-timer"></span></button>
+            <button class="btn" onclick="navigate('invite-screen')"><span><i class="fa-solid fa-user-plus"></i> Afiliados</span><i class="fa-solid fa-angle-right"></i></button>
+            <button class="btn" onclick="navigate('withdraw-screen')"><span><i class="fa-solid fa-wallet"></i> Retiros</span><i class="fa-solid fa-angle-right"></i></button>
+            <button class="btn" onclick="navigate('leader-screen')"><span><i class="fa-solid fa-chart-line"></i> Global</span><i class="fa-solid fa-angle-right"></i></button>
         </div>
     </div>
 
     <div id="invite-screen" class="screen">
-        <div class="back-circle" onclick="navigate('home-screen')"><i class="fas fa-arrow-left"></i></div>
+        <div class="back-btn" onclick="navigate('home-screen')"><i class="fa-solid fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-rocket" style="font-size: 50px; color: var(--accent);"></i>
-            <h2 style="margin: 20px 0;">Sistema de Socios</h2>
-            <p>Gana <b>0.50 USDT</b> por cada invitado y el <b>15%</b> de sus ganancias de por vida.</p>
-            
-            <div style="background: white; padding: 20px; border-radius: 20px; margin: 20px 0;">
-                <small>Comisión acumulada:</small>
-                <h3 id="comm-pending">0.00 USDT</h3>
-                <button class="btn-game btn-primary" style="margin-top: 10px; padding: 12px; width: 100%;" onclick="claimCommissions()">Reclamar ahora</button>
+            <i class="fa-solid fa-link" style="font-size: 32px; color: var(--accent);"></i>
+            <h3 style="margin: 15px 0;">Programa de Afiliados</h3>
+            <p style="font-size: 13px; opacity: 0.7; line-height: 1.5;">+0.50 USDT por registro directo.<br>15% de comisión por actividad delegada.</p>
+            <div style="background: white; padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid #f0f0f0;">
+                <small style="font-weight: 700; opacity: 0.5;">COMISIÓN PENDIENTE</small>
+                <div id="comm-val" style="font-size: 24px; font-weight: 700; margin: 5px 0;">0.0000</div>
+                <button class="btn btn-main" style="width: 100%; padding: 10px; font-size: 13px; justify-content: center;" onclick="collectComm()">Transferir a Balance</button>
             </div>
-
-            <button class="btn-game" style="width: 100%;" onclick="copyRefLink()">
-                <i class="fas fa-share-alt"></i> Compartir Link
-            </button>
+            <div style="margin-bottom: 20px; text-align: left;">
+                <small style="font-weight: 700; opacity: 0.5;">ESTADÍSTICAS</small>
+                <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:14px;">
+                    <span>Invitados directos:</span> <span id="ref-count" style="font-weight: 700;">0</span>
+                </div>
+            </div>
+            <button class="btn" style="width: 100%; justify-content: center; gap: 10px;" onclick="copyLink()"><i class="fa-solid fa-copy"></i> Copiar Enlace</button>
         </div>
     </div>
 
     <div id="withdraw-screen" class="screen">
-        <div class="back-circle" onclick="navigate('home-screen')"><i class="fas fa-arrow-left"></i></div>
+        <div class="back-btn" onclick="navigate('home-screen')"><i class="fa-solid fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-wallet" style="font-size: 50px; color: #2ecc71;"></i>
-            <h2 style="margin: 15px 0;">Retirar Cosecha</h2>
-            <input type="text" id="wallet-address" class="btn-game" style="width: 100%; border: 2px solid #eee; margin-bottom: 15px;" placeholder="Dirección BEP20">
-            <button class="btn-game btn-primary" style="width: 100%;" onclick="handleWithdraw()">Iniciar Pago</button>
-            <p style="margin-top: 15px; font-size: 12px; opacity: 0.6;">Mínimo: 10 USDT. Procesado en 24h.</p>
+            <i class="fa-solid fa-receipt" style="font-size: 32px; color: #2ecc71;"></i>
+            <h3 style="margin: 15px 0;">Gestión de Fondos</h3>
+            <input type="text" id="wallet-addr" class="input-field" placeholder="Dirección USDT BEP20 (0x...)">
+            <button class="btn btn-main" style="width: 100%; justify-content: center;" onclick="requestPayout()">Solicitar Retiro</button>
+            <p style="margin-top: 15px; font-size: 11px; opacity: 0.5;">Los pagos se procesan en bloques de 24 horas.</p>
         </div>
     </div>
 
-    <div id="leaderboard-screen" class="screen">
-        <div class="back-circle" onclick="navigate('home-screen')"><i class="fas fa-arrow-left"></i></div>
+    <div id="leader-screen" class="screen">
+        <div class="back-btn" onclick="navigate('home-screen')"><i class="fa-solid fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h2 style="margin-bottom: 20px;">Top 10 Global</h2>
-            <div id="leaderboard-list" style="text-align: left;">
-                </div>
+            <h3 style="margin-bottom: 20px;">Top Global</h3>
+            <div id="leader-list"></div>
         </div>
     </div>
-
 </div>
 
 <script>
-    // --- CONFIGURACIÓN FIREBASE ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
-        authDomain: "usdt-8b129.firebaseapp.com",
-        projectId: "usdt-8b129",
-        storageBucket: "usdt-8b129.firebasestorage.app",
-        messagingSenderId: "816855613636",
-        appId: "1:816855613636:web:7891ba3996acef2c91c991"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU", authDomain: "usdt-8b129.firebaseapp.com", projectId: "usdt-8b129", storageBucket: "usdt-8b129.firebasestorage.app", messagingSenderId: "816855613636", appId: "1:816855613636:web:7891ba3996acef2c91c991" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    let audioCtx, audioEnabled = false;
 
-    // --- SONIDOS (Sintetizados para evitar carga externa lenta) ---
-    const playSound = (type) => {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-
-            if (type === 'coin') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-            } else if (type === 'success') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(440, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-            }
-            
-            osc.start();
-            osc.stop(ctx.currentTime + 0.5);
-        } catch (e) { console.log("Audio no soportado"); }
-    };
-
-    // --- LÓGICA DE NAVEGACIÓN CON ANIMACIÓN ---
-    function navigate(screenId) {
-        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        
-        const current = document.querySelector('.screen.active');
-        const next = document.getElementById(screenId);
-        
-        gsap.to(current, { opacity: 0, x: -20, duration: 0.3, onComplete: () => {
-            current.classList.remove('active');
-            next.classList.add('active');
-            gsap.fromTo(next, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.3 });
-        }});
-
-        if(screenId === 'leaderboard-screen') loadLeaderboard();
+    function unlockApp() {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioEnabled = true;
+        gsap.to("#audio-unlock", { opacity: 0, duration: 0.4, onComplete: () => document.getElementById("audio-unlock").style.display = "none" });
+        initUser();
     }
 
-    // --- LÓGICA DE DATOS ---
-    const userId = tg.initDataUnsafe?.user?.id?.toString() || "test_user";
-    const userName = tg.initDataUnsafe?.user?.first_name || "Buscador";
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.innerText = msg;
+        t.style.display = "block";
+        gsap.fromTo(t, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3 });
+        setTimeout(() => gsap.to(t, { opacity: 0, duration: 0.3, onComplete: () => t.style.display = "none" }), 2000);
+    }
+
+    function playNote(freq) {
+        if(!audioEnabled) return;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    function navigate(id) {
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        const curr = document.querySelector('.screen.active');
+        const next = document.getElementById(id);
+        gsap.to(curr, { opacity: 0, x: -10, duration: 0.2, onComplete: () => {
+            curr.classList.remove('active');
+            next.classList.add('active');
+            gsap.fromTo(next, { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.2 });
+        }});
+        if(id === 'leader-screen') updateLeaders();
+    }
+
+    const uid = tg.initDataUnsafe?.user?.id?.toString() || "dev_user";
+    const uName = tg.initDataUnsafe?.user?.first_name || "Usuario";
 
     async function initUser() {
-        const userRef = db.collection("usuarios").doc(userId);
-        const doc = await userRef.get();
-        const startParam = tg.initDataUnsafe?.start_param;
+        tg.setHeaderColor('#fdf5e6');
+        tg.setBackgroundColor('#fdf5e6');
+        tg.expand();
 
-        if (!doc.exists) {
-            let inviterId = (startParam && startParam !== userId) ? startParam : "none";
-            
-            // Pagar bono al invitador
-            if(inviterId !== "none") {
-                const invRef = db.collection("usuarios").doc(inviterId);
-                await invRef.update({ 
-                    balance: firebase.firestore.FieldValue.increment(0.50),
-                    referidos: firebase.firestore.FieldValue.increment(1)
-                }).catch(() => {});
+        const ref = db.collection("usuarios").doc(uid);
+        const doc = await ref.get();
+        if(!doc.exists) {
+            const sp = tg.initDataUnsafe?.start_param;
+            if(sp && sp !== uid) {
+                db.collection("usuarios").doc(sp).update({ balance: firebase.firestore.FieldValue.increment(0.50), referidos: firebase.firestore.FieldValue.increment(1) }).catch(()=>{});
             }
-
-            await userRef.set({
-                nombre: userName,
-                balance: 0.00,
-                comision: 0.00,
-                invitado_por: inviterId,
-                referidos: 0,
-                streak: 0,
-                lastBonus: 0,
-                id: userId
-            });
-        }
-        updateUI();
-        simulateActiveUsers();
-    }
-
-    function simulateActiveUsers() {
-        document.getElementById('active-users').innerText = Math.floor(Math.random() * (450 - 300) + 300);
-    }
-
-    async function updateUI() {
-        const doc = await db.collection("usuarios").doc(userId).get();
-        const data = doc.data();
-
-        // Efecto Pop en el balance
-        const balanceEl = document.getElementById('user-balance');
-        const oldVal = parseFloat(balanceEl.innerText);
-        if(oldVal < data.balance) {
-            gsap.to(balanceEl, { scale: 1.2, duration: 0.1, yoyo: true, repeat: 1 });
-        }
-
-        balanceEl.innerText = data.balance.toFixed(2);
-        document.getElementById('comm-pending').innerText = (data.comision || 0).toFixed(4) + " USDT";
-        document.getElementById('streak-count').innerText = data.streak || 0;
-
-        // Progress bar
-        const progress = Math.min((data.balance / 10) * 100, 100);
-        document.getElementById('progress-fill').style.width = progress + "%";
-
-        // Mensajes motivadores
-        const msgs = ["🔥 Vas como un tiburón", "💎 Imparable", "⚡ Rumbo a la cima", "💰 Cosechando éxito"];
-        document.getElementById('motivational-text').innerText = msgs[Math.floor(Math.random() * msgs.length)];
-    }
-
-    async function claimDailyBonus() {
-        const userRef = db.collection("usuarios").doc(userId);
-        const doc = await userRef.get();
-        const data = doc.data();
-        
-        const now = Date.now();
-        const lastBonus = data.lastBonus || 0;
-        const diff = (now - lastBonus) / (1000 * 60 * 60);
-
-        if (diff < 24) {
-            const horasRestantes = (24 - diff).toFixed(1);
-            tg.showAlert(`⌛ Paciencia, tiburón. Vuelve en ${horasRestantes} horas.`);
-            return;
-        }
-
-        let newStreak = (diff < 48) ? (data.streak || 0) + 1 : 1;
-        let bonoFinal = 0.05;
-        let isSpecial = false;
-
-        if (newStreak % 7 === 0) {
-            bonoFinal += 0.50;
-            isSpecial = true;
-        }
-
-        await userRef.update({
-            balance: firebase.firestore.FieldValue.increment(bonoFinal),
-            lastBonus: now,
-            streak: newStreak
-        });
-
-        // 15% para el patrocinador
-        if (data.invitado_por && data.invitado_por !== "none") {
-            await db.collection("usuarios").doc(data.invitado_por).update({
-                comision: firebase.firestore.FieldValue.increment(bonoFinal * 0.15)
-            });
-        }
-
-        // Animaciones
-        playSound('coin');
-        confetti({ particleCount: isSpecial ? 200 : 100, spread: 70, origin: { y: 0.6 } });
-        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        
-        tg.showAlert(isSpecial ? `🏆 ¡RACHA SEMANAL! Ganaste 0.55 USDT` : `✨ ¡Bono de ${bonoFinal} USDT recibido!`);
-        updateUI();
-    }
-
-    async function loadLeaderboard() {
-        const listEl = document.getElementById('leaderboard-list');
-        listEl.innerHTML = "Cargando...";
-        
-        const snapshot = await db.collection("usuarios").orderBy("balance", "desc").limit(10).get();
-        listEl.innerHTML = "";
-        
-        let i = 1;
-        snapshot.forEach(doc => {
-            const u = doc.data();
-            listEl.innerHTML += `
-                <div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee;">
-                    <span>${i}. ${u.nombre.substring(0, 12)}</span>
-                    <span style="font-weight:800; color:var(--accent);">${u.balance.toFixed(2)} USDT</span>
-                </div>
-            `;
-            i++;
-        });
-    }
-
-    function copyRefLink() {
-        const link = `https://t.me/USDTGIFTKBot?startapp=${userId}`;
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=🎁 ¡Únete a mi equipo de inversores y gana USDT diario!`);
-        playSound('success');
-    }
-
-    async function handleWithdraw() {
-        const addr = document.getElementById('wallet-address').value;
-        if(addr.length < 10) { tg.showAlert("Dirección no válida"); return; }
-        
-        const doc = await db.collection("usuarios").doc(userId).get();
-        if(doc.data().balance < 10) {
-            tg.showAlert("⚠️ Necesitas 10.00 USDT para retirar.");
+            await ref.set({ nombre: uName, balance: 0, comision: 0, invitado_por: sp || "none", referidos: 0, streak: 0, lastBonus: 0, wallet: "" });
         } else {
-            playSound('success');
-            tg.showConfirm("¿Confirmas el retiro a esta billetera?", (res) => {
-                if(res) tg.showAlert("🚀 Solicitud enviada. Recibirás tu pago en 24 horas.");
-            });
+            if(doc.data().wallet) document.getElementById("wallet-addr").value = doc.data().wallet;
         }
+        syncData();
+        setInterval(updateTimer, 1000);
+        countActive();
     }
 
-    async function claimCommissions() {
-        const userRef = db.collection("usuarios").doc(userId);
-        const doc = await userRef.get();
-        const c = doc.data().comision || 0;
-        
-        if(c <= 0) { tg.showAlert("No tienes comisiones aún."); return; }
-        
-        await userRef.update({
-            balance: firebase.firestore.FieldValue.increment(c),
-            comision: 0
+    async function syncData() {
+        const doc = await db.collection("usuarios").doc(uid).get();
+        const d = doc.data();
+        const balEl = document.getElementById("user-balance");
+        const old = parseFloat(balEl.innerText);
+        if(d.balance > old) gsap.to(balEl, { scale: 1.1, duration: 0.1, yoyo: true, repeat: 1 });
+        balEl.innerText = d.balance.toFixed(2);
+        document.getElementById("comm-val").innerText = d.comision.toFixed(4);
+        document.getElementById("streak-val").innerText = d.streak;
+        document.getElementById("ref-count").innerText = d.referidos;
+        document.getElementById("progress-fill").style.width = Math.min((d.balance / 10)*100, 100) + "%";
+        document.getElementById("promo-text").innerText = d.balance >= 9.5 ? "Umbral de retiro próximo" : "Ascenso constante";
+    }
+
+    async function countActive() {
+        const snap = await db.collection("usuarios").limit(1000).get();
+        document.getElementById("active-users").innerText = snap.size;
+    }
+
+    async function claimBonus() {
+        const ref = db.collection("usuarios").doc(uid);
+        const d = (await ref.get()).data();
+        const now = Date.now();
+        const diff = (now - (d.lastBonus || 0)) / 3600000;
+
+        if(diff < 24) { showToast("Disponible en " + (24 - diff).toFixed(1) + "h"); return; }
+
+        let nS = (diff < 48) ? (d.streak + 1) : 1;
+        let amt = 0.05;
+        if(nS % 7 === 0) amt += 0.50;
+
+        await ref.update({ balance: firebase.firestore.FieldValue.increment(amt), lastBonus: now, streak: nS });
+        if(d.invitado_por !== "none") {
+            db.collection("usuarios").doc(d.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(amt * 0.15) });
+        }
+
+        playNote(880);
+        confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 }, colors: ['#d37a5a'] });
+        showToast("+" + amt.toFixed(2));
+        syncData();
+    }
+
+    function updateTimer() {
+        // Lógica de timer visual si se requiere (opcional para no saturar)
+    }
+
+    async function collectComm() {
+        const ref = db.collection("usuarios").doc(uid);
+        const c = (await ref.get()).data().comision;
+        if(c <= 0) return;
+        await ref.update({ balance: firebase.firestore.FieldValue.increment(c), comision: 0 });
+        playNote(660);
+        showToast("Saldo actualizado");
+        syncData();
+    }
+
+    function copyLink() {
+        const l = `https://t.me/USDTGIFTKBot?startapp=${uid}`;
+        const t = document.createElement("textarea"); t.value = l; document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t);
+        showToast("Copiado");
+    }
+
+    async function requestPayout() {
+        const addr = document.getElementById("wallet-addr").value;
+        if(!/^0x[a-fA-F0-9]{40}$/.test(addr)) { showToast("Dirección inválida"); return; }
+        const d = (await db.collection("usuarios").doc(uid).get()).data();
+        if(d.balance < 10) { showToast("Mínimo 10.00"); return; }
+        await db.collection("usuarios").doc(uid).update({ wallet: addr });
+        showToast("Completado");
+    }
+
+    async function updateLeaders() {
+        const snap = await db.collection("usuarios").orderBy("balance", "desc").limit(10).get();
+        const l = document.getElementById("leader-list"); l.innerHTML = "";
+        snap.forEach((doc, i) => {
+            const u = doc.data();
+            l.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; font-size:13px;">
+                <span>${i+1}. ${u.nombre}</span><span style="font-weight:700;">${u.balance.toFixed(2)}</span>
+            </div>`;
         });
-        
-        playSound('coin');
-        tg.showAlert(`💎 ${c.toFixed(4)} USDT transferidos a tu balance.`);
-        updateUI();
     }
-
-    // Inicializar
-    initUser();
 </script>
 </body>
 </html>
