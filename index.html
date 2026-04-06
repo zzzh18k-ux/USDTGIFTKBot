@@ -11,8 +11,11 @@
         body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 20px; }
         .card { background: #1e1e1e; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; }
         .balance { font-size: 35px; font-weight: bold; color: #00ff88; margin: 10px 0; }
-        button { background: #00d2ff; border: none; color: white; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; margin-top: 10px; }
+        button { background: #00d2ff; border: none; color: white; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; }
         button.invite { background: #8e44ad; }
+        button.withdraw { background: #e67e22; }
+        button.task { background: #2ecc71; margin-bottom: 5px; }
+        .info-text { font-size: 14px; color: #aaa; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -22,7 +25,14 @@
     <div class="card">
         <div>Balance Actual</div>
         <div class="balance" id="user-balance">0.00 USDT</div>
-        <button onclick="claimBonus()">🎁 Bono Diario</button>
+        <button onclick="claimBonus()">🎁 Bono Diario (0.05)</button>
+        <button class="withdraw" onclick="requestWithdraw()">💸 Retirar (Mínimo 10.00)</button>
+    </div>
+
+    <div class="card">
+        <h3>Tareas Extra</h3>
+        <button class="task" onclick="doTask('https://t.me/TuCanal', 0.10)">📢 Unirse al Canal (+0.10)</button>
+        <div class="info-text">Más tareas pronto...</div>
     </div>
 
     <div class="card">
@@ -30,10 +40,9 @@
         <button class="invite" onclick="shareRef()">🔗 Invitar Amigos (0.50)</button>
     </div>
 
-    <div id="status" style="font-size: 12px; color: #888;">Conectando...</div>
+    <div id="status" style="font-size: 12px; color: #888;">Cargando datos...</div>
 
     <script>
-        // TUS DATOS NUEVOS DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
             authDomain: "usdt-8b129.firebaseapp.com",
@@ -50,6 +59,7 @@
         const user = tg.initDataUnsafe?.user;
         const startParam = tg.initDataUnsafe?.start_param;
 
+        // CARGAR DATOS SIN QUE SE PIERDAN
         async function loadData() {
             if (!user) {
                 document.getElementById('status').innerText = "Abre desde Telegram";
@@ -60,19 +70,20 @@
             let doc = await userRef.get();
 
             if (!doc.exists) {
+                // Nuevo usuario (con referido si existe)
                 if (startParam && startParam !== user.id.toString()) {
                     const inviterRef = db.collection("usuarios").doc(startParam);
                     await inviterRef.update({
                         balance: firebase.firestore.FieldValue.increment(0.50),
                         referidos: firebase.firestore.FieldValue.increment(1)
-                    }).catch(() => console.log("Error al sumar referido"));
+                    }).catch(() => console.log("Inviter no existe"));
                 }
 
                 await userRef.set({
                     nombre: user.first_name,
                     balance: 0.00,
                     referidos: 0,
-                    invitadoPor: startParam || "Ninguno"
+                    id: user.id
                 });
                 doc = await userRef.get();
             }
@@ -80,19 +91,46 @@
             const data = doc.data();
             document.getElementById('user-balance').innerText = data.balance.toFixed(2) + " USDT";
             document.getElementById('ref-count').innerText = data.referidos;
-            document.getElementById('status').innerText = "ID: " + user.id;
+            document.getElementById('status').innerText = "ID: " + user.id + " | Conectado ✅";
         }
 
-        function shareRef() {
-            const refLink = `https://t.me/USDTGIFTKBot?startapp=${user.id}`;
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=Gana USDT gratis`);
-        }
-
+        // FUNCIÓN BONO
         async function claimBonus() {
             const userRef = db.collection("usuarios").doc(user.id.toString());
             await userRef.update({ balance: firebase.firestore.FieldValue.increment(0.05) });
-            tg.showAlert("¡Bono cobrado!");
+            tg.showAlert("¡Has recibido 0.05 USDT!");
             loadData();
+        }
+
+        // FUNCIÓN RETIRO
+        async function requestWithdraw() {
+            const userRef = db.collection("usuarios").doc(user.id.toString());
+            const doc = await userRef.get();
+            const balance = doc.data().balance;
+
+            if (balance >= 10) {
+                tg.showAlert("Solicitud enviada. Escribe a soporte con tu ID: " + user.id);
+            } else {
+                tg.showAlert("Necesitas al menos 10.00 USDT para retirar.");
+            }
+        }
+
+        // TAREAS
+        function doTask(url, reward) {
+            tg.openTelegramLink(url);
+            tg.showConfirm("¿Te uniste al canal?", async (confirmed) => {
+                if (confirmed) {
+                    const userRef = db.collection("usuarios").doc(user.id.toString());
+                    await userRef.update({ balance: firebase.firestore.FieldValue.increment(reward) });
+                    loadData();
+                }
+            });
+        }
+
+        // INVITAR
+        function shareRef() {
+            const refLink = `https://t.me/USDTGIFTKBot?startapp=${user.id}`;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=🎁 Regístrate y gana USDT gratis`);
         }
 
         loadData();
