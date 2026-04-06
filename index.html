@@ -5,84 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>USDT GIFT K Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #1c1c1c; color: white; text-align: center; margin: 0; padding: 20px; }
-        .card { background: #2b2b2b; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        h1 { color: #00d2ff; font-size: 24px; }
-        .balance { font-size: 35px; font-weight: bold; margin: 10px 0; color: #4cd137; }
-        button { background: #00d2ff; border: none; color: white; padding: 12px 25px; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; margin-top: 10px; }
-        button.invite { background: #9b59b6; }
-        button.withdraw { background: #e67e22; }
-        .info { font-size: 14px; color: #aaa; margin-top: 15px; }
+        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 20px; }
+        .card { background: #1e1e1e; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; }
+        .balance { font-size: 35px; font-weight: bold; color: #00ff88; margin: 10px 0; }
+        button { background: #00d2ff; border: none; color: white; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; margin-top: 10px; }
+        button.invite { background: #8e44ad; }
     </style>
 </head>
 <body>
 
     <h1>USDT GIFT K BOT</h1>
-
+    
     <div class="card">
-        <div>Mi Balance</div>
+        <div>Balance Actual</div>
         <div class="balance" id="user-balance">0.00 USDT</div>
-        <button onclick="claimDaily()">Reclamar Bono Diario</button>
+        <button onclick="claimBonus()">🎁 Bono Diario</button>
     </div>
 
     <div class="card">
         <div>Invitados: <span id="ref-count">0</span></div>
-        <button class="invite" onclick="shareRef()">Invitar Amigos</button>
+        <button class="invite" onclick="shareRef()">🔗 Invitar Amigos (0.50)</button>
     </div>
 
-    <div class="card">
-        <button class="withdraw" onclick="openWithdraw()">Retirar Fondos</button>
-    </div>
-
-    <div id="status" class="info">Cargando datos...</div>
+    <div id="status" style="font-size: 12px; color: #888;">Conectando...</div>
 
     <script>
-        // Inicializamos la App de Telegram
+        // TUS DATOS NUEVOS DE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
+            authDomain: "usdt-8b129.firebaseapp.com",
+            projectId: "usdt-8b129",
+            storageBucket: "usdt-8b129.firebasestorage.app",
+            messagingSenderId: "816855613636",
+            appId: "1:816855613636:web:7891ba3996acef2c91c991"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Expandir la app a pantalla completa
-
-        // Datos básicos del usuario de Telegram
+        tg.expand();
         const user = tg.initDataUnsafe?.user;
-        const startParam = tg.initDataUnsafe?.start_param; // Aquí está el ID del que invita
+        const startParam = tg.initDataUnsafe?.start_param;
 
-        // Elementos de la pantalla
-        const balanceEl = document.getElementById('user-balance');
-        const refCountEl = document.getElementById('ref-count');
-        const statusEl = document.getElementById('status');
-
-        function initApp() {
-            if (user) {
-                statusEl.innerText = `Hola ${user.first_name}!`;
-                
-                // PRUEBA DE REFERIDO: Si alguien entró con link, avisamos
-                if (startParam) {
-                    statusEl.innerText += `\nFelicidades! Te invitó el ID: ${startParam}`;
-                }
-            } else {
-                statusEl.innerText = "Error: Ábrelo desde Telegram.";
+        async function loadData() {
+            if (!user) {
+                document.getElementById('status').innerText = "Abre desde Telegram";
+                return;
             }
+
+            const userRef = db.collection("usuarios").doc(user.id.toString());
+            let doc = await userRef.get();
+
+            if (!doc.exists) {
+                if (startParam && startParam !== user.id.toString()) {
+                    const inviterRef = db.collection("usuarios").doc(startParam);
+                    await inviterRef.update({
+                        balance: firebase.firestore.FieldValue.increment(0.50),
+                        referidos: firebase.firestore.FieldValue.increment(1)
+                    }).catch(() => console.log("Error al sumar referido"));
+                }
+
+                await userRef.set({
+                    nombre: user.first_name,
+                    balance: 0.00,
+                    referidos: 0,
+                    invitadoPor: startParam || "Ninguno"
+                });
+                doc = await userRef.get();
+            }
+
+            const data = doc.data();
+            document.getElementById('user-balance').innerText = data.balance.toFixed(2) + " USDT";
+            document.getElementById('ref-count').innerText = data.referidos;
+            document.getElementById('status').innerText = "ID: " + user.id;
         }
 
         function shareRef() {
-            const userId = user ? user.id : '000';
-            const botUsername = 'TU_BOT_AQUI'; // <--- Cambia esto por el nombre de tu bot
-            const refLink = `https://t.me/${botUsername}?startapp=${userId}`;
-            
-            // Copiar al portapapeles o usar el compartir de Telegram
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=Únete y gana USDT gratis!`);
+            const refLink = `https://t.me/USDTGIFTKBot?startapp=${user.id}`;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=Gana USDT gratis`);
         }
 
-        function openWithdraw() {
-            tg.showAlert("Mínimo de retiro: 5.00 USDT. ¡Sigue invitando!");
+        async function claimBonus() {
+            const userRef = db.collection("usuarios").doc(user.id.toString());
+            await userRef.update({ balance: firebase.firestore.FieldValue.increment(0.05) });
+            tg.showAlert("¡Bono cobrado!");
+            loadData();
         }
 
-        function claimDaily() {
-            tg.showAlert("Bono de 0.05 USDT reclamado con éxito.");
-        }
-
-        // Arrancar la app
-        initApp();
+        loadData();
     </script>
 </body>
 </html>
