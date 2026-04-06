@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USDT GIFT K</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -14,73 +14,61 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        :root {
+            --gold: #ffcc00;
+            --orange-gradient: linear-gradient(135deg, #d37a5a 0%, #e68d71 100%);
+            --bg-color: #fdf5e6;
+            --text-main: #5d4037;
+            --accent: #d37a5a;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Outfit', sans-serif;
             background: #fdf5e6;
-            min-height: 100vh;
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
-            position: relative;
         }
 
-        /* Fondo animado */
         #gradient-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(45deg, #fdf5e6, #fff5ea, #ffedd8, #fdf5e6);
             background-size: 400% 400%;
-            z-index: -2;
+            z-index: -1;
             animation: gradientMove 15s ease infinite;
         }
+        @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Contenedor principal - CORREGIDO para que no quede torcido */
         #app-container {
             width: 100%;
             max-width: 450px;
-            min-height: 100vh;
-            padding: 20px 20px 40px 20px;
-            position: relative;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
             z-index: 1;
+            overflow: hidden;
         }
 
-        /* Pantallas */
         .screen {
             display: none;
+            flex-direction: column;
             width: 100%;
-            animation: fadeIn 0.3s ease;
+            height: 100%;
+            overflow-y: auto;
         }
+        .screen.active { display: flex; }
 
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Header */
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-top: 10px;
         }
 
         .streak-badge {
@@ -89,34 +77,27 @@
             border-radius: 20px;
             font-weight: 800;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #d37a5a;
-            font-size: 13px;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--accent);
         }
 
-        /* Balance */
         .balance-card {
             text-align: center;
             margin: 30px 0;
         }
-
         #user-balance {
             font-size: 70px;
             font-weight: 800;
-            color: #5d4037;
-            line-height: 1;
+            display: inline-block;
+            transition: transform 0.1s ease;
         }
-
         .balance-label {
             font-size: 14px;
             letter-spacing: 5px;
             opacity: 0.6;
-            margin-top: 5px;
+            margin-top: -10px;
         }
 
-        /* Barra de progreso */
         .progress-container {
             width: 100%;
             height: 12px;
@@ -125,52 +106,40 @@
             margin: 20px 0;
             overflow: hidden;
         }
-
         #progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(135deg, #d37a5a 0%, #e68d71 100%);
+            background: var(--orange-gradient);
             border-radius: 10px;
-            transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Sección de mensajes motivadores (NUEVA - larga y emotiva) */
+        /* Mensajes motivadores largos */
         .motivation-card {
             background: rgba(255,255,255,0.7);
             backdrop-filter: blur(8px);
             border-radius: 24px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 16px;
+            margin: 15px 0;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.5);
         }
-
-        .motivation-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #d37a5a;
-            margin-bottom: 8px;
-        }
-
         .motivation-message {
-            font-size: 15px;
+            font-size: 13px;
             color: #5d4037;
-            line-height: 1.5;
-            font-weight: 500;
+            line-height: 1.4;
         }
-
         .motivation-sub {
-            font-size: 12px;
-            color: #a08a7a;
-            margin-top: 10px;
+            font-size: 11px;
+            color: #d37a5a;
+            margin-top: 6px;
         }
 
-        /* Botones */
         .menu-grid {
-            display: flex;
-            flex-direction: column;
+            display: grid;
             gap: 12px;
-            margin-top: 20px;
+            width: 100%;
+            margin-top: 10px;
         }
 
         .btn-game {
@@ -180,75 +149,87 @@
             border-radius: 24px;
             font-size: 16px;
             font-weight: 600;
-            color: #5d4037;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 8px 20px rgba(0,0,0,0.04);
             cursor: pointer;
-            transition: transform 0.1s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-game:active {
-            transform: scale(0.97);
+        .btn-game::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+            pointer-events: none;
         }
+        .btn-game:active::after { left: 100%; }
+        .btn-game:active { transform: scale(0.97); }
 
         .btn-primary {
-            background: linear-gradient(135deg, #d37a5a 0%, #e68d71 100%);
+            background: var(--orange-gradient);
             color: white;
         }
 
+        .floating-bonus {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
         .glass-card {
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.8);
             backdrop-filter: blur(10px);
             border-radius: 35px;
             padding: 25px;
             border: 1px solid white;
             box-shadow: 0 20px 40px rgba(0,0,0,0.05);
             margin-top: 20px;
+            text-align: center;
         }
 
         .back-circle {
-            width: 45px;
-            height: 45px;
+            width: 45px; height: 45px;
             background: white;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .countdown-text {
-            font-size: 12px;
-            color: #d37a5a;
-            margin-top: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
         }
 
         .toast-premium {
             position: fixed;
-            bottom: 80px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(12px);
             color: white;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 40px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.2s ease;
             pointer-events: none;
-            white-space: nowrap;
+        }
+
+        .countdown-text {
+            font-size: 11px;
+            color: var(--accent);
+            margin-top: 5px;
         }
 
         input {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             border-radius: 20px;
             border: 2px solid #eee;
             font-family: 'Outfit', sans-serif;
@@ -272,7 +253,7 @@
 
 <div id="app-container">
 
-    <!-- Pantalla principal -->
+    <!-- HOME SCREEN - INTERFAZ ORIGINAL -->
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="streak-badge">
@@ -294,21 +275,18 @@
             <div class="countdown-text" id="bonus-countdown"></div>
         </div>
 
-        <!-- Mensajes motivadores LARGOS que enganchan -->
+        <!-- Mensajes motivadores largos -->
         <div class="motivation-card" id="motivationCard">
-            <div class="motivation-title">
-                <i class="fas fa-chart-line"></i> TU MOMENTUM
-            </div>
             <div class="motivation-message" id="motivationMessage">
                 Cada bono diario te acerca a tu primer retiro. La constancia es la clave.
             </div>
             <div class="motivation-sub" id="motivationSub">
-                Sigue así y en 7 días tendrás un bono extra
+                <i class="fas fa-star"></i> 7 días seguidos = bono extra
             </div>
         </div>
 
         <div class="menu-grid">
-            <button class="btn-game btn-primary" id="bonusBtn">
+            <button class="btn-game btn-primary floating-bonus" id="bonusBtn">
                 <span><i class="fas fa-gift"></i> Bono Diario</span>
                 <i class="fas fa-arrow-right"></i>
             </button>
@@ -331,11 +309,11 @@
         </div>
     </div>
 
-    <!-- Pantalla de invitados -->
+    <!-- INVITE SCREEN -->
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-rocket" style="font-size: 45px; color: #d37a5a;"></i>
+            <i class="fas fa-rocket" style="font-size: 45px; color: var(--accent);"></i>
             <h3 style="margin: 15px 0;">Sistema de Socios</h3>
             <p>0.50 USDT por invitado + 15% de sus ganancias</p>
             
@@ -357,7 +335,7 @@
         </div>
     </div>
 
-    <!-- Pantalla de retiro -->
+    <!-- WITHDRAW SCREEN -->
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -369,7 +347,7 @@
         </div>
     </div>
 
-    <!-- Pantalla de ranking -->
+    <!-- LEADERBOARD SCREEN -->
     <div id="leaderboard-screen" class="screen">
         <div class="back-circle" id="backHomeLeader"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -378,7 +356,7 @@
         </div>
     </div>
 
-    <!-- Pantalla de invitados lista -->
+    <!-- INVITES LIST SCREEN -->
     <div id="invites-list-screen" class="screen">
         <div class="back-circle" id="backToInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -387,7 +365,7 @@
         </div>
     </div>
 
-    <!-- Pantalla de historial de retiros NUEVA -->
+    <!-- HISTORY SCREEN -->
     <div id="history-screen" class="screen">
         <div class="back-circle" id="backHomeHistory"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -417,20 +395,18 @@
 
     const userId = tg.initDataUnsafe?.user?.id?.toString();
     const userName = tg.initDataUnsafe?.user?.first_name || "Usuario";
-
     let currentUserData = null;
 
-    // Mensajes motivadores LARGOS que rotan
+    // Mensajes motivadores largos que rotan
     const motivationMessages = [
-        { msg: "Cada bono diario te acerca a tu primer retiro. La constancia es la clave.", sub: "Sigue así y en 7 días tendrás un bono extra" },
+        { msg: "Cada bono diario te acerca a tu primer retiro. La constancia es la clave.", sub: "7 días seguidos = bono extra" },
         { msg: "Invitando amigos multiplicas tus ganancias. Un equipo fuerte crece rápido.", sub: "15% de por vida de lo que ellos generen" },
-        { msg: "Llevas una racha activa. No la rompas, cada día suma.", sub: "7 días seguidos = bono sorpresa" },
+        { msg: "Llevas una racha activa. No la rompas, cada día suma.", sub: "Sigue así" },
         { msg: "Estás a solo unos pasos de tu primer retiro. Sigue acumulando.", sub: "Meta: 10.00 USDT" },
         { msg: "Los grandes ganadores no se rinden. Tú puedes lograrlo.", sub: "Confiamos en ti" },
         { msg: "Hoy es un buen día para crecer. Reclama tu bono y avanza.", sub: "Un paso más cerca" }
     ];
     let motivationIndex = 0;
-
     function rotateMotivationMessage() {
         const msg = motivationMessages[motivationIndex % motivationMessages.length];
         document.getElementById('motivationMessage').innerText = msg.msg;
@@ -441,7 +417,7 @@
     setInterval(rotateMotivationMessage, 8000);
     rotateMotivationMessage();
 
-    // Sonidos MEJORADOS
+    // Sonidos mejorados
     function playSound(type) {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -449,7 +425,6 @@
             const gain = ctx.createGain();
             osc.connect(gain);
             gain.connect(ctx.destination);
-            
             if (type === 'coin') {
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(800, ctx.currentTime);
@@ -467,16 +442,8 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
                 osc.start();
                 osc.stop(ctx.currentTime + 0.4);
-            } else if (type === 'withdraw') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.5);
             }
-        } catch(e) { console.log("Audio no disponible"); }
+        } catch(e) {}
     }
 
     function showToast(message) {
@@ -543,7 +510,7 @@
             gsap.to(balanceEl, { scale: 1.2, duration: 0.1, yoyo: true, repeat: 1 });
         }
         balanceEl.innerText = currentUserData.balance.toFixed(2);
-        document.getElementById('comm-pending').innerText = (currentUserData.comision || 0).toFixed(4) + " USDT";
+        document.getElementById('comm-pending').innerHTML = (currentUserData.comision || 0).toFixed(4) + " USDT";
         document.getElementById('streak-count').innerText = currentUserData.streak || 0;
         document.getElementById('referidos-count').innerText = currentUserData.referidos || 0;
 
@@ -565,9 +532,9 @@
             const remaining = (24 - diff);
             const hours = Math.floor(remaining);
             const minutes = Math.floor((remaining - hours) * 60);
-            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-hourglass-half"></i> Disponible en ${hours}h ${minutes}m`;
+            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-hourglass-half"></i> ${hours}h ${minutes}m`;
         } else {
-            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-check-circle"></i> Bono disponible`;
+            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-check-circle"></i> Disponible`;
         }
     }
 
@@ -589,7 +556,7 @@
             const remaining = (24 - diff);
             const hours = Math.floor(remaining);
             const minutes = Math.floor((remaining - hours) * 60);
-            showToast(`Disponible en ${hours}h ${minutes}m`);
+            showToast(`${hours}h ${minutes}m`);
             return;
         }
 
@@ -611,10 +578,7 @@
         }
 
         playSound('coin');
-        
-        // CONFETI REACTIVADO
         canvasConfetti({ particleCount: isSpecial ? 250 : 120, spread: 70, origin: { y: 0.6 }, colors: ['#d37a5a', '#e68d71', '#ffcc00'] });
-        
         if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         showToast(`+${bonoFinal.toFixed(2)} USDT`);
         await updateUI();
@@ -644,7 +608,7 @@
         let i = 1;
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee;"><span>${i}. ${u.nombre.substring(0, 12)}</span><span style="font-weight:800; color:#d37a5a;">${u.balance.toFixed(2)} USDT</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee;"><span>${i}. ${u.nombre.substring(0, 12)}</span><span style="font-weight:800; color:var(--accent);">${u.balance.toFixed(2)} USDT</span></div>`;
             i++;
         });
     }
@@ -658,7 +622,7 @@
         if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; opacity:0.6;'>Sin invitados</p>"; return; }
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:#d37a5a;">${u.balance.toFixed(2)} USDT</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance.toFixed(2)} USDT</span></div>`;
         });
     }
 
@@ -673,14 +637,14 @@
         }
         listEl.innerHTML = "";
         history.reverse().forEach(item => {
-            listEl.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:#d37a5a;">${item.amount} USDT</span><span>${item.status}</span></div>`;
+            listEl.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:var(--accent);">${item.amount} USDT</span><span>${item.status}</span></div>`;
         });
     }
 
     function copyRefLink() {
         if(!userId) return;
         const link = `https://t.me/USDTGIFTKBot?startapp=${userId}`;
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=USDT GIFT K — acumula saldo`);
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=USDT GIFT K`);
         playSound('success');
         showToast("Link generado");
     }
@@ -702,11 +666,11 @@
             withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
                 amount: amount.toFixed(2),
                 date: dateStr,
-                status: "Procesado"
+                status: "Completado"
             })
         });
         
-        playSound('withdraw');
+        playSound('success');
         canvasConfetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
         showToast("Solicitud enviada");
         await updateUI();
