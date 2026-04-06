@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USDT GIFT K - Royal Edition</title>
+    <title>USDT GIFT K - Final Test</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -18,7 +18,6 @@
             --text-main: #5d4037;
             --btn-orange: #d37a5a;
             --btn-cream: #f3d5b5;
-            --glass: rgba(255, 255, 255, 0.8);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -31,44 +30,56 @@
             height: 100vh; overflow: hidden; display: flex; justify-content: center;
         }
 
-        #app-container { width: 100%; max-width: 450px; position: relative; padding: 20px; z-index: 1; overflow-y: auto; }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
 
-        .screen { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.5s; }
+        #app-container { width: 100%; max-width: 450px; position: relative; padding: 25px; z-index: 1; overflow-y: auto; }
+
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.4s; }
         .screen.active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Cabecera */
-        .balance-section { text-align: center; margin: 30px 0; animation: pulse 3s infinite; }
-        .balance-amount { font-size: 60px; font-weight: 600; color: var(--text-main); }
-        .balance-label { font-size: 18px; letter-spacing: 3px; opacity: 0.7; }
-
-        /* Tarjetas Estilo Imagen */
-        .detail-card {
-            background: var(--glass); backdrop-filter: blur(10px);
-            padding: 25px; border-radius: 35px; width: 100%;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05); border: 1px solid white;
-            margin-bottom: 20px;
+        /* Cabecera Estilo Original */
+        .header-deco {
+            width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
         }
+
+        .lang-badge { background: white; padding: 10px 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-size: 13px; }
+
+        .bonus-badge {
+            background: white; border: 2px dashed var(--btn-orange); width: 75px; height: 75px;
+            border-radius: 50%; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; font-size: 9px; cursor: pointer; animation: pulse 2s infinite;
+        }
+
+        .balance-section { text-align: center; margin: 40px 0; }
+        .balance-amount { font-size: 64px; font-weight: 600; color: var(--text-main); line-height: 1; }
+        .balance-label { font-size: 20px; letter-spacing: 2px; opacity: 0.7; }
 
         /* Botones */
+        .menu-buttons { width: 100%; display: flex; flex-direction: column; gap: 15px; }
         .btn-custom {
-            border: none; padding: 18px; border-radius: 50px; font-size: 15px; font-weight: 600;
+            border: none; padding: 18px; border-radius: 50px; font-size: 16px; font-weight: 600;
             cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-            transition: 0.3s; width: 100%; margin-bottom: 12px;
+            transition: 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-        .btn-cream { background: var(--btn-cream); color: var(--text-main); }
-        .btn-orange { background: var(--btn-orange); color: white; }
-        .btn-custom:active { transform: scale(0.96); }
+        .btn-cream { background-color: var(--btn-cream); color: var(--text-main); }
+        .btn-orange { background-color: var(--btn-orange); color: white; }
+        .btn-custom:active { transform: scale(0.97); }
 
-        /* Historiales */
-        .history-list { width: 100%; max-height: 200px; overflow-y: auto; margin-top: 15px; text-align: left; }
-        .history-item { 
-            padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); 
-            display: flex; justify-content: space-between; font-size: 13px;
+        /* Detalle */
+        .detail-card {
+            background: white; padding: 30px; border-radius: 35px; width: 100%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center;
         }
 
-        .back-btn { background: none; border: 1px solid var(--primary-accent); padding: 10px 25px; border-radius: 20px; color: var(--primary-accent); margin-top: 15px; cursor: pointer; }
+        .back-btn { margin-top: 20px; background: none; border: 1px solid var(--primary-accent); padding: 10px 20px; border-radius: 20px; color: var(--primary-accent); cursor: pointer; }
+        
+        .input-elegant { width: 100%; padding: 15px; border-radius: 15px; border: 1px solid #ddd; margin: 15px 0; outline: none; }
     </style>
 </head>
 <body>
@@ -76,22 +87,30 @@
 <div id="app-container">
     
     <div id="home-screen" class="screen active">
-        <div class="balance-section">
-            <div class="balance-amount" id="user-balance">0.00</div>
-            <div class="balance-label">USDT TOTAL</div>
+        <div class="header-deco">
+            <div class="lang-badge">A / 文 <br><small>Traducir</small></div>
+            <div class="bonus-badge" onclick="claimBonus()">
+                <i class="fas fa-gift" style="font-size: 20px; color: var(--btn-orange);"></i>
+                <span style="font-weight: bold;">BONO</span>
+            </div>
         </div>
 
-        <div style="width: 100%;">
-            <button class="btn-custom btn-cream" onclick="claimBonus()">
-                <span><i class="fas fa-gift"></i> Bono Diario</span>
-                <i class="fas fa-plus-circle"></i>
+        <div class="balance-section">
+            <div class="balance-amount" id="user-balance">0.00</div>
+            <div class="balance-label">USDT DISPONIBLE</div>
+        </div>
+
+        <div class="menu-buttons">
+            <button class="btn-custom btn-cream" onclick="openTutorial()">
+                <span><i class="fas fa-certificate"></i> Bono Diario</span>
+                <i class="fas fa-chevron-right"></i>
             </button>
             <button class="btn-custom btn-orange" onclick="showScreen('invite-screen')">
-                <span><i class="fas fa-users"></i> Invitar y Ganar 15%</span>
+                <span><i class="fas fa-seedling"></i> Invitar Amigos</span>
                 <i class="fas fa-chevron-right"></i>
             </button>
             <button class="btn-custom btn-cream" onclick="showScreen('withdraw-screen')">
-                <span><i class="fas fa-wallet"></i> Retiros e Historial</span>
+                <span><i class="fas fa-wallet"></i> Retirar Fondos</span>
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -99,43 +118,33 @@
 
     <div id="invite-screen" class="screen">
         <div class="detail-card">
-            <i class="fas fa-chart-line" style="font-size: 40px; color: var(--btn-orange);"></i>
-            <h2 style="margin: 10px 0;">Sistema de Socios</h2>
-            <p style="font-size: 13px; margin-bottom: 15px;">Ganas el <b>15% de por vida</b> de todo lo que generen tus invitados.</p>
+            <i class="fas fa-users" style="font-size: 40px; color: var(--btn-orange);"></i>
+            <h2 style="margin: 15px 0;">Mis Referidos</h2>
+            <p style="font-size: 14px; opacity: 0.8;">Gana el <b>15%</b> de lo que generen tus amigos.</p>
             
-            <div style="background: #fff; padding: 15px; border-radius: 20px; margin-bottom: 15px;">
-                <small>Comisión por Reclamar:</small>
+            <div style="background: var(--bg-color); padding: 15px; border-radius: 20px; margin: 15px 0;">
+                <small>Comisión Acumulada:</small>
                 <div style="font-size: 24px; font-weight: bold;" id="comm-pending">0.00 USDT</div>
-                <button class="btn-custom btn-orange" style="margin-top: 10px; padding: 10px;" onclick="claimCommission()">
+                <button class="btn-custom btn-orange" style="margin-top: 10px; padding: 10px; font-size: 12px; justify-content: center;" onclick="claimCommission()">
                     Reclamar Comisión
                 </button>
             </div>
 
-            <button class="btn-custom btn-cream" onclick="shareRef()">Copiar Link</button>
+            <button class="btn-custom btn-cream" style="justify-content: center;" onclick="shareRef()">
+                Copiar Link de Invitación
+            </button>
             
-            <div class="history-list">
-                <center><small><b>HISTORIAL DE REFERIDOS</b></small></center>
-                <div id="ref-history"></div>
-            </div>
-
             <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
         </div>
     </div>
 
     <div id="withdraw-screen" class="screen">
         <div class="detail-card">
-            <i class="fas fa-university" style="font-size: 40px; color: var(--primary-accent);"></i>
-            <h2 style="margin: 10px 0;">Mis Retiros</h2>
-            <p style="font-size: 13px;">Mínimo 10.00 USDT</p>
-            
-            <input type="text" class="input-elegant" style="width:100%; padding:15px; border-radius:15px; border:1px solid #ddd; margin:10px 0;" placeholder="Billetera USDT BEP20">
-            <button class="btn-custom btn-orange" onclick="requestWithdraw()">Retirar Ahora</button>
-
-            <div class="history-list">
-                <center><small><b>HISTORIAL DE PAGOS</b></small></center>
-                <div id="withdraw-history"></div>
-            </div>
-
+            <i class="fas fa-hand-holding-usd" style="font-size: 40px; color: var(--primary-accent);"></i>
+            <h2 style="margin: 15px 0;">Retirar USDT</h2>
+            <p style="font-size: 14px;">Mínimo: 10.00 USDT</p>
+            <input type="text" id="wallet-addr" class="input-elegant" placeholder="Dirección BEP20">
+            <button class="btn-custom btn-orange" style="justify-content: center; width: 100%;" onclick="requestWithdraw()">Solicitar Pago</button>
             <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
         </div>
     </div>
@@ -143,7 +152,6 @@
 </div>
 
 <script>
-    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -163,8 +171,6 @@
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(id === 'invite-screen') loadRefHistory();
-        if(id === 'withdraw-screen') loadWithdrawHistory();
     }
 
     async function loadData() {
@@ -178,7 +184,6 @@
                 nombre: user.first_name,
                 balance: 0.00,
                 comision: 0.00,
-                referidos_count: 0,
                 invitado_por: inviter,
                 id: user.id
             });
@@ -186,64 +191,61 @@
         }
 
         const data = doc.data();
-        document.getElementById('user-balance').innerText = data.balance.toFixed(2);
+        document.getElementById('user-balance').innerText = (data.balance || 0).toFixed(2);
         document.getElementById('comm-pending').innerText = (data.comision || 0).toFixed(2) + " USDT";
     }
 
-    // Lógica 15%: Al reclamar bono, el invitado le da el 15% al que lo invitó
     async function claimBonus() {
+        if(!user) return;
         const userRef = db.collection("usuarios").doc(user.id.toString());
-        const userDoc = await userRef.get();
-        const data = userDoc.data();
+        const doc = await userRef.get();
+        const data = doc.data();
         const bono = 0.05;
 
-        // Sumar al usuario
         await userRef.update({ balance: firebase.firestore.FieldValue.increment(bono) });
 
-        // Dar 15% al patrocinador
+        // Lógica real de comisión 15%
         if (data.invitado_por && data.invitado_por !== "none") {
-            const comision = bono * 0.15;
-            await db.collection("usuarios").doc(data.invitado_por).update({
-                comision: firebase.firestore.FieldValue.increment(comision)
+            const patrocinadorRef = db.collection("usuarios").doc(data.invitado_por);
+            await patrocinadorRef.update({
+                comision: firebase.firestore.FieldValue.increment(bono * 0.15)
             });
         }
 
-        tg.showAlert("¡Bono recibido! Tus referidos están generando comisiones para ti.");
+        tg.showAlert("¡Has recibido 0.05 USDT!");
         loadData();
     }
 
     async function claimCommission() {
         const userRef = db.collection("usuarios").doc(user.id.toString());
         const doc = await userRef.get();
-        const comm = doc.data().comision || 0;
+        const totalComm = doc.data().comision || 0;
 
-        if(comm > 0) {
+        if (totalComm > 0) {
             await userRef.update({
-                balance: firebase.firestore.FieldValue.increment(comm),
+                balance: firebase.firestore.FieldValue.increment(totalComm),
                 comision: 0
             });
-            tg.showAlert("Comisiones transferidas al balance principal.");
+            tg.showAlert("Comisiones cobradas con éxito.");
             loadData();
         } else {
-            tg.showAlert("No tienes comisiones pendientes.");
+            tg.showAlert("No tienes comisiones para reclamar.");
         }
     }
 
-    // HISTORIALES SIMULADOS (Para que se vea profesional)
-    function loadRefHistory() {
-        const div = document.getElementById('ref-history');
-        div.innerHTML = `<div class="history-item"><span>User_ID_${Math.floor(Math.random()*1000)}</span><span style="color:green">+0.01</span></div>
-                         <div class="history-item"><span>User_ID_${Math.floor(Math.random()*1000)}</span><span style="color:green">+0.01</span></div>`;
+    function openTutorial() {
+        tg.showConfirm("¿Deseas reclamar tu bono diario de 0.05 USDT?", (res) => {
+            if(res) claimBonus();
+        });
     }
 
-    function loadWithdrawHistory() {
-        const div = document.getElementById('withdraw-history');
-        div.innerHTML = `<div class="history-item"><span>2024-03-01</span><span style="color:orange">Pendiente</span></div>`;
+    function requestWithdraw() {
+        tg.showAlert("Solicitud enviada a revisión (Mínimo 10 USDT).");
     }
 
     function shareRef() {
         const refLink = `https://t.me/USDTGIFTKBot?startapp=${user.id}`;
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=🎁 Gana USDT y 15% de comisiones conmigo.`);
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=🎁 Gana USDT gratis con esta app`);
     }
 
     loadData();
