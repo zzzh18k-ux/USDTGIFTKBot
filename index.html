@@ -245,6 +245,28 @@
             padding: 12px 16px;
             margin: 0;
         }
+        .update-balance-btn {
+            background: rgba(211, 122, 90, 0.1);
+            border: 1px dashed var(--accent);
+            border-radius: 30px;
+            padding: 8px;
+            margin-top: 10px;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .channel-join {
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 16px;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .channel-join a {
+            color: #2ecc71;
+            font-weight: 600;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -266,6 +288,9 @@
             <div class="balance-label">USDT</div>
             <div class="progress-container"><div id="progress-fill"></div></div>
             <div class="countdown-text" id="bonus-countdown"></div>
+            <div class="update-balance-btn" id="refreshBalanceBtn">
+                <i class="fas fa-sync-alt"></i> Actualizar saldo
+            </div>
         </div>
 
         <div class="motivation-card">
@@ -346,10 +371,14 @@
         <div class="glass-card">
             <i class="fas fa-ticket-alt" style="font-size: 40px; color: var(--accent);"></i>
             <h3 style="margin: 10px 0;">Canjear Código</h3>
-            <p style="font-size: 13px;">Ingresa tu código de regalo</p>
             
+            <div class="channel-join">
+                <i class="fab fa-telegram"></i> Únete al canal para obtener códigos<br>
+                <a href="#" onclick="joinChannel(); return false;">@UsdtGiftChannel</a>
+            </div>
+
             <div class="code-input-group">
-                <input type="text" id="redeem-code" placeholder="Ej: BIENVENIDA25">
+                <input type="text" id="redeem-code" placeholder="Código">
                 <button class="btn-game btn-primary" id="redeemSubmitBtn" style="width: auto;">Canjear</button>
             </div>
 
@@ -464,6 +493,11 @@
         showToast('Abriendo @cctip_bot');
     }
 
+    function joinChannel() {
+        tg.openTelegramLink('https://t.me/UsdtGiftChannel');
+        showToast('Canal abierto');
+    }
+
     async function initUser() {
         if(!userId) return;
         const userRef = db.collection("usuarios").doc(userId);
@@ -489,7 +523,7 @@
                 invitado_por: inviterId,
                 referidos: 0,
                 streak: 0,
-                lastBonus: 0,
+                lastMicroBonus: 0,
                 ccwallet_id: "",
                 withdrawHistory: [],
                 redeemedCodes: [],
@@ -498,7 +532,7 @@
         }
         await updateUI();
         updateActiveUsersCount();
-        setInterval(() => updateBonusTimer(), 60000);
+        setInterval(() => updateMicroBonusTimer(), 1000);
     }
 
     async function updateUI() {
@@ -512,7 +546,7 @@
         if(oldVal < currentUserData.balance) {
             gsap.to(balanceEl, { scale: 1.2, duration: 0.1, yoyo: true, repeat: 1 });
         }
-        balanceEl.innerText = currentUserData.balance.toFixed(2);
+        balanceEl.innerText = currentUserData.balance.toFixed(4);
         document.getElementById('comm-pending').innerHTML = (currentUserData.comision || 0).toFixed(4) + " USDT";
         document.getElementById('streak-count').innerText = currentUserData.streak || 0;
         document.getElementById('referidos-count').innerText = currentUserData.referidos || 0;
@@ -523,68 +557,52 @@
         if(currentUserData.ccwallet_id) {
             document.getElementById('ccwallet-id').value = currentUserData.ccwallet_id;
         }
-        updateBonusTimer();
+        updateMicroBonusTimer();
     }
 
-    function updateBonusTimer() {
+    function updateMicroBonusTimer() {
         if(!currentUserData) return;
-        const lastBonus = currentUserData.lastBonus || 0;
+        const lastMicro = currentUserData.lastMicroBonus || 0;
         const now = Date.now();
-        const diff = (now - lastBonus) / (1000 * 60 * 60);
-        if(diff < 24) {
-            const remaining = (24 - diff);
-            const hours = Math.floor(remaining);
-            const minutes = Math.floor((remaining - hours) * 60);
-            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-hourglass-half"></i> ${hours}h ${minutes}m`;
+        const diff = (now - lastMicro) / (1000 * 60);
+        
+        if(diff < 50) {
+            const remaining = Math.ceil(50 - diff);
+            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-hourglass-half"></i> ${remaining} min`;
         } else {
-            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-check-circle"></i> Disponible`;
+            document.getElementById('bonus-countdown').innerHTML = `<i class="fas fa-gift"></i> Reclama 0.0001 USDT`;
         }
     }
 
-    async function updateActiveUsersCount() {
-        const snapshot = await db.collection("usuarios").get();
-        document.getElementById('active-users').innerHTML = snapshot.size;
-    }
-
-    async function claimDailyBonus() {
+    async function claimMicroBonus() {
         if(!userId) return;
         const userRef = db.collection("usuarios").doc(userId);
         const doc = await userRef.get();
         const data = doc.data();
         const now = Date.now();
-        const lastBonus = data.lastBonus || 0;
-        const diff = (now - lastBonus) / (1000 * 60 * 60);
+        const lastMicro = data.lastMicroBonus || 0;
+        const diff = (now - lastMicro) / (1000 * 60);
 
-        if (diff < 24) {
-            const remaining = (24 - diff);
-            const hours = Math.floor(remaining);
-            const minutes = Math.floor((remaining - hours) * 60);
-            showToast(`${hours}h ${minutes}m`);
+        if (diff < 50) {
+            const remaining = Math.ceil(50 - diff);
+            showToast(`Vuelve en ${remaining} min`);
             return;
         }
 
-        let newStreak = (diff < 48) ? (data.streak || 0) + 1 : 1;
-        let bonoFinal = 0.05;
-        let isSpecial = (newStreak % 7 === 0);
-        if (isSpecial) bonoFinal += 0.50;
-
         await userRef.update({
-            balance: firebase.firestore.FieldValue.increment(bonoFinal),
-            lastBonus: now,
-            streak: newStreak
+            balance: firebase.firestore.FieldValue.increment(0.0001),
+            lastMicroBonus: now
         });
 
-        if (data.invitado_por && data.invitado_por !== "none") {
-            await db.collection("usuarios").doc(data.invitado_por).update({
-                comision: firebase.firestore.FieldValue.increment(bonoFinal * 0.15)
-            });
-        }
-
         playSound('coin');
-        canvasConfetti({ particleCount: isSpecial ? 250 : 120, spread: 70, origin: { y: 0.6 }, colors: ['#d37a5a', '#e68d71', '#ffcc00'] });
-        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        showToast(`+${bonoFinal.toFixed(2)} USDT`);
+        canvasConfetti({ particleCount: 80, spread: 50, origin: { y: 0.6 } });
+        showToast(`+0.0001 USDT`);
         await updateUI();
+    }
+
+    async function updateActiveUsersCount() {
+        const snapshot = await db.collection("usuarios").get();
+        document.getElementById('active-users').innerHTML = snapshot.size;
     }
 
     async function claimCommissions() {
@@ -611,7 +629,7 @@
         let i = 1;
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${i}. ${u.nombre.substring(0, 12)}</span><span style="font-weight:800; color:var(--accent);">${u.balance.toFixed(2)} USDT</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${i}. ${u.nombre.substring(0, 12)}</span><span style="font-weight:800; color:var(--accent);">${u.balance.toFixed(4)} USDT</span></div>`;
             i++;
         });
     }
@@ -625,7 +643,7 @@
         if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; opacity:0.6;'>Sin invitados</p>"; return; }
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance.toFixed(2)} USDT</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance.toFixed(4)} USDT</span></div>`;
         });
     }
 
@@ -676,18 +694,11 @@
         tg.openTelegramLink(`https://t.me/cctip_bot`);
         playSound('success');
         canvasConfetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
-        showToast(`${balance.toFixed(4)} USDT enviado a @cctip_bot`);
+        showToast(`${balance.toFixed(4)} USDT enviado`);
         await updateUI();
         await loadHistory();
         navigate('withdraw-screen');
     }
-
-    // Códigos de regalo predefinidos
-    const giftCodes = {
-        "BIENVENIDA25": 0.25,
-        "EXTRA10": 0.10,
-        "BONO05": 0.05
-    };
 
     async function handleRedeem() {
         if(!userId) return;
@@ -708,32 +719,40 @@
             return;
         }
         
-        const amount = giftCodes[code];
-        if(!amount) {
+        // Buscar código en Firebase (códigos dinámicos)
+        const codesSnapshot = await db.collection("giftCodes").where("code", "==", code).where("used", "==", false).get();
+        
+        if(codesSnapshot.empty) {
             msgDiv.innerHTML = '<span style="color: #e74c3c;">Código invalido</span>';
             return;
         }
+        
+        const codeDoc = codesSnapshot.docs[0];
+        const amount = codeDoc.data().amount;
         
         await userRef.update({
             balance: firebase.firestore.FieldValue.increment(amount),
             redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
         });
         
+        await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId, usedAt: new Date() });
+        
         playSound('coin');
-        canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        msgDiv.innerHTML = `<span style="color: #27ae60;">+${amount.toFixed(2)} USDT canjeado</span>`;
+        canvasConfetti({ particleCount: 1000, spread: 100, origin: { y: 0.5 }, colors: ['#d37a5a', '#e68d71', '#ffcc00', '#2ecc71'] });
+        msgDiv.innerHTML = `<span style="color: #27ae60; font-size: 16px;">+${amount.toFixed(4)} USDT</span>`;
         document.getElementById('redeem-code').value = '';
         await updateUI();
         
-        setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
+        setTimeout(() => { msgDiv.innerHTML = ''; }, 4000);
     }
 
     // Event listeners
-    document.getElementById('bonusBtn').onclick = claimDailyBonus;
+    document.getElementById('bonusBtn').onclick = claimMicroBonus;
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => { navigate('withdraw-screen'); loadHistory(); };
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
     document.getElementById('leaderboardNavBtn').onclick = () => navigate('leaderboard-screen');
+    document.getElementById('refreshBalanceBtn').onclick = () => updateUI();
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
     document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
     document.getElementById('backHomeLeader').onclick = () => navigate('home-screen');
