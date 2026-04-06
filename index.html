@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USDT GIFT K - Premium</title>
+    <title>USDT GIFT K - Ultra Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
         :root {
@@ -25,215 +26,251 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at top left, #f3d5b5 0%, transparent 20%),
-                              radial-gradient(circle at bottom right, #e6b8a2 0%, transparent 20%);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(211, 122, 90, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(243, 213, 181, 0.4) 0%, transparent 25%);
             color: var(--text-main);
-            display: flex;
-            justify-content: center;
             height: 100vh;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Animación de flotación para elementos decorativos */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .bg-deco {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.1;
+            z-index: -1;
+            animation: float 6s infinite ease-in-out;
         }
 
         #app-container {
             width: 100%;
             max-width: 450px;
             position: relative;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 25px;
+            z-index: 1;
         }
 
-        /* Pantallas */
+        /* Pantallas con transiciones de entrada */
         .screen {
-            position: absolute;
-            top: 20px;
-            width: calc(100% - 40px);
             display: none;
             flex-direction: column;
             align-items: center;
-            animation: fadeIn 0.4s ease-out;
+            width: 100%;
+            animation: bounceIn 0.8s;
         }
-
         .screen.active { display: flex; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Estética de la Imagen */
+        /* Estética de la Imagen - Cabecera */
         .header-deco {
             width: 100%;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s;
         }
 
         .lang-badge {
-            background: white;
-            padding: 10px 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            font-size: 14px;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
+            padding: 12px 18px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            font-size: 13px;
         }
 
         .bonus-badge {
-            background: #fff;
-            border: 2px dashed var(--primary-accent);
-            padding: 10px;
+            background: white;
+            border: 2px dashed var(--btn-orange);
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            width: 70px;
-            height: 70px;
             display: flex;
             flex-direction: column;
-            font-size: 8px;
-            text-align: center;
+            align-items: center;
             justify-content: center;
+            font-size: 9px;
             cursor: pointer;
+            transition: all 0.3s;
+            animation: pulse 2s infinite;
         }
+        .bonus-badge:hover { transform: scale(1.1) rotate(10deg); }
 
+        /* Balance con efecto de contador */
         .balance-section {
             text-align: center;
-            margin: 60px 0;
+            margin: 40px 0;
+            animation: zoomIn 1s;
         }
-
         .balance-amount {
-            font-size: 64px;
+            font-size: 72px;
             font-weight: 600;
             color: var(--text-main);
-            line-height: 1;
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.05);
         }
-
         .balance-label {
-            font-size: 20px;
-            letter-spacing: 2px;
-            opacity: 0.7;
+            font-size: 22px;
+            letter-spacing: 4px;
+            font-weight: 300;
+            margin-top: -10px;
         }
 
-        /* Botones Estilo Píldora */
-        .menu-buttons { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        /* Botones con psicología de color y escala */
+        .menu-buttons { width: 100%; display: flex; flex-direction: column; gap: 18px; }
 
         .btn-custom {
             border: none;
-            padding: 18px 25px;
+            padding: 20px;
             border-radius: 50px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(211, 122, 90, 0.15);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .btn-custom:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(211, 122, 90, 0.25); }
+        .btn-custom:active { transform: scale(0.95); }
 
-        .btn-custom:active { transform: scale(0.98); }
+        .btn-cream { background: linear-gradient(135deg, #f3d5b5, #ffedd8); color: var(--text-main); }
+        .btn-orange { background: linear-gradient(135deg, #d37a5a, #e68d71); color: white; }
 
-        .btn-cream { background-color: var(--btn-cream); color: var(--text-main); }
-        .btn-orange { background-color: var(--btn-orange); color: white; }
-
-        /* Decoración de hojas */
-        .leaf-icon { position: absolute; opacity: 0.2; z-index: -1; }
-
-        /* Pantallas de Detalle */
+        /* Pantallas de Detalle Mejoradas */
         .detail-card {
-            background: white;
-            padding: 30px;
-            border-radius: 30px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            padding: 35px;
+            border-radius: 40px;
             width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border: 1px solid white;
         }
 
         .back-btn {
-            margin-top: 20px;
+            margin-top: 25px;
             background: none;
-            border: 1px solid var(--primary-accent);
-            padding: 10px 20px;
-            border-radius: 20px;
+            border: 1.5px solid var(--primary-accent);
+            padding: 12px 30px;
+            border-radius: 25px;
             color: var(--primary-accent);
+            font-weight: 600;
             cursor: pointer;
         }
 
         .input-elegant {
             width: 100%;
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #ddd;
-            margin: 15px 0;
-            outline: none;
+            padding: 18px;
+            border-radius: 20px;
+            border: 2px solid #eee;
+            margin: 20px 0;
+            font-family: inherit;
+            transition: border 0.3s;
         }
+        .input-elegant:focus { border-color: var(--btn-orange); }
+
     </style>
 </head>
 <body>
 
+<i class="fas fa-leaf bg-deco" style="top: 10%; left: 5%;"></i>
+<i class="fas fa-star bg-deco" style="top: 40%; right: 10%; animation-delay: 2s;"></i>
+<i class="fas fa-coffee bg-deco" style="bottom: 10%; left: 15%; animation-delay: 4s;"></i>
+
 <div id="app-container">
     
+    <audio id="bg-music" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="home-screen" class="screen active">
         <div class="header-deco">
-            <div class="lang-badge">A / 文 <br><small>Traducir</small></div>
+            <div class="lang-badge"><b>Explora</b> <br><small>Tu fortuna</small></div>
             <div class="bonus-badge" onclick="claimBonus()">
-                <i class="fas fa-gift" style="font-size: 20px;"></i>
-                Bono Diario
+                <i class="fas fa-gift animate__animated animate__tada animate__infinite" style="font-size: 24px; color: #d37a5a;"></i>
+                <span style="margin-top:5px; font-weight: bold;">RECIBIR</span>
             </div>
         </div>
 
         <div class="balance-section">
             <div class="balance-amount" id="user-balance">0.00</div>
-            <div class="balance-label">USDT</div>
+            <div class="balance-label">USDT DISPONIBLE</div>
         </div>
 
         <div class="menu-buttons">
-            <button class="btn-custom btn-cream" onclick="claimBonus()">
-                <i class="fas fa-certificate"></i> Recordatorio diario
+            <button class="btn-custom btn-cream" onclick="openTutorial('bonus')">
+                <span><i class="fas fa-calendar-check"></i> Bono Diario</span>
+                <i class="fas fa-chevron-right"></i>
             </button>
             <button class="btn-custom btn-orange" onclick="showScreen('invite-screen')">
-                <i class="fas fa-seedling"></i> Invitar a un amigo
+                <span><i class="fas fa-heart"></i> Crecer Juntos</span>
+                <i class="fas fa-chevron-right"></i>
             </button>
             <button class="btn-custom btn-cream" onclick="showScreen('withdraw-screen')">
-                <i class="fas fa-coffee"></i> Retirar USDT
+                <span><i class="fas fa-hand-holding-usd"></i> Retirar Cosecha</span>
+                <i class="fas fa-chevron-right"></i>
             </button>
             <button class="btn-custom btn-orange" onclick="showScreen('gift-screen')">
-                <i class="fas fa-box-open"></i> Canjea código de regalo
+                <span><i class="fas fa-magic"></i> Código Mágico</span>
+                <i class="fas fa-chevron-right"></i>
             </button>
         </div>
         
-        <div id="status" style="margin-top: 30px; font-size: 10px; opacity: 0.5;">Cargando...</div>
+        <div id="status" style="margin-top: 40px; font-size: 12px; font-weight: 600; color: var(--btn-orange);">
+            <i class="fas fa-circle animate__animated animate__flash animate__infinite"></i> Conectado al Nodo
+        </div>
     </div>
 
     <div id="invite-screen" class="screen">
         <div class="detail-card">
-            <i class="fas fa-users" style="font-size: 40px; color: var(--btn-orange);"></i>
-            <h2 style="margin: 15px 0;">Mis Invitados</h2>
-            <div style="font-size: 30px; font-weight: bold;" id="ref-count">0</div>
-            <p style="font-size: 14px; opacity: 0.7;">Gana 0.50 USDT por cada referido.</p>
-            <button class="btn-custom btn-orange" style="margin-top: 20px; width: 100%;" onclick="shareRef()">
-                Copiar Link de Invitación
-            </button>
-            <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
+            <div class="animate__animated animate__fadeInDown">
+                <i class="fas fa-hands-helping" style="font-size: 50px; color: var(--btn-orange);"></i>
+                <h2 style="margin: 20px 0;">El Poder de Compartir</h2>
+                <p style="font-size: 15px; line-height: 1.6;">"La abundancia no se divide, se multiplica cuando invitas a otros."</p>
+                <div style="background: var(--bg-color); padding: 20px; border-radius: 20px; margin: 20px 0;">
+                    <small>Amigos vinculados</small>
+                    <div style="font-size: 35px; font-weight: bold;" id="ref-count">0</div>
+                </div>
+                <p style="font-size: 13px; color: #888;">Por cada amigo que despierte su fortuna con tu link, recibirás <b>0.50 USDT</b> instantáneos.</p>
+                <button class="btn-custom btn-orange" style="width: 100%; margin-top: 20px;" onclick="shareRef()">
+                    <i class="fas fa-share-alt"></i> Compartir mi Fortuna
+                </button>
+            </div>
+            <button class="back-btn" onclick="showScreen('home-screen')">Regresar al Inicio</button>
         </div>
     </div>
 
     <div id="withdraw-screen" class="screen">
         <div class="detail-card">
-            <i class="fas fa-wallet" style="font-size: 40px; color: var(--primary-accent);"></i>
-            <h2 style="margin: 15px 0;">Retirar Fondos</h2>
-            <p>Mínimo de retiro: 10.00 USDT</p>
-            <input type="text" class="input-elegant" placeholder="Dirección de billetera USDT (BEP20)">
-            <button class="btn-custom btn-cream" style="width: 100%;" onclick="requestWithdraw()">Solicitar Pago</button>
-            <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
+            <i class="fas fa-seedling" style="font-size: 50px; color: #2ecc71;"></i>
+            <h2 style="margin: 20px 0;">Tu Cosecha</h2>
+            <p style="font-size: 14px;">Has trabajado bien. Cuando tu balance alcance los 10.00 USDT, podrás mover tus activos a tu billetera personal.</p>
+            <input type="text" class="input-elegant" placeholder="Dirección de Destino (BEP20)">
+            <button class="btn-custom btn-cream" style="width: 100%;" onclick="requestWithdraw()">
+                <i class="fas fa-arrow-up"></i> Iniciar Transferencia
+            </button>
+            <button class="back-btn" onclick="showScreen('home-screen')">Seguir Cosechando</button>
         </div>
     </div>
 
     <div id="gift-screen" class="screen">
         <div class="detail-card">
-            <i class="fas fa-tags" style="font-size: 40px; color: var(--btn-orange);"></i>
-            <h2 style="margin: 15px 0;">Código de Regalo</h2>
-            <input type="text" class="input-elegant" placeholder="Ingresa tu código aquí">
-            <button class="btn-custom btn-orange" style="width: 100%;" onclick="tg.showAlert('Código no válido')">Canjear</button>
+            <i class="fas fa-sparkles" style="font-size: 50px; color: #f1c40f;"></i>
+            <h2 style="margin: 20px 0;">Activar Misterio</h2>
+            <p style="font-size: 14px;">Ingresa una palabra secreta para desbloquear tesoros ocultos en la red.</p>
+            <input type="text" class="input-elegant" placeholder="Escribe el secreto...">
+            <button class="btn-custom btn-orange" style="width: 100%;" onclick="playClick(); tg.showAlert('El misterio aún no ha sido revelado. Busca en el canal.')">
+                <i class="fas fa-unlock"></i> Desbloquear
+            </button>
             <button class="back-btn" onclick="showScreen('home-screen')">Volver</button>
         </div>
     </div>
@@ -241,7 +278,6 @@
 </div>
 
 <script>
-    // --- CONFIGURACIÓN FIREBASE (Mantenemos la suya original) ---
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -255,23 +291,37 @@
     const db = firebase.firestore();
     const tg = window.Telegram.WebApp;
     tg.expand();
+
+    // --- EFECTOS DE SONIDO ---
+    const clickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-simple-click-630.mp3');
+    function playClick() {
+        clickSound.currentTime = 0;
+        clickSound.play();
+        // Activar música de fondo en el primer click si no está sonando
+        const music = document.getElementById('bg-music');
+        if(music.paused) { music.volume = 0.2; music.play(); }
+    }
+
+    function showScreen(id) {
+        playClick();
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // --- PSICOLOGÍA: TUTORIALES LARGOS Y PERSUASIVOS ---
+    function openTutorial(type) {
+        if(type === 'bonus') {
+            tg.showConfirm("🌟 EL RITUAL DEL ÉXITO\n\nBienvenido, buscador. Para que la abundancia fluya, la constancia es la clave. Al presionar este botón cada 24 horas, confirmas tu compromiso con tu crecimiento financiero.\n\n¿Deseas reclamar tu recompensa de hoy y mantener tu racha activa?", (res) => {
+                if(res) claimBonus();
+            });
+        }
+    }
+
     const user = tg.initDataUnsafe?.user;
     const startParam = tg.initDataUnsafe?.start_param;
 
-    // Lógica de Navegación entre pantallas
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    // CARGAR DATOS
     async function loadData() {
-        if (!user) {
-            document.getElementById('status').innerText = "Abre desde Telegram";
-            // Para pruebas en PC descomenta la linea de abajo:
-            // return; 
-        }
-
+        if (!user) return;
         const userRef = db.collection("usuarios").doc(user.id.toString());
         let doc = await userRef.get();
 
@@ -281,51 +331,54 @@
                 await inviterRef.update({
                     balance: firebase.firestore.FieldValue.increment(0.50),
                     referidos: firebase.firestore.FieldValue.increment(1)
-                }).catch(() => console.log("Inviter no existe"));
+                });
             }
-
-            await userRef.set({
-                nombre: user.first_name,
-                balance: 0.00,
-                referidos: 0,
-                id: user.id
-            });
+            await userRef.set({ nombre: user.first_name, balance: 0.00, referidos: 0, id: user.id });
             doc = await userRef.get();
         }
 
         const data = doc.data();
-        document.getElementById('user-balance').innerText = data.balance.toFixed(2);
+        // Animación de números
+        animateValue("user-balance", 0, data.balance, 1000);
         document.getElementById('ref-count').innerText = data.referidos;
-        document.getElementById('status').innerText = "Conectado como " + user.first_name;
     }
 
-    // FUNCIÓN BONO
+    function animateValue(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = (progress * (end - start) + start).toFixed(2);
+            if (progress < 1) window.requestAnimationFrame(step);
+        };
+        window.requestAnimationFrame(step);
+    }
+
     async function claimBonus() {
+        playClick();
         const userRef = db.collection("usuarios").doc(user.id.toString());
         await userRef.update({ balance: firebase.firestore.FieldValue.increment(0.05) });
-        tg.showAlert("¡Has recibido 0.05 USDT!");
+        tg.showAlert("✨ ¡ENERGÍA RECIBIDA!\nHas sumado 0.05 USDT a tu patrimonio. Vuelve mañana para no romper tu ciclo de prosperidad.");
         loadData();
     }
 
-    // FUNCIÓN RETIRO
     async function requestWithdraw() {
-        const userRef = db.collection("usuarios").doc(user.id.toString());
-        const doc = await userRef.get();
-        const balance = doc.data().balance;
-
-        if (balance >= 10) {
-            tg.showConfirm("¿Confirmas el retiro de tus fondos?", (confirmed) => {
-                if(confirmed) tg.showAlert("Solicitud enviada a revisión.");
+        playClick();
+        const doc = await db.collection("usuarios").doc(user.id.toString()).get();
+        if (doc.data().balance >= 10) {
+            tg.showConfirm("💎 SOLICITUD DE TRANSFERENCIA\n\nEstás a punto de enviar tus USDT a la red externa. Este proceso es manual para garantizar tu seguridad.\n\n¿Estás seguro de que deseas retirar tus fondos ahora?", (conf) => {
+                if(conf) tg.showAlert("Solicitud registrada. Un guía revisará tu transacción en las próximas 24h.");
             });
         } else {
-            tg.showAlert("Necesitas al menos 10.00 USDT.");
+            tg.showAlert("⚠️ PACIENCIA, AMIGO\nTu cosecha aún está creciendo. Necesitas al menos 10.00 USDT para que el envío sea eficiente.");
         }
     }
 
-    // INVITAR
     function shareRef() {
+        playClick();
         const refLink = `https://t.me/USDTGIFTKBot?startapp=${user.id}`;
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=🎁 Regístrate y gana USDT gratis`);
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=🎁 Amigo, encontré una fuente de abundancia digital. Únete y ganemos juntos.`);
     }
 
     loadData();
