@@ -3,46 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USDT GIFT K Bot</title>
+    <title>USDT GIFT K Bot - Aesthetic Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
-        body { font-family: sans-serif; background: #121212; color: white; text-align: center; padding: 20px; }
-        .card { background: #1e1e1e; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; }
-        .balance { font-size: 35px; font-weight: bold; color: #00ff88; margin: 10px 0; }
-        button { background: #00d2ff; border: none; color: white; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        button.invite { background: #8e44ad; }
-        button.withdraw { background: #e67e22; }
-        button.task { background: #2ecc71; margin-bottom: 5px; }
-        .info-text { font-size: 14px; color: #aaa; margin-top: 5px; }
+        /* CSS GENERAL - COLORES AESTHETIC DE LA MAQUETA */
+        body {
+            font-family: 'Garamond', serif; /* Fuente elegante para balance */
+            background: #fff8f0; /* Color beige muy suave de fondo */
+            margin: 0;
+            padding: 0;
+            color: #7b5b4a; /* Marrón suave para textos */
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* CAPA DE FONDO CON LAS ONDAS AESTHETIC (Requiere imagen en GitHub) */
+        .background-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('fondo.jpg'); /* Sube tu imagen de ondas aesthetic a GitHub */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.9;
+            z-index: -1;
+        }
+
+        /* HEADER CON EL BOTÓN TRADUCIR Y EL SELLO DEL BONO */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .translate-box {
+            background-color: #f6efe4; /* Color beige claro */
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid #e1d2bf;
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #7b5b4a;
+        }
+
+        .bono-badge {
+            width: 70px; /* Tamaño del sello del bono */
+            height: 70px;
+            background-image: url('bono_badge.png'); /* Sube tu sello a GitHub */
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        /* SECCIÓN CENTRAL DEL BALANCE DE USDT */
+        .balance-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 35vh; /* Ocupa 35% de la altura */
+            z-index: 5;
+        }
+
+        .balance {
+            font-size: 100px; /* Balance muy grande y elegante */
+            font-weight: 300; /* Letra más delgada y fina */
+            margin: 0;
+            padding: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* Sombra sutil */
+        }
+
+        .usdt-text {
+            font-size: 24px;
+            font-weight: 400;
+            margin-top: -10px;
+        }
+
+        /* CONTENEDOR DE BOTONES (CARD REDONDEADA) */
+        .card {
+            background-color: transparent;
+            padding: 0 30px;
+            z-index: 10;
+        }
+
+        /* ESTILO AESTHETIC DE LOS BOTONES OVALADOS */
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Iconos a la izquierda */
+            width: 100%;
+            padding: 18px 25px;
+            margin-bottom: 12px;
+            border-radius: 40px; /* Muy redondeados */
+            border: none;
+            font-family: sans-serif; /* Botones más modernos */
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Sombra elegante */
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: translateY(2px); /* Efecto de presionar */
+        }
+
+        /* COLORES DE LOS BOTONES DE LA MAQUETA */
+        .btn-light-beige {
+            background-color: #f7e6cf; /* Color beige claro de los botones 1 y 3 */
+            color: #7b5b4a;
+        }
+
+        .btn-dark-brown {
+            background-color: #bb7457; /* Color marrón de los botones 2 y 4 */
+            color: white;
+        }
+
+        /* ICONOS (Simulación con emoji o imagen pequeña) */
+        .btn-icon {
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        /* STATUS DE CONEXIÓN MINIMALISTA */
+        #status {
+            font-family: sans-serif;
+            font-size: 11px;
+            color: #e1d2bf;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>USDT GIFT K BOT</h1>
-    
-    <div class="card">
-        <div>Balance Actual</div>
-        <div class="balance" id="user-balance">0.00 USDT</div>
-        <button onclick="claimBonus()">🎁 Bono Diario (0.05)</button>
-        <button class="withdraw" onclick="requestWithdraw()">💸 Retirar (Mínimo 10.00)</button>
+    <div class="background-overlay"></div>
+
+    <div class="header">
+        <div class="translate-box">A/文<br>Traducir</div>
+        <div class="bono-badge" onclick="claimBonus()"></div>
+    </div>
+
+    <div class="balance-section">
+        <div class="balance" id="user-balance">0.00</div>
+        <div class="usdt-text">USDT</div>
     </div>
 
     <div class="card">
-        <h3>Tareas Extra</h3>
-        <button class="task" onclick="doTask('https://t.me/TuCanal', 0.10)">📢 Unirse al Canal (+0.10)</button>
-        <div class="info-text">Más tareas pronto...</div>
+        <button class="btn-light-beige" onclick="claimBonus()">
+            <span class="btn-icon">🌼</span>Recordatorio diario
+        </button>
+
+        <button class="btn-dark-brown" onclick="shareRef()">
+            <span class="btn-icon">🍃</span>Invitar a un amigo
+        </button>
+
+        <button class="btn-light-beige" onclick="requestWithdraw()">
+            <span class="btn-icon">☕</span>Retirar USDT
+        </button>
+
+        <button class="btn-dark-brown" onclick="canjearCodigo()">
+            <span class="btn-icon">🎁</span>Canjea código de regalo
+        </button>
     </div>
 
-    <div class="card">
-        <div>Invitados: <span id="ref-count">0</span></div>
-        <button class="invite" onclick="shareRef()">🔗 Invitar Amigos (0.50)</button>
-    </div>
-
-    <div id="status" style="font-size: 12px; color: #888;">Cargando datos...</div>
+    <div id="status">Sincronizando ID...</div>
 
     <script>
+        // TUS DATOS DE FIREBASE (SIN PERDER REFERIDOS)
         const firebaseConfig = {
             apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
             authDomain: "usdt-8b129.firebaseapp.com",
@@ -56,6 +189,9 @@
         const db = firebase.firestore();
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.backgroundColor = '#fff8f0'; // Setea color de fondo de la app en Telegram
+        tg.headerColor = '#fff8f0';
+        
         const user = tg.initDataUnsafe?.user;
         const startParam = tg.initDataUnsafe?.start_param;
 
@@ -70,13 +206,13 @@
             let doc = await userRef.get();
 
             if (!doc.exists) {
-                // Nuevo usuario (con referido si existe)
+                // Nuevo usuario (con referido si existe - sigue a 0.50 USDT)
                 if (startParam && startParam !== user.id.toString()) {
                     const inviterRef = db.collection("usuarios").doc(startParam);
                     await inviterRef.update({
                         balance: firebase.firestore.FieldValue.increment(0.50),
                         referidos: firebase.firestore.FieldValue.increment(1)
-                    }).catch(() => console.log("Inviter no existe"));
+                    });
                 }
 
                 await userRef.set({
@@ -89,48 +225,36 @@
             }
 
             const data = doc.data();
-            document.getElementById('user-balance').innerText = data.balance.toFixed(2) + " USDT";
-            document.getElementById('ref-count').innerText = data.referidos;
-            document.getElementById('status').innerText = "ID: " + user.id + " | Conectado ✅";
+            document.getElementById('user-balance').innerText = data.balance.toFixed(2);
+            document.getElementById('status').innerText = "USDT GIFT K | ID: " + user.id;
         }
 
-        // FUNCIÓN BONO
+        // FUNCIÓN BONO (BOTÓN 1 Y SELLO SUPERIOR)
         async function claimBonus() {
             const userRef = db.collection("usuarios").doc(user.id.toString());
             await userRef.update({ balance: firebase.firestore.FieldValue.increment(0.05) });
-            tg.showAlert("¡Has recibido 0.05 USDT!");
+            tg.showAlert("¡Has recibido 0.05 USDT de regalo!");
             loadData();
         }
 
-        // FUNCIÓN RETIRO
-        async function requestWithdraw() {
-            const userRef = db.collection("usuarios").doc(user.id.toString());
-            const doc = await userRef.get();
-            const balance = doc.data().balance;
-
-            if (balance >= 10) {
-                tg.showAlert("Solicitud enviada. Escribe a soporte con tu ID: " + user.id);
-            } else {
-                tg.showAlert("Necesitas al menos 10.00 USDT para retirar.");
-            }
-        }
-
-        // TAREAS
-        function doTask(url, reward) {
-            tg.openTelegramLink(url);
-            tg.showConfirm("¿Te uniste al canal?", async (confirmed) => {
-                if (confirmed) {
-                    const userRef = db.collection("usuarios").doc(user.id.toString());
-                    await userRef.update({ balance: firebase.firestore.FieldValue.increment(reward) });
-                    loadData();
-                }
-            });
-        }
-
-        // INVITAR
+        // FUNCIÓN INVITAR (BOTÓN 2)
         function shareRef() {
             const refLink = `https://t.me/USDTGIFTKBot?startapp=${user.id}`;
-            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=🎁 Regístrate y gana USDT gratis`);
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=Gana USDT gratis con USDT GIFT K`);
+        }
+
+        // FUNCIÓN RETIRO (BOTÓN 3)
+        function requestWithdraw() {
+            tg.showAlert("Mínimo de retiro: 10 USDT. Tu saldo se actualizará pronto.");
+        }
+
+        // FUNCIÓN CÓDIGO REGALO (BOTÓN 4 - Sin programar, solo ejemplo)
+        function canjearCodigo() {
+            tg.showConfirm("¿Tienes un código de regalo?", (confirmed) => {
+                if (confirmed) {
+                    tg.showAlert("Canjeando código... (Función en desarrollo)");
+                }
+            });
         }
 
         loadData();
