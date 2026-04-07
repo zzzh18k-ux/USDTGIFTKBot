@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT GIFT PRO</title>
+    <title>USDT GIFT K - Moneda Dorada</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -16,9 +16,12 @@
     <style>
         :root {
             --gold: #ffcc00;
-            --premium-dark: #1a1a1a;
+            --orange-gradient: linear-gradient(135deg, #d37a5a 0%, #e68d71 100%);
+            --bg-color: #fdf5e6;
+            --text-main: #5d4037;
             --accent: #d37a5a;
-            --glass: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.02);
+            --btn-hover: brightness(0.96);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -26,192 +29,474 @@
         body {
             font-family: 'Outfit', sans-serif;
             background: #fdf5e6;
-            color: #444;
+            color: var(--text-main);
             height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        #gradient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #fdf5e6, #fff5ea, #ffedd8, #fdf5e6);
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: gradientMove 15s ease infinite;
+        }
+        @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+        #app-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
             overflow: hidden;
         }
 
-        /* Contenedor Principal */
-        #app-container {
-            width: 100%;
-            max-width: 500px;
-            height: 100vh;
-            margin: 0 auto;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Pantallas */
         .screen {
             display: none;
             flex-direction: column;
             width: 100%;
             height: 100%;
-            padding: 20px;
             overflow-y: auto;
-            position: absolute;
-            top: 0; left: 0;
-            background: #fdf5e6;
+            padding-bottom: 10px;
         }
-        .screen.active { display: flex; animation: fadeIn 0.3s ease; }
+        .screen.active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .screen::-webkit-scrollbar { display: none; }
+        .screen { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Tarjeta de Balance */
-        .balance-section {
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .streak-badge {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(4px);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+            border: 0.5px solid rgba(255,255,255,0.6);
+        }
+
+        .balance-card {
             text-align: center;
-            padding: 30px 0;
+            margin: 8px 0 12px 0;
         }
-        #user-balance { font-size: 54px; font-weight: 800; color: var(--premium-dark); }
-        .unit { font-size: 14px; letter-spacing: 3px; opacity: 0.5; }
+        #user-balance {
+            font-size: 48px;
+            font-weight: 800;
+            display: inline-block;
+            background: linear-gradient(135deg, #e68d71, #d37a5a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: none;
+        }
+        .balance-label {
+            font-size: 10px;
+            letter-spacing: 4px;
+            opacity: 0.7;
+            margin-top: -5px;
+            font-weight: 500;
+        }
 
-        /* Objeto de Click Pro */
-        .coin-master {
-            width: 200px; height: 200px;
+        /* MONEDA DORADA BRILLANTE */
+        .click-object {
             background: radial-gradient(circle, #ffe066 0%, #ffcc00 100%);
-            margin: 20px auto;
+            width: 180px;
+            height: 180px;
+            margin: 15px auto;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 5px solid #f5c542;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.6), inset 0 0 15px rgba(255, 255, 200, 0.8);
+            transition: transform 0.05s linear;
+        }
+        .click-object i {
+            font-size: 80px;
+            color: #fff6d5;
+            text-shadow: 0 0 12px rgba(0,0,0,0.2);
+        }
+        .click-object span {
+            margin-top: 12px;
+            font-weight: bold;
+            color: #5d4037;
+            background: rgba(255,250,210,0.8);
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 13px;
+        }
+
+        /* BARRA DE PROGRESO DE CLICS */
+        .progress-clicks {
+            margin: 10px 0 12px 0;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--orange-gradient);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 6px #e68d71;
+        }
+        .clicks-counter {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 6px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* BOTONES GEMELOS ELEGANTES - Estilo premium */
+        .action-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 12px 0 8px 0;
+        }
+        .premium-btn {
+            width: 100%;
+            padding: 15px 12px;
+            border: none;
+            border-radius: 44px;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(2px);
+            letter-spacing: 0.3px;
+        }
+        .premium-btn:active {
+            transform: scale(0.97);
+            filter: brightness(0.96);
+        }
+        .premium-btn i {
+            font-size: 20px;
+        }
+        .btn-claim {
+            background: linear-gradient(105deg, #2c3e50 0%, #1e2a36 100%);
+            color: #f8f9fa;
+            border: 1px solid rgba(255,215,120,0.3);
+        }
+        .btn-claim::before {
+            content: "✨";
+            margin-right: 6px;
+            font-size: 18px;
+        }
+        .btn-ad {
+            background: linear-gradient(105deg, #0f2b3d 0%, #1b4a6e 100%);
+            color: #eef4ff;
+            border: 1px solid rgba(100,180,250,0.4);
+        }
+        .btn-ad i {
+            color: #ffd966;
+        }
+        .premium-btn.disabled {
+            opacity: 0.6;
+            filter: grayscale(0.1);
+            transform: none;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .premium-btn.disabled:active {
+            transform: none;
+            filter: brightness(0.95);
+        }
+        .multiplier-info {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 6px;
+            background: rgba(255,255,240,0.7);
+            padding: 6px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(2px);
+            font-weight: 500;
+            color: #4a6a3b;
+        }
+        .reset-timer {
+            text-align: center;
+            font-size: 11px;
+            background: rgba(255,255,245,0.6);
+            padding: 5px 12px;
+            border-radius: 50px;
+            width: fit-content;
+            margin: 8px auto 0 auto;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .menu-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+        .btn-game {
+            background: rgba(255,255,245,0.85);
+            backdrop-filter: blur(8px);
+            border: none;
+            padding: 14px 20px;
+            border-radius: 32px;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: 0.1s linear;
+            color: #4a3b2c;
+        }
+        .btn-game:active { transform: scale(0.97); background: rgba(255,255,240,1);}
+        .btn-primary { background: var(--orange-gradient); color: white; box-shadow: 0 6px 14px rgba(211,122,90,0.2);}
+
+        .glass-card {
+            background: rgba(255,255,250,0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 38px;
+            padding: 24px 20px;
+            border: 1px solid rgba(255,245,215,0.9);
+            box-shadow: var(--card-shadow);
+            margin-top: 8px;
+        }
+        .back-circle {
+            width: 44px; height: 44px;
+            background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border: 8px solid white;
-            box-shadow: 0 15px 35px rgba(255, 204, 0, 0.3);
-            transition: transform 0.1s;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: 0.1s;
         }
-        .coin-master i { font-size: 90px; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        /* Progress Bar */
-        .progress-container { margin: 20px 0; }
-        .bar-bg { width: 100%; height: 10px; background: #eee; border-radius: 10px; overflow: hidden; }
-        .bar-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s; }
-        .bar-text { text-align: center; font-size: 12px; margin-top: 8px; font-weight: 600; color: var(--accent); }
-
-        /* Botones Elegantes */
-        .btn-premium {
-            background: var(--premium-dark);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 18px;
-            font-size: 15px;
-            font-weight: 600;
+        .back-circle:active { transform: scale(0.94);}
+        .toast-premium {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            color: #ffefcf;
+            padding: 10px 24px;
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        input, textarea {
             width: 100%;
-            margin-bottom: 10px;
+            padding: 14px 16px;
+            border-radius: 28px;
+            border: 1.5px solid #f0e2cf;
+            font-family: 'Outfit', sans-serif;
+            margin: 8px 0;
+            background: white;
+            font-size: 14px;
+        }
+        .history-item {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #efe3d4;
+            font-size: 13px;
         }
-        .btn-premium.disabled { background: #ccc; opacity: 0.6; }
-        
-        .btn-secondary { background: white; color: var(--premium-dark); }
-
-        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .nav-item {
-            background: white; padding: 15px; border-radius: 15px;
-            text-align: center; font-size: 13px; font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        .history-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 20px 0 12px 0;
+            color: var(--accent);
         }
-
-        /* Toast */
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); color: white; padding: 10px 20px;
-            border-radius: 25px; font-size: 13px; z-index: 9999; opacity: 0; pointer-events: none;
+        .ccwallet-info {
+            background: #fef3e4;
+            border-radius: 24px;
+            padding: 14px;
+            margin: 12px 0;
+            font-size: 13px;
+            text-align: left;
         }
-
-        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .back-btn { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .code-input-group { display: flex; gap: 10px; margin: 16px 0; }
+        .code-input-group input { flex: 1; margin: 0; }
+        .code-input-group button { width: auto; padding: 12px 20px; margin: 0; border-radius: 44px; background: var(--orange-gradient); color: white;}
+        .channel-join {
+            background: rgba(46, 204, 113, 0.12);
+            border-radius: 24px;
+            padding: 14px;
+            margin: 15px 0;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-<div id="toast" class="toast"></div>
+<div id="gradient-bg"></div>
+<div id="toast-element" class="toast-premium"></div>
 
 <div id="app-container">
-    
+
+    <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
-        <div class="balance-section">
+        <div class="top-nav">
+            <div class="streak-badge"><i class="fas fa-fire"></i> <span id="streak-count">0</span> DIAS</div>
+            <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
+        </div>
+
+        <div class="balance-card">
             <div id="user-balance">0.0000</div>
-            <div class="unit">USDT DISPONIBLE</div>
+            <div class="balance-label">USDT</div>
         </div>
 
-        <div class="coin-master" id="coinBtn">
+        <!-- MONEDA DORADA BRILLANTE -->
+        <div class="click-object" id="clickObject">
             <i class="fas fa-coins"></i>
+            <span>¡TOCA LA MONEDA!</span>
         </div>
 
-        <div class="progress-container">
-            <div class="bar-bg"><div class="bar-fill" id="pBar"></div></div>
-            <div class="bar-text" id="pText">0 / 10 TOQUES</div>
+        <!-- BARRA DE PROGRESO -->
+        <div class="progress-clicks">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="clickProgressFill"></div>
+            </div>
+            <div class="clicks-counter" id="clicksCounter">0 / 10 clicks</div>
         </div>
 
-        <button class="btn-premium disabled" id="claimBtn" disabled>
-            <i class="fas fa-gift"></i> RECLAMAR BONO
-        </button>
+        <!-- CONTENEDOR DE BOTONES PREMIUM -->
+        <div class="action-buttons-container">
+            <button class="premium-btn btn-claim" id="doubleBtn">
+                <i class="fas fa-gem"></i> RECLAMAR RECOMPENSA
+            </button>
+            <button class="premium-btn btn-ad" id="watchAdBtn">
+                <i class="fas fa-play-circle"></i> VER ANUNCIO (+0.0001 USDT extra)
+            </button>
+        </div>
 
-        <button class="btn-premium btn-secondary" id="adBtn" style="border: 1px solid #ddd;">
-            <i class="fas fa-play-circle"></i> VER ANUNCIO (+BONO)
-        </button>
+        <div class="multiplier-info" id="multiplierInfo">💰 Bono extra: +0.0000 USDT | Videos vistos: 0/4</div>
+        <div class="reset-timer" id="resetTimer"></div>
 
-        <div id="timerDisplay" style="text-align: center; font-size: 12px; color: #999; margin: 10px 0;"></div>
-
-        <div class="nav-grid">
-            <div class="nav-item" onclick="nav('withdraw-screen')"><i class="fas fa-wallet"></i><br>Retiros</div>
-            <div class="nav-item" onclick="nav('team-screen')"><i class="fas fa-users"></i><br>Equipo</div>
-            <div class="nav-item" onclick="nav('code-screen')"><i class="fas fa-ticket-alt"></i><br>Canjes</div>
-            <div class="nav-item" onclick="nav('top-screen')"><i class="fas fa-trophy"></i><br>Ranking</div>
+        <div class="menu-grid">
+            <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Crecer Equipo</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Mi Cosecha</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="leaderboardNavBtn"><span><i class="fas fa-trophy"></i> Top Usuarios</span> <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
+    <!-- INVITE SCREEN -->
+    <div id="invite-screen" class="screen">
+        <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <i class="fas fa-rocket" style="font-size: 40px; color: var(--accent);"></i>
+            <h3 style="margin: 10px 0;">Sistema de Socios</h3>
+            <p style="font-size: 13px;">+0.02 USDT por referido activo + 15% comisión</p>
+            <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
+                <small>Comision acumulada</small>
+                <h3 id="comm-pending">0.00 USDT</h3>
+                <button class="btn-game btn-primary" style="margin-top: 8px; padding: 10px; width: 100%;" id="claimCommBtn">Reclamar</button>
+            </div>
+            <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
+                <small>Amigos invitados</small>
+                <h3 id="referidos-count">0</h3>
+                <button class="btn-game" style="margin-top: 8px; padding: 10px; width: 100%;" id="viewInvitesBtn">Ver lista</button>
+            </div>
+            <button class="btn-game btn-primary" style="width: 100%;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir Link</button>
+        </div>
+    </div>
+
+    <!-- WITHDRAW SCREEN -->
     <div id="withdraw-screen" class="screen">
-        <div class="header">
-            <div class="back-btn" onclick="nav('home-screen')"><i class="fas fa-chevron-left"></i></div>
-            <h2>Mi Billetera</h2>
-        </div>
-        <div style="background: white; padding: 20px; border-radius: 20px;">
-            <p style="font-size: 12px; margin-bottom: 10px;">ID de CCWallet (@cctip_bot)</p>
-            <input type="text" id="walletId" placeholder="Ej: 123456" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd;">
-            <button class="btn-premium" style="margin-top: 15px;" onclick="solicitarRetiro()">SOLICITAR RETIRO</button>
-            <small style="display:block; text-align: center; margin-top: 10px; color: #999;">Mínimo: 0.01 USDT</small>
+        <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <i class="fas fa-wallet" style="font-size: 40px; color: #2ecc71;"></i>
+            <h3 style="margin: 10px 0;">Retirar con CCWallet</h3>
+            <div class="ccwallet-info">
+                <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
+                <a href="#" onclick="openCCWallet(); return false;">Crear cuenta aquí</a><br>
+                <small>Tu retiro se enviará a @cctip_bot</small>
+            </div>
+            <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
+            <button class="btn-game btn-primary" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Retiro</button>
+            <p style="margin-top: 10px; font-size: 11px; opacity: 0.6;">Minimo 0.01 USDT</p>
+            <div class="history-title"><i class="fas fa-clock"></i> Historial de retiros</div>
+            <div id="history-list" style="max-height: 200px; overflow-y: auto;"></div>
         </div>
     </div>
 
-    <div id="team-screen" class="screen">
-        <div class="header">
-            <div class="back-btn" onclick="nav('home-screen')"><i class="fas fa-chevron-left"></i></div>
-            <h2>Mi Equipo</h2>
+    <!-- REDEEM SCREEN -->
+    <div id="redeem-screen" class="screen">
+        <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <i class="fas fa-ticket-alt" style="font-size: 40px; color: var(--accent);"></i>
+            <h3 style="margin: 10px 0;">Canjear Código</h3>
+            <div class="channel-join">
+                <i class="fab fa-telegram"></i> Únete al canal<br>
+                <a href="#" onclick="joinChannel(); return false;">@UsdtGiftChannel</a>
+            </div>
+            <div class="code-input-group">
+                <input type="text" id="redeem-code" placeholder="Código">
+                <button class="btn-game btn-primary" id="redeemSubmitBtn" style="width: auto;">Canjear</button>
+            </div>
+            <div id="redeem-message" style="margin-top: 15px; font-size: 12px; text-align: center;"></div>
         </div>
-        <div class="nav-item" style="margin-bottom: 15px;">
-            <small>Socios Directos</small>
-            <h2 id="teamCount">0</h2>
-        </div>
-        <button class="btn-premium" onclick="compartirLink()">INVITAR AMIGOS</button>
     </div>
 
-    <div id="code-screen" class="screen">
-        <div class="header">
-            <div class="back-btn" onclick="nav('home-screen')"><i class="fas fa-chevron-left"></i></div>
-            <h2>Canje de Códigos</h2>
+    <!-- LEADERBOARD SCREEN -->
+    <div id="leaderboard-screen" class="screen">
+        <div class="back-circle" id="backHomeLeader"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <h3 style="margin-bottom: 15px;">Top 10 Global</h3>
+            <div id="leaderboard-list" style="max-height: 400px; overflow-y: auto;"></div>
         </div>
-        <input type="text" id="giftCode" placeholder="Ingresa el código" style="width: 100%; padding: 15px; border-radius: 15px; border: 1px solid #ddd;">
-        <button class="btn-premium" style="margin-top: 10px;" onclick="canjear()">VALIDAR CÓDIGO</button>
     </div>
 
-    <div id="top-screen" class="screen">
-        <div class="header">
-            <div class="back-btn" onclick="nav('home-screen')"><i class="fas fa-chevron-left"></i></div>
-            <h2>Líderes</h2>
+    <!-- INVITES LIST SCREEN -->
+    <div id="invites-list-screen" class="screen">
+        <div class="back-circle" id="backToInvite"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <h3 style="margin-bottom: 15px;">Mis invitados</h3>
+            <div id="invites-list" style="max-height: 400px; overflow-y: auto;"></div>
         </div>
-        <div id="leaderList"></div>
     </div>
 
 </div>
 
 <script>
-    // --- CONFIGURACIÓN FIREBASE (Mantén la tuya) ---
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -220,103 +505,409 @@
         messagingSenderId: "816855613636",
         appId: "1:816855613636:web:7891ba3996acef2c91c991"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const tg = window.Telegram.WebApp;
     tg.expand();
+    tg.setHeaderColor('#fdf5e6');
+    tg.setBackgroundColor('#fdf5e6');
 
-    // --- VARIABLES DE ESTADO ---
-    let clicks = 0;
-    let bonusAds = 0;
-    let isLocked = false;
-    const userId = tg.initDataUnsafe?.user?.id?.toString() || "dev_user";
+    const userId = tg.initDataUnsafe?.user?.id?.toString();
+    const userName = tg.initDataUnsafe?.user?.first_name || "Usuario";
+    let currentUserData = null;
 
-    // --- FUNCIONES CORE ---
-    function nav(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
+    let currentClicks = 0;
+    let watchedAds = 0;      
+    let lastResetTime = 0;
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg;
-        gsap.to(t, { opacity: 1, duration: 0.3 });
-        setTimeout(() => gsap.to(t, { opacity: 0, duration: 0.3 }), 2500);
-    }
+    async function initUser() {
+        if(!userId) return;
+        const userRef = db.collection("usuarios").doc(userId);
+        const doc = await userRef.get();
+        const startParam = tg.initDataUnsafe?.start_param;
 
-    // Manejo de Clicks
-    document.getElementById('coinBtn').onclick = () => {
-        if(isLocked) return showToast("Espera al siguiente ciclo");
-        if(clicks < 10) {
-            clicks++;
-            updateUI();
-            gsap.fromTo("#coinBtn", {scale: 0.9}, {scale: 1, duration: 0.1});
-            if(clicks === 10) {
-                confetti();
-                showToast("¡Listo! Ya puedes reclamar o ver Ads para subir el bono");
+        if (!doc.exists) {
+            let inviterId = (startParam && startParam !== userId) ? startParam : "none";
+            if(inviterId !== "none") {
+                const invRef = db.collection("usuarios").doc(inviterId);
+                const invDoc = await invRef.get();
+                if(invDoc.exists) {
+                    await invRef.update({ 
+                        balance: firebase.firestore.FieldValue.increment(0.02),
+                        referidos: firebase.firestore.FieldValue.increment(1)
+                    });
+                }
             }
+            await userRef.set({
+                nombre: userName,
+                balance: 0.0000,
+                comision: 0.0000,
+                invitado_por: inviterId,
+                referidos: 0,
+                streak: 0,
+                ccwallet_id: "",
+                withdrawHistory: [],
+                redeemedCodes: [],
+                gameClicks: 0,
+                gameWatchedAds: 0,
+                gameLastReset: 0,
+                id: userId
+            });
         }
-    };
+        await loadGameState();
+        await updateUI();
+        updateActiveUsersCount();
+    }
 
-    function updateUI() {
-        const p = (clicks / 10) * 100;
-        document.getElementById('pBar').style.width = p + "%";
-        document.getElementById('pText').innerText = `${clicks} / 10 CLICKS`;
+    async function loadGameState() {
+        if(!userId) return;
+        const doc = await db.collection("usuarios").doc(userId).get();
+        const data = doc.data();
+        currentClicks = data.gameClicks || 0;
+        watchedAds = data.gameWatchedAds || 0;
+        lastResetTime = data.gameLastReset || 0;
         
-        const claimBtn = document.getElementById('claimBtn');
-        if(clicks >= 10 && !isLocked) {
-            claimBtn.disabled = false;
-            claimBtn.classList.remove('disabled');
+        updateClickUI();
+        checkAndResetIfNeeded();
+    }
+
+    async function saveGameState() {
+        if(!userId) return;
+        await db.collection("usuarios").doc(userId).update({
+            gameClicks: currentClicks,
+            gameWatchedAds: watchedAds,
+            gameLastReset: lastResetTime
+        });
+    }
+
+    function checkAndResetIfNeeded() {
+        const now = Date.now();
+        if (lastResetTime === 0) {
+            lastResetTime = now;
+            saveGameState();
+            return;
+        }
+        const diffMinutes = (now - lastResetTime) / (1000 * 60);
+        if (diffMinutes >= 50) {
+            currentClicks = 0;
+            watchedAds = 0;
+            lastResetTime = now;
+            updateClickUI();
+            saveGameState();
+            showToast("🔄 Nuevo ciclo. Completa 10 clicks para 0.0001 USDT base + bonos");
         } else {
-            claimBtn.disabled = true;
-            claimBtn.classList.add('disabled');
+            updateResetTimer();
         }
     }
 
-    // Reclamar Premio
-    document.getElementById('claimBtn').onclick = async () => {
-        const reward = 0.0001 + (bonusAds * 0.0001);
-        await db.collection("usuarios").doc(userId).update({
-            balance: firebase.firestore.FieldValue.increment(reward),
-            lastClaim: Date.now()
+    function updateResetTimer() {
+        const now = Date.now();
+        const diff = (now - lastResetTime) / (1000 * 60);
+        const remaining = Math.max(0, 50 - diff);
+        const minutes = Math.floor(remaining);
+        const seconds = Math.floor((remaining - minutes) * 60);
+        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-hourglass-half"></i> Reinicio en ${minutes}:${seconds.toString().padStart(2,'0')}`;
+        setTimeout(() => updateResetTimer(), 1000);
+    }
+
+    function updateClickUI() {
+        const progress = (currentClicks / 10) * 100;
+        document.getElementById('clickProgressFill').style.width = progress + "%";
+        document.getElementById('clicksCounter').innerHTML = `${currentClicks} / 10 clicks`;
+        
+        const extraBonus = watchedAds * 0.0001;
+        document.getElementById('multiplierInfo').innerHTML = `💰 Bono extra: +${extraBonus.toFixed(6)} USDT | Videos vistos: ${watchedAds}/4`;
+        
+        const doubleBtn = document.getElementById('doubleBtn');
+        const watchAdBtn = document.getElementById('watchAdBtn');
+        
+        if (currentClicks >= 10) {
+            doubleBtn.disabled = false;
+            doubleBtn.classList.remove('disabled');
+            if (watchedAds < 4) {
+                watchAdBtn.disabled = false;
+                watchAdBtn.classList.remove('disabled');
+            } else {
+                watchAdBtn.disabled = true;
+                watchAdBtn.classList.add('disabled');
+            }
+        } else {
+            doubleBtn.disabled = true;
+            doubleBtn.classList.add('disabled');
+            watchAdBtn.disabled = true;
+            watchAdBtn.classList.add('disabled');
+        }
+        
+        if (watchedAds >= 4) {
+            watchAdBtn.disabled = true;
+            watchAdBtn.classList.add('disabled');
+        }
+    }
+
+    async function handleClick() {
+        if (currentClicks >= 10) {
+            showToast("✨ Ya cargaste la moneda. ¡Cobra tu premio o mira videos!");
+            return;
+        }
+        
+        currentClicks++;
+        updateClickUI();
+        
+        const obj = document.getElementById('clickObject');
+        gsap.to(obj, { scale: 0.92, boxShadow: "0 0 40px rgba(255, 204, 0, 1)", duration: 0.05, yoyo: true, repeat: 1 });
+        
+        if (currentClicks === 10) {
+            showToast("🎉 ¡Moneda cargada! Elige tu recompensa abajo.");
+            canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.5 } });
+        }
+        
+        await saveGameState();
+    }
+
+    async function claimWithMultiplier() {
+        if (currentClicks < 10) {
+            showToast("⚠️ Necesitas 10 clicks primero");
+            return;
+        }
+        
+        const extraByAds = watchedAds * 0.0001;
+        const reward = 0.0001 + extraByAds;
+        
+        const userRef = db.collection("usuarios").doc(userId);
+        await userRef.update({
+            balance: firebase.firestore.FieldValue.increment(reward)
         });
         
-        confetti({ particleCount: 150, spread: 70 });
-        showToast(`+${reward.toFixed(4)} USDT reclamados`);
+        canvasConfetti({ particleCount: 220, spread: 75, origin: { y: 0.6 } });
+        showToast(`💰 +${reward.toFixed(6)} USDT reclamados`);
         
-        clicks = 0; bonusAds = 0;
-        isLocked = true;
-        updateUI();
-        startTimer();
-    };
-
-    function startTimer() {
-        // Lógica de 50 min de espera
-        let timeLeft = 50 * 60;
-        const timerInt = setInterval(() => {
-            timeLeft--;
-            const min = Math.floor(timeLeft / 60);
-            const sec = timeLeft % 60;
-            document.getElementById('timerDisplay').innerText = `Próximo bono en: ${min}:${sec < 10 ? '0'+sec : sec}`;
-            if(timeLeft <= 0) {
-                isLocked = false;
-                clearInterval(timerInt);
-                document.getElementById('timerDisplay').innerText = "";
-                updateUI();
-            }
-        }, 1000);
+        currentClicks = 0;
+        watchedAds = 0;
+        lastResetTime = Date.now(); 
+        
+        updateClickUI();
+        await saveGameState();
+        await updateUI();
     }
 
-    // Inicializar Usuario
-    async function init() {
+    async function watchAdForDouble() {
+        if (currentClicks < 10) {
+            showToast("⚠️ Completa 10 clicks primero");
+            return;
+        }
+        
+        if (watchedAds >= 4) {
+            showToast("🎯 Máximo de bonificación alcanzado (0.0005 USDT total)");
+            return;
+        }
+        
+        showToast("📺 Reproduciendo anuncio...");
+        
+        setTimeout(async () => {
+            watchedAds++;
+            const currentExtra = watchedAds * 0.0001;
+            
+            updateClickUI();
+            await saveGameState();
+            showToast(`✨ Bono actual: +${currentExtra.toFixed(6)} USDT extra`);
+            
+            if (watchedAds === 4) {
+                showToast("🏆 ¡Moneda al máximo nivel! Ya puedes cobrar 0.0005 USDT.");
+                canvasConfetti({ particleCount: 300, spread: 80, origin: { y: 0.5 } });
+            }
+        }, 1500);
+    }
+
+    async function updateUI() {
+        if(!userId) return;
         const doc = await db.collection("usuarios").doc(userId).get();
-        if(doc.exists) {
-            document.getElementById('user-balance').innerText = doc.data().balance.toFixed(4);
-            document.getElementById('teamCount').innerText = doc.data().referidos || 0;
+        currentUserData = doc.data();
+        if(!currentUserData) return;
+
+        document.getElementById('user-balance').innerText = currentUserData.balance.toFixed(6);
+        document.getElementById('comm-pending').innerHTML = (currentUserData.comision || 0).toFixed(6) + " USDT";
+        document.getElementById('streak-count').innerText = currentUserData.streak || 0;
+        document.getElementById('referidos-count').innerText = currentUserData.referidos || 0;
+
+        if(currentUserData.ccwallet_id) {
+            document.getElementById('ccwallet-id').value = currentUserData.ccwallet_id;
         }
     }
 
-    init();
+    async function updateActiveUsersCount() {
+        const snapshot = await db.collection("usuarios").get();
+        document.getElementById('active-users').innerHTML = snapshot.size;
+    }
+
+    async function claimCommissions() {
+        if(!userId) return;
+        const userRef = db.collection("usuarios").doc(userId);
+        const doc = await userRef.get();
+        const c = doc.data().comision || 0;
+        if(c <= 0) { showToast("Sin comisiones"); return; }
+        await userRef.update({
+            balance: firebase.firestore.FieldValue.increment(c),
+            comision: 0
+        });
+        canvasConfetti({ particleCount: 100, spread: 50, origin: { y: 0.5 } });
+        showToast(`+${c.toFixed(6)} USDT`);
+        await updateUI();
+    }
+
+    async function loadLeaderboard() {
+        const listEl = document.getElementById('leaderboard-list');
+        listEl.innerHTML = "Cargando...";
+        const snapshot = await db.collection("usuarios").orderBy("balance", "desc").limit(10).get();
+        listEl.innerHTML = "";
+        let i = 1;
+        snapshot.forEach(doc => {
+            const u = doc.data();
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${i}. ${u.nombre.substring(0, 12)}</span><span style="font-weight:800; color:var(--accent);">${u.balance.toFixed(6)} USDT</span></div>`;
+            i++;
+        });
+    }
+
+    async function loadInvitesList() {
+        if(!userId) return;
+        const listEl = document.getElementById('invites-list');
+        listEl.innerHTML = "Cargando...";
+        const snapshot = await db.collection("usuarios").where("invitado_por", "==", userId).get();
+        listEl.innerHTML = "";
+        if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; opacity:0.6;'>Sin invitados</p>"; return; }
+        snapshot.forEach(doc => {
+            const u = doc.data();
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance.toFixed(6)} USDT</span></div>`;
+        });
+    }
+
+    async function loadHistory() {
+        if(!userId) return;
+        const doc = await db.collection("usuarios").doc(userId).get();
+        const history = doc.data().withdrawHistory || [];
+        const listEl = document.getElementById('history-list');
+        if(history.length === 0) {
+            listEl.innerHTML = "<p style='text-align:center; opacity:0.6; padding:15px;'>Sin retiros previos</p>";
+            return;
+        }
+        listEl.innerHTML = "";
+        history.reverse().forEach(item => {
+            listEl.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:var(--accent);">${item.amount} USDT</span><span>${item.status}</span></div>`;
+        });
+    }
+
+    function copyRefLink() {
+        if(!userId) return;
+        const link = `https://t.me/USDTGIFTKBot?startapp=${userId}`;
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=USDT GIFT K`);
+        showToast("Link generado");
+    }
+
+    async function handleWithdraw() {
+        if(!userId) return;
+        const ccwalletId = document.getElementById('ccwallet-id').value.trim();
+        if(ccwalletId.length < 3) { showToast("ID de CCWallet invalido"); return; }
+        const doc = await db.collection("usuarios").doc(userId).get();
+        const balance = doc.data().balance;
+        if(balance < 0.01) { showToast("Minimo 0.01 USDT"); return; }
+        await db.collection("usuarios").doc(userId).update({
+            ccwallet_id: ccwalletId,
+            balance: 0,
+            withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                amount: balance.toFixed(6),
+                date: new Date().toLocaleDateString(),
+                status: "Enviado a @cctip_bot",
+                ccwallet: ccwalletId
+            })
+        });
+        tg.openTelegramLink(`https://t.me/cctip_bot`);
+        canvasConfetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
+        showToast(`${balance.toFixed(6)} USDT enviado`);
+        await updateUI();
+        await loadHistory();
+        navigate('withdraw-screen');
+    }
+
+    async function handleRedeem() {
+        if(!userId) return;
+        const code = document.getElementById('redeem-code').value.trim().toUpperCase();
+        const msgDiv = document.getElementById('redeem-message');
+        if(!code) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Ingresa un código</span>';
+            return;
+        }
+        const userRef = db.collection("usuarios").doc(userId);
+        const userDoc = await userRef.get();
+        const redeemed = userDoc.data().redeemedCodes || [];
+        if(redeemed.includes(code)) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Código ya usado</span>';
+            return;
+        }
+        const codesSnapshot = await db.collection("giftCodes").where("code", "==", code).where("used", "==", false).get();
+        if(codesSnapshot.empty) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Código invalido</span>';
+            return;
+        }
+        const codeDoc = codesSnapshot.docs[0];
+        const amount = codeDoc.data().amount;
+        await userRef.update({
+            balance: firebase.firestore.FieldValue.increment(amount),
+            redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+        });
+        await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId, usedAt: new Date() });
+        canvasConfetti({ particleCount: 1000, spread: 100, origin: { y: 0.5 } });
+        msgDiv.innerHTML = `<span style="color: #27ae60; font-size: 16px;">+${amount.toFixed(6)} USDT</span>`;
+        document.getElementById('redeem-code').value = '';
+        await updateUI();
+        setTimeout(() => { msgDiv.innerHTML = ''; }, 4000);
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast-element');
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+    }
+
+    function navigate(screenId) {
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        if(screenId === 'leaderboard-screen') loadLeaderboard();
+        if(screenId === 'invites-list-screen') loadInvitesList();
+        if(screenId === 'withdraw-screen') loadHistory();
+    }
+
+    function openCCWallet() {
+        tg.openTelegramLink('https://t.me/cctip_bot');
+        showToast('Abriendo @cctip_bot');
+    }
+
+    function joinChannel() {
+        tg.openTelegramLink('https://t.me/UsdtGiftChannel');
+        showToast('Canal abierto');
+    }
+
+    document.getElementById('clickObject').onclick = handleClick;
+    document.getElementById('doubleBtn').onclick = claimWithMultiplier;
+    document.getElementById('watchAdBtn').onclick = watchAdForDouble;
+    document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
+    document.getElementById('withdrawNavBtn').onclick = () => { navigate('withdraw-screen'); loadHistory(); };
+    document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
+    document.getElementById('leaderboardNavBtn').onclick = () => navigate('leaderboard-screen');
+    document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeLeader').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
+    document.getElementById('backToInvite').onclick = () => navigate('invite-screen');
+    document.getElementById('claimCommBtn').onclick = claimCommissions;
+    document.getElementById('shareRefBtn').onclick = copyRefLink;
+    document.getElementById('viewInvitesBtn').onclick = () => navigate('invites-list-screen');
+    document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
+    document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
+
+    setInterval(() => checkAndResetIfNeeded(), 1000);
+    initUser();
 </script>
 </body>
 </html>
