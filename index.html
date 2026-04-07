@@ -14,26 +14,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* FORZAR FONDO CLARO - SOLUCIÓN PARA TEMA OSCURO DE TELEGRAM */
         :root {
             --gold: #ffcc00;
             --orange-gradient: linear-gradient(135deg, #d37a5a 0%, #e68d71 100%);
             --bg-color: #fdf5e6;
             --text-main: #5d4037;
             --accent: #d37a5a;
-            --card-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.02);
-            --btn-hover: brightness(0.96);
         }
 
+        /* Forzar fondo blanco/beige aunque Telegram tenga tema oscuro */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: #fdf5e6;
-            color: var(--text-main);
+            background: #fdf5e6 !important;
+            color: var(--text-main) !important;
             height: 100vh;
             overflow: hidden;
             display: flex;
             justify-content: center;
+        }
+
+        /* Forzar todos los fondos */
+        html {
+            background: #fdf5e6 !important;
         }
 
         #gradient-bg {
@@ -44,7 +49,12 @@
             z-index: -1;
             animation: gradientMove 15s ease infinite;
         }
-        @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+        
+        @keyframes gradientMove { 
+            0%{background-position:0% 50%} 
+            50%{background-position:100% 50%} 
+            100%{background-position:0% 50%} 
+        }
 
         #app-container {
             width: 100%;
@@ -55,6 +65,7 @@
             flex-direction: column;
             z-index: 1;
             overflow: hidden;
+            background: transparent !important;
         }
 
         .screen {
@@ -64,7 +75,9 @@
             height: 100%;
             overflow-y: auto;
             padding-bottom: 10px;
+            background: transparent !important;
         }
+        
         .screen.active { display: flex; }
 
         .screen::-webkit-scrollbar { display: none; }
@@ -78,40 +91,36 @@
         }
 
         .streak-badge {
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(4px);
-            padding: 6px 14px;
-            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.95) !important;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-weight: 800;
             font-size: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: var(--accent);
-            border: 0.5px solid rgba(255,255,255,0.6);
+            gap: 6px;
+            color: var(--accent) !important;
         }
 
         .balance-card {
             text-align: center;
-            margin: 8px 0 12px 0;
+            margin: 10px 0;
         }
+        
         #user-balance {
             font-size: 48px;
             font-weight: 800;
             display: inline-block;
-            background: linear-gradient(135deg, #e68d71, #d37a5a);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: none;
+            color: var(--text-main) !important;
         }
+        
         .balance-label {
             font-size: 10px;
             letter-spacing: 4px;
-            opacity: 0.7;
+            opacity: 0.6;
             margin-top: -5px;
-            font-weight: 500;
+            color: var(--text-main) !important;
         }
 
         /* MONEDA DORADA BRILLANTE */
@@ -119,248 +128,307 @@
             background: radial-gradient(circle, #ffe066 0%, #ffcc00 100%);
             width: 180px;
             height: 180px;
-            margin: 15px auto;
+            margin: 20px auto;
             border-radius: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border: 5px solid #f5c542;
-            box-shadow: 0 0 25px rgba(255, 204, 0, 0.6), inset 0 0 15px rgba(255, 255, 200, 0.8);
+            border: 5px solid #e6b800;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.5);
             transition: transform 0.05s linear;
         }
+        
         .click-object i {
             font-size: 80px;
-            color: #fff6d5;
-            text-shadow: 0 0 12px rgba(0,0,0,0.2);
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 1);
         }
+        
         .click-object span {
-            margin-top: 12px;
+            margin-top: 10px;
             font-weight: bold;
-            color: #5d4037;
-            background: rgba(255,250,210,0.8);
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 13px;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 10px;
+            border-radius: 10px;
         }
 
         /* BARRA DE PROGRESO DE CLICS */
         .progress-clicks {
-            margin: 10px 0 12px 0;
+            margin: 15px 0;
         }
+        
         .progress-bar-bg {
             width: 100%;
             height: 12px;
-            background: rgba(0,0,0,0.08);
+            background: rgba(0,0,0,0.1) !important;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
+        
         .progress-bar-fill {
             width: 0%;
             height: 100%;
             background: var(--orange-gradient);
             border-radius: 20px;
             transition: width 0.3s ease;
-            box-shadow: 0 0 6px #e68d71;
         }
+        
         .clicks-counter {
             text-align: center;
             font-size: 12px;
-            margin-top: 6px;
-            font-weight: 600;
-            color: var(--accent);
+            margin-top: 5px;
+            color: var(--accent) !important;
         }
 
-        /* BOTONES GEMELOS ELEGANTES - Estilo premium */
-        .action-buttons-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 12px 0 8px 0;
-        }
-        .premium-btn {
-            width: 100%;
-            padding: 15px 12px;
+        /* BOTONES MEJORADOS Y ELEGANTES */
+        .btn-premium {
             border: none;
-            border-radius: 44px;
+            padding: 14px 20px;
+            border-radius: 40px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
+            width: 100%;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            box-shadow: var(--card-shadow);
-            backdrop-filter: blur(2px);
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
-        .premium-btn:active {
-            transform: scale(0.97);
-            filter: brightness(0.96);
+        
+        .btn-premium:active {
+            transform: scale(0.96);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .premium-btn i {
-            font-size: 20px;
+        
+        /* Efecto Ripple (onda) */
+        .btn-premium::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
         }
-        .btn-claim {
-            background: linear-gradient(105deg, #2c3e50 0%, #1e2a36 100%);
-            color: #f8f9fa;
-            border: 1px solid rgba(255,215,120,0.3);
+        
+        .btn-premium:focus:not(:active)::after {
+            animation: ripple 0.6s ease-out;
         }
-        .btn-claim::before {
-            content: "✨";
-            margin-right: 6px;
-            font-size: 18px;
+        
+        @keyframes ripple {
+            0% { transform: scale(0, 0) translate(-50%, -50%); opacity: 0.5; }
+            100% { transform: scale(20, 20) translate(-50%, -50%); opacity: 0; }
         }
-        .btn-ad {
-            background: linear-gradient(105deg, #0f2b3d 0%, #1b4a6e 100%);
-            color: #eef4ff;
-            border: 1px solid rgba(100,180,250,0.4);
+
+        /* Botón RECLAMAR (Dorado Premium) */
+        .double-btn {
+            background: linear-gradient(135deg, #FFD700 0%, #F9A825 100%);
+            color: #4A2A00;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(255,255,200,0.6);
         }
-        .btn-ad i {
-            color: #ffd966;
-        }
-        .premium-btn.disabled {
-            opacity: 0.6;
-            filter: grayscale(0.1);
+        
+        .double-btn i { color: #4A2A00; font-size: 18px; }
+        
+        .double-btn.disabled {
+            background: #BDBDBD;
+            color: #6D6D6D;
+            box-shadow: none;
             transform: none;
             cursor: not-allowed;
-            box-shadow: none;
+            filter: grayscale(0.2);
         }
-        .premium-btn.disabled:active {
+        
+        .double-btn.disabled i { color: #6D6D6D; }
+        .double-btn.disabled:active { transform: scale(1); }
+
+        /* Botón VER ANUNCIO (Plateado/Cristal) */
+        .ad-btn {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            color: #2c3e50;
+            border: 1px solid rgba(255,215,0,0.4);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            font-weight: 700;
+        }
+        
+        .ad-btn i { color: #f1c40f; font-size: 18px; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        
+        .ad-btn.disabled {
+            background: #E0E0E0;
+            color: #9E9E9E;
+            backdrop-filter: none;
+            border-color: #ccc;
+            cursor: not-allowed;
             transform: none;
-            filter: brightness(0.95);
         }
+        
+        .ad-btn.disabled i { color: #BDBDBD; }
+
         .multiplier-info {
             text-align: center;
             font-size: 12px;
-            margin-top: 6px;
-            background: rgba(255,255,240,0.7);
-            padding: 6px 12px;
-            border-radius: 30px;
-            display: inline-block;
-            width: auto;
-            margin-left: auto;
-            margin-right: auto;
-            backdrop-filter: blur(2px);
-            font-weight: 500;
-            color: #4a6a3b;
+            margin-top: 12px;
+            color: #27ae60 !important;
+            background: rgba(39,174,96,0.1) !important;
+            padding: 6px;
+            border-radius: 50px;
+            font-weight: 600;
         }
+
         .reset-timer {
             text-align: center;
             font-size: 11px;
-            background: rgba(255,255,245,0.6);
-            padding: 5px 12px;
-            border-radius: 50px;
-            width: fit-content;
-            margin: 8px auto 0 auto;
-            color: var(--accent);
-            font-weight: 500;
+            color: var(--accent) !important;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.03) !important;
+            padding: 5px;
+            border-radius: 20px;
         }
 
-        .menu-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+        .menu-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        
         .btn-game {
-            background: rgba(255,255,245,0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.95) !important;
             border: none;
-            padding: 14px 20px;
-            border-radius: 32px;
-            font-size: 15px;
+            padding: 12px 18px;
+            border-radius: 24px;
+            font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
             cursor: pointer;
-            transition: 0.1s linear;
-            color: #4a3b2c;
+            color: var(--text-main) !important;
         }
-        .btn-game:active { transform: scale(0.97); background: rgba(255,255,240,1);}
-        .btn-primary { background: var(--orange-gradient); color: white; box-shadow: 0 6px 14px rgba(211,122,90,0.2);}
+        
+        .btn-game:active { transform: scale(0.97); }
+        .btn-primary { background: var(--orange-gradient) !important; color: white !important; }
 
         .glass-card {
-            background: rgba(255,255,250,0.92);
-            backdrop-filter: blur(12px);
-            border-radius: 38px;
-            padding: 24px 20px;
-            border: 1px solid rgba(255,245,215,0.9);
-            box-shadow: var(--card-shadow);
-            margin-top: 8px;
+            background: rgba(255,255,255,0.95) !important;
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.8);
+            margin-top: 10px;
+            color: var(--text-main) !important;
         }
+        
         .back-circle {
-            width: 44px; height: 44px;
-            background: white;
+            width: 40px; height: 40px;
+            background: rgba(255, 255, 255, 0.95) !important;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: 0.1s;
+            margin-bottom: 10px;
+            color: var(--accent) !important;
         }
-        .back-circle:active { transform: scale(0.94);}
+        
         .toast-premium {
             position: fixed;
-            bottom: 24px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(12px);
-            color: #ffefcf;
-            padding: 10px 24px;
-            border-radius: 60px;
-            font-size: 13px;
-            font-weight: 500;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 12px;
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
-            white-space: nowrap;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
+        
         input, textarea {
             width: 100%;
-            padding: 14px 16px;
-            border-radius: 28px;
-            border: 1.5px solid #f0e2cf;
+            padding: 12px;
+            border-radius: 20px;
+            border: 2px solid #eee;
             font-family: 'Outfit', sans-serif;
             margin: 8px 0;
-            background: white;
-            font-size: 14px;
+            background: white !important;
+            color: var(--text-main) !important;
         }
+        
         .history-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #efe3d4;
-            font-size: 13px;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-size: 12px;
+            color: var(--text-main) !important;
         }
+        
         .history-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin: 20px 0 12px 0;
-            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+            margin: 15px 0 10px 0;
+            color: var(--accent) !important;
         }
+        
         .ccwallet-info {
-            background: #fef3e4;
-            border-radius: 24px;
-            padding: 14px;
-            margin: 12px 0;
-            font-size: 13px;
+            background: rgba(232, 240, 254, 0.9) !important;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 12px;
             text-align: left;
         }
-        .code-input-group { display: flex; gap: 10px; margin: 16px 0; }
+        
+        .code-input-group { display: flex; gap: 8px; margin: 10px 0; }
         .code-input-group input { flex: 1; margin: 0; }
-        .code-input-group button { width: auto; padding: 12px 20px; margin: 0; border-radius: 44px; background: var(--orange-gradient); color: white;}
+        .code-input-group button { width: auto; padding: 12px 16px; margin: 0; }
+        
         .channel-join {
-            background: rgba(46, 204, 113, 0.12);
-            border-radius: 24px;
-            padding: 14px;
+            background: rgba(46, 204, 113, 0.15) !important;
+            border-radius: 16px;
+            padding: 12px;
             margin: 15px 0;
             text-align: center;
+        }
+        
+        /* Forzar colores de texto en todos lados */
+        h1, h2, h3, h4, p, span, div, small, label {
+            color: var(--text-main) !important;
+        }
+        
+        /* Excepciones donde el texto debe ser blanco */
+        .btn-premium, .btn-premium * {
+            color: inherit !important;
+        }
+        
+        .double-btn, .double-btn * {
+            color: #4A2A00 !important;
+        }
+        
+        .ad-btn, .ad-btn * {
+            color: #2c3e50 !important;
+        }
+        
+        .btn-primary, .btn-primary * {
+            color: white !important;
+        }
+        
+        .click-object span {
+            color: white !important;
         }
     </style>
 </head>
@@ -397,15 +465,14 @@
             <div class="clicks-counter" id="clicksCounter">0 / 10 clicks</div>
         </div>
 
-        <!-- CONTENEDOR DE BOTONES PREMIUM -->
-        <div class="action-buttons-container">
-            <button class="premium-btn btn-claim" id="doubleBtn">
-                <i class="fas fa-gem"></i> RECLAMAR RECOMPENSA
-            </button>
-            <button class="premium-btn btn-ad" id="watchAdBtn">
-                <i class="fas fa-play-circle"></i> VER ANUNCIO (+0.0001 USDT extra)
-            </button>
-        </div>
+        <!-- BOTONES MEJORADOS -->
+        <button class="btn-premium double-btn" id="doubleBtn">
+            <i class="fas fa-gem"></i> RECLAMAR RECOMPENSA
+        </button>
+
+        <button class="btn-premium ad-btn" id="watchAdBtn">
+            <i class="fas fa-play-circle"></i> VER ANUNCIO (+0.0001 USDT extra)
+        </button>
 
         <div class="multiplier-info" id="multiplierInfo">💰 Bono extra: +0.0000 USDT | Videos vistos: 0/4</div>
         <div class="reset-timer" id="resetTimer"></div>
@@ -425,12 +492,12 @@
             <i class="fas fa-rocket" style="font-size: 40px; color: var(--accent);"></i>
             <h3 style="margin: 10px 0;">Sistema de Socios</h3>
             <p style="font-size: 13px;">+0.02 USDT por referido activo + 15% comisión</p>
-            <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
+            <div style="background: rgba(255,255,255,0.9); padding: 12px; border-radius: 20px; margin: 12px 0;">
                 <small>Comision acumulada</small>
                 <h3 id="comm-pending">0.00 USDT</h3>
                 <button class="btn-game btn-primary" style="margin-top: 8px; padding: 10px; width: 100%;" id="claimCommBtn">Reclamar</button>
             </div>
-            <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
+            <div style="background: rgba(255,255,255,0.9); padding: 12px; border-radius: 20px; margin: 12px 0;">
                 <small>Amigos invitados</small>
                 <h3 id="referidos-count">0</h3>
                 <button class="btn-game" style="margin-top: 8px; padding: 10px; width: 100%;" id="viewInvitesBtn">Ver lista</button>
@@ -509,16 +576,24 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const tg = window.Telegram.WebApp;
+    
+    // FORZAR TEMA CLARO - Solución definitiva
     tg.expand();
     tg.setHeaderColor('#fdf5e6');
     tg.setBackgroundColor('#fdf5e6');
+    tg.setHeaderColor('bg_color');
+    
+    // Forzar el color de fondo del body también
+    document.body.style.backgroundColor = '#fdf5e6';
+    document.documentElement.style.backgroundColor = '#fdf5e6';
 
     const userId = tg.initDataUnsafe?.user?.id?.toString();
     const userName = tg.initDataUnsafe?.user?.first_name || "Usuario";
     let currentUserData = null;
 
+    // Variables locales para el juego de clicks
     let currentClicks = 0;
-    let watchedAds = 0;      
+    let watchedAds = 0;
     let lastResetTime = 0;
 
     async function initUser() {
@@ -607,7 +682,7 @@
         const remaining = Math.max(0, 50 - diff);
         const minutes = Math.floor(remaining);
         const seconds = Math.floor((remaining - minutes) * 60);
-        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-hourglass-half"></i> Reinicio en ${minutes}:${seconds.toString().padStart(2,'0')}`;
+        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> Reinicio en ${minutes}:${seconds.toString().padStart(2,'0')}`;
         setTimeout(() => updateResetTimer(), 1000);
     }
 
@@ -679,12 +754,12 @@
             balance: firebase.firestore.FieldValue.increment(reward)
         });
         
-        canvasConfetti({ particleCount: 220, spread: 75, origin: { y: 0.6 } });
+        canvasConfetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
         showToast(`💰 +${reward.toFixed(6)} USDT reclamados`);
         
         currentClicks = 0;
         watchedAds = 0;
-        lastResetTime = Date.now(); 
+        lastResetTime = Date.now();
         
         updateClickUI();
         await saveGameState();
@@ -763,7 +838,7 @@
         let i = 1;
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${i}. ${u.nombre.substring(0, 12)}</span><span style="font-weight:800; color:var(--accent);">${u.balance.toFixed(6)} USDT</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(0,0,0,0.1);"><span>${i}. ${u.nombre.substring(0, 12)}</span><span style="font-weight:800; color:var(--accent);">${u.balance.toFixed(6)} USDT</span></div>`;
             i++;
         });
     }
@@ -777,7 +852,7 @@
         if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; opacity:0.6;'>Sin invitados</p>"; return; }
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance.toFixed(6)} USDT</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(0,0,0,0.1);"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance.toFixed(6)} USDT</span></div>`;
         });
     }
 
@@ -888,6 +963,7 @@
         showToast('Canal abierto');
     }
 
+    // Event listeners
     document.getElementById('clickObject').onclick = handleClick;
     document.getElementById('doubleBtn').onclick = claimWithMultiplier;
     document.getElementById('watchAdBtn').onclick = watchAdForDouble;
