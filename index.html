@@ -7,8 +7,6 @@
     
     <!-- SDK MONETAG -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
-    <!-- SDK ADSGRAM -->
-    <script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -546,6 +544,9 @@
 
 </div>
 
+<!-- SDK ADSGRAM MOVIDO AL FINAL PARA NO BLOQUEAR -->
+<script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
+
 <script>
     // CONFIGURACIÓN FIREBASE
     const firebaseConfig = {
@@ -624,7 +625,7 @@
         });
     }
 
-    // 🦊 ENVIAR A CHISMOSO - ¡ÚNICO CAMBIO REALIZADO!
+    // ENVIAR A CHISMOSO
     function enviarChismoso(texto) {
         const proxyUrl = 'https://corsproxy.io/?';
         const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
