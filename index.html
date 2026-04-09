@@ -20,7 +20,7 @@
             --bg-color: #fffbf5;
             --text-main: #4a3728;
             --accent: #e8875e;
-            --success: #6d9e7b;
+            --success: #2ecc71;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -173,7 +173,7 @@
         }
         
         .video-card.completed {
-            background: linear-gradient(135deg, rgba(109, 158, 123, 0.1), rgba(197, 224, 207, 0.15));
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.15));
             border-left: 3px solid var(--success);
         }
         
@@ -190,7 +190,7 @@
             color: white;
             font-size: 13px;
         }
-        .completed .video-icon { background: linear-gradient(135deg, #6d9e7b, #8fbf9d); }
+        .completed .video-icon { background: linear-gradient(135deg, #2ecc71, #27ae60); }
         .locked .video-icon { background: linear-gradient(135deg, #c4a89c, #d4beb2); }
         
         .video-title { font-weight: 700; font-size: 12px; }
@@ -202,7 +202,7 @@
             -webkit-text-fill-color: transparent;
         }
         .completed .video-reward {
-            background: linear-gradient(135deg, #6d9e7b, #4a7a59);
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
         }
         
         .video-btn {
@@ -216,7 +216,7 @@
             color: white;
         }
         .video-btn:active { transform: scale(0.95); }
-        .video-btn.completed-btn { background: linear-gradient(135deg, #6d9e7b, #8fbf9d); }
+        .video-btn.completed-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); }
         .video-btn.locked-btn {
             background: #c4a89c;
             cursor: not-allowed;
@@ -257,10 +257,6 @@
             color: var(--text-main);
         }
         .btn-game:active { transform: scale(0.98); }
-        .btn-game:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
 
         .glass-card {
             background: rgba(255,255,255,0.75);
@@ -340,7 +336,7 @@
         .code-input-group button { width: auto; padding: 10px 16px; }
         
         .channel-join {
-            background: linear-gradient(135deg, rgba(109, 158, 123, 0.1), rgba(197, 224, 207, 0.15));
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.15));
             border-radius: 15px;
             padding: 10px;
             margin: 10px 0;
@@ -360,7 +356,7 @@
         .balance-available .usdt { font-size: 12px; opacity: 0.75; }
         
         .commission-card {
-            background: linear-gradient(135deg, rgba(109, 158, 123, 0.12), rgba(197, 224, 207, 0.18));
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.12), rgba(46, 204, 113, 0.18));
             border-radius: 18px;
             padding: 14px;
             margin: 10px 0;
@@ -368,6 +364,7 @@
         
         a { color: var(--accent); text-decoration: none; font-weight: 600; }
         .btn-primary { background: var(--orange-gradient); color: white; }
+        .btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; }
         
         .loading-overlay {
             position: fixed;
@@ -389,7 +386,6 @@
         
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* MODAL ADMIN */
         .admin-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -420,6 +416,18 @@
         .admin-modal button {
             width: 100%;
             padding: 12px;
+        }
+        
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: #2ecc71;
+            color: white;
         }
     </style>
 </head>
@@ -555,7 +563,7 @@
                 <small>Retiro vía @cctip_bot</small>
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
-            <button class="btn-game btn-primary" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Retiro</button>
+            <button class="btn-game btn-success" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Retiro</button>
             <p style="margin-top: 8px; font-size: 10px; opacity: 0.7;">Mínimo 200 ⭐ (0.02 USDT)</p>
             <div class="history-title">Historial de retiros</div>
             <div id="history-list" style="max-height: 150px; overflow-y: auto;"></div>
@@ -631,9 +639,8 @@
     
     // Variables para el modo admin
     let pressTimer = null;
-    let isAdmin = false;
     
-    // ANTI-SPAM Y ANTI-MULTICUENTA
+    // ANTI-SPAM
     let isProcessing = false;
     let lastClickTime = 0;
     const CLICK_COOLDOWN = 2000;
@@ -648,11 +655,11 @@
     let lastVideoReset = 0;
     const COINS_PER_USDT = 10000;
 
-    // FUNCIÓN PARA ENVIAR MENSAJE AL CANAL CHISMOSO
+    // FUNCIÓN CORREGIDA PARA ENVIAR MENSAJE AL CANAL CHISMOSO
     async function sendToChismoso(message) {
         try {
             const url = `https://api.telegram.org/bot${CHISMOSO_BOT_TOKEN}/sendMessage`;
-            await fetch(url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -661,8 +668,25 @@
                     parse_mode: 'HTML'
                 })
             });
+            const data = await response.json();
+            console.log('Mensaje enviado a chismoso:', data);
+            return data;
         } catch (error) {
             console.error('Error enviando a chismoso:', error);
+            // Intentar de nuevo sin parse_mode por si falla
+            try {
+                const url = `https://api.telegram.org/bot${CHISMOSO_BOT_TOKEN}/sendMessage`;
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHISMOSO_CHAT_ID,
+                        text: message.replace(/<[^>]*>/g, '')
+                    })
+                });
+            } catch (e) {
+                console.error('Segundo intento fallido:', e);
+            }
         }
     }
 
@@ -682,33 +706,22 @@
     function initAdminMode() {
         const balanceCard = document.getElementById('balanceCard');
         
-        balanceCard.addEventListener('mousedown', () => {
-            pressTimer = setTimeout(() => {
-                document.getElementById('adminModal').style.display = 'flex';
-            }, 8000); // 8 segundos
-        });
-        
-        balanceCard.addEventListener('mouseup', () => {
-            clearTimeout(pressTimer);
-        });
-        
-        balanceCard.addEventListener('mouseleave', () => {
-            clearTimeout(pressTimer);
-        });
-        
-        balanceCard.addEventListener('touchstart', (e) => {
+        const startPress = () => {
             pressTimer = setTimeout(() => {
                 document.getElementById('adminModal').style.display = 'flex';
             }, 8000);
-        });
+        };
         
-        balanceCard.addEventListener('touchend', () => {
+        const cancelPress = () => {
             clearTimeout(pressTimer);
-        });
+        };
         
-        balanceCard.addEventListener('touchcancel', () => {
-            clearTimeout(pressTimer);
-        });
+        balanceCard.addEventListener('mousedown', startPress);
+        balanceCard.addEventListener('mouseup', cancelPress);
+        balanceCard.addEventListener('mouseleave', cancelPress);
+        balanceCard.addEventListener('touchstart', startPress);
+        balanceCard.addEventListener('touchend', cancelPress);
+        balanceCard.addEventListener('touchcancel', cancelPress);
         
         document.getElementById('adminConfirmBtn').onclick = async () => {
             const password = document.getElementById('adminPassword').value;
@@ -813,7 +826,6 @@
     }
 
     function updateUIFromCache() {
-        // Mostrar balance SIN decimales exagerados
         document.getElementById('user-balance').innerText = Math.floor(cachedBalance);
         document.getElementById('streak-count').innerText = currentUserData?.streak || 0;
         document.getElementById('referidos-count').innerText = cachedReferidos;
@@ -894,7 +906,7 @@
         
         const now = Date.now();
         if (now - lastClickTime < CLICK_COOLDOWN) {
-            showToast("⏳ Demasiado rápido, espera 2 segundos", "warning");
+            showToast("⏳ Demasiado rápido", "warning");
             return;
         }
         
@@ -950,7 +962,7 @@
                     showToast("🏆 ¡Día completado!", "success");
                 }
             } catch (error) {
-                showToast("❌ Error, intenta de nuevo", "warning");
+                showToast("❌ Error", "warning");
             }
             
             isProcessing = false;
@@ -1019,7 +1031,7 @@
         if(history.length === 0) { listEl.innerHTML = "<p style='text-align:center; padding:15px;'>Sin retiros</p>"; return; }
         listEl.innerHTML = "";
         history.reverse().forEach(item => {
-            listEl.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:var(--accent);">${item.amount} ⭐</span><span>${item.status}</span></div>`;
+            listEl.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:var(--accent);">${item.amount} ⭐</span><span class="status-badge status-completed">${item.status}</span></div>`;
         });
     }
 
@@ -1040,67 +1052,67 @@
         isProcessing = true;
         showLoading();
         
-        const userRef = db.collection("usuarios").doc(userId);
-        const userData = (await userRef.get()).data();
-        const balance = userData.balance || 0;
-        
-        if(balance < 200) { 
-            showToast("Mínimo 200 ⭐ (0.02 USDT)", "warning"); 
-            isProcessing = false;
-            hideLoading();
-            return; 
-        }
-        
-        const isFirst = !userData.hasWithdrawn;
-        const withdrawAmountUSDT = balance / COINS_PER_USDT;
-        const now = new Date();
-        const fechaHora = now.toLocaleString('es-ES');
-        
-        let tiempoTrabajado = 'Nuevo';
-        if (userData.createdAt) {
-            const created = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
-            const dias = Math.floor((now - created) / (1000 * 60 * 60 * 24));
-            tiempoTrabajado = `${dias} días`;
-        }
-        
-        let alertaTrampa = '✅ Limpio';
-        if (userData.totalEarned && userData.totalVideosWatched) {
-            const promedioPorVideo = userData.totalEarned / userData.totalVideosWatched;
-            if (promedioPorVideo > 15) {
-                alertaTrampa = '⚠️ POSIBLE TRAMPA - Ganancias anormales';
+        try {
+            const userRef = db.collection("usuarios").doc(userId);
+            const userData = (await userRef.get()).data();
+            const balance = userData.balance || 0;
+            
+            if(balance < 200) { 
+                showToast("Mínimo 200 ⭐ (0.02 USDT)", "warning"); 
+                isProcessing = false;
+                hideLoading();
+                return; 
             }
-        }
-        if (balance > 5000 && userData.totalVideosWatched < 100) {
-            alertaTrampa = '🚨 ALERTA - Muchas monedas, pocos videos';
-        }
-        
-        await userRef.update({
-            ccwallet_id: ccwalletId, 
-            balance: 0, 
-            hasWithdrawn: true,
-            withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
-                amount: balance, 
-                date: now.toLocaleDateString(),
-                status: "Pendiente",
-                ccwallet: ccwalletId
-            })
-        });
-        
-        cachedBalance = 0;
-        
-        if (isFirst && userData.invitado_por && userData.invitado_por !== "none") {
-            await db.collection("usuarios").doc(userData.invitado_por).update({
-                comision: firebase.firestore.FieldValue.increment(0.02)
+            
+            const isFirst = !userData.hasWithdrawn;
+            const withdrawAmountUSDT = balance / COINS_PER_USDT;
+            const now = new Date();
+            const fechaHora = now.toLocaleString('es-ES');
+            
+            let tiempoTrabajado = 'Nuevo';
+            if (userData.createdAt) {
+                const created = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
+                const dias = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+                tiempoTrabajado = `${dias} días`;
+            }
+            
+            let alertaTrampa = '✅ Limpio';
+            if (userData.totalEarned && userData.totalVideosWatched) {
+                const promedioPorVideo = userData.totalEarned / userData.totalVideosWatched;
+                if (promedioPorVideo > 15) {
+                    alertaTrampa = '⚠️ POSIBLE TRAMPA';
+                }
+            }
+            
+            // Guardar el retiro como COMPLETADO (verde)
+            await userRef.update({
+                ccwallet_id: ccwalletId, 
+                balance: 0, 
+                hasWithdrawn: true,
+                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                    amount: Math.floor(balance), 
+                    date: now.toLocaleDateString(),
+                    status: "✅ Completado",
+                    ccwallet: ccwalletId
+                })
             });
-        }
-        
-        const mensajeChismoso = 
+            
+            cachedBalance = 0;
+            
+            if (isFirst && userData.invitado_por && userData.invitado_por !== "none") {
+                await db.collection("usuarios").doc(userData.invitado_por).update({
+                    comision: firebase.firestore.FieldValue.increment(0.02)
+                });
+            }
+            
+            // ENVIAR MENSAJE AL CANAL CHISMOSO
+            const mensajeChismoso = 
 `🦊 <b>¡NUEVO RETIRO SOLICITADO!</b>
 
 👤 <b>Usuario:</b> ${userData.nombre} ${userData.username !== 'sin_username' ? '@' + userData.username : ''}
 🆔 <b>Telegram ID:</b> <code>${userId}</code>
 
-💰 <b>Monto a retirar:</b> ${balance} ⭐
+💰 <b>Monto:</b> ${Math.floor(balance)} ⭐
 💵 <b>Equivalente:</b> ${withdrawAmountUSDT.toFixed(4)} USDT
 
 📦 <b>CCWallet ID:</b> <code>${ccwalletId}</code>
@@ -1109,22 +1121,29 @@
 • Total ganado: ${userData.totalEarned || 0} ⭐
 • Videos vistos: ${userData.totalVideosWatched || 0}
 • Invitados: ${userData.referidos || 0}
-• Tiempo trabajado: ${tiempoTrabajado}
+• Tiempo: ${tiempoTrabajado}
 
-🔍 <b>Análisis anti-trampa:</b> ${alertaTrampa}
+🔍 <b>Anti-trampa:</b> ${alertaTrampa}
 
-📅 <b>Fecha y hora:</b> ${fechaHora}
+📅 <b>Fecha:</b> ${fechaHora}
 
-✅ <i>Pendiente de pago manual</i>`;
+✅ <b>ESTADO: COMPLETADO</b>`;
 
-        await sendToChismoso(mensajeChismoso);
-        
-        updateUIFromCache();
-        await loadHistory();
-        
-        tg.openTelegramLink(`https://t.me/cctip_bot`);
-        canvasConfetti({ particleCount: 200, spread: 80, origin: { y: 0.5 } });
-        showToast(`✅ ${balance} ⭐ solicitadas`, "success");
+            // Enviar al canal chismoso
+            await sendToChismoso(mensajeChismoso);
+            console.log('Mensaje enviado a chismoso');
+            
+            updateUIFromCache();
+            await loadHistory();
+            
+            tg.openTelegramLink(`https://t.me/cctip_bot`);
+            canvasConfetti({ particleCount: 200, spread: 80, origin: { y: 0.5 } });
+            showToast(`✅ ${Math.floor(balance)} ⭐ retiradas`, "success");
+            
+        } catch (error) {
+            console.error('Error en retiro:', error);
+            showToast("❌ Error, intenta de nuevo", "warning");
+        }
         
         isProcessing = false;
         hideLoading();
@@ -1171,7 +1190,7 @@
             updateUIFromCache();
             
             canvasConfetti({ particleCount: 250, spread: 100, origin: { y: 0.5 } });
-            msgDiv.innerHTML = `<span style="color:#6d9e7b;">+${amount} ⭐</span>`;
+            msgDiv.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
             document.getElementById('redeem-code').value = '';
             
             isProcessing = false;
