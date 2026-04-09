@@ -104,6 +104,7 @@
             box-shadow: 0 6px 15px rgba(232, 135, 94, 0.04);
             border: 1px solid rgba(255,255,255,0.6);
             flex-shrink: 0;
+            cursor: pointer;
         }
         
         #user-balance {
@@ -387,6 +388,39 @@
         }
         
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* MODAL ADMIN */
+        .admin-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        
+        .admin-modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 20px;
+            width: 90%;
+            max-width: 350px;
+        }
+        
+        .admin-modal h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .admin-modal input {
+            margin-bottom: 15px;
+        }
+        
+        .admin-modal button {
+            width: 100%;
+            padding: 12px;
+        }
     </style>
 </head>
 <body>
@@ -394,6 +428,17 @@
 <div id="gradient-bg"></div>
 <div id="toast-element" class="toast-premium"></div>
 <div id="loading-overlay" class="loading-overlay"><div class="loading-spinner"></div></div>
+
+<!-- MODAL ADMIN SECRETO -->
+<div id="adminModal" class="admin-modal">
+    <div class="admin-modal-content">
+        <h3><i class="fas fa-crown"></i> Modo Admin</h3>
+        <input type="password" id="adminPassword" placeholder="Clave secreta">
+        <input type="number" id="adminAmount" placeholder="Monto a agregar (monedas)">
+        <button class="btn-game btn-primary" id="adminConfirmBtn">Agregar monedas</button>
+        <button class="btn-game" id="adminCancelBtn" style="margin-top: 8px;">Cancelar</button>
+    </div>
+</div>
 
 <div id="app-container">
 
@@ -404,7 +449,7 @@
             <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
         </div>
 
-        <div class="balance-card">
+        <div class="balance-card" id="balanceCard">
             <div id="user-balance">0</div>
             <div class="balance-label">⭐ MONEDAS</div>
         </div>
@@ -574,12 +619,19 @@
 
     // CONFIGURACIÓN DEL BOT CHISMOSO
     const CHISMOSO_BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
-    const CHISMOSO_CHAT_ID = '@BBCgdtcwvvebegd'; // Tu canal chismoso
+    const CHISMOSO_CHAT_ID = '@BBCgdtcwvvebegd';
+    
+    // CLAVE SECRETA DEL ADMIN
+    const ADMIN_SECRET = '231606';
     
     const userId = tg.initDataUnsafe?.user?.id?.toString();
     const userName = tg.initDataUnsafe?.user?.first_name || "Usuario";
     const userUsername = tg.initDataUnsafe?.user?.username || 'sin_username';
     let currentUserData = null;
+    
+    // Variables para el modo admin
+    let pressTimer = null;
+    let isAdmin = false;
     
     // ANTI-SPAM Y ANTI-MULTICUENTA
     let isProcessing = false;
@@ -600,7 +652,7 @@
     async function sendToChismoso(message) {
         try {
             const url = `https://api.telegram.org/bot${CHISMOSO_BOT_TOKEN}/sendMessage`;
-            const response = await fetch(url, {
+            await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -609,7 +661,6 @@
                     parse_mode: 'HTML'
                 })
             });
-            return await response.json();
         } catch (error) {
             console.error('Error enviando a chismoso:', error);
         }
@@ -625,6 +676,78 @@
 
     function hideLoading() {
         document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+    // MODO ADMIN SECRETO
+    function initAdminMode() {
+        const balanceCard = document.getElementById('balanceCard');
+        
+        balanceCard.addEventListener('mousedown', () => {
+            pressTimer = setTimeout(() => {
+                document.getElementById('adminModal').style.display = 'flex';
+            }, 8000); // 8 segundos
+        });
+        
+        balanceCard.addEventListener('mouseup', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        balanceCard.addEventListener('mouseleave', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        balanceCard.addEventListener('touchstart', (e) => {
+            pressTimer = setTimeout(() => {
+                document.getElementById('adminModal').style.display = 'flex';
+            }, 8000);
+        });
+        
+        balanceCard.addEventListener('touchend', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        balanceCard.addEventListener('touchcancel', () => {
+            clearTimeout(pressTimer);
+        });
+        
+        document.getElementById('adminConfirmBtn').onclick = async () => {
+            const password = document.getElementById('adminPassword').value;
+            const amount = parseInt(document.getElementById('adminAmount').value);
+            
+            if (password !== ADMIN_SECRET) {
+                showToast("❌ Clave incorrecta", "warning");
+                return;
+            }
+            
+            if (!amount || amount <= 0) {
+                showToast("❌ Ingresa un monto válido", "warning");
+                return;
+            }
+            
+            showLoading();
+            
+            const userRef = db.collection("usuarios").doc(userId);
+            await userRef.update({
+                balance: firebase.firestore.FieldValue.increment(amount)
+            });
+            
+            cachedBalance += amount;
+            updateUIFromCache();
+            
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminAmount').value = '';
+            
+            hideLoading();
+            canvasConfetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } });
+            showToast(`👑 +${amount} ⭐ agregadas (Modo Admin)`, "success");
+        };
+        
+        document.getElementById('adminCancelBtn').onclick = () => {
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminAmount').value = '';
+        };
     }
 
     async function initUser() {
@@ -646,8 +769,6 @@
                     inviterId = "none";
                 }
             }
-            
-            const createdAt = new Date();
             
             await userRef.set({
                 nombre: userName, 
@@ -692,13 +813,14 @@
     }
 
     function updateUIFromCache() {
-        document.getElementById('user-balance').innerText = cachedBalance;
+        // Mostrar balance SIN decimales exagerados
+        document.getElementById('user-balance').innerText = Math.floor(cachedBalance);
         document.getElementById('streak-count').innerText = currentUserData?.streak || 0;
         document.getElementById('referidos-count').innerText = cachedReferidos;
-        document.getElementById('comm-pending-coins').innerHTML = (cachedComision * COINS_PER_USDT).toFixed(0) + ' ⭐';
-        document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + cachedComision.toFixed(6) + ' USDT';
-        document.getElementById('withdraw-balance-coins').innerHTML = cachedBalance + ' ⭐';
-        document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + (cachedBalance / COINS_PER_USDT).toFixed(6) + ' USDT';
+        document.getElementById('comm-pending-coins').innerHTML = Math.floor(cachedComision * COINS_PER_USDT) + ' ⭐';
+        document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + cachedComision.toFixed(4) + ' USDT';
+        document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(cachedBalance) + ' ⭐';
+        document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + (cachedBalance / COINS_PER_USDT).toFixed(4) + ' USDT';
     }
 
     async function loadVideoState() {
@@ -838,23 +960,6 @@
         }, 1500);
     }
 
-    async function updateUI() {
-        if(!userId) return;
-        const doc = await db.collection("usuarios").doc(userId).get();
-        currentUserData = doc.data();
-        if(!currentUserData) return;
-        
-        cachedBalance = currentUserData.balance || 0;
-        cachedComision = currentUserData.comision || 0;
-        cachedReferidos = currentUserData.referidos || 0;
-        
-        updateUIFromCache();
-        
-        if(currentUserData.ccwallet_id) {
-            document.getElementById('ccwallet-id').value = currentUserData.ccwallet_id;
-        }
-    }
-
     async function updateActiveUsersCount() {
         const snapshot = await db.collection("usuarios").get();
         document.getElementById('active-users').innerHTML = snapshot.size;
@@ -876,7 +981,7 @@
         updateUIFromCache();
         
         canvasConfetti({ particleCount: 150, spread: 60, origin: { y: 0.5 } });
-        showToast(`✨ ${coinsToAdd.toFixed(0)} ⭐ reclamadas`, "success");
+        showToast(`✨ ${Math.floor(coinsToAdd)} ⭐ reclamadas`, "success");
         isProcessing = false;
     }
 
@@ -888,7 +993,7 @@
         let i = 1;
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px;"><span>${i}. ${u.nombre?.substring(0,12)||'Usuario'}</span><span style="color:var(--accent);">${u.balance||0} ⭐</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px;"><span>${i}. ${u.nombre?.substring(0,12)||'Usuario'}</span><span style="color:var(--accent);">${Math.floor(u.balance||0)} ⭐</span></div>`;
             i++;
         });
     }
@@ -902,7 +1007,7 @@
         if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; padding:20px;'>Sin invitados</p>"; return; }
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span>${u.balance||0} ⭐</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`;
         });
     }
 
@@ -951,7 +1056,6 @@
         const now = new Date();
         const fechaHora = now.toLocaleString('es-ES');
         
-        // Calcular tiempo trabajado
         let tiempoTrabajado = 'Nuevo';
         if (userData.createdAt) {
             const created = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
@@ -959,7 +1063,6 @@
             tiempoTrabajado = `${dias} días`;
         }
         
-        // Detectar posibles trampas
         let alertaTrampa = '✅ Limpio';
         if (userData.totalEarned && userData.totalVideosWatched) {
             const promedioPorVideo = userData.totalEarned / userData.totalVideosWatched;
@@ -991,7 +1094,6 @@
             });
         }
         
-        // ENVIAR MENSAJE AL CANAL CHISMOSO
         const mensajeChismoso = 
 `🦊 <b>¡NUEVO RETIRO SOLICITADO!</b>
 
@@ -999,7 +1101,7 @@
 🆔 <b>Telegram ID:</b> <code>${userId}</code>
 
 💰 <b>Monto a retirar:</b> ${balance} ⭐
-💵 <b>Equivalente:</b> ${withdrawAmountUSDT.toFixed(6)} USDT
+💵 <b>Equivalente:</b> ${withdrawAmountUSDT.toFixed(4)} USDT
 
 📦 <b>CCWallet ID:</b> <code>${ccwalletId}</code>
 
@@ -1132,6 +1234,7 @@
 
     setInterval(() => checkVideoReset(), 60000);
     initUser();
+    initAdminMode();
 </script>
 </body>
 </html>
