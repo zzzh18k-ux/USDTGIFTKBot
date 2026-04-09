@@ -341,6 +341,35 @@
             margin: 15px 0;
             text-align: center;
         }
+        
+        /* Estilo para mostrar balance disponible */
+        .balance-available {
+            background: linear-gradient(135deg, #fff9e6, #fff0cc);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 15px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+        
+        .balance-available .coins {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        
+        .balance-available .usdt {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .commission-card {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 12px 0;
+        }
     </style>
 </head>
 <body>
@@ -446,7 +475,7 @@
 
         <div class="menu-grid">
             <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Crecer Equipo</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Mi Cosecha</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Retirar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="leaderboardNavBtn"><span><i class="fas fa-trophy"></i> Top Usuarios</span> <i class="fas fa-chevron-right"></i></button>
         </div>
@@ -459,11 +488,14 @@
             <i class="fas fa-rocket" style="font-size: 40px; color: var(--accent);"></i>
             <h3 style="margin: 10px 0;">Sistema de Socios</h3>
             <p style="font-size: 13px;">+0.02 USDT por referido cuando haga su primer retiro</p>
-            <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
-                <small>Comision acumulada</small>
-                <h3 id="comm-pending">0.00 USDT</h3>
-                <button class="btn-game btn-primary" style="margin-top: 8px; padding: 10px; width: 100%;" id="claimCommBtn">Reclamar</button>
+            
+            <div class="commission-card">
+                <small><i class="fas fa-hand-holding-usd"></i> Comisión acumulada</small>
+                <h3 style="font-size: 28px; margin: 5px 0;" id="comm-pending-coins">0 ⭐</h3>
+                <div style="font-size: 13px; opacity: 0.8;" id="comm-pending-usdt">≈ 0.00 USDT</div>
+                <button class="btn-game btn-primary" style="margin-top: 12px; padding: 10px; width: 100%;" id="claimCommBtn">Reclamar</button>
             </div>
+            
             <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
                 <small>Amigos invitados</small>
                 <h3 id="referidos-count">0</h3>
@@ -479,6 +511,14 @@
         <div class="glass-card">
             <i class="fas fa-wallet" style="font-size: 40px; color: #2ecc71;"></i>
             <h3 style="margin: 10px 0;">Retirar con CCWallet</h3>
+            
+            <!-- Balance disponible -->
+            <div class="balance-available">
+                <small><i class="fas fa-coins"></i> Balance disponible</small>
+                <div class="coins" id="withdraw-balance-coins">0 ⭐</div>
+                <div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div>
+            </div>
+            
             <div class="ccwallet-info">
                 <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
                 <a href="#" onclick="openCCWallet(); return false;">Crear cuenta aquí</a><br>
@@ -555,6 +595,9 @@
     const VIDEO_REWARDS = [10, 10, 15, 10, 15];
     let videosWatched = 0;
     let lastVideoReset = 0;
+    
+    // Tasa de cambio: 10,000 monedas = 1 USDT → 1 moneda = 0.0001 USDT
+    const COINS_PER_USDT = 10000;
 
     async function initUser() {
         if(!userId) return;
@@ -644,7 +687,6 @@
     function updateVideoUI() {
         document.getElementById('videosWatchedToday').innerText = videosWatched;
         
-        // Actualizar dots
         const dots = document.querySelectorAll('.dot');
         dots.forEach((dot, index) => {
             if (index < videosWatched) {
@@ -654,7 +696,6 @@
             }
         });
         
-        // Actualizar cada video
         for (let i = 1; i <= 5; i++) {
             const card = document.getElementById(`video${i}Card`);
             const btn = document.getElementById(`video${i}Btn`);
@@ -699,7 +740,6 @@
         
         showToast("📺 Reproduciendo anuncio...");
         
-        // SIMULACIÓN DE ANUNCIO
         setTimeout(async () => {
             const reward = VIDEO_REWARDS[videoNumber - 1];
             
@@ -729,10 +769,21 @@
         currentUserData = doc.data();
         if(!currentUserData) return;
 
-        document.getElementById('user-balance').innerText = currentUserData.balance || 0;
-        document.getElementById('comm-pending').innerHTML = (currentUserData.comision || 0).toFixed(2) + " USDT";
+        const balance = currentUserData.balance || 0;
+        const comision = currentUserData.comision || 0;
+        const comisionCoins = comision * COINS_PER_USDT;
+        
+        document.getElementById('user-balance').innerText = balance;
         document.getElementById('streak-count').innerText = currentUserData.streak || 0;
         document.getElementById('referidos-count').innerText = currentUserData.referidos || 0;
+        
+        // Comisión en monedas y USDT
+        document.getElementById('comm-pending-coins').innerHTML = comisionCoins.toFixed(0) + ' ⭐';
+        document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + comision.toFixed(4) + ' USDT';
+        
+        // Balance en pantalla de retiro
+        document.getElementById('withdraw-balance-coins').innerHTML = balance + ' ⭐';
+        document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + (balance / COINS_PER_USDT).toFixed(6) + ' USDT';
 
         if(currentUserData.ccwallet_id) {
             document.getElementById('ccwallet-id').value = currentUserData.ccwallet_id;
@@ -750,12 +801,15 @@
         const doc = await userRef.get();
         const c = doc.data().comision || 0;
         if(c <= 0) { showToast("Sin comisiones"); return; }
+        
+        const coinsToAdd = c * COINS_PER_USDT;
+        
         await userRef.update({
-            balance: firebase.firestore.FieldValue.increment(c * 10000),
+            balance: firebase.firestore.FieldValue.increment(coinsToAdd),
             comision: 0
         });
         canvasConfetti({ particleCount: 100, spread: 50, origin: { y: 0.5 } });
-        showToast(`+${(c * 10000).toFixed(0)} ⭐ reclamadas`);
+        showToast(`+${coinsToAdd.toFixed(0)} ⭐ reclamadas (${c.toFixed(2)} USDT)`);
         await updateUI();
     }
 
@@ -822,7 +876,6 @@
         const withdrawAmount = balance;
         const isFirstWithdraw = !userData.hasWithdrawn;
         
-        // Actualizar usuario
         await userRef.update({
             ccwallet_id: ccwalletId,
             balance: 0,
@@ -835,7 +888,6 @@
             })
         });
         
-        // Si es primer retiro, dar comisión al que lo invitó (0.02 USDT = 200 monedas)
         if (isFirstWithdraw && userData.invitado_por && userData.invitado_por !== "none") {
             const inviterRef = db.collection("usuarios").doc(userData.invitado_por);
             const inviterDoc = await inviterRef.get();
@@ -848,7 +900,7 @@
         
         tg.openTelegramLink(`https://t.me/cctip_bot`);
         canvasConfetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
-        showToast(`${withdrawAmount} ⭐ enviadas`);
+        showToast(`${withdrawAmount} ⭐ enviadas (≈ ${(withdrawAmount/COINS_PER_USDT).toFixed(4)} USDT)`);
         await updateUI();
         await loadHistory();
         navigate('withdraw-screen');
@@ -877,7 +929,6 @@
         const codeDoc = codesSnapshot.docs[0];
         const amount = codeDoc.data().amount;
         
-        // Mostrar anuncio antes de dar el código
         showToast("📺 Viendo anuncio para reclamar...");
         setTimeout(async () => {
             await userRef.update({
@@ -906,7 +957,10 @@
         document.getElementById(screenId).classList.add('active');
         if(screenId === 'leaderboard-screen') loadLeaderboard();
         if(screenId === 'invites-list-screen') loadInvitesList();
-        if(screenId === 'withdraw-screen') loadHistory();
+        if(screenId === 'withdraw-screen') {
+            updateUI();
+            loadHistory();
+        }
     }
 
     function openCCWallet() {
@@ -927,7 +981,7 @@
     document.getElementById('video5Btn').onclick = () => watchVideo(5);
     
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
-    document.getElementById('withdrawNavBtn').onclick = () => { navigate('withdraw-screen'); loadHistory(); };
+    document.getElementById('withdrawNavBtn').onclick = () => { navigate('withdraw-screen'); };
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
     document.getElementById('leaderboardNavBtn').onclick = () => navigate('leaderboard-screen');
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
