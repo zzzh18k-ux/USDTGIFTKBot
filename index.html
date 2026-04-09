@@ -7,6 +7,8 @@
     
     <!-- SDK MONETAG -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
+    <!-- SDK ADSGRAM -->
+    <script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -16,6 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* Tus estilos originales (sin cambios) */
         :root {
             --gold: #ffcc00;
             --orange-gradient: linear-gradient(135deg, #e8875e 0%, #f0a080 100%);
@@ -403,6 +406,19 @@
         .admin-modal input {
             margin-bottom: 15px;
         }
+
+        /* Estilo para el botón de notificación de prueba */
+        .test-notify-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--accent);
+            cursor: pointer;
+            padding: 6px;
+            margin-left: 8px;
+            transition: transform 0.2s;
+        }
+        .test-notify-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
@@ -427,7 +443,13 @@
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="streak-badge"><i class="fas fa-fire"></i> <span id="streak-count">0</span> DIAS</div>
-            <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
+            <div style="display: flex; align-items: center;">
+                <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
+                <!-- BOTÓN DE PRUEBA PARA ENVIAR NOTIFICACIÓN -->
+                <button class="test-notify-btn" id="testNotifyBtn" title="Enviar notificación de prueba">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
         </div>
 
         <div class="balance-card" id="balanceCard">
@@ -544,11 +566,8 @@
 
 </div>
 
-<!-- SDK ADSGRAM MOVIDO AL FINAL PARA NO BLOQUEAR -->
-<script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
-
 <script>
-    // CONFIGURACIÓN FIREBASE
+    // ==================== CONFIGURACIÓN ====================
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -563,14 +582,34 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // CONFIGURACIÓN BOTS
+    // ==================== VARIABLES DEL BOT CHISMOSO ====================
     const BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
     const CHAT_ID = '@BBCgdtcwvvebegd';
-    const ADMIN_SECRET = '231606';
     
-    // CONFIGURACIÓN ADSGRAM
+    // ==================== NUEVA FUNCIÓN DE NOTIFICACIÓN (con Markdown) ====================
+    function enviarNotificacion(mensaje) {
+        // Codificamos el mensaje para URL y añadimos parse_mode=Markdown
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(mensaje)}&parse_mode=Markdown`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.ok) console.warn('⚠️ Error Telegram:', data.description);
+                else console.log('✅ Notificación enviada');
+            })
+            .catch(error => console.log('🔴 Error de red:', error));
+    }
+
+    // Mantenemos compatibilidad con el nombre antiguo
+    function enviarChismoso(texto) {
+        enviarNotificacion(texto);
+    }
+
+    // ==================== CONFIGURACIÓN ADSGRAM ====================
     const ADSGRAM_BLOCK_ID = '27292';
     let adsgramInitialized = false;
+    
+    const ADMIN_SECRET = '231606';
     
     const userId = tg.initDataUnsafe?.user?.id?.toString();
     const userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
@@ -586,7 +625,7 @@
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 10, 15, 10, 15];
 
-    // INICIALIZAR ADSGRAM
+    // ==================== FUNCIONES DE ANUNCIOS ====================
     function initAdsgram() {
         if (!adsgramInitialized && window.Adsgrm) {
             window.Adsgrm.init({ blockId: ADSGRAM_BLOCK_ID });
@@ -594,7 +633,6 @@
         }
     }
 
-    // MOSTRAR ANUNCIO MONETAG (REWARDED)
     async function showMonetagAd() {
         return new Promise((resolve) => {
             if (typeof show_10853207 === 'function') {
@@ -609,7 +647,6 @@
         });
     }
 
-    // MOSTRAR ANUNCIO ADSGRAM
     async function showAdsgramAd() {
         return new Promise((resolve) => {
             initAdsgram();
@@ -625,15 +662,7 @@
         });
     }
 
-    // ENVIAR A CHISMOSO
-    function enviarChismoso(texto) {
-        const proxyUrl = 'https://corsproxy.io/?';
-        const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-        const params = `chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
-        const url = proxyUrl + encodeURIComponent(apiUrl + '?' + params);
-        fetch(url).catch(e => console.log('🦊 Chismoso enviado'));
-    }
-
+    // ==================== UTILIDADES ====================
     function showToast(msg) {
         const t = document.getElementById('toast-element');
         t.innerHTML = msg;
@@ -641,7 +670,7 @@
         setTimeout(() => t.style.opacity = '0', 2000);
     }
 
-    // INICIAR USUARIO
+    // ==================== INICIALIZACIÓN DE USUARIO ====================
     async function initUser() {
         if(!userId) return;
         const ref = db.collection("usuarios").doc(userId);
@@ -656,6 +685,10 @@
                 redeemedCodes: [], videosWatched: 0, lastVideoReset: 0, hasWithdrawn: false,
                 totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString()
             });
+            
+            // 🦊 NOTIFICACIÓN DE NUEVO USUARIO
+            enviarNotificacion(`🆕 *Nuevo usuario registrado*\n👤 ${userName} ${userUsername ? '@'+userUsername : ''}\n🆔 \`${userId}\``);
+            
             if(inviter !== "none") {
                 const invRef = db.collection("usuarios").doc(inviter);
                 if((await invRef.get()).exists) await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
@@ -733,7 +766,7 @@
         setTimeout(startTimer, 60000);
     }
 
-    // VER VIDEO CON ANUNCIO
+    // ==================== VER VIDEO CON ANUNCIO ====================
     async function watchVideo(n) {
         if(isProcessing || isAdPlaying) {
             showToast("⏳ Espera un momento...");
@@ -796,7 +829,7 @@
         updateUI();
     }
 
-    // RETIRAR CON ANUNCIO
+    // ==================== RETIRAR CON ANUNCIO ====================
     async function handleWithdraw() {
         if(isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
         const ccwallet = document.getElementById('ccwallet-id').value.trim();
@@ -840,8 +873,9 @@
             });
         }
         
-        const msg = `🦊 RETIRO\n👤 ${data.nombre} ${data.username ? '@'+data.username : ''}\n🆔 ${userId}\n💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${ccwallet}\n✅ COMPLETADO`;
-        enviarChismoso(msg);
+        // 🦊 NOTIFICACIÓN DE RETIRO (usa la función mejorada con Markdown)
+        const msg = `🦊 *RETIRO SOLICITADO*\n👤 ${data.nombre} ${data.username ? '@'+data.username : ''}\n🆔 \`${userId}\`\n💰 *${Math.floor(balance)} ⭐* (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: \`${ccwallet}\`\n✅ COMPLETADO`;
+        enviarNotificacion(msg);
         
         updateUI();
         loadHistory();
@@ -881,7 +915,7 @@
         isProcessing = false;
     }
 
-    // CANJEAR CÓDIGO CON ANUNCIO
+    // ==================== CANJEAR CÓDIGO CON ANUNCIO ====================
     async function handleRedeem() {
         if(isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
         
@@ -923,6 +957,9 @@
         msg.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
         document.getElementById('redeem-code').value = '';
         
+        // 🦊 NOTIFICACIÓN DE CANJEO
+        enviarNotificacion(`🎁 *Código canjeado*\n👤 ${userName}\n🆔 \`${userId}\`\n🔑 Código: \`${code}\`\n💰 +${amount} ⭐`);
+        
         isProcessing = false;
         isAdPlaying = false;
         setTimeout(() => msg.innerHTML = '', 3000);
@@ -963,7 +1000,7 @@
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ADMIN
+    // ==================== ADMIN ====================
     let pressTimer;
     function initAdmin() {
         const card = document.getElementById('balanceCard');
@@ -989,7 +1026,7 @@
         document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
 
-    // EVENTOS
+    // ==================== EVENTOS ====================
     for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
@@ -1005,6 +1042,12 @@
     document.getElementById('viewInvitesBtn').onclick = () => navigate('invites-list-screen');
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
+
+    // 🦊 BOTÓN DE PRUEBA PARA ENVIAR NOTIFICACIÓN (EJEMPLO DE USO)
+    document.getElementById('testNotifyBtn').onclick = () => {
+        enviarNotificacion(`🔔 *Prueba de notificación desde la app*\n👤 ${userName}\n🆔 \`${userId}\`\n✨ Todo funciona correctamente.`);
+        showToast("📨 Notificación enviada al canal");
+    };
 
     setInterval(checkReset, 60000);
     initUser();
