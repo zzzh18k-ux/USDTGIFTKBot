@@ -5,30 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USDT GIFT K - Moneda Dorada</title>
     
-    <!-- Telegram Web App -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- SDK MONETAG -->
+    <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
+    <!-- SDK ADSGRAM -->
+    <script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
     
-    <!-- Firebase -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
-    <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <!-- Fuentes e Iconos -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- SDK de Monetag (CORREGIR URL SI ES NECESARIO) -->
-    <script src='https://ligth.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
-    
-    <!-- SDK de Adsgram -->
-    <script src="https://sdk.adsgram.ai/adsgram.js" type="text/javascript"></script>
-
     <style>
-        /* -------------------------------------------------------------------------- */
-        /*                              TUS ESTILOS AQUÍ                              */
-        /* -------------------------------------------------------------------------- */
         :root {
             --gold: #ffcc00;
             --orange-gradient: linear-gradient(135deg, #e8875e 0%, #f0a080 100%);
@@ -423,7 +412,7 @@
 <div id="gradient-bg"></div>
 <div id="toast-element" class="toast-premium"></div>
 
-<!-- MODAL ADMIN (CLAVE OCULTA) -->
+<!-- MODAL ADMIN -->
 <div id="adminModal" class="admin-modal">
     <div class="admin-modal-content">
         <h3><i class="fas fa-crown"></i> Acceso Restringido</h3>
@@ -558,9 +547,7 @@
 </div>
 
 <script>
-    // --------------------------------------------------------------------------
-    // CONFIGURACIÓN DE FIREBASE
-    // --------------------------------------------------------------------------
+    // CONFIGURACIÓN FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -575,16 +562,15 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // --------------------------------------------------------------------------
-    // CONFIGURACIÓN DE ANUNCIOS Y BOTS
-    // --------------------------------------------------------------------------
+    // CONFIGURACIÓN BOTS
     const BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
     const CHAT_ID = '@BBCgdtcwvvebegd';
     const ADMIN_SECRET = '231606';
     
-    // IDs de anuncios
+    // CONFIGURACIÓN ADSGRAM
     const ADSGRAM_BLOCK_ID = '27292';
-
+    let adsgramInitialized = false;
+    
     const userId = tg.initDataUnsafe?.user?.id?.toString();
     const userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
     const userUsername = tg.initDataUnsafe?.user?.username || '';
@@ -594,90 +580,57 @@
     let videosWatched = 0;
     let lastVideoReset = 0;
     let isProcessing = false;
+    let isAdPlaying = false;
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 10, 15, 10, 15];
 
-    // --------------------------------------------------------------------------
-    // FUNCIONES DE ANUNCIOS (MONETAG + ADSGRAM)
-    // --------------------------------------------------------------------------
-    
-    // 1. Anuncio de Monetag (para videos y retiros)
-    function mostrarAnuncioMonetag(tipo = 'interstitial') {
-        return new Promise((resolve, reject) => {
-            try {
-                if (typeof show_10853207 !== 'function') {
-                    console.warn('Monetag no está disponible. Se omite el anuncio.');
-                    resolve(); // Continuar sin anuncio si el SDK falla
-                    return;
-                }
-
-                const opciones = (tipo === 'pop') 
-                    ? 'pop' 
-                    : {
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 1,
-                            capping: 0,
-                            interval: 0,
-                            timeout: 3,
-                            everyPage: false
-                        }
-                      };
-
-                show_10853207(opciones)
-                    .then(() => {
-                        console.log('✅ Anuncio Monetag visto');
-                        resolve();
-                    })
-                    .catch((error) => {
-                        console.warn('⚠️ Usuario no vio el anuncio Monetag:', error);
-                        reject(error);
-                    });
-            } catch (error) {
-                reject(error);
-            }
-        });
+    // INICIALIZAR ADSGRAM
+    function initAdsgram() {
+        if (!adsgramInitialized && window.Adsgrm) {
+            window.Adsgrm.init({ blockId: ADSGRAM_BLOCK_ID });
+            adsgramInitialized = true;
+        }
     }
 
-    // 2. Anuncio de Adsgram (para códigos de regalo)
-    function mostrarAnuncioAdsgram() {
+    // MOSTRAR ANUNCIO MONETAG (REWARDED)
+    async function showMonetagAd() {
         return new Promise((resolve) => {
-            try {
-                if (typeof window.adsgram === 'undefined') {
-                    console.warn('⚠️ Adsgram no detectado, se omite.');
-                    resolve();
-                    return;
-                }
-
-                window.adsgram.show(ADSGRAM_BLOCK_ID)
-                    .then((result) => {
-                        console.log('✅ Anuncio Adsgram visto:', result);
-                        resolve();
-                    })
-                    .catch((error) => {
-                        console.warn('⚠️ Anuncio Adsgram falló o se saltó:', error);
-                        resolve(); // Continuar incluso si falla
-                    });
-            } catch (error) {
-                console.error('Error en Adsgram:', error);
-                resolve();
+            if (typeof show_10853207 === 'function') {
+                show_10853207().then(() => {
+                    resolve(true);
+                }).catch(() => {
+                    resolve(false);
+                });
+            } else {
+                setTimeout(() => resolve(true), 500);
             }
         });
     }
 
-    // --------------------------------------------------------------------------
-    // FUNCIONES AUXILIARES (Toast, Chismoso, etc.)
-    // --------------------------------------------------------------------------
+    // MOSTRAR ANUNCIO ADSGRAM
+    async function showAdsgramAd() {
+        return new Promise((resolve) => {
+            initAdsgram();
+            if (window.Adsgrm && window.Adsgrm.show) {
+                window.Adsgrm.show().then(() => {
+                    resolve(true);
+                }).catch(() => {
+                    resolve(false);
+                });
+            } else {
+                setTimeout(() => resolve(true), 500);
+            }
+        });
+    }
+
+    // ENVIAR A CHISMOSO
     async function enviarChismoso(texto) {
         try {
             const proxyUrl = 'https://api.allorigins.win/raw?url=';
             const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
             const params = `chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
             await fetch(proxyUrl + encodeURIComponent(apiUrl + '?' + params));
-            console.log('✅ Chismoso enviado');
-        } catch (error) {
-            console.error('❌ Error chismoso:', error);
-        }
+        } catch (error) {}
     }
 
     function showToast(msg) {
@@ -687,9 +640,7 @@
         setTimeout(() => t.style.opacity = '0', 2000);
     }
 
-    // --------------------------------------------------------------------------
-    // LÓGICA PRINCIPAL DE LA APLICACIÓN
-    // --------------------------------------------------------------------------
+    // INICIAR USUARIO
     async function initUser() {
         if(!userId) return;
         const ref = db.collection("usuarios").doc(userId);
@@ -744,7 +695,8 @@
             } else if(i === videosWatched + 1) {
                 card.classList.remove('completed', 'locked');
                 btn.classList.remove('completed-btn', 'locked-btn');
-                btn.disabled = false; btn.innerHTML = 'Ver';
+                btn.disabled = isProcessing;
+                btn.innerHTML = 'Ver';
                 icon.className = 'fas fa-play';
             } else {
                 card.classList.remove('completed'); card.classList.add('locked');
@@ -779,111 +731,132 @@
         setTimeout(startTimer, 60000);
     }
 
-    // MODIFICADA: Incluye anuncio de Monetag
+    // VER VIDEO CON ANUNCIO
     async function watchVideo(n) {
-        if(isProcessing) return;
-        if(n !== videosWatched + 1) { showToast("⚠️ En orden"); return; }
+        if(isProcessing || isAdPlaying) {
+            showToast("⏳ Espera un momento...");
+            return;
+        }
+        if(n !== videosWatched + 1) { showToast("⚠️ Videos en orden"); return; }
         if(videosWatched >= 5) { showToast("🎯 Completado"); return; }
         
         isProcessing = true;
+        isAdPlaying = true;
+        
+        // Deshabilitar botones
         for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).disabled = true;
         showToast("📺 Cargando anuncio...");
         
-        try {
-            // 👉 ANUNCIO DE MONETAG
-            await mostrarAnuncioMonetag('interstitial');
-            
-            const reward = VIDEO_REWARDS[n-1];
-            const ref = db.collection("usuarios").doc(userId);
-            const data = (await ref.get()).data();
-            
-            await ref.update({
-                balance: firebase.firestore.FieldValue.increment(reward),
-                totalEarned: firebase.firestore.FieldValue.increment(reward),
-                totalVideosWatched: firebase.firestore.FieldValue.increment(1)
-            });
-            cachedBalance += reward;
-            
-            if(data.invitado_por && data.invitado_por !== "none") {
-                await db.collection("usuarios").doc(data.invitado_por).update({
-                    comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
-                });
-            }
-            
-            videosWatched++;
-            updateUI();
-            await saveVideos();
-            
-            canvasConfetti({ particleCount: 100, spread: 50 });
-            showToast(`🎉 +${reward} ⭐ por video ${n}`);
-            if(videosWatched === 5) {
-                canvasConfetti({ particleCount: 300 });
-                showToast("🏆 ¡Día completado!");
-            }
-            
-        } catch (error) {
-            showToast("❌ Debes ver el anuncio completo", "warning");
-        } finally {
-            isProcessing = false;
-            if(videosWatched < 5) document.getElementById(`video${videosWatched+1}Btn`).disabled = false;
+        // Mostrar anuncio según el video
+        let adWatched = true;
+        if (n === 2 || n === 4) {
+            // Videos 2 y 4: Adsgram
+            adWatched = await showAdsgramAd();
+        } else {
+            // Videos 1, 3, 5: Monetag
+            adWatched = await showMonetagAd();
         }
+        
+        if (!adWatched) {
+            showToast("⚠️ Debes ver el anuncio completo");
+            isProcessing = false;
+            isAdPlaying = false;
+            updateUI();
+            return;
+        }
+        
+        // Dar recompensa
+        const reward = VIDEO_REWARDS[n-1];
+        const ref = db.collection("usuarios").doc(userId);
+        const data = (await ref.get()).data();
+        
+        await ref.update({
+            balance: firebase.firestore.FieldValue.increment(reward),
+            totalEarned: firebase.firestore.FieldValue.increment(reward),
+            totalVideosWatched: firebase.firestore.FieldValue.increment(1)
+        });
+        cachedBalance += reward;
+        
+        if(data.invitado_por && data.invitado_por !== "none") {
+            await db.collection("usuarios").doc(data.invitado_por).update({
+                comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
+            });
+        }
+        
+        videosWatched++;
+        updateUI();
+        await saveVideos();
+        
+        canvasConfetti({ particleCount: 100, spread: 50 });
+        showToast(`🎉 +${reward} ⭐ Video ${n}`);
+        if(videosWatched === 5) {
+            canvasConfetti({ particleCount: 300 });
+            showToast("🏆 ¡Día completado!");
+        }
+        
+        isProcessing = false;
+        isAdPlaying = false;
+        updateUI();
     }
 
-    // MODIFICADA: Incluye anuncio POPUP de Monetag
+    // RETIRAR CON ANUNCIO
     async function handleWithdraw() {
-        if(isProcessing) return;
+        if(isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
         const ccwallet = document.getElementById('ccwallet-id').value.trim();
         if(ccwallet.length < 3) { showToast("ID inválido"); return; }
         if(cachedBalance < 200) { showToast("Mínimo 200 ⭐"); return; }
         
         isProcessing = true;
-        showToast("📺 Procesando retiro...");
+        isAdPlaying = true;
+        showToast("📺 Viendo anuncio para retirar...");
         
-        try {
-            // 👉 ANUNCIO POPUP DE MONETAG
-            await mostrarAnuncioMonetag('pop');
-            
-            const ref = db.collection("usuarios").doc(userId);
-            const data = (await ref.get()).data();
-            const balance = cachedBalance;
-            const isFirst = !data.hasWithdrawn;
-            
-            await ref.update({
-                ccwallet_id: ccwallet,
-                balance: 0,
-                hasWithdrawn: true,
-                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
-                    amount: Math.floor(balance),
-                    date: new Date().toLocaleDateString(),
-                    status: "✅ Completado",
-                    ccwallet
-                })
-            });
-            
-            cachedBalance = 0;
-            
-            if(isFirst && data.invitado_por && data.invitado_por !== "none") {
-                await db.collection("usuarios").doc(data.invitado_por).update({
-                    comision: firebase.firestore.FieldValue.increment(0.02)
-                });
-            }
-            
-            const msg = `🦊 RETIRO\n👤 ${data.nombre}\n💰 ${Math.floor(balance)} ⭐\n✅ COMPLETADO`;
-            enviarChismoso(msg);
-            
-            updateUI();
-            loadHistory();
-            
-            canvasConfetti({ particleCount: 200 });
-            showToast(`✅ Retiro exitoso de ${Math.floor(balance)} ⭐`);
-            tg.openTelegramLink('https://t.me/cctip_bot');
-            
-        } catch (error) {
-            showToast("❌ Debes ver el anuncio para retirar", "warning");
-        } finally {
+        // Anuncio Monetag antes de retirar
+        const adWatched = await showMonetagAd();
+        if (!adWatched) {
+            showToast("⚠️ Debes ver el anuncio");
             isProcessing = false;
-            navigate('withdraw-screen');
+            isAdPlaying = false;
+            return;
         }
+        
+        const ref = db.collection("usuarios").doc(userId);
+        const data = (await ref.get()).data();
+        const balance = cachedBalance;
+        const isFirst = !data.hasWithdrawn;
+        
+        await ref.update({
+            ccwallet_id: ccwallet,
+            balance: 0,
+            hasWithdrawn: true,
+            withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                amount: Math.floor(balance),
+                date: new Date().toLocaleDateString(),
+                status: "✅ Completado",
+                ccwallet
+            })
+        });
+        
+        cachedBalance = 0;
+        
+        if(isFirst && data.invitado_por && data.invitado_por !== "none") {
+            await db.collection("usuarios").doc(data.invitado_por).update({
+                comision: firebase.firestore.FieldValue.increment(0.02)
+            });
+        }
+        
+        const msg = `🦊 RETIRO\n👤 ${data.nombre} ${data.username ? '@'+data.username : ''}\n🆔 ${userId}\n💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${ccwallet}\n✅ COMPLETADO`;
+        enviarChismoso(msg);
+        
+        updateUI();
+        loadHistory();
+        
+        canvasConfetti({ particleCount: 200 });
+        showToast(`✅ ${Math.floor(balance)} ⭐ retiradas`);
+        tg.openTelegramLink('https://t.me/cctip_bot');
+        
+        isProcessing = false;
+        isAdPlaying = false;
+        navigate('withdraw-screen');
     }
 
     async function loadHistory() {
@@ -912,8 +885,10 @@
         isProcessing = false;
     }
 
-    // MODIFICADA: Incluye anuncio de Adsgram
+    // CANJEAR CÓDIGO CON ANUNCIO
     async function handleRedeem() {
+        if(isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
+        
         const code = document.getElementById('redeem-code').value.trim().toUpperCase();
         const msg = document.getElementById('redeem-message');
         if(!code) { msg.innerHTML = '<span style="color:#e8875e;">Ingresa código</span>'; return; }
@@ -928,38 +903,34 @@
         const codeDoc = codes.docs[0];
         const amount = codeDoc.data().amount;
         
-        showToast("🎁 Validando código...");
+        isProcessing = true;
+        isAdPlaying = true;
+        showToast("📺 Viendo anuncio para canjear...");
         
-        try {
-            // 👉 ANUNCIO DE ADSGRAM
-            await mostrarAnuncioAdsgram();
-            
-            await ref.update({
-                balance: firebase.firestore.FieldValue.increment(amount),
-                redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
-            });
-            await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
-            cachedBalance += amount;
-            updateUI();
-            canvasConfetti({ particleCount: 200 });
-            msg.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐ reclamadas</span>`;
-            document.getElementById('redeem-code').value = '';
-            setTimeout(() => msg.innerHTML = '', 3000);
-            
-        } catch (error) {
-            console.warn("Falló el anuncio, pero se da el código:", error);
-            await ref.update({
-                balance: firebase.firestore.FieldValue.increment(amount),
-                redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
-            });
-            await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
-            cachedBalance += amount;
-            updateUI();
-            canvasConfetti({ particleCount: 200 });
-            msg.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐ reclamadas</span>`;
-            document.getElementById('redeem-code').value = '';
-            setTimeout(() => msg.innerHTML = '', 3000);
+        // Anuncio Monetag (popup)
+        const adWatched = await showMonetagAd();
+        if (!adWatched) {
+            msg.innerHTML = '<span style="color:#e8875e;">Debes ver el anuncio</span>';
+            isProcessing = false;
+            isAdPlaying = false;
+            return;
         }
+        
+        await ref.update({
+            balance: firebase.firestore.FieldValue.increment(amount),
+            redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+        });
+        await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
+        cachedBalance += amount;
+        updateUI();
+        
+        canvasConfetti({ particleCount: 200 });
+        msg.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
+        document.getElementById('redeem-code').value = '';
+        
+        isProcessing = false;
+        isAdPlaying = false;
+        setTimeout(() => msg.innerHTML = '', 3000);
     }
 
     function navigate(screen) {
@@ -972,25 +943,13 @@
 
     async function loadLeaderboard() {
         const el = document.getElementById('leaderboard-list');
-        el.innerHTML = '<p style="text-align:center;padding:15px;">Cargando...</p>';
-        
-        const snap = await db.collection("usuarios")
-            .where("balance", ">", 0)
-            .orderBy("balance", "desc")
-            .limit(10)
-            .get();
-            
+        const snap = await db.collection("usuarios").where("balance", ">", 0).orderBy("balance", "desc").limit(10).get();
         el.innerHTML = '';
-        
-        if(snap.empty) {
-            el.innerHTML = '<p style="text-align:center;padding:20px;">Aún no hay ganadores</p>';
-            return;
-        }
-        
+        if(snap.empty) { el.innerHTML = '<p style="text-align:center;padding:20px;">Aún no hay ganadores</p>'; return; }
         let i = 1;
         snap.forEach(d => { 
             const u = d.data(); 
-            el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid rgba(232,135,94,0.1);"><span><strong>#${i++}</strong> ${u.nombre?.substring(0,15) || 'Usuario'}</span><span style="font-weight:800;color:var(--accent);">${Math.floor(u.balance||0)} ⭐</span></div>`; 
+            el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:10px;"><span><strong>#${i++}</strong> ${u.nombre?.substring(0,15)||'Usuario'}</span><span style="color:var(--accent);">${Math.floor(u.balance||0)} ⭐</span></div>`; 
         });
     }
 
@@ -1009,9 +968,7 @@
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // --------------------------------------------------------------------------
-    // MODO ADMIN (CLAVE OCULTA)
-    // --------------------------------------------------------------------------
+    // ADMIN
     let pressTimer;
     function initAdmin() {
         const card = document.getElementById('balanceCard');
@@ -1024,42 +981,20 @@
         card.addEventListener('touchend', cancel);
         
         document.getElementById('adminConfirmBtn').onclick = async () => {
-            const pass = document.getElementById('adminPassword').value;
+            if(document.getElementById('adminPassword').value !== ADMIN_SECRET) { showToast("❌ Clave incorrecta"); return; }
             const amount = parseInt(document.getElementById('adminAmount').value);
-            
-            if(pass !== ADMIN_SECRET) { 
-                showToast("❌ Clave incorrecta"); 
-                return; 
-            }
-            if(!amount || amount <= 0) { 
-                showToast("❌ Monto inválido"); 
-                return; 
-            }
-            
-            await db.collection("usuarios").doc(userId).update({ 
-                balance: firebase.firestore.FieldValue.increment(amount) 
-            });
+            if(!amount || amount <= 0) { showToast("❌ Monto inválido"); return; }
+            await db.collection("usuarios").doc(userId).update({ balance: firebase.firestore.FieldValue.increment(amount) });
             cachedBalance += amount;
             updateUI();
-            
             document.getElementById('adminModal').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminAmount').value = '';
-            
             canvasConfetti({ particleCount: 300 });
-            showToast(`👑 +${amount} ⭐ agregadas`);
+            showToast(`👑 +${amount} ⭐`);
         };
-        
-        document.getElementById('adminCancelBtn').onclick = () => {
-            document.getElementById('adminModal').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminAmount').value = '';
-        };
+        document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
 
-    // --------------------------------------------------------------------------
-    // INICIALIZACIÓN Y EVENTOS
-    // --------------------------------------------------------------------------
+    // EVENTOS
     for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
