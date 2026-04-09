@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT GIFT K - Migración</title>
+    <title>USDT GIFT K - Moneda Dorada</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -30,17 +30,29 @@
             color: var(--text-main);
             height: 100vh;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
         }
+
+        #gradient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #fdf5e6, #fff5ea, #ffedd8, #fdf5e6);
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: gradientMove 15s ease infinite;
+        }
+        @keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
         #app-container {
             width: 100%;
             max-width: 450px;
             height: 100vh;
-            margin: 0 auto;
             padding: 15px 20px;
             display: flex;
             flex-direction: column;
-            position: relative;
+            z-index: 1;
+            overflow: hidden;
         }
 
         .screen {
@@ -49,96 +61,476 @@
             width: 100%;
             height: 100%;
             overflow-y: auto;
+            padding-bottom: 10px;
         }
         .screen.active { display: flex; }
 
-        .balance-card { text-align: center; margin: 20px 0; }
-        #user-balance { font-size: 48px; font-weight: 800; }
+        .screen::-webkit-scrollbar { display: none; }
+        .screen { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .streak-badge {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+        }
+
+        .balance-card {
+            text-align: center;
+            margin: 20px 0;
+        }
+        #user-balance {
+            font-size: 56px;
+            font-weight: 800;
+            display: inline-block;
+            color: var(--accent);
+        }
+        .balance-label {
+            font-size: 12px;
+            letter-spacing: 4px;
+            opacity: 0.6;
+            margin-top: -5px;
+        }
+
+        /* ESTILOS PARA LOS 5 VIDEOS DIARIOS */
+        .videos-section {
+            margin-top: 10px;
+        }
         
-        .click-object {
-            background: radial-gradient(circle, #ffe066 0%, #ffcc00 100%);
-            width: 180px; height: 180px;
-            margin: 20px auto;
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .video-card {
+            background: white;
+            border-radius: 20px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+        }
+        
+        .video-card.completed {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            opacity: 0.8;
+        }
+        
+        .video-card.locked {
+            opacity: 0.6;
+            background: #f5f5f5;
+        }
+        
+        .video-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .video-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--orange-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .completed .video-icon {
+            background: #27ae60;
+        }
+        
+        .locked .video-icon {
+            background: #bdc3c7;
+        }
+        
+        .video-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .video-title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .video-reward {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        
+        .completed .video-reward {
+            color: #27ae60;
+        }
+        
+        .video-btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            background: var(--orange-gradient);
+            color: white;
+            box-shadow: 0 2px 8px rgba(211, 122, 90, 0.3);
+        }
+        
+        .video-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .video-btn.completed-btn {
+            background: #27ae60;
+        }
+        
+        .video-btn.locked-btn {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .daily-progress {
+            background: white;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .daily-progress span {
+            font-weight: 600;
+        }
+        
+        .progress-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .dot {
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 5px solid #e6b800;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.7);
+            background: #e0e0e0;
+        }
+        
+        .dot.completed {
+            background: var(--accent);
+        }
+
+        .reset-timer {
+            text-align: center;
+            font-size: 11px;
+            color: var(--accent);
+            margin: 15px 0;
+        }
+
+        .menu-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        .btn-game {
+            background: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
             cursor: pointer;
         }
-        .click-object i { font-size: 80px; color: #fff; }
+        .btn-game:active { transform: scale(0.97); }
+        .btn-primary { background: var(--orange-gradient); color: white; }
 
-        .progress-bar-bg { width: 100%; height: 12px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; margin-top: 15px; }
-        .progress-bar-fill { width: 0%; height: 100%; background: var(--orange-gradient); transition: width 0.3s; }
-
-        .btn-main {
-            background: var(--orange-gradient);
-            color: white; border: none; padding: 15px; border-radius: 30px;
-            font-weight: bold; width: 100%; margin-top: 10px; cursor: pointer;
+        .glass-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 20px;
+            border: 1px solid white;
+            margin-top: 10px;
         }
-        .btn-main.disabled { background: #ccc; }
-
-        .glass-card { background: white; border-radius: 25px; padding: 20px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .back-btn { cursor: pointer; margin-bottom: 10px; font-weight: bold; color: var(--accent); }
-        
-        .toast {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #333; color: #fff; padding: 10px 20px; border-radius: 20px;
-            opacity: 0; transition: 0.3s; z-index: 1000;
+        .back-circle {
+            width: 40px; height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .toast-premium {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 20px;
+            border: 2px solid #eee;
+            font-family: 'Outfit', sans-serif;
+            margin: 8px 0;
+            background: white;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .history-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 15px 0 10px 0;
+            color: var(--accent);
+        }
+        .ccwallet-info {
+            background: #e8f0fe;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 12px;
+            text-align: left;
+        }
+        .code-input-group { display: flex; gap: 8px; margin: 10px 0; }
+        .code-input-group input { flex: 1; margin: 0; }
+        .code-input-group button { width: auto; padding: 12px 16px; margin: 0; }
+        .channel-join {
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 16px;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
+<div id="gradient-bg"></div>
+<div id="toast-element" class="toast-premium"></div>
+
 <div id="app-container">
-    <div id="toast" class="toast"></div>
 
+    <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
+        <div class="top-nav">
+            <div class="streak-badge"><i class="fas fa-fire"></i> <span id="streak-count">0</span> DIAS</div>
+            <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
+        </div>
+
         <div class="balance-card">
-            <div id="user-balance">0.0000</div>
-            <p style="font-size: 12px; opacity: 0.6; letter-spacing: 2px;">USDT DISPONIBLE</p>
+            <div id="user-balance">0</div>
+            <div class="balance-label">⭐ MONEDAS</div>
         </div>
 
-        <div class="click-object" id="clickObject">
-            <i class="fas fa-coins"></i>
-            <span style="color:white; font-weight:bold; font-size:10px; margin-top:5px;">TOCA AQUÍ</span>
+        <!-- SECCIÓN DE 5 VIDEOS DIARIOS -->
+        <div class="videos-section">
+            <div class="section-title">
+                <i class="fas fa-video" style="color: var(--accent);"></i>
+                <span>Videos diarios</span>
+            </div>
+            
+            <!-- Progreso diario -->
+            <div class="daily-progress">
+                <span><span id="videosWatchedToday">0</span>/5 videos</span>
+                <div class="progress-dots" id="videoDots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            
+            <!-- Video 1 -->
+            <div class="video-card" id="video1Card">
+                <div class="video-info">
+                    <div class="video-icon"><i class="fas fa-play"></i></div>
+                    <div class="video-details">
+                        <div class="video-title">Video 1</div>
+                        <div class="video-reward">+10 ⭐</div>
+                    </div>
+                </div>
+                <button class="video-btn" id="video1Btn">Ver</button>
+            </div>
+            
+            <!-- Video 2 -->
+            <div class="video-card locked" id="video2Card">
+                <div class="video-info">
+                    <div class="video-icon"><i class="fas fa-lock"></i></div>
+                    <div class="video-details">
+                        <div class="video-title">Video 2</div>
+                        <div class="video-reward">+10 ⭐</div>
+                    </div>
+                </div>
+                <button class="video-btn locked-btn" id="video2Btn" disabled>Bloqueado</button>
+            </div>
+            
+            <!-- Video 3 -->
+            <div class="video-card locked" id="video3Card">
+                <div class="video-info">
+                    <div class="video-icon"><i class="fas fa-lock"></i></div>
+                    <div class="video-details">
+                        <div class="video-title">Video 3</div>
+                        <div class="video-reward">+15 ⭐</div>
+                    </div>
+                </div>
+                <button class="video-btn locked-btn" id="video3Btn" disabled>Bloqueado</button>
+            </div>
+            
+            <!-- Video 4 -->
+            <div class="video-card locked" id="video4Card">
+                <div class="video-info">
+                    <div class="video-icon"><i class="fas fa-lock"></i></div>
+                    <div class="video-details">
+                        <div class="video-title">Video 4</div>
+                        <div class="video-reward">+10 ⭐</div>
+                    </div>
+                </div>
+                <button class="video-btn locked-btn" id="video4Btn" disabled>Bloqueado</button>
+            </div>
+            
+            <!-- Video 5 -->
+            <div class="video-card locked" id="video5Card">
+                <div class="video-info">
+                    <div class="video-icon"><i class="fas fa-gift"></i></div>
+                    <div class="video-details">
+                        <div class="video-title">Video 5 (Bonus)</div>
+                        <div class="video-reward">+15 ⭐</div>
+                    </div>
+                </div>
+                <button class="video-btn locked-btn" id="video5Btn" disabled>Bloqueado</button>
+            </div>
         </div>
 
-        <div class="progress-bar-bg">
-            <div id="progress-fill" class="progress-bar-fill"></div>
-        </div>
-        <p id="clicks-text" style="text-align:center; font-size:12px; margin-top:5px;">0 / 10 clicks</p>
+        <div class="reset-timer" id="resetTimer">Reinicio en 24 horas</div>
 
-        <button id="claimBtn" class="btn-main disabled">RECLAMAR RECOMPENSA</button>
-        
-        <div style="margin-top: 20px;">
-            <button class="btn-main" style="background:white; color:var(--text-main);" onclick="nav('withdraw-screen')">Mi Cosecha (Retirar)</button>
-            <button class="btn-main" style="background:white; color:var(--text-main);" onclick="nav('invite-screen')">Equipo (Referidos)</button>
+        <div class="menu-grid">
+            <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Crecer Equipo</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Mi Cosecha</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="leaderboardNavBtn"><span><i class="fas fa-trophy"></i> Top Usuarios</span> <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
-    <div id="withdraw-screen" class="screen">
-        <div class="back-btn" onclick="nav('home-screen')"><i class="fas fa-arrow-left"></i> Volver</div>
-        <div class="glass-card">
-            <h3>Retirar a CCWallet</h3>
-            <p style="font-size:12px; margin: 10px 0;">Envío directo a @cctip_bot</p>
-            <input type="text" id="cc-id" placeholder="Tu ID de CCWallet" style="width:100%; padding:12px; border-radius:15px; border:1px solid #ddd;">
-            <button class="btn-main" onclick="solicitarRetiro()">Solicitar Retiro</button>
-        </div>
-    </div>
-
+    <!-- INVITE SCREEN -->
     <div id="invite-screen" class="screen">
-        <div class="back-btn" onclick="nav('home-screen')"><i class="fas fa-arrow-left"></i> Volver</div>
+        <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h3>Mi Equipo</h3>
-            <p>Invita y gana el 15% de comisión.</p>
-            <div id="ref-link" style="background:#f0f0f0; padding:10px; border-radius:10px; margin:10px 0; font-size:11px; word-break:break-all;">...</div>
-            <button class="btn-main" onclick="copiarLink()">Copiar Enlace</button>
+            <i class="fas fa-rocket" style="font-size: 40px; color: var(--accent);"></i>
+            <h3 style="margin: 10px 0;">Sistema de Socios</h3>
+            <p style="font-size: 13px;">+0.02 USDT por referido cuando haga su primer retiro</p>
+            <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
+                <small>Comision acumulada</small>
+                <h3 id="comm-pending">0.00 USDT</h3>
+                <button class="btn-game btn-primary" style="margin-top: 8px; padding: 10px; width: 100%;" id="claimCommBtn">Reclamar</button>
+            </div>
+            <div style="background: white; padding: 12px; border-radius: 20px; margin: 12px 0;">
+                <small>Amigos invitados</small>
+                <h3 id="referidos-count">0</h3>
+                <button class="btn-game" style="margin-top: 8px; padding: 10px; width: 100%;" id="viewInvitesBtn">Ver lista</button>
+            </div>
+            <button class="btn-game btn-primary" style="width: 100%;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir Link</button>
         </div>
     </div>
+
+    <!-- WITHDRAW SCREEN -->
+    <div id="withdraw-screen" class="screen">
+        <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <i class="fas fa-wallet" style="font-size: 40px; color: #2ecc71;"></i>
+            <h3 style="margin: 10px 0;">Retirar con CCWallet</h3>
+            <div class="ccwallet-info">
+                <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
+                <a href="#" onclick="openCCWallet(); return false;">Crear cuenta aquí</a><br>
+                <small>Tu retiro se enviará a @cctip_bot</small>
+            </div>
+            <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
+            <button class="btn-game btn-primary" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Retiro</button>
+            <p style="margin-top: 10px; font-size: 11px; opacity: 0.6;">Minimo 200 monedas (0.02 USDT)</p>
+            <div class="history-title"><i class="fas fa-clock"></i> Historial de retiros</div>
+            <div id="history-list" style="max-height: 200px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- REDEEM SCREEN -->
+    <div id="redeem-screen" class="screen">
+        <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <i class="fas fa-ticket-alt" style="font-size: 40px; color: var(--accent);"></i>
+            <h3 style="margin: 10px 0;">Canjear Código</h3>
+            <div class="channel-join">
+                <i class="fab fa-telegram"></i> Únete al canal<br>
+                <a href="#" onclick="joinChannel(); return false;">@UsdtGiftChannel</a>
+            </div>
+            <div class="code-input-group">
+                <input type="text" id="redeem-code" placeholder="Código">
+                <button class="btn-game btn-primary" id="redeemSubmitBtn" style="width: auto;">Canjear</button>
+            </div>
+            <div id="redeem-message" style="margin-top: 15px; font-size: 12px; text-align: center;"></div>
+        </div>
+    </div>
+
+    <!-- LEADERBOARD SCREEN -->
+    <div id="leaderboard-screen" class="screen">
+        <div class="back-circle" id="backHomeLeader"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <h3 style="margin-bottom: 15px;">Top 10 Global</h3>
+            <div id="leaderboard-list" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <!-- INVITES LIST SCREEN -->
+    <div id="invites-list-screen" class="screen">
+        <div class="back-circle" id="backToInvite"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <h3 style="margin-bottom: 15px;">Mis invitados</h3>
+            <div id="invites-list" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -151,119 +543,406 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const tg = window.Telegram.WebApp;
-    const userId = tg.initDataUnsafe?.user?.id?.toString() || "test_user";
+    tg.expand();
+    tg.setHeaderColor('#fdf5e6');
+    tg.setBackgroundColor('#fdf5e6');
+
+    const userId = tg.initDataUnsafe?.user?.id?.toString();
     const userName = tg.initDataUnsafe?.user?.first_name || "Usuario";
+    let currentUserData = null;
 
-    let balance = 0;
-    let clicks = 0;
+    // Variables para videos diarios
+    const VIDEO_REWARDS = [10, 10, 15, 10, 15];
+    let videosWatched = 0;
+    let lastVideoReset = 0;
 
-    // --- MIGRACIÓN DE SALDO ---
-    async function migrarDatos(userRef) {
-        const LLAVE_VIEJA = '_candy_v8_lanzamiento_oficial';
-        const datosLocales = localStorage.getItem(LLAVE_VIEJA);
-        
-        if (datosLocales) {
-            try {
-                const data = JSON.parse(datosLocales);
-                const saldoAnterior = parseFloat(data.profit) || 0;
-                
-                if (saldoAnterior > 0) {
-                    await userRef.update({
-                        balance: firebase.firestore.FieldValue.increment(saldoAnterior)
-                    });
-                    showToast(`✅ ¡Migramos ${saldoAnterior} USDT de tu cuenta anterior!`);
-                }
-                localStorage.removeItem(LLAVE_VIEJA); // Limpiar para que no se repita
-            } catch(e) { console.error("Error en migración", e); }
-        }
-    }
-
-    // --- INICIO ---
-    async function init() {
+    async function initUser() {
         if(!userId) return;
         const userRef = db.collection("usuarios").doc(userId);
         const doc = await userRef.get();
+        const startParam = tg.initDataUnsafe?.start_param;
 
         if (!doc.exists) {
+            let inviterId = (startParam && startParam !== userId) ? startParam : "none";
+            if(inviterId !== "none") {
+                const invRef = db.collection("usuarios").doc(inviterId);
+                const invDoc = await invRef.get();
+                if(invDoc.exists) {
+                    await invRef.update({ 
+                        referidos: firebase.firestore.FieldValue.increment(1)
+                    });
+                }
+            }
             await userRef.set({
                 nombre: userName,
                 balance: 0,
-                gameClicks: 0
+                comision: 0.0000,
+                invitado_por: inviterId,
+                referidos: 0,
+                streak: 0,
+                ccwallet_id: "",
+                withdrawHistory: [],
+                redeemedCodes: [],
+                videosWatched: 0,
+                lastVideoReset: 0,
+                hasWithdrawn: false,
+                id: userId
             });
-            await migrarDatos(userRef);
         }
-
-        const actual = await userRef.get();
-        balance = actual.data().balance || 0;
-        clicks = actual.data().gameClicks || 0;
-        
-        document.getElementById('ref-link').innerText = `https://t.me/TuBotNombre?start=${userId}`;
-        updateUI();
+        await loadVideoState();
+        await updateUI();
+        updateActiveUsersCount();
+        updateTimer();
     }
 
-    function updateUI() {
-        document.getElementById('user-balance').innerText = balance.toFixed(6);
-        document.getElementById('progress-fill').style.width = (clicks * 10) + "%";
-        document.getElementById('clicks-text').innerText = `${clicks} / 10 clicks`;
+    async function loadVideoState() {
+        if(!userId) return;
+        const doc = await db.collection("usuarios").doc(userId).get();
+        const data = doc.data();
+        videosWatched = data.videosWatched || 0;
+        lastVideoReset = data.lastVideoReset || 0;
         
-        const btn = document.getElementById('claimBtn');
-        if (clicks >= 10) {
-            btn.classList.remove('disabled');
-            btn.disabled = false;
-        } else {
-            btn.classList.add('disabled');
-            btn.disabled = true;
+        checkVideoReset();
+        updateVideoUI();
+    }
+
+    function checkVideoReset() {
+        const now = Date.now();
+        if (lastVideoReset === 0) {
+            lastVideoReset = now;
+            saveVideoState();
+            return;
+        }
+        const diffHours = (now - lastVideoReset) / (1000 * 60 * 60);
+        if (diffHours >= 24) {
+            videosWatched = 0;
+            lastVideoReset = now;
+            updateVideoUI();
+            saveVideoState();
+            showToast("🔄 Nuevo día! Videos reiniciados");
         }
     }
 
-    // --- ACCIONES ---
-    document.getElementById('clickObject').onclick = async () => {
-        if (clicks < 10) {
-            clicks++;
-            gsap.to('#clickObject', { scale: 0.9, duration: 0.05, yoyo: true, repeat: 1 });
-            updateUI();
-            await db.collection("usuarios").doc(userId).update({ gameClicks: clicks });
-        }
-    };
+    function updateTimer() {
+        const now = Date.now();
+        const diff = (now - lastVideoReset) / (1000 * 60 * 60);
+        const remaining = Math.max(0, 24 - diff);
+        const hours = Math.floor(remaining);
+        const minutes = Math.floor((remaining - hours) * 60);
+        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> Reinicio en ${hours}:${minutes.toString().padStart(2,'0')}`;
+        setTimeout(() => updateTimer(), 60000);
+    }
 
-    document.getElementById('claimBtn').onclick = async () => {
-        const premio = 0.0001;
-        balance += premio;
-        clicks = 0;
-        updateUI();
-        showToast(`+${premio} USDT Reclamados`);
-        canvasConfetti({ particleCount: 100, spread: 70 });
-        
+    async function saveVideoState() {
+        if(!userId) return;
         await db.collection("usuarios").doc(userId).update({
-            balance: firebase.firestore.FieldValue.increment(premio),
-            gameClicks: 0
+            videosWatched: videosWatched,
+            lastVideoReset: lastVideoReset
         });
-    };
+    }
 
-    function nav(id) {
+    function updateVideoUI() {
+        document.getElementById('videosWatchedToday').innerText = videosWatched;
+        
+        // Actualizar dots
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            if (index < videosWatched) {
+                dot.classList.add('completed');
+            } else {
+                dot.classList.remove('completed');
+            }
+        });
+        
+        // Actualizar cada video
+        for (let i = 1; i <= 5; i++) {
+            const card = document.getElementById(`video${i}Card`);
+            const btn = document.getElementById(`video${i}Btn`);
+            const icon = card.querySelector('.video-icon i');
+            
+            if (i <= videosWatched) {
+                card.classList.add('completed');
+                card.classList.remove('locked');
+                btn.classList.add('completed-btn');
+                btn.classList.remove('locked-btn');
+                btn.disabled = true;
+                btn.innerHTML = '✓ Visto';
+                icon.className = 'fas fa-check';
+            } else if (i === videosWatched + 1) {
+                card.classList.remove('completed', 'locked');
+                btn.classList.remove('completed-btn', 'locked-btn');
+                btn.disabled = false;
+                btn.innerHTML = 'Ver';
+                icon.className = 'fas fa-play';
+            } else {
+                card.classList.remove('completed');
+                card.classList.add('locked');
+                btn.classList.remove('completed-btn');
+                btn.classList.add('locked-btn');
+                btn.disabled = true;
+                btn.innerHTML = 'Bloqueado';
+                icon.className = 'fas fa-lock';
+            }
+        }
+    }
+
+    async function watchVideo(videoNumber) {
+        if (videoNumber !== videosWatched + 1) {
+            showToast("⚠️ Debes ver los videos en orden");
+            return;
+        }
+        
+        if (videosWatched >= 5) {
+            showToast("🎯 Ya viste todos los videos de hoy");
+            return;
+        }
+        
+        showToast("📺 Reproduciendo anuncio...");
+        
+        // SIMULACIÓN DE ANUNCIO
+        setTimeout(async () => {
+            const reward = VIDEO_REWARDS[videoNumber - 1];
+            
+            const userRef = db.collection("usuarios").doc(userId);
+            await userRef.update({
+                balance: firebase.firestore.FieldValue.increment(reward)
+            });
+            
+            videosWatched++;
+            updateVideoUI();
+            await saveVideoState();
+            await updateUI();
+            
+            canvasConfetti({ particleCount: 100, spread: 50, origin: { y: 0.5 } });
+            showToast(`🎉 +${reward} ⭐ por ver el video ${videoNumber}`);
+            
+            if (videosWatched === 5) {
+                canvasConfetti({ particleCount: 300, spread: 80, origin: { y: 0.5 } });
+                showToast("🏆 ¡Completaste todos los videos del día!");
+            }
+        }, 1500);
+    }
+
+    async function updateUI() {
+        if(!userId) return;
+        const doc = await db.collection("usuarios").doc(userId).get();
+        currentUserData = doc.data();
+        if(!currentUserData) return;
+
+        document.getElementById('user-balance').innerText = currentUserData.balance || 0;
+        document.getElementById('comm-pending').innerHTML = (currentUserData.comision || 0).toFixed(2) + " USDT";
+        document.getElementById('streak-count').innerText = currentUserData.streak || 0;
+        document.getElementById('referidos-count').innerText = currentUserData.referidos || 0;
+
+        if(currentUserData.ccwallet_id) {
+            document.getElementById('ccwallet-id').value = currentUserData.ccwallet_id;
+        }
+    }
+
+    async function updateActiveUsersCount() {
+        const snapshot = await db.collection("usuarios").get();
+        document.getElementById('active-users').innerHTML = snapshot.size;
+    }
+
+    async function claimCommissions() {
+        if(!userId) return;
+        const userRef = db.collection("usuarios").doc(userId);
+        const doc = await userRef.get();
+        const c = doc.data().comision || 0;
+        if(c <= 0) { showToast("Sin comisiones"); return; }
+        await userRef.update({
+            balance: firebase.firestore.FieldValue.increment(c * 10000),
+            comision: 0
+        });
+        canvasConfetti({ particleCount: 100, spread: 50, origin: { y: 0.5 } });
+        showToast(`+${(c * 10000).toFixed(0)} ⭐ reclamadas`);
+        await updateUI();
+    }
+
+    async function loadLeaderboard() {
+        const listEl = document.getElementById('leaderboard-list');
+        listEl.innerHTML = "Cargando...";
+        const snapshot = await db.collection("usuarios").orderBy("balance", "desc").limit(10).get();
+        listEl.innerHTML = "";
+        let i = 1;
+        snapshot.forEach(doc => {
+            const u = doc.data();
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${i}. ${u.nombre?.substring(0, 12) || 'Usuario'}</span><span style="font-weight:800; color:var(--accent);">${u.balance || 0} ⭐</span></div>`;
+            i++;
+        });
+    }
+
+    async function loadInvitesList() {
+        if(!userId) return;
+        const listEl = document.getElementById('invites-list');
+        listEl.innerHTML = "Cargando...";
+        const snapshot = await db.collection("usuarios").where("invitado_por", "==", userId).get();
+        listEl.innerHTML = "";
+        if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; opacity:0.6;'>Sin invitados</p>"; return; }
+        snapshot.forEach(doc => {
+            const u = doc.data();
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance || 0} ⭐</span></div>`;
+        });
+    }
+
+    async function loadHistory() {
+        if(!userId) return;
+        const doc = await db.collection("usuarios").doc(userId).get();
+        const history = doc.data().withdrawHistory || [];
+        const listEl = document.getElementById('history-list');
+        if(history.length === 0) {
+            listEl.innerHTML = "<p style='text-align:center; opacity:0.6; padding:15px;'>Sin retiros previos</p>";
+            return;
+        }
+        listEl.innerHTML = "";
+        history.reverse().forEach(item => {
+            listEl.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:var(--accent);">${item.amount} ⭐</span><span>${item.status}</span></div>`;
+        });
+    }
+
+    function copyRefLink() {
+        if(!userId) return;
+        const link = `https://t.me/USDTGIFTKBot?startapp=${userId}`;
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Gana monedas viendo videos`);
+        showToast("Link generado");
+    }
+
+    async function handleWithdraw() {
+        if(!userId) return;
+        const ccwalletId = document.getElementById('ccwallet-id').value.trim();
+        if(ccwalletId.length < 3) { showToast("ID de CCWallet invalido"); return; }
+        
+        const userRef = db.collection("usuarios").doc(userId);
+        const doc = await userRef.get();
+        const userData = doc.data();
+        const balance = userData.balance || 0;
+        
+        if(balance < 200) { showToast("Mínimo 200 monedas (0.02 USDT) para retirar"); return; }
+        
+        const withdrawAmount = balance;
+        const isFirstWithdraw = !userData.hasWithdrawn;
+        
+        // Actualizar usuario
+        await userRef.update({
+            ccwallet_id: ccwalletId,
+            balance: 0,
+            hasWithdrawn: true,
+            withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                amount: withdrawAmount,
+                date: new Date().toLocaleDateString(),
+                status: "Enviado a @cctip_bot",
+                ccwallet: ccwalletId
+            })
+        });
+        
+        // Si es primer retiro, dar comisión al que lo invitó (0.02 USDT = 200 monedas)
+        if (isFirstWithdraw && userData.invitado_por && userData.invitado_por !== "none") {
+            const inviterRef = db.collection("usuarios").doc(userData.invitado_por);
+            const inviterDoc = await inviterRef.get();
+            if (inviterDoc.exists) {
+                await inviterRef.update({
+                    comision: firebase.firestore.FieldValue.increment(0.02)
+                });
+            }
+        }
+        
+        tg.openTelegramLink(`https://t.me/cctip_bot`);
+        canvasConfetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
+        showToast(`${withdrawAmount} ⭐ enviadas`);
+        await updateUI();
+        await loadHistory();
+        navigate('withdraw-screen');
+    }
+
+    async function handleRedeem() {
+        if(!userId) return;
+        const code = document.getElementById('redeem-code').value.trim().toUpperCase();
+        const msgDiv = document.getElementById('redeem-message');
+        if(!code) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Ingresa un código</span>';
+            return;
+        }
+        const userRef = db.collection("usuarios").doc(userId);
+        const userDoc = await userRef.get();
+        const redeemed = userDoc.data().redeemedCodes || [];
+        if(redeemed.includes(code)) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Código ya usado</span>';
+            return;
+        }
+        const codesSnapshot = await db.collection("giftCodes").where("code", "==", code).where("used", "==", false).get();
+        if(codesSnapshot.empty) {
+            msgDiv.innerHTML = '<span style="color: #e74c3c;">Código invalido</span>';
+            return;
+        }
+        const codeDoc = codesSnapshot.docs[0];
+        const amount = codeDoc.data().amount;
+        
+        // Mostrar anuncio antes de dar el código
+        showToast("📺 Viendo anuncio para reclamar...");
+        setTimeout(async () => {
+            await userRef.update({
+                balance: firebase.firestore.FieldValue.increment(amount),
+                redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+            });
+            await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId, usedAt: new Date() });
+            canvasConfetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+            msgDiv.innerHTML = `<span style="color: #27ae60; font-size: 16px;">+${amount} ⭐</span>`;
+            document.getElementById('redeem-code').value = '';
+            await updateUI();
+            setTimeout(() => { msgDiv.innerHTML = ''; }, 4000);
+        }, 1500);
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast-element');
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+    }
+
+    function navigate(screenId) {
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        document.getElementById(screenId).classList.add('active');
+        if(screenId === 'leaderboard-screen') loadLeaderboard();
+        if(screenId === 'invites-list-screen') loadInvitesList();
+        if(screenId === 'withdraw-screen') loadHistory();
     }
 
-    function showToast(m) {
-        const t = document.getElementById('toast');
-        t.innerText = m; t.style.opacity = 1;
-        setTimeout(() => t.style.opacity = 0, 3000);
+    function openCCWallet() {
+        tg.openTelegramLink('https://t.me/cctip_bot');
+        showToast('Abriendo @cctip_bot');
     }
 
-    function solicitarRetiro() {
-        const id = document.getElementById('cc-id').value;
-        if(id.length < 3) return showToast("ID Inválido");
-        showToast("Procesando retiro...");
+    function joinChannel() {
+        tg.openTelegramLink('https://t.me/UsdtGiftChannel');
+        showToast('Canal abierto');
     }
 
-    function copiarLink() {
-        const link = document.getElementById('ref-link').innerText;
-        navigator.clipboard.writeText(link);
-        showToast("¡Enlace copiado!");
-    }
+    // Event listeners
+    document.getElementById('video1Btn').onclick = () => watchVideo(1);
+    document.getElementById('video2Btn').onclick = () => watchVideo(2);
+    document.getElementById('video3Btn').onclick = () => watchVideo(3);
+    document.getElementById('video4Btn').onclick = () => watchVideo(4);
+    document.getElementById('video5Btn').onclick = () => watchVideo(5);
+    
+    document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
+    document.getElementById('withdrawNavBtn').onclick = () => { navigate('withdraw-screen'); loadHistory(); };
+    document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
+    document.getElementById('leaderboardNavBtn').onclick = () => navigate('leaderboard-screen');
+    document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeLeader').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
+    document.getElementById('backToInvite').onclick = () => navigate('invite-screen');
+    document.getElementById('claimCommBtn').onclick = claimCommissions;
+    document.getElementById('shareRefBtn').onclick = copyRefLink;
+    document.getElementById('viewInvitesBtn').onclick = () => navigate('invites-list-screen');
+    document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
+    document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
 
-    init();
+    setInterval(() => checkVideoReset(), 60000);
+    initUser();
 </script>
 </body>
 </html>
