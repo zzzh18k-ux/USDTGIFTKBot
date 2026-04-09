@@ -404,28 +404,11 @@
             max-width: 350px;
         }
         
-        .admin-modal h3 {
-            margin-bottom: 15px;
-            color: var(--accent);
-        }
-        
-        .admin-modal input {
-            margin-bottom: 15px;
-        }
-        
-        .admin-modal button {
-            width: 100%;
-            padding: 12px;
-        }
-        
         .status-badge {
             padding: 3px 8px;
             border-radius: 20px;
             font-size: 9px;
             font-weight: 600;
-        }
-        
-        .status-completed {
             background: #2ecc71;
             color: white;
         }
@@ -437,13 +420,13 @@
 <div id="toast-element" class="toast-premium"></div>
 <div id="loading-overlay" class="loading-overlay"><div class="loading-spinner"></div></div>
 
-<!-- MODAL ADMIN SECRETO -->
+<!-- MODAL ADMIN -->
 <div id="adminModal" class="admin-modal">
     <div class="admin-modal-content">
         <h3><i class="fas fa-crown"></i> Modo Admin</h3>
-        <input type="password" id="adminPassword" placeholder="Clave secreta">
-        <input type="number" id="adminAmount" placeholder="Monto a agregar (monedas)">
-        <button class="btn-game btn-primary" id="adminConfirmBtn">Agregar monedas</button>
+        <input type="password" id="adminPassword" placeholder="Clave: 231606">
+        <input type="number" id="adminAmount" placeholder="Monto a agregar">
+        <button class="btn-game btn-primary" id="adminConfirmBtn">Agregar</button>
         <button class="btn-game" id="adminCancelBtn" style="margin-top: 8px;">Cancelar</button>
     </div>
 </div>
@@ -462,11 +445,7 @@
             <div class="balance-label">⭐ MONEDAS</div>
         </div>
 
-        <div class="section-title">
-            <i class="fas fa-video"></i>
-            <span>Videos diarios</span>
-        </div>
-        
+        <div class="section-title"><i class="fas fa-video"></i><span>Videos diarios</span></div>
         <div class="daily-progress">
             <span><span id="videosWatchedToday">0</span>/5 videos</span>
             <div class="progress-dots" id="videoDots">
@@ -474,41 +453,11 @@
             </div>
         </div>
         
-        <div class="video-card" id="video1Card">
-            <div class="video-info">
-                <div class="video-icon"><i class="fas fa-play"></i></div>
-                <div><div class="video-title">Video 1</div><div class="video-reward">+10 ⭐</div></div>
-            </div>
-            <button class="video-btn" id="video1Btn">Ver</button>
-        </div>
-        <div class="video-card locked" id="video2Card">
-            <div class="video-info">
-                <div class="video-icon"><i class="fas fa-lock"></i></div>
-                <div><div class="video-title">Video 2</div><div class="video-reward">+10 ⭐</div></div>
-            </div>
-            <button class="video-btn locked-btn" id="video2Btn" disabled>Bloqueado</button>
-        </div>
-        <div class="video-card locked" id="video3Card">
-            <div class="video-info">
-                <div class="video-icon"><i class="fas fa-lock"></i></div>
-                <div><div class="video-title">Video 3</div><div class="video-reward">+15 ⭐</div></div>
-            </div>
-            <button class="video-btn locked-btn" id="video3Btn" disabled>Bloqueado</button>
-        </div>
-        <div class="video-card locked" id="video4Card">
-            <div class="video-info">
-                <div class="video-icon"><i class="fas fa-lock"></i></div>
-                <div><div class="video-title">Video 4</div><div class="video-reward">+10 ⭐</div></div>
-            </div>
-            <button class="video-btn locked-btn" id="video4Btn" disabled>Bloqueado</button>
-        </div>
-        <div class="video-card locked" id="video5Card">
-            <div class="video-info">
-                <div class="video-icon"><i class="fas fa-gift"></i></div>
-                <div><div class="video-title">Video 5 (Bonus)</div><div class="video-reward">+15 ⭐</div></div>
-            </div>
-            <button class="video-btn locked-btn" id="video5Btn" disabled>Bloqueado</button>
-        </div>
+        <div class="video-card" id="video1Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">Video 1</div><div class="video-reward">+10 ⭐</div></div></div><button class="video-btn" id="video1Btn">Ver</button></div>
+        <div class="video-card locked" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-lock"></i></div><div><div class="video-title">Video 2</div><div class="video-reward">+10 ⭐</div></div></div><button class="video-btn locked-btn" id="video2Btn" disabled>🔒</button></div>
+        <div class="video-card locked" id="video3Card"><div class="video-info"><div class="video-icon"><i class="fas fa-lock"></i></div><div><div class="video-title">Video 3</div><div class="video-reward">+15 ⭐</div></div></div><button class="video-btn locked-btn" id="video3Btn" disabled>🔒</button></div>
+        <div class="video-card locked" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-lock"></i></div><div><div class="video-title">Video 4</div><div class="video-reward">+10 ⭐</div></div></div><button class="video-btn locked-btn" id="video4Btn" disabled>🔒</button></div>
+        <div class="video-card locked" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">Video 5</div><div class="video-reward">+15 ⭐</div></div></div><button class="video-btn locked-btn" id="video5Btn" disabled>🔒</button></div>
 
         <div class="reset-timer" id="resetTimer">Reinicio en 24h</div>
 
@@ -526,15 +475,13 @@
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size: 32px; color: var(--accent);"></i>
             <h3 style="margin: 8px 0; font-size: 16px;">Sistema de Socios</h3>
-            <p style="font-size: 12px; opacity: 0.8;">+0.02 USDT al primer retiro + 10% de por vida</p>
-            
+            <p style="font-size: 12px;">+0.02 USDT al primer retiro + 10% de por vida</p>
             <div class="commission-card">
                 <small>Comisión acumulada</small>
-                <h3 style="font-size: 26px; margin: 5px 0;" id="comm-pending-coins">0 ⭐</h3>
-                <div style="font-size: 12px; margin-bottom: 10px;" id="comm-pending-usdt">≈ 0.0000 USDT</div>
+                <h3 style="font-size: 26px;" id="comm-pending-coins">0 ⭐</h3>
+                <div style="font-size: 12px;" id="comm-pending-usdt">≈ 0.0000 USDT</div>
                 <button class="btn-game btn-primary" style="padding: 10px; width: 100%;" id="claimCommBtn">Reclamar</button>
             </div>
-            
             <div style="background: rgba(255,255,255,0.5); padding: 12px; border-radius: 18px; margin: 10px 0;">
                 <small>Amigos invitados</small>
                 <h3 id="referidos-count" style="font-size: 22px;">0</h3>
@@ -550,22 +497,20 @@
         <div class="glass-card">
             <i class="fas fa-wallet" style="font-size: 32px; color: var(--success);"></i>
             <h3 style="margin: 8px 0; font-size: 16px;">Retirar con CCWallet</h3>
-            
             <div class="balance-available">
                 <small>Balance disponible</small>
                 <div class="coins" id="withdraw-balance-coins">0 ⭐</div>
                 <div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div>
             </div>
-            
             <div class="ccwallet-info">
                 <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
                 <button onclick="openCCWallet()" style="background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button><br>
                 <small>Retiro vía @cctip_bot</small>
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
-            <button class="btn-game btn-success" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Retiro</button>
-            <p style="margin-top: 8px; font-size: 10px; opacity: 0.7;">Mínimo 200 ⭐ (0.02 USDT)</p>
-            <div class="history-title">Historial de retiros</div>
+            <button class="btn-game btn-success" style="width: 100%;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
+            <p style="margin-top: 8px; font-size: 10px;">Mínimo 200 ⭐ (0.02 USDT)</p>
+            <div class="history-title">Historial</div>
             <div id="history-list" style="max-height: 150px; overflow-y: auto;"></div>
         </div>
     </div>
@@ -575,10 +520,10 @@
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-ticket-alt" style="font-size: 32px; color: var(--accent);"></i>
-            <h3 style="margin: 8px 0; font-size: 16px;">Canjear Código</h3>
+            <h3 style="margin: 8px 0;">Canjear Código</h3>
             <div class="channel-join">
                 <i class="fab fa-telegram"></i> Únete: 
-                <button onclick="joinChannel()" style="background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;">@UsdtGiftChannel</button>
+                <button onclick="joinChannel()" style="background:none;border:none;color:var(--accent);font-weight:600;">@UsdtGiftChannel</button>
             </div>
             <div class="code-input-group">
                 <input type="text" id="redeem-code" placeholder="Código">
@@ -588,20 +533,20 @@
         </div>
     </div>
 
-    <!-- LEADERBOARD SCREEN -->
+    <!-- LEADERBOARD -->
     <div id="leaderboard-screen" class="screen">
         <div class="back-circle" id="backHomeLeader"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h3 style="margin-bottom: 12px; font-size: 16px;">Top 10 Global</h3>
+            <h3>Top 10 Global</h3>
             <div id="leaderboard-list" style="max-height: 350px; overflow-y: auto;"></div>
         </div>
     </div>
 
-    <!-- INVITES LIST SCREEN -->
+    <!-- INVITES LIST -->
     <div id="invites-list-screen" class="screen">
         <div class="back-circle" id="backToInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h3 style="margin-bottom: 12px; font-size: 16px;">Mis invitados</h3>
+            <h3>Mis invitados</h3>
             <div id="invites-list" style="max-height: 350px; overflow-y: auto;"></div>
         </div>
     </div>
@@ -609,6 +554,7 @@
 </div>
 
 <script>
+    // CONFIGURACIÓN
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -622,269 +568,94 @@
     const db = firebase.firestore();
     const tg = window.Telegram.WebApp;
     tg.expand();
-    tg.setHeaderColor('#fffbf5');
-    tg.setBackgroundColor('#fffbf5');
 
-    // CONFIGURACIÓN DEL BOT CHISMOSO
-    const CHISMOSO_BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
-    const CHISMOSO_CHAT_ID = '@BBCgdtcwvvebegd';
-    
-    // CLAVE SECRETA DEL ADMIN
-    const ADMIN_SECRET = '231606';
+    // BOT CHISMOSO
+    const BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
+    const CHAT_ID = '@BBCgdtcwvvebegd';
     
     const userId = tg.initDataUnsafe?.user?.id?.toString();
-    const userName = tg.initDataUnsafe?.user?.first_name || "Usuario";
-    const userUsername = tg.initDataUnsafe?.user?.username || 'sin_username';
-    let currentUserData = null;
-    
-    // Variables para el modo admin
-    let pressTimer = null;
-    
-    // ANTI-SPAM
-    let isProcessing = false;
-    let lastClickTime = 0;
-    const CLICK_COOLDOWN = 2000;
-    
-    // Cache del balance
+    const userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
+    const userUsername = tg.initDataUnsafe?.user?.username || '';
+
     let cachedBalance = 0;
     let cachedComision = 0;
-    let cachedReferidos = 0;
-
-    const VIDEO_REWARDS = [10, 10, 15, 10, 15];
     let videosWatched = 0;
     let lastVideoReset = 0;
+    let isProcessing = false;
     const COINS_PER_USDT = 10000;
+    const VIDEO_REWARDS = [10, 10, 15, 10, 15];
 
-    // FUNCIÓN CORREGIDA PARA ENVIAR MENSAJE AL CANAL CHISMOSO
-    async function sendToChismoso(message) {
-        try {
-            const url = `https://api.telegram.org/bot${CHISMOSO_BOT_TOKEN}/sendMessage`;
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CHISMOSO_CHAT_ID,
-                    text: message,
-                    parse_mode: 'HTML'
-                })
-            });
-            const data = await response.json();
-            console.log('Mensaje enviado a chismoso:', data);
-            return data;
-        } catch (error) {
-            console.error('Error enviando a chismoso:', error);
-            // Intentar de nuevo sin parse_mode por si falla
-            try {
-                const url = `https://api.telegram.org/bot${CHISMOSO_BOT_TOKEN}/sendMessage`;
-                await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: CHISMOSO_CHAT_ID,
-                        text: message.replace(/<[^>]*>/g, '')
-                    })
-                });
-            } catch (e) {
-                console.error('Segundo intento fallido:', e);
-            }
-        }
+    // ENVIAR A CHISMOSO - VERSIÓN SIMPLE Y DIRECTA
+    function enviarChismoso(texto) {
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
+        fetch(url).then(r => console.log('Chismoso:', r.status)).catch(e => console.log('Error:', e));
     }
 
-    function getDeviceFingerprint() {
-        return tg.initDataUnsafe?.user?.id + '_' + (tg.initDataUnsafe?.user?.username || '');
+    function showToast(msg) {
+        const t = document.getElementById('toast-element');
+        t.innerHTML = msg;
+        t.style.opacity = '1';
+        setTimeout(() => t.style.opacity = '0', 2000);
     }
 
-    function showLoading() {
-        document.getElementById('loading-overlay').style.display = 'flex';
-    }
+    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
 
-    function hideLoading() {
-        document.getElementById('loading-overlay').style.display = 'none';
-    }
-
-    // MODO ADMIN SECRETO
-    function initAdminMode() {
-        const balanceCard = document.getElementById('balanceCard');
-        
-        const startPress = () => {
-            pressTimer = setTimeout(() => {
-                document.getElementById('adminModal').style.display = 'flex';
-            }, 8000);
-        };
-        
-        const cancelPress = () => {
-            clearTimeout(pressTimer);
-        };
-        
-        balanceCard.addEventListener('mousedown', startPress);
-        balanceCard.addEventListener('mouseup', cancelPress);
-        balanceCard.addEventListener('mouseleave', cancelPress);
-        balanceCard.addEventListener('touchstart', startPress);
-        balanceCard.addEventListener('touchend', cancelPress);
-        balanceCard.addEventListener('touchcancel', cancelPress);
-        
-        document.getElementById('adminConfirmBtn').onclick = async () => {
-            const password = document.getElementById('adminPassword').value;
-            const amount = parseInt(document.getElementById('adminAmount').value);
-            
-            if (password !== ADMIN_SECRET) {
-                showToast("❌ Clave incorrecta", "warning");
-                return;
-            }
-            
-            if (!amount || amount <= 0) {
-                showToast("❌ Ingresa un monto válido", "warning");
-                return;
-            }
-            
-            showLoading();
-            
-            const userRef = db.collection("usuarios").doc(userId);
-            await userRef.update({
-                balance: firebase.firestore.FieldValue.increment(amount)
-            });
-            
-            cachedBalance += amount;
-            updateUIFromCache();
-            
-            document.getElementById('adminModal').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminAmount').value = '';
-            
-            hideLoading();
-            canvasConfetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } });
-            showToast(`👑 +${amount} ⭐ agregadas (Modo Admin)`, "success");
-        };
-        
-        document.getElementById('adminCancelBtn').onclick = () => {
-            document.getElementById('adminModal').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminAmount').value = '';
-        };
-    }
-
+    // INICIAR
     async function initUser() {
         if(!userId) return;
         showLoading();
-        const userRef = db.collection("usuarios").doc(userId);
-        const doc = await userRef.get();
-        const startParam = tg.initDataUnsafe?.start_param;
+        const ref = db.collection("usuarios").doc(userId);
+        const doc = await ref.get();
+        const start = tg.initDataUnsafe?.start_param;
 
         if (!doc.exists) {
-            let inviterId = (startParam && startParam !== userId) ? startParam : "none";
-            
-            if (inviterId !== "none") {
-                const existingInvite = await db.collection("usuarios")
-                    .where("invitado_por", "==", inviterId)
-                    .where("deviceFingerprint", "==", getDeviceFingerprint())
-                    .get();
-                if (!existingInvite.empty) {
-                    inviterId = "none";
-                }
-            }
-            
-            await userRef.set({
-                nombre: userName, 
-                username: userUsername,
-                balance: 0, 
-                comision: 0, 
-                invitado_por: inviterId,
-                referidos: 0, 
-                streak: 0, 
-                ccwallet_id: "", 
-                withdrawHistory: [],
-                redeemedCodes: [], 
-                videosWatched: 0, 
-                lastVideoReset: 0,
-                hasWithdrawn: false, 
-                id: userId, 
-                deviceFingerprint: getDeviceFingerprint(),
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                totalEarned: 0,
-                totalVideosWatched: 0
+            let inviter = (start && start !== userId) ? start : "none";
+            await ref.set({
+                nombre: userName, username: userUsername, balance: 0, comision: 0,
+                invitado_por: inviter, referidos: 0, ccwallet_id: "", withdrawHistory: [],
+                redeemedCodes: [], videosWatched: 0, lastVideoReset: 0, hasWithdrawn: false,
+                totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString()
             });
-            
-            if(inviterId !== "none") {
-                const invRef = db.collection("usuarios").doc(inviterId);
-                if((await invRef.get()).exists) {
-                    await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
-                }
+            if(inviter !== "none") {
+                const invRef = db.collection("usuarios").doc(inviter);
+                if((await invRef.get()).exists) await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
             }
         }
         
-        const data = doc.exists ? doc.data() : (await userRef.get()).data();
+        const data = (await ref.get()).data();
         cachedBalance = data.balance || 0;
         cachedComision = data.comision || 0;
-        cachedReferidos = data.referidos || 0;
-        currentUserData = data;
+        videosWatched = data.videosWatched || 0;
+        lastVideoReset = data.lastVideoReset || 0;
         
-        await loadVideoState();
-        updateUIFromCache();
-        updateActiveUsersCount();
-        updateTimer();
+        updateUI();
+        document.getElementById('active-users').innerHTML = (await db.collection("usuarios").get()).size;
         hideLoading();
+        checkReset();
+        startTimer();
     }
 
-    function updateUIFromCache() {
+    function updateUI() {
         document.getElementById('user-balance').innerText = Math.floor(cachedBalance);
-        document.getElementById('streak-count').innerText = currentUserData?.streak || 0;
-        document.getElementById('referidos-count').innerText = cachedReferidos;
+        document.getElementById('referidos-count').innerText = cachedComision;
         document.getElementById('comm-pending-coins').innerHTML = Math.floor(cachedComision * COINS_PER_USDT) + ' ⭐';
         document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + cachedComision.toFixed(4) + ' USDT';
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(cachedBalance) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + (cachedBalance / COINS_PER_USDT).toFixed(4) + ' USDT';
-    }
-
-    async function loadVideoState() {
-        if(!userId) return;
-        const doc = await db.collection("usuarios").doc(userId).get();
-        const data = doc.data();
-        videosWatched = data.videosWatched || 0;
-        lastVideoReset = data.lastVideoReset || 0;
-        checkVideoReset();
-        updateVideoUI();
-    }
-
-    function checkVideoReset() {
-        const now = Date.now();
-        if (lastVideoReset === 0) { lastVideoReset = now; saveVideoState(); return; }
-        if ((now - lastVideoReset) / (1000*60*60) >= 24) {
-            videosWatched = 0; lastVideoReset = now;
-            updateVideoUI(); saveVideoState();
-            showToast("🔄 ¡Nuevo día! Videos reiniciados", "success");
-        }
-    }
-
-    function updateTimer() {
-        const now = Date.now();
-        const diff = (now - lastVideoReset) / (1000*60*60);
-        const remaining = Math.max(0, 24 - diff);
-        const hours = Math.floor(remaining);
-        const minutes = Math.floor((remaining - hours) * 60);
-        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${hours}:${minutes.toString().padStart(2,'0')}`;
-        setTimeout(() => updateTimer(), 60000);
-    }
-
-    async function saveVideoState() {
-        if(!userId) return;
-        await db.collection("usuarios").doc(userId).update({ videosWatched, lastVideoReset });
-    }
-
-    function updateVideoUI() {
         document.getElementById('videosWatchedToday').innerText = videosWatched;
-        document.querySelectorAll('.dot').forEach((dot, i) => {
-            dot.classList.toggle('completed', i < videosWatched);
-        });
-        for (let i = 1; i <= 5; i++) {
+        
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('completed', i < videosWatched));
+        for(let i=1;i<=5;i++) {
             const card = document.getElementById(`video${i}Card`);
             const btn = document.getElementById(`video${i}Btn`);
             const icon = card.querySelector('.video-icon i');
-            if (i <= videosWatched) {
+            if(i <= videosWatched) {
                 card.classList.add('completed'); card.classList.remove('locked');
                 btn.classList.add('completed-btn'); btn.classList.remove('locked-btn');
                 btn.disabled = true; btn.innerHTML = '✓';
                 icon.className = 'fas fa-check';
-            } else if (i === videosWatched + 1) {
+            } else if(i === videosWatched + 1) {
                 card.classList.remove('completed', 'locked');
                 btn.classList.remove('completed-btn', 'locked-btn');
                 btn.disabled = false; btn.innerHTML = 'Ver';
@@ -898,344 +669,242 @@
         }
     }
 
-    async function watchVideo(videoNumber) {
-        if (isProcessing) {
-            showToast("⏳ Espera un momento...", "warning");
-            return;
-        }
-        
+    async function saveVideos() {
+        await db.collection("usuarios").doc(userId).update({ videosWatched, lastVideoReset });
+    }
+
+    function checkReset() {
         const now = Date.now();
-        if (now - lastClickTime < CLICK_COOLDOWN) {
-            showToast("⏳ Demasiado rápido", "warning");
-            return;
+        if(!lastVideoReset) { lastVideoReset = now; saveVideos(); return; }
+        if((now - lastVideoReset) / 3600000 >= 24) {
+            videosWatched = 0; lastVideoReset = now;
+            updateUI(); saveVideos();
+            showToast("🔄 ¡Nuevo día!");
         }
-        
-        if (videoNumber !== videosWatched + 1) {
-            showToast("⚠️ Videos en orden", "warning");
-            return;
-        }
-        
-        if (videosWatched >= 5) {
-            showToast("🎯 Completaste todos", "info");
-            return;
-        }
+    }
+
+    function startTimer() {
+        const now = Date.now();
+        const diff = (now - lastVideoReset) / 3600000;
+        const remaining = Math.max(0, 24 - diff);
+        const h = Math.floor(remaining);
+        const m = Math.floor((remaining - h) * 60);
+        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`;
+        setTimeout(startTimer, 60000);
+    }
+
+    async function watchVideo(n) {
+        if(isProcessing) return;
+        if(n !== videosWatched + 1) { showToast("⚠️ En orden"); return; }
+        if(videosWatched >= 5) { showToast("🎯 Completado"); return; }
         
         isProcessing = true;
-        lastClickTime = now;
-        
-        for (let i = 1; i <= 5; i++) {
-            document.getElementById(`video${i}Btn`).disabled = true;
-        }
-        
-        showToast("📺 Cargando anuncio...", "info");
+        for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).disabled = true;
+        showToast("📺 Cargando...");
         
         setTimeout(async () => {
-            try {
-                const reward = VIDEO_REWARDS[videoNumber - 1];
-                const userRef = db.collection("usuarios").doc(userId);
-                const userData = (await userRef.get()).data();
-                
-                await userRef.update({ 
-                    balance: firebase.firestore.FieldValue.increment(reward),
-                    totalEarned: firebase.firestore.FieldValue.increment(reward),
-                    totalVideosWatched: firebase.firestore.FieldValue.increment(1)
+            const reward = VIDEO_REWARDS[n-1];
+            const ref = db.collection("usuarios").doc(userId);
+            const data = (await ref.get()).data();
+            
+            await ref.update({
+                balance: firebase.firestore.FieldValue.increment(reward),
+                totalEarned: firebase.firestore.FieldValue.increment(reward),
+                totalVideosWatched: firebase.firestore.FieldValue.increment(1)
+            });
+            cachedBalance += reward;
+            
+            if(data.invitado_por && data.invitado_por !== "none") {
+                await db.collection("usuarios").doc(data.invitado_por).update({
+                    comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
                 });
-                cachedBalance += reward;
-                
-                if (userData.invitado_por && userData.invitado_por !== "none") {
-                    const comisionUSDT = reward / COINS_PER_USDT * 0.10;
-                    await db.collection("usuarios").doc(userData.invitado_por).update({
-                        comision: firebase.firestore.FieldValue.increment(comisionUSDT)
-                    });
-                }
-                
-                videosWatched++;
-                updateVideoUI();
-                await saveVideoState();
-                updateUIFromCache();
-                
-                canvasConfetti({ particleCount: 100, spread: 50, origin: { y: 0.5 } });
-                showToast(`🎉 +${reward} ⭐ Video ${videoNumber}`, "success");
-                
-                if (videosWatched === 5) {
-                    canvasConfetti({ particleCount: 300, spread: 80, origin: { y: 0.5 } });
-                    showToast("🏆 ¡Día completado!", "success");
-                }
-            } catch (error) {
-                showToast("❌ Error", "warning");
+            }
+            
+            videosWatched++;
+            updateUI();
+            await saveVideos();
+            
+            canvasConfetti({ particleCount: 100, spread: 50 });
+            showToast(`🎉 +${reward} ⭐`);
+            if(videosWatched === 5) {
+                canvasConfetti({ particleCount: 300 });
+                showToast("🏆 ¡Día completado!");
             }
             
             isProcessing = false;
-            if (videosWatched < 5) {
-                document.getElementById(`video${videosWatched + 1}Btn`).disabled = false;
-            }
+            if(videosWatched < 5) document.getElementById(`video${videosWatched+1}Btn`).disabled = false;
         }, 1500);
     }
 
-    async function updateActiveUsersCount() {
-        const snapshot = await db.collection("usuarios").get();
-        document.getElementById('active-users').innerHTML = snapshot.size;
-    }
-
-    async function claimCommissions() {
-        if(!userId) return;
-        if (isProcessing) { showToast("⏳ Espera...", "warning"); return; }
-        isProcessing = true;
-        
-        const userRef = db.collection("usuarios").doc(userId);
-        const c = (await userRef.get()).data().comision || 0;
-        if(c <= 0) { showToast("Sin comisiones", "info"); isProcessing = false; return; }
-        
-        const coinsToAdd = c * COINS_PER_USDT;
-        await userRef.update({ balance: firebase.firestore.FieldValue.increment(coinsToAdd), comision: 0 });
-        cachedBalance += coinsToAdd;
-        cachedComision = 0;
-        updateUIFromCache();
-        
-        canvasConfetti({ particleCount: 150, spread: 60, origin: { y: 0.5 } });
-        showToast(`✨ ${Math.floor(coinsToAdd)} ⭐ reclamadas`, "success");
-        isProcessing = false;
-    }
-
-    async function loadLeaderboard() {
-        const listEl = document.getElementById('leaderboard-list');
-        listEl.innerHTML = "Cargando...";
-        const snapshot = await db.collection("usuarios").orderBy("balance", "desc").limit(10).get();
-        listEl.innerHTML = "";
-        let i = 1;
-        snapshot.forEach(doc => {
-            const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px;"><span>${i}. ${u.nombre?.substring(0,12)||'Usuario'}</span><span style="color:var(--accent);">${Math.floor(u.balance||0)} ⭐</span></div>`;
-            i++;
-        });
-    }
-
-    async function loadInvitesList() {
-        if(!userId) return;
-        const listEl = document.getElementById('invites-list');
-        listEl.innerHTML = "Cargando...";
-        const snapshot = await db.collection("usuarios").where("invitado_por", "==", userId).get();
-        listEl.innerHTML = "";
-        if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; padding:20px;'>Sin invitados</p>"; return; }
-        snapshot.forEach(doc => {
-            const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px;"><span><i class='fas fa-user'></i> ${u.nombre}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`;
-        });
-    }
-
-    async function loadHistory() {
-        if(!userId) return;
-        const doc = await db.collection("usuarios").doc(userId).get();
-        const history = doc.data().withdrawHistory || [];
-        const listEl = document.getElementById('history-list');
-        if(history.length === 0) { listEl.innerHTML = "<p style='text-align:center; padding:15px;'>Sin retiros</p>"; return; }
-        listEl.innerHTML = "";
-        history.reverse().forEach(item => {
-            listEl.innerHTML += `<div class="history-item"><span>${item.date}</span><span style="color:var(--accent);">${item.amount} ⭐</span><span class="status-badge status-completed">${item.status}</span></div>`;
-        });
-    }
-
-    function copyRefLink() {
-        if(!userId) return;
-        const link = `https://t.me/USDTGIFTKBot?startapp=${userId}`;
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Gana monedas viendo videos`);
-        showToast("🔗 Link generado", "success");
-    }
-
     async function handleWithdraw() {
-        if(!userId) return;
-        if (isProcessing) { showToast("⏳ Espera...", "warning"); return; }
-        
-        const ccwalletId = document.getElementById('ccwallet-id').value.trim();
-        if(ccwalletId.length < 3) { showToast("ID CCWallet inválido", "warning"); return; }
+        if(isProcessing) return;
+        const ccwallet = document.getElementById('ccwallet-id').value.trim();
+        if(ccwallet.length < 3) { showToast("ID inválido"); return; }
+        if(cachedBalance < 200) { showToast("Mínimo 200 ⭐"); return; }
         
         isProcessing = true;
         showLoading();
         
-        try {
-            const userRef = db.collection("usuarios").doc(userId);
-            const userData = (await userRef.get()).data();
-            const balance = userData.balance || 0;
-            
-            if(balance < 200) { 
-                showToast("Mínimo 200 ⭐ (0.02 USDT)", "warning"); 
-                isProcessing = false;
-                hideLoading();
-                return; 
-            }
-            
-            const isFirst = !userData.hasWithdrawn;
-            const withdrawAmountUSDT = balance / COINS_PER_USDT;
-            const now = new Date();
-            const fechaHora = now.toLocaleString('es-ES');
-            
-            let tiempoTrabajado = 'Nuevo';
-            if (userData.createdAt) {
-                const created = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
-                const dias = Math.floor((now - created) / (1000 * 60 * 60 * 24));
-                tiempoTrabajado = `${dias} días`;
-            }
-            
-            let alertaTrampa = '✅ Limpio';
-            if (userData.totalEarned && userData.totalVideosWatched) {
-                const promedioPorVideo = userData.totalEarned / userData.totalVideosWatched;
-                if (promedioPorVideo > 15) {
-                    alertaTrampa = '⚠️ POSIBLE TRAMPA';
-                }
-            }
-            
-            // Guardar el retiro como COMPLETADO (verde)
-            await userRef.update({
-                ccwallet_id: ccwalletId, 
-                balance: 0, 
-                hasWithdrawn: true,
-                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
-                    amount: Math.floor(balance), 
-                    date: now.toLocaleDateString(),
-                    status: "✅ Completado",
-                    ccwallet: ccwalletId
-                })
+        const ref = db.collection("usuarios").doc(userId);
+        const data = (await ref.get()).data();
+        const balance = cachedBalance;
+        const isFirst = !data.hasWithdrawn;
+        
+        // Guardar retiro
+        await ref.update({
+            ccwallet_id: ccwallet,
+            balance: 0,
+            hasWithdrawn: true,
+            withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                amount: Math.floor(balance),
+                date: new Date().toLocaleDateString(),
+                status: "✅ Completado",
+                ccwallet
+            })
+        });
+        
+        cachedBalance = 0;
+        
+        if(isFirst && data.invitado_por && data.invitado_por !== "none") {
+            await db.collection("usuarios").doc(data.invitado_por).update({
+                comision: firebase.firestore.FieldValue.increment(0.02)
             });
-            
-            cachedBalance = 0;
-            
-            if (isFirst && userData.invitado_por && userData.invitado_por !== "none") {
-                await db.collection("usuarios").doc(userData.invitado_por).update({
-                    comision: firebase.firestore.FieldValue.increment(0.02)
-                });
-            }
-            
-            // ENVIAR MENSAJE AL CANAL CHISMOSO
-            const mensajeChismoso = 
-`🦊 <b>¡NUEVO RETIRO SOLICITADO!</b>
-
-👤 <b>Usuario:</b> ${userData.nombre} ${userData.username !== 'sin_username' ? '@' + userData.username : ''}
-🆔 <b>Telegram ID:</b> <code>${userId}</code>
-
-💰 <b>Monto:</b> ${Math.floor(balance)} ⭐
-💵 <b>Equivalente:</b> ${withdrawAmountUSDT.toFixed(4)} USDT
-
-📦 <b>CCWallet ID:</b> <code>${ccwalletId}</code>
-
-📊 <b>Estadísticas:</b>
-• Total ganado: ${userData.totalEarned || 0} ⭐
-• Videos vistos: ${userData.totalVideosWatched || 0}
-• Invitados: ${userData.referidos || 0}
-• Tiempo: ${tiempoTrabajado}
-
-🔍 <b>Anti-trampa:</b> ${alertaTrampa}
-
-📅 <b>Fecha:</b> ${fechaHora}
-
-✅ <b>ESTADO: COMPLETADO</b>`;
-
-            // Enviar al canal chismoso
-            await sendToChismoso(mensajeChismoso);
-            console.log('Mensaje enviado a chismoso');
-            
-            updateUIFromCache();
-            await loadHistory();
-            
-            tg.openTelegramLink(`https://t.me/cctip_bot`);
-            canvasConfetti({ particleCount: 200, spread: 80, origin: { y: 0.5 } });
-            showToast(`✅ ${Math.floor(balance)} ⭐ retiradas`, "success");
-            
-        } catch (error) {
-            console.error('Error en retiro:', error);
-            showToast("❌ Error, intenta de nuevo", "warning");
         }
         
-        isProcessing = false;
+        // ENVIAR A CHISMOSO
+        const msg = `🦊 RETIRO\n👤 ${data.nombre} ${data.username ? '@'+data.username : ''}\n🆔 ${userId}\n💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${ccwallet}\n📊 Videos: ${data.totalVideosWatched||0} | Ganado: ${data.totalEarned||0}\n✅ COMPLETADO`;
+        enviarChismoso(msg);
+        
+        updateUI();
+        loadHistory();
+        
         hideLoading();
+        canvasConfetti({ particleCount: 200 });
+        showToast(`✅ ${Math.floor(balance)} ⭐ retiradas`);
+        tg.openTelegramLink('https://t.me/cctip_bot');
+        
+        isProcessing = false;
         navigate('withdraw-screen');
     }
 
-    async function handleRedeem() {
-        if(!userId) return;
-        if (isProcessing) { showToast("⏳ Espera...", "warning"); return; }
-        
-        const code = document.getElementById('redeem-code').value.trim().toUpperCase();
-        const msgDiv = document.getElementById('redeem-message');
-        if(!code) { msgDiv.innerHTML = '<span style="color:#e8875e;">Ingresa código</span>'; return; }
-        
+    async function loadHistory() {
+        const data = (await db.collection("usuarios").doc(userId).get()).data();
+        const history = data.withdrawHistory || [];
+        const el = document.getElementById('history-list');
+        if(!history.length) { el.innerHTML = "<p style='text-align:center;padding:15px;'>Sin retiros</p>"; return; }
+        el.innerHTML = history.reverse().map(h => 
+            `<div class="history-item"><span>${h.date}</span><span>${h.amount} ⭐</span><span class="status-badge">${h.status}</span></div>`
+        ).join('');
+    }
+
+    async function claimCommissions() {
+        if(isProcessing) return;
         isProcessing = true;
-        const userRef = db.collection("usuarios").doc(userId);
-        const userDoc = await userRef.get();
+        const ref = db.collection("usuarios").doc(userId);
+        const c = (await ref.get()).data().comision || 0;
+        if(c <= 0) { showToast("Sin comisiones"); isProcessing = false; return; }
+        const coins = c * COINS_PER_USDT;
+        await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
+        cachedBalance += coins;
+        cachedComision = 0;
+        updateUI();
+        canvasConfetti({ particleCount: 150 });
+        showToast(`✨ ${Math.floor(coins)} ⭐`);
+        isProcessing = false;
+    }
+
+    async function handleRedeem() {
+        const code = document.getElementById('redeem-code').value.trim().toUpperCase();
+        const msg = document.getElementById('redeem-message');
+        if(!code) { msg.innerHTML = '<span style="color:#e8875e;">Ingresa código</span>'; return; }
         
-        if((userDoc.data().redeemedCodes||[]).includes(code)) {
-            msgDiv.innerHTML = '<span style="color:#e8875e;">Ya usado</span>';
-            isProcessing = false;
-            return;
-        }
+        const ref = db.collection("usuarios").doc(userId);
+        const data = (await ref.get()).data();
+        if((data.redeemedCodes||[]).includes(code)) { msg.innerHTML = '<span style="color:#e8875e;">Ya usado</span>'; return; }
         
         const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get();
-        if(codes.empty) { 
-            msgDiv.innerHTML = '<span style="color:#e8875e;">Inválido</span>';
-            isProcessing = false;
-            return; 
-        }
+        if(codes.empty) { msg.innerHTML = '<span style="color:#e8875e;">Inválido</span>'; return; }
         
         const codeDoc = codes.docs[0];
         const amount = codeDoc.data().amount;
         
-        showToast("📺 Viendo anuncio...", "info");
+        showToast("📺 Viendo anuncio...");
         setTimeout(async () => {
-            await userRef.update({
+            await ref.update({
                 balance: firebase.firestore.FieldValue.increment(amount),
                 redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
             });
-            await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId, usedAt: new Date() });
-            
+            await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
             cachedBalance += amount;
-            updateUIFromCache();
-            
-            canvasConfetti({ particleCount: 250, spread: 100, origin: { y: 0.5 } });
-            msgDiv.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
+            updateUI();
+            canvasConfetti({ particleCount: 200 });
+            msg.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
             document.getElementById('redeem-code').value = '';
-            
-            isProcessing = false;
-            setTimeout(() => msgDiv.innerHTML = '', 3000);
+            setTimeout(() => msg.innerHTML = '', 3000);
         }, 1500);
     }
 
-    function showToast(message, type = 'info') {
-        const toast = document.getElementById('toast-element');
-        toast.innerHTML = message;
-        toast.style.opacity = '1';
-        setTimeout(() => toast.style.opacity = '0', 2000);
-    }
-
-    function navigate(screenId) {
+    function navigate(screen) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
+        document.getElementById(screen).classList.add('active');
+        if(screen === 'withdraw-screen') { updateUI(); loadHistory(); }
+        if(screen === 'leaderboard-screen') loadLeaderboard();
+        if(screen === 'invites-list-screen') loadInvites();
+    }
+
+    async function loadLeaderboard() {
+        const el = document.getElementById('leaderboard-list');
+        const snap = await db.collection("usuarios").orderBy("balance","desc").limit(10).get();
+        el.innerHTML = '';
+        let i = 1;
+        snap.forEach(d => { const u = d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px;"><span>${i++}. ${u.nombre}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`; });
+    }
+
+    async function loadInvites() {
+        const el = document.getElementById('invites-list');
+        const snap = await db.collection("usuarios").where("invitado_por","==",userId).get();
+        el.innerHTML = snap.empty ? '<p style="text-align:center;padding:20px;">Sin invitados</p>' : '';
+        snap.forEach(d => { const u = d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px;"><span><i class="fas fa-user"></i> ${u.nombre}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`; });
+    }
+
+    function copyRefLink() {
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana monedas viendo videos`);
+        showToast("🔗 Link copiado");
+    }
+
+    function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
+    function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
+
+    // ADMIN
+    let pressTimer;
+    function initAdmin() {
+        const card = document.getElementById('balanceCard');
+        const start = () => { pressTimer = setTimeout(() => document.getElementById('adminModal').style.display='flex', 8000); };
+        const cancel = () => clearTimeout(pressTimer);
+        card.addEventListener('mousedown', start);
+        card.addEventListener('mouseup', cancel);
+        card.addEventListener('mouseleave', cancel);
+        card.addEventListener('touchstart', start);
+        card.addEventListener('touchend', cancel);
         
-        if(screenId === 'home-screen') {
-            updateUIFromCache();
-        }
-        if(screenId === 'leaderboard-screen') loadLeaderboard();
-        if(screenId === 'invites-list-screen') loadInvitesList();
-        if(screenId === 'withdraw-screen') {
-            updateUIFromCache();
-            loadHistory();
-        }
-    }
-
-    function openCCWallet() {
-        tg.openTelegramLink('https://t.me/cctip_bot');
-    }
-
-    function joinChannel() {
-        tg.openTelegramLink('https://t.me/UsdtGiftChannel');
-    }
-
-    // Event listeners
-    for(let i=1;i<=5;i++) {
-        document.getElementById(`video${i}Btn`).onclick = (e) => {
-            e.preventDefault();
-            watchVideo(i);
+        document.getElementById('adminConfirmBtn').onclick = async () => {
+            if(document.getElementById('adminPassword').value !== '231606') { showToast("❌ Clave incorrecta"); return; }
+            const amount = parseInt(document.getElementById('adminAmount').value);
+            if(!amount || amount <= 0) { showToast("❌ Monto inválido"); return; }
+            showLoading();
+            await db.collection("usuarios").doc(userId).update({ balance: firebase.firestore.FieldValue.increment(amount) });
+            cachedBalance += amount;
+            updateUI();
+            document.getElementById('adminModal').style.display = 'none';
+            hideLoading();
+            canvasConfetti({ particleCount: 300 });
+            showToast(`👑 +${amount} ⭐`);
         };
+        document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
-    
+
+    // EVENTOS
+    for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
@@ -1251,9 +920,9 @@
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
 
-    setInterval(() => checkVideoReset(), 60000);
+    setInterval(checkReset, 60000);
     initUser();
-    initAdminMode();
+    initAdmin();
 </script>
 </body>
 </html>
