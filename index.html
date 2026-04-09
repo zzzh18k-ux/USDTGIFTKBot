@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Tus estilos originales (sin cambios) */
         :root {
             --gold: #ffcc00;
             --orange-gradient: linear-gradient(135deg, #e8875e 0%, #f0a080 100%);
@@ -406,19 +405,6 @@
         .admin-modal input {
             margin-bottom: 15px;
         }
-
-        /* Estilo para el botón de notificación de prueba */
-        .test-notify-btn {
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: var(--accent);
-            cursor: pointer;
-            padding: 6px;
-            margin-left: 8px;
-            transition: transform 0.2s;
-        }
-        .test-notify-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
@@ -443,13 +429,7 @@
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="streak-badge"><i class="fas fa-fire"></i> <span id="streak-count">0</span> DIAS</div>
-            <div style="display: flex; align-items: center;">
-                <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
-                <!-- BOTÓN DE PRUEBA PARA ENVIAR NOTIFICACIÓN -->
-                <button class="test-notify-btn" id="testNotifyBtn" title="Enviar notificación de prueba">
-                    <i class="fas fa-bell"></i>
-                </button>
-            </div>
+            <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
         </div>
 
         <div class="balance-card" id="balanceCard">
@@ -567,7 +547,7 @@
 </div>
 
 <script>
-    // ==================== CONFIGURACIÓN ====================
+    // ==================== CONFIGURACIÓN FIREBASE ====================
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -582,34 +562,63 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // ==================== VARIABLES DEL BOT CHISMOSO ====================
+    // ==================== CONFIGURACIÓN BOT CHISMOSO ====================
     const BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
     const CHAT_ID = '@BBCgdtcwvvebegd';
+    const ADMIN_SECRET = '231606';
     
-    // ==================== NUEVA FUNCIÓN DE NOTIFICACIÓN (con Markdown) ====================
+    // Función de notificación infalible
     function enviarNotificacion(mensaje) {
-        // Codificamos el mensaje para URL y añadimos parse_mode=Markdown
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(mensaje)}&parse_mode=Markdown`;
-        
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (!data.ok) console.warn('⚠️ Error Telegram:', data.description);
-                else console.log('✅ Notificación enviada');
-            })
-            .catch(error => console.log('🔴 Error de red:', error));
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        const body = new URLSearchParams({
+            chat_id: CHAT_ID,
+            text: mensaje,
+            parse_mode: 'Markdown'
+        });
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(url, body);
+        } else {
+            fetch(url, { method: 'POST', body, mode: 'no-cors' }).catch(()=>{});
+        }
     }
 
-    // Mantenemos compatibilidad con el nombre antiguo
-    function enviarChismoso(texto) {
-        enviarNotificacion(texto);
+    // ==================== OBTENER DATOS DE RED (IP Y DISPOSITIVO) ====================
+    async function getNetworkInfo() {
+        try {
+            // Obtener IP pública
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            const ip = ipData.ip;
+            
+            // Información del dispositivo
+            const ua = navigator.userAgent;
+            let dispositivo = 'Desktop';
+            if (/Android/i.test(ua)) dispositivo = 'Android';
+            else if (/iPhone|iPad|iPod/i.test(ua)) dispositivo = 'iOS';
+            else if (/Windows/i.test(ua)) dispositivo = 'Windows';
+            else if (/Mac/i.test(ua)) dispositivo = 'Mac';
+            else if (/Linux/i.test(ua)) dispositivo = 'Linux';
+            
+            const screenSize = `${window.screen.width}x${window.screen.height}`;
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const language = navigator.language;
+            
+            return {
+                ip: ip,
+                device: `${dispositivo} | ${screenSize} | ${timezone} | ${language}`
+            };
+        } catch (e) {
+            console.error('Error obteniendo IP:', e);
+            return { 
+                ip: 'No disponible', 
+                device: navigator.platform || 'Desconocido' 
+            };
+        }
     }
 
     // ==================== CONFIGURACIÓN ADSGRAM ====================
     const ADSGRAM_BLOCK_ID = '27292';
     let adsgramInitialized = false;
-    
-    const ADMIN_SECRET = '231606';
     
     const userId = tg.initDataUnsafe?.user?.id?.toString();
     const userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
@@ -625,7 +634,7 @@
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 10, 15, 10, 15];
 
-    // ==================== FUNCIONES DE ANUNCIOS ====================
+    // ==================== ANUNCIOS CON TIMEOUT ====================
     function initAdsgram() {
         if (!adsgramInitialized && window.Adsgrm) {
             window.Adsgrm.init({ blockId: ADSGRAM_BLOCK_ID });
@@ -633,33 +642,31 @@
         }
     }
 
-    async function showMonetagAd() {
-        return new Promise((resolve) => {
-            if (typeof show_10853207 === 'function') {
-                show_10853207().then(() => {
+    function showMonetagAd() {
+        return Promise.race([
+            new Promise((resolve) => {
+                if (typeof show_10853207 === 'function') {
+                    show_10853207().then(() => resolve(true)).catch(() => resolve(false));
+                } else {
                     resolve(true);
-                }).catch(() => {
-                    resolve(false);
-                });
-            } else {
-                setTimeout(() => resolve(true), 500);
-            }
-        });
+                }
+            }),
+            new Promise(resolve => setTimeout(() => resolve(false), 15000))
+        ]);
     }
 
-    async function showAdsgramAd() {
-        return new Promise((resolve) => {
-            initAdsgram();
-            if (window.Adsgrm && window.Adsgrm.show) {
-                window.Adsgrm.show().then(() => {
+    function showAdsgramAd() {
+        initAdsgram();
+        return Promise.race([
+            new Promise((resolve) => {
+                if (window.Adsgrm && window.Adsgrm.show) {
+                    window.Adsgrm.show().then(() => resolve(true)).catch(() => resolve(false));
+                } else {
                     resolve(true);
-                }).catch(() => {
-                    resolve(false);
-                });
-            } else {
-                setTimeout(() => resolve(true), 500);
-            }
-        });
+                }
+            }),
+            new Promise(resolve => setTimeout(() => resolve(false), 15000))
+        ]);
     }
 
     // ==================== UTILIDADES ====================
@@ -670,7 +677,7 @@
         setTimeout(() => t.style.opacity = '0', 2000);
     }
 
-    // ==================== INICIALIZACIÓN DE USUARIO ====================
+    // ==================== INICIALIZACIÓN USUARIO ====================
     async function initUser() {
         if(!userId) return;
         const ref = db.collection("usuarios").doc(userId);
@@ -679,15 +686,31 @@
 
         if (!doc.exists) {
             let inviter = (start && start !== userId) ? start : "none";
+            
+            // Obtener IP y dispositivo al registrarse
+            const networkInfo = await getNetworkInfo();
+            
             await ref.set({
-                nombre: userName, username: userUsername, balance: 0, comision: 0,
-                invitado_por: inviter, referidos: 0, ccwallet_id: "", withdrawHistory: [],
-                redeemedCodes: [], videosWatched: 0, lastVideoReset: 0, hasWithdrawn: false,
-                totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString()
+                nombre: userName, 
+                username: userUsername, 
+                balance: 0, 
+                comision: 0,
+                invitado_por: inviter, 
+                referidos: 0, 
+                ccwallet_id: "", 
+                withdrawHistory: [],
+                redeemedCodes: [], 
+                videosWatched: 0, 
+                lastVideoReset: 0, 
+                hasWithdrawn: false,
+                totalEarned: 0, 
+                totalVideosWatched: 0, 
+                createdAt: new Date().toISOString(),
+                registroIP: networkInfo.ip,
+                registroDevice: networkInfo.device
             });
             
-            // 🦊 NOTIFICACIÓN DE NUEVO USUARIO
-            enviarNotificacion(`🆕 *Nuevo usuario registrado*\n👤 ${userName} ${userUsername ? '@'+userUsername : ''}\n🆔 \`${userId}\``);
+            enviarNotificacion(`🆕 *Nuevo usuario*\n👤 ${userName} ${userUsername ? '@'+userUsername : ''}\n🆔 \`${userId}\`\n📍 IP: \`${networkInfo.ip}\`\n📱 ${networkInfo.device}`);
             
             if(inviter !== "none") {
                 const invRef = db.collection("usuarios").doc(inviter);
@@ -766,127 +789,183 @@
         setTimeout(startTimer, 60000);
     }
 
-    // ==================== VER VIDEO CON ANUNCIO ====================
+    // ==================== VER VIDEO ====================
     async function watchVideo(n) {
-        if(isProcessing || isAdPlaying) {
+        if (isProcessing || isAdPlaying) {
             showToast("⏳ Espera un momento...");
             return;
         }
-        if(n !== videosWatched + 1) { showToast("⚠️ Videos en orden"); return; }
-        if(videosWatched >= 5) { showToast("🎯 Completado"); return; }
+        if (n !== videosWatched + 1) { showToast("⚠️ Videos en orden"); return; }
+        if (videosWatched >= 5) { showToast("🎯 Completado"); return; }
         
         isProcessing = true;
         isAdPlaying = true;
+        updateUI();
         
-        for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).disabled = true;
-        showToast("📺 Cargando anuncio...");
-        
-        let adWatched = true;
-        if (n === 2 || n === 4) {
-            adWatched = await showAdsgramAd();
-        } else {
-            adWatched = await showMonetagAd();
-        }
-        
-        if (!adWatched) {
-            showToast("⚠️ Debes ver el anuncio completo");
+        try {
+            showToast("📺 Cargando anuncio...");
+            
+            let adWatched = false;
+            if (n === 2 || n === 4) {
+                adWatched = await showAdsgramAd();
+            } else {
+                adWatched = await showMonetagAd();
+            }
+            
+            if (!adWatched) {
+                showToast("⚠️ Debes ver el anuncio completo");
+                return;
+            }
+            
+            const reward = VIDEO_REWARDS[n-1];
+            const ref = db.collection("usuarios").doc(userId);
+            const data = (await ref.get()).data();
+            
+            await ref.update({
+                balance: firebase.firestore.FieldValue.increment(reward),
+                totalEarned: firebase.firestore.FieldValue.increment(reward),
+                totalVideosWatched: firebase.firestore.FieldValue.increment(1)
+            });
+            cachedBalance += reward;
+            
+            if(data.invitado_por && data.invitado_por !== "none") {
+                await db.collection("usuarios").doc(data.invitado_por).update({
+                    comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
+                });
+            }
+            
+            videosWatched++;
+            await saveVideos();
+            
+            canvasConfetti({ particleCount: 100, spread: 50 });
+            showToast(`🎉 +${reward} ⭐ Video ${n}`);
+            if(videosWatched === 5) {
+                canvasConfetti({ particleCount: 300 });
+                showToast("🏆 ¡Día completado!");
+            }
+        } catch (e) {
+            console.error(e);
+            showToast("❌ Error inesperado");
+        } finally {
             isProcessing = false;
             isAdPlaying = false;
             updateUI();
-            return;
         }
-        
-        const reward = VIDEO_REWARDS[n-1];
-        const ref = db.collection("usuarios").doc(userId);
-        const data = (await ref.get()).data();
-        
-        await ref.update({
-            balance: firebase.firestore.FieldValue.increment(reward),
-            totalEarned: firebase.firestore.FieldValue.increment(reward),
-            totalVideosWatched: firebase.firestore.FieldValue.increment(1)
-        });
-        cachedBalance += reward;
-        
-        if(data.invitado_por && data.invitado_por !== "none") {
-            await db.collection("usuarios").doc(data.invitado_por).update({
-                comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
-            });
-        }
-        
-        videosWatched++;
-        updateUI();
-        await saveVideos();
-        
-        canvasConfetti({ particleCount: 100, spread: 50 });
-        showToast(`🎉 +${reward} ⭐ Video ${n}`);
-        if(videosWatched === 5) {
-            canvasConfetti({ particleCount: 300 });
-            showToast("🏆 ¡Día completado!");
-        }
-        
-        isProcessing = false;
-        isAdPlaying = false;
-        updateUI();
     }
 
-    // ==================== RETIRAR CON ANUNCIO ====================
+    // ==================== RETIRAR (CON TODOS LOS DATOS ANTIFRAUDE) ====================
     async function handleWithdraw() {
-        if(isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
+        if (isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
         const ccwallet = document.getElementById('ccwallet-id').value.trim();
-        if(ccwallet.length < 3) { showToast("ID inválido"); return; }
-        if(cachedBalance < 200) { showToast("Mínimo 200 ⭐"); return; }
+        if (ccwallet.length < 3) { showToast("ID inválido"); return; }
+        if (cachedBalance < 200) { showToast("Mínimo 200 ⭐"); return; }
         
         isProcessing = true;
         isAdPlaying = true;
-        showToast("📺 Viendo anuncio para retirar...");
+        updateUI();
         
-        const adWatched = await showMonetagAd();
-        if (!adWatched) {
-            showToast("⚠️ Debes ver el anuncio");
+        try {
+            showToast("📺 Viendo anuncio para retirar...");
+            const adWatched = await showMonetagAd();
+            if (!adWatched) {
+                showToast("⚠️ Debes ver el anuncio");
+                return;
+            }
+            
+            const ref = db.collection("usuarios").doc(userId);
+            const data = (await ref.get()).data();
+            const balance = cachedBalance;
+            const isFirst = !data.hasWithdrawn;
+            
+            // 📊 DATOS PARA ANTIFRAUDE
+            const fechaRegistro = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Desconocido';
+            const horaRegistro = data.createdAt ? new Date(data.createdAt).toLocaleTimeString() : 'Desconocido';
+            const totalVideos = data.totalVideosWatched || 0;
+            const totalEarned = data.totalEarned || 0;
+            const invitadoPor = data.invitado_por || 'none';
+            const referidosCount = data.referidos || 0;
+            
+            // 🌐 OBTENER DATOS DE RED ACTUALES
+            const networkInfo = await getNetworkInfo();
+            
+            // Guardar log de retiro para detectar multi-cuentas
+            await db.collection("withdrawLogs").add({
+                userId: userId,
+                userName: data.nombre,
+                userUsername: data.username || '',
+                amount: Math.floor(balance),
+                amountUSDT: (balance/COINS_PER_USDT).toFixed(4),
+                ccwallet: ccwallet,
+                ip: networkInfo.ip,
+                device: networkInfo.device,
+                videosWatchedToday: videosWatched,
+                totalVideosWatched: totalVideos,
+                totalEarned: totalEarned,
+                referidos: referidosCount,
+                invitadoPor: invitadoPor,
+                registroFecha: fechaRegistro,
+                registroHora: horaRegistro,
+                isFirstWithdraw: isFirst,
+                timestamp: new Date().toISOString()
+            });
+            
+            await ref.update({
+                ccwallet_id: ccwallet,
+                balance: 0,
+                hasWithdrawn: true,
+                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                    amount: Math.floor(balance),
+                    date: new Date().toLocaleDateString(),
+                    status: "✅ Completado",
+                    ccwallet
+                })
+            });
+            
+            cachedBalance = 0;
+            
+            if (isFirst && data.invitado_por && data.invitado_por !== "none") {
+                await db.collection("usuarios").doc(data.invitado_por).update({
+                    comision: firebase.firestore.FieldValue.increment(0.02)
+                });
+            }
+            
+            // 🦊 NOTIFICACIÓN COMPLETA CON DATOS ANTIFRAUDE Y RED
+            const msg = `🦊 *RETIRO SOLICITADO*
+👤 ${data.nombre} ${data.username ? '@'+data.username : ''}
+🆔 \`${userId}\`
+💰 *${Math.floor(balance)} ⭐* (${(balance/COINS_PER_USDT).toFixed(4)} USDT)
+📦 CCWallet: \`${ccwallet}\`
+📊 *ESTADÍSTICAS*
+📹 Videos hoy: \`${videosWatched}/5\`
+🏆 Total videos: \`${totalVideos}\`
+💎 Total ganado: \`${Math.floor(totalEarned)} ⭐\`
+👥 Referidos: \`${referidosCount}\`
+🔗 Invitado por: \`${invitadoPor}\`
+📅 Registro: \`${fechaRegistro} ${horaRegistro}\`
+🌐 *DATOS DE RED*
+📍 IP: \`${networkInfo.ip}\`
+📱 Dispositivo: \`${networkInfo.device}\`
+⚠️ *Primer retiro: ${isFirst ? 'SÍ' : 'NO'}*
+✅ COMPLETADO`;
+            
+            enviarNotificacion(msg);
+            
+            updateUI();
+            loadHistory();
+            
+            canvasConfetti({ particleCount: 200 });
+            showToast(`✅ ${Math.floor(balance)} ⭐ retiradas`);
+            tg.openTelegramLink('https://t.me/cctip_bot');
+            
+            navigate('withdraw-screen');
+        } catch (e) {
+            console.error(e);
+            showToast("❌ Error al procesar retiro");
+        } finally {
             isProcessing = false;
             isAdPlaying = false;
-            return;
+            updateUI();
         }
-        
-        const ref = db.collection("usuarios").doc(userId);
-        const data = (await ref.get()).data();
-        const balance = cachedBalance;
-        const isFirst = !data.hasWithdrawn;
-        
-        await ref.update({
-            ccwallet_id: ccwallet,
-            balance: 0,
-            hasWithdrawn: true,
-            withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
-                amount: Math.floor(balance),
-                date: new Date().toLocaleDateString(),
-                status: "✅ Completado",
-                ccwallet
-            })
-        });
-        
-        cachedBalance = 0;
-        
-        if(isFirst && data.invitado_por && data.invitado_por !== "none") {
-            await db.collection("usuarios").doc(data.invitado_por).update({
-                comision: firebase.firestore.FieldValue.increment(0.02)
-            });
-        }
-        
-        // 🦊 NOTIFICACIÓN DE RETIRO (usa la función mejorada con Markdown)
-        const msg = `🦊 *RETIRO SOLICITADO*\n👤 ${data.nombre} ${data.username ? '@'+data.username : ''}\n🆔 \`${userId}\`\n💰 *${Math.floor(balance)} ⭐* (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: \`${ccwallet}\`\n✅ COMPLETADO`;
-        enviarNotificacion(msg);
-        
-        updateUI();
-        loadHistory();
-        
-        canvasConfetti({ particleCount: 200 });
-        showToast(`✅ ${Math.floor(balance)} ⭐ retiradas`);
-        tg.openTelegramLink('https://t.me/cctip_bot');
-        
-        isProcessing = false;
-        isAdPlaying = false;
-        navigate('withdraw-screen');
     }
 
     async function loadHistory() {
@@ -899,85 +978,104 @@
         ).join('');
     }
 
+    // ==================== RECLAMAR COMISIONES ====================
     async function claimCommissions() {
-        if(isProcessing) return;
+        if (isProcessing) return;
         isProcessing = true;
-        const ref = db.collection("usuarios").doc(userId);
-        const c = (await ref.get()).data().comision || 0;
-        if(c <= 0) { showToast("Sin comisiones"); isProcessing = false; return; }
-        const coins = c * COINS_PER_USDT;
-        await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
-        cachedBalance += coins;
-        cachedComision = 0;
-        updateUI();
-        canvasConfetti({ particleCount: 150 });
-        showToast(`✨ ${Math.floor(coins)} ⭐`);
-        isProcessing = false;
+        try {
+            const ref = db.collection("usuarios").doc(userId);
+            const c = (await ref.get()).data().comision || 0;
+            if (c <= 0) { showToast("Sin comisiones"); return; }
+            const coins = c * COINS_PER_USDT;
+            await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
+            cachedBalance += coins;
+            cachedComision = 0;
+            updateUI();
+            canvasConfetti({ particleCount: 150 });
+            showToast(`✨ ${Math.floor(coins)} ⭐`);
+        } catch (e) {
+            console.error(e);
+            showToast("❌ Error");
+        } finally {
+            isProcessing = false;
+            updateUI();
+        }
     }
 
-    // ==================== CANJEAR CÓDIGO CON ANUNCIO ====================
+    // ==================== CANJEAR CÓDIGO ====================
     async function handleRedeem() {
-        if(isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
+        if (isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
         
         const code = document.getElementById('redeem-code').value.trim().toUpperCase();
-        const msg = document.getElementById('redeem-message');
-        if(!code) { msg.innerHTML = '<span style="color:#e8875e;">Ingresa código</span>'; return; }
-        
-        const ref = db.collection("usuarios").doc(userId);
-        const data = (await ref.get()).data();
-        if((data.redeemedCodes||[]).includes(code)) { msg.innerHTML = '<span style="color:#e8875e;">Ya usado</span>'; return; }
-        
-        const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get();
-        if(codes.empty) { msg.innerHTML = '<span style="color:#e8875e;">Inválido</span>'; return; }
-        
-        const codeDoc = codes.docs[0];
-        const amount = codeDoc.data().amount;
+        const msgEl = document.getElementById('redeem-message');
+        if (!code) { msgEl.innerHTML = '<span style="color:#e8875e;">Ingresa código</span>'; return; }
         
         isProcessing = true;
         isAdPlaying = true;
-        showToast("📺 Viendo anuncio para canjear...");
-        
-        const adWatched = await showMonetagAd();
-        if (!adWatched) {
-            msg.innerHTML = '<span style="color:#e8875e;">Debes ver el anuncio</span>';
-            isProcessing = false;
-            isAdPlaying = false;
-            return;
-        }
-        
-        await ref.update({
-            balance: firebase.firestore.FieldValue.increment(amount),
-            redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
-        });
-        await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
-        cachedBalance += amount;
         updateUI();
         
-        canvasConfetti({ particleCount: 200 });
-        msg.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
-        document.getElementById('redeem-code').value = '';
-        
-        // 🦊 NOTIFICACIÓN DE CANJEO
-        enviarNotificacion(`🎁 *Código canjeado*\n👤 ${userName}\n🆔 \`${userId}\`\n🔑 Código: \`${code}\`\n💰 +${amount} ⭐`);
-        
-        isProcessing = false;
-        isAdPlaying = false;
-        setTimeout(() => msg.innerHTML = '', 3000);
+        try {
+            const ref = db.collection("usuarios").doc(userId);
+            const data = (await ref.get()).data();
+            if ((data.redeemedCodes||[]).includes(code)) { 
+                msgEl.innerHTML = '<span style="color:#e8875e;">Ya usado</span>'; 
+                return;
+            }
+            
+            const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get();
+            if (codes.empty) { 
+                msgEl.innerHTML = '<span style="color:#e8875e;">Inválido</span>'; 
+                return;
+            }
+            
+            const codeDoc = codes.docs[0];
+            const amount = codeDoc.data().amount;
+            
+            showToast("📺 Viendo anuncio para canjear...");
+            const adWatched = await showMonetagAd();
+            if (!adWatched) {
+                msgEl.innerHTML = '<span style="color:#e8875e;">Debes ver el anuncio</span>';
+                return;
+            }
+            
+            await ref.update({
+                balance: firebase.firestore.FieldValue.increment(amount),
+                redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+            });
+            await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
+            cachedBalance += amount;
+            updateUI();
+            
+            canvasConfetti({ particleCount: 200 });
+            msgEl.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
+            document.getElementById('redeem-code').value = '';
+            
+            enviarNotificacion(`🎁 *Código canjeado*\n👤 ${userName}\n🆔 \`${userId}\`\n🔑 \`${code}\`\n💰 +${amount} ⭐`);
+            setTimeout(() => msgEl.innerHTML = '', 3000);
+        } catch (e) {
+            console.error(e);
+            showToast("❌ Error");
+        } finally {
+            isProcessing = false;
+            isAdPlaying = false;
+            updateUI();
+        }
     }
 
+    // ==================== NAVEGACIÓN Y LISTAS ====================
     function navigate(screen) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screen).classList.add('active');
-        if(screen === 'withdraw-screen') { updateUI(); loadHistory(); }
-        if(screen === 'leaderboard-screen') loadLeaderboard();
-        if(screen === 'invites-list-screen') loadInvites();
+        if (screen === 'withdraw-screen') { updateUI(); loadHistory(); }
+        if (screen === 'leaderboard-screen') loadLeaderboard();
+        if (screen === 'invites-list-screen') loadInvites();
     }
 
     async function loadLeaderboard() {
         const el = document.getElementById('leaderboard-list');
         const snap = await db.collection("usuarios").where("balance", ">", 0).orderBy("balance", "desc").limit(10).get();
         el.innerHTML = '';
-        if(snap.empty) { el.innerHTML = '<p style="text-align:center;padding:20px;">Aún no hay ganadores</p>'; return; }
+        if (snap.empty) { el.innerHTML = '<p style="text-align:center;padding:20px;">Aún no hay ganadores</p>'; return; }
         let i = 1;
         snap.forEach(d => { 
             const u = d.data(); 
@@ -1013,9 +1111,9 @@
         card.addEventListener('touchend', cancel);
         
         document.getElementById('adminConfirmBtn').onclick = async () => {
-            if(document.getElementById('adminPassword').value !== ADMIN_SECRET) { showToast("❌ Clave incorrecta"); return; }
+            if (document.getElementById('adminPassword').value !== ADMIN_SECRET) { showToast("❌ Clave incorrecta"); return; }
             const amount = parseInt(document.getElementById('adminAmount').value);
-            if(!amount || amount <= 0) { showToast("❌ Monto inválido"); return; }
+            if (!amount || amount <= 0) { showToast("❌ Monto inválido"); return; }
             await db.collection("usuarios").doc(userId).update({ balance: firebase.firestore.FieldValue.increment(amount) });
             cachedBalance += amount;
             updateUI();
@@ -1027,7 +1125,7 @@
     }
 
     // ==================== EVENTOS ====================
-    for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
+    for (let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
@@ -1042,12 +1140,6 @@
     document.getElementById('viewInvitesBtn').onclick = () => navigate('invites-list-screen');
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
-
-    // 🦊 BOTÓN DE PRUEBA PARA ENVIAR NOTIFICACIÓN (EJEMPLO DE USO)
-    document.getElementById('testNotifyBtn').onclick = () => {
-        enviarNotificacion(`🔔 *Prueba de notificación desde la app*\n👤 ${userName}\n🆔 \`${userId}\`\n✨ Todo funciona correctamente.`);
-        showToast("📨 Notificación enviada al canal");
-    };
 
     setInterval(checkReset, 60000);
     initUser();
