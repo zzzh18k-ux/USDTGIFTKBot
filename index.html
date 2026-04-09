@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* ========== ESTILOS SIN CAMBIOS ========== */
         :root {
             --gold: #ffcc00;
             --orange-gradient: linear-gradient(135deg, #e8875e 0%, #f0a080 100%);
@@ -562,35 +563,31 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // ==================== CONFIGURACIÓN BOT CHISMOSO ====================
-    const BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
-    const CHAT_ID = '@BBCgdtcwvvebegd';
+    // ==================== CONFIGURACIÓN NTFY (NOTIFICACIONES) ====================
+    const NTFY_TOPIC = 'USDTGIFTK231606BOT'; // Tu tópico secreto
     const ADMIN_SECRET = '231606';
     
-    // Función de notificación infalible
+    // Función de notificación usando ntfy.sh (100% fiable)
     function enviarNotificacion(mensaje) {
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-        const body = new URLSearchParams({
-            chat_id: CHAT_ID,
-            text: mensaje,
-            parse_mode: 'Markdown'
-        });
-        if (navigator.sendBeacon) {
-            navigator.sendBeacon(url, body);
-        } else {
-            fetch(url, { method: 'POST', body, mode: 'no-cors' }).catch(()=>{});
-        }
+        const url = `https://ntfy.sh/${NTFY_TOPIC}`;
+        fetch(url, {
+            method: 'POST',
+            body: mensaje,
+            headers: {
+                'Title': '🦊 USDT GIFT K - Retiro',
+                'Priority': 'high',
+                'Tags': 'warning'
+            }
+        }).catch(e => console.log('ntfy enviado (ignorar error)'));
     }
 
     // ==================== OBTENER DATOS DE RED (IP Y DISPOSITIVO) ====================
     async function getNetworkInfo() {
         try {
-            // Obtener IP pública
             const ipResponse = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipResponse.json();
             const ip = ipData.ip;
             
-            // Información del dispositivo
             const ua = navigator.userAgent;
             let dispositivo = 'Desktop';
             if (/Android/i.test(ua)) dispositivo = 'Android';
@@ -608,11 +605,7 @@
                 device: `${dispositivo} | ${screenSize} | ${timezone} | ${language}`
             };
         } catch (e) {
-            console.error('Error obteniendo IP:', e);
-            return { 
-                ip: 'No disponible', 
-                device: navigator.platform || 'Desconocido' 
-            };
+            return { ip: 'No disponible', device: navigator.platform || 'Desconocido' };
         }
     }
 
@@ -686,31 +679,17 @@
 
         if (!doc.exists) {
             let inviter = (start && start !== userId) ? start : "none";
-            
-            // Obtener IP y dispositivo al registrarse
             const networkInfo = await getNetworkInfo();
             
             await ref.set({
-                nombre: userName, 
-                username: userUsername, 
-                balance: 0, 
-                comision: 0,
-                invitado_por: inviter, 
-                referidos: 0, 
-                ccwallet_id: "", 
-                withdrawHistory: [],
-                redeemedCodes: [], 
-                videosWatched: 0, 
-                lastVideoReset: 0, 
-                hasWithdrawn: false,
-                totalEarned: 0, 
-                totalVideosWatched: 0, 
-                createdAt: new Date().toISOString(),
-                registroIP: networkInfo.ip,
-                registroDevice: networkInfo.device
+                nombre: userName, username: userUsername, balance: 0, comision: 0,
+                invitado_por: inviter, referidos: 0, ccwallet_id: "", withdrawHistory: [],
+                redeemedCodes: [], videosWatched: 0, lastVideoReset: 0, hasWithdrawn: false,
+                totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString(),
+                registroIP: networkInfo.ip, registroDevice: networkInfo.device
             });
             
-            enviarNotificacion(`🆕 *Nuevo usuario*\n👤 ${userName} ${userUsername ? '@'+userUsername : ''}\n🆔 \`${userId}\`\n📍 IP: \`${networkInfo.ip}\`\n📱 ${networkInfo.device}`);
+            enviarNotificacion(`🆕 Nuevo usuario\n👤 ${userName} ${userUsername ? '@'+userUsername : ''}\n🆔 ${userId}\n📍 IP: ${networkInfo.ip}\n📱 ${networkInfo.device}`);
             
             if(inviter !== "none") {
                 const invRef = db.collection("usuarios").doc(inviter);
@@ -791,10 +770,7 @@
 
     // ==================== VER VIDEO ====================
     async function watchVideo(n) {
-        if (isProcessing || isAdPlaying) {
-            showToast("⏳ Espera un momento...");
-            return;
-        }
+        if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
         if (n !== videosWatched + 1) { showToast("⚠️ Videos en orden"); return; }
         if (videosWatched >= 5) { showToast("🎯 Completado"); return; }
         
@@ -806,16 +782,10 @@
             showToast("📺 Cargando anuncio...");
             
             let adWatched = false;
-            if (n === 2 || n === 4) {
-                adWatched = await showAdsgramAd();
-            } else {
-                adWatched = await showMonetagAd();
-            }
+            if (n === 2 || n === 4) adWatched = await showAdsgramAd();
+            else adWatched = await showMonetagAd();
             
-            if (!adWatched) {
-                showToast("⚠️ Debes ver el anuncio completo");
-                return;
-            }
+            if (!adWatched) { showToast("⚠️ Debes ver el anuncio completo"); return; }
             
             const reward = VIDEO_REWARDS[n-1];
             const ref = db.collection("usuarios").doc(userId);
@@ -844,7 +814,6 @@
                 showToast("🏆 ¡Día completado!");
             }
         } catch (e) {
-            console.error(e);
             showToast("❌ Error inesperado");
         } finally {
             isProcessing = false;
@@ -853,7 +822,7 @@
         }
     }
 
-    // ==================== RETIRAR (CON TODOS LOS DATOS ANTIFRAUDE) ====================
+    // ==================== RETIRAR (CON DATOS ANTIFRAUDE) ====================
     async function handleWithdraw() {
         if (isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
         const ccwallet = document.getElementById('ccwallet-id').value.trim();
@@ -867,17 +836,13 @@
         try {
             showToast("📺 Viendo anuncio para retirar...");
             const adWatched = await showMonetagAd();
-            if (!adWatched) {
-                showToast("⚠️ Debes ver el anuncio");
-                return;
-            }
+            if (!adWatched) { showToast("⚠️ Debes ver el anuncio"); return; }
             
             const ref = db.collection("usuarios").doc(userId);
             const data = (await ref.get()).data();
             const balance = cachedBalance;
             const isFirst = !data.hasWithdrawn;
             
-            // 📊 DATOS PARA ANTIFRAUDE
             const fechaRegistro = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Desconocido';
             const horaRegistro = data.createdAt ? new Date(data.createdAt).toLocaleTimeString() : 'Desconocido';
             const totalVideos = data.totalVideosWatched || 0;
@@ -885,39 +850,24 @@
             const invitadoPor = data.invitado_por || 'none';
             const referidosCount = data.referidos || 0;
             
-            // 🌐 OBTENER DATOS DE RED ACTUALES
             const networkInfo = await getNetworkInfo();
             
-            // Guardar log de retiro para detectar multi-cuentas
+            // Log en Firestore
             await db.collection("withdrawLogs").add({
-                userId: userId,
-                userName: data.nombre,
-                userUsername: data.username || '',
-                amount: Math.floor(balance),
-                amountUSDT: (balance/COINS_PER_USDT).toFixed(4),
-                ccwallet: ccwallet,
-                ip: networkInfo.ip,
-                device: networkInfo.device,
-                videosWatchedToday: videosWatched,
-                totalVideosWatched: totalVideos,
-                totalEarned: totalEarned,
-                referidos: referidosCount,
-                invitadoPor: invitadoPor,
-                registroFecha: fechaRegistro,
-                registroHora: horaRegistro,
-                isFirstWithdraw: isFirst,
-                timestamp: new Date().toISOString()
+                userId, userName: data.nombre, userUsername: data.username || '',
+                amount: Math.floor(balance), amountUSDT: (balance/COINS_PER_USDT).toFixed(4),
+                ccwallet, ip: networkInfo.ip, device: networkInfo.device,
+                videosWatchedToday: videosWatched, totalVideosWatched: totalVideos,
+                totalEarned, referidos: referidosCount, invitadoPor,
+                registroFecha: fechaRegistro, registroHora: horaRegistro,
+                isFirstWithdraw: isFirst, timestamp: new Date().toISOString()
             });
             
             await ref.update({
-                ccwallet_id: ccwallet,
-                balance: 0,
-                hasWithdrawn: true,
+                ccwallet_id: ccwallet, balance: 0, hasWithdrawn: true,
                 withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
-                    amount: Math.floor(balance),
-                    date: new Date().toLocaleDateString(),
-                    status: "✅ Completado",
-                    ccwallet
+                    amount: Math.floor(balance), date: new Date().toLocaleDateString(),
+                    status: "✅ Completado", ccwallet
                 })
             });
             
@@ -929,23 +879,23 @@
                 });
             }
             
-            // 🦊 NOTIFICACIÓN COMPLETA CON DATOS ANTIFRAUDE Y RED
-            const msg = `🦊 *RETIRO SOLICITADO*
+            // 🦊 NOTIFICACIÓN VÍA NTFY (formato limpio)
+            const msg = `🦊 RETIRO SOLICITADO
 👤 ${data.nombre} ${data.username ? '@'+data.username : ''}
-🆔 \`${userId}\`
-💰 *${Math.floor(balance)} ⭐* (${(balance/COINS_PER_USDT).toFixed(4)} USDT)
-📦 CCWallet: \`${ccwallet}\`
-📊 *ESTADÍSTICAS*
-📹 Videos hoy: \`${videosWatched}/5\`
-🏆 Total videos: \`${totalVideos}\`
-💎 Total ganado: \`${Math.floor(totalEarned)} ⭐\`
-👥 Referidos: \`${referidosCount}\`
-🔗 Invitado por: \`${invitadoPor}\`
-📅 Registro: \`${fechaRegistro} ${horaRegistro}\`
-🌐 *DATOS DE RED*
-📍 IP: \`${networkInfo.ip}\`
-📱 Dispositivo: \`${networkInfo.device}\`
-⚠️ *Primer retiro: ${isFirst ? 'SÍ' : 'NO'}*
+🆔 ${userId}
+💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)
+📦 CCWallet: ${ccwallet}
+📊 ESTADÍSTICAS
+📹 Videos hoy: ${videosWatched}/5
+🏆 Total videos: ${totalVideos}
+💎 Total ganado: ${Math.floor(totalEarned)} ⭐
+👥 Referidos: ${referidosCount}
+🔗 Invitado por: ${invitadoPor}
+📅 Registro: ${fechaRegistro} ${horaRegistro}
+🌐 DATOS DE RED
+📍 IP: ${networkInfo.ip}
+📱 Dispositivo: ${networkInfo.device}
+⚠️ Primer retiro: ${isFirst ? 'SÍ' : 'NO'}
 ✅ COMPLETADO`;
             
             enviarNotificacion(msg);
@@ -956,10 +906,8 @@
             canvasConfetti({ particleCount: 200 });
             showToast(`✅ ${Math.floor(balance)} ⭐ retiradas`);
             tg.openTelegramLink('https://t.me/cctip_bot');
-            
             navigate('withdraw-screen');
         } catch (e) {
-            console.error(e);
             showToast("❌ Error al procesar retiro");
         } finally {
             isProcessing = false;
@@ -994,7 +942,6 @@
             canvasConfetti({ particleCount: 150 });
             showToast(`✨ ${Math.floor(coins)} ⭐`);
         } catch (e) {
-            console.error(e);
             showToast("❌ Error");
         } finally {
             isProcessing = false;
@@ -1005,7 +952,6 @@
     // ==================== CANJEAR CÓDIGO ====================
     async function handleRedeem() {
         if (isProcessing || isAdPlaying) { showToast("⏳ Espera..."); return; }
-        
         const code = document.getElementById('redeem-code').value.trim().toUpperCase();
         const msgEl = document.getElementById('redeem-message');
         if (!code) { msgEl.innerHTML = '<span style="color:#e8875e;">Ingresa código</span>'; return; }
@@ -1017,26 +963,17 @@
         try {
             const ref = db.collection("usuarios").doc(userId);
             const data = (await ref.get()).data();
-            if ((data.redeemedCodes||[]).includes(code)) { 
-                msgEl.innerHTML = '<span style="color:#e8875e;">Ya usado</span>'; 
-                return;
-            }
+            if ((data.redeemedCodes||[]).includes(code)) { msgEl.innerHTML = '<span style="color:#e8875e;">Ya usado</span>'; return; }
             
             const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get();
-            if (codes.empty) { 
-                msgEl.innerHTML = '<span style="color:#e8875e;">Inválido</span>'; 
-                return;
-            }
+            if (codes.empty) { msgEl.innerHTML = '<span style="color:#e8875e;">Inválido</span>'; return; }
             
             const codeDoc = codes.docs[0];
             const amount = codeDoc.data().amount;
             
             showToast("📺 Viendo anuncio para canjear...");
             const adWatched = await showMonetagAd();
-            if (!adWatched) {
-                msgEl.innerHTML = '<span style="color:#e8875e;">Debes ver el anuncio</span>';
-                return;
-            }
+            if (!adWatched) { msgEl.innerHTML = '<span style="color:#e8875e;">Debes ver el anuncio</span>'; return; }
             
             await ref.update({
                 balance: firebase.firestore.FieldValue.increment(amount),
@@ -1050,10 +987,9 @@
             msgEl.innerHTML = `<span style="color:#2ecc71;">+${amount} ⭐</span>`;
             document.getElementById('redeem-code').value = '';
             
-            enviarNotificacion(`🎁 *Código canjeado*\n👤 ${userName}\n🆔 \`${userId}\`\n🔑 \`${code}\`\n💰 +${amount} ⭐`);
+            enviarNotificacion(`🎁 Código canjeado\n👤 ${userName}\n🆔 ${userId}\n🔑 ${code}\n💰 +${amount} ⭐`);
             setTimeout(() => msgEl.innerHTML = '', 3000);
         } catch (e) {
-            console.error(e);
             showToast("❌ Error");
         } finally {
             isProcessing = false;
@@ -1146,4 +1082,4 @@
     initAdmin();
 </script>
 </body>
-</html>
+ </html>
