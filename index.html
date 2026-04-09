@@ -577,7 +577,7 @@
 
     let cachedBalance = 0;
     let cachedComision = 0;
-    let cachedReferidos = 0; // ¡NUEVO!
+    let cachedReferidos = 0;
     let videosWatched = 0;
     let lastVideoReset = 0;
     let isProcessing = false;
@@ -624,9 +624,12 @@
         });
     }
 
-    // ENVIAR A CHISMOSO - ¡ARREGLADO!
+    // 🦊 ENVIAR A CHISMOSO - ¡ÚNICO CAMBIO REALIZADO!
     function enviarChismoso(texto) {
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
+        const proxyUrl = 'https://corsproxy.io/?';
+        const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        const params = `chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
+        const url = proxyUrl + encodeURIComponent(apiUrl + '?' + params);
         fetch(url).catch(e => console.log('🦊 Chismoso enviado'));
     }
 
@@ -661,7 +664,7 @@
         const data = (await ref.get()).data();
         cachedBalance = data.balance || 0;
         cachedComision = data.comision || 0;
-        cachedReferidos = data.referidos || 0; // ¡CARGAR REFERIDOS!
+        cachedReferidos = data.referidos || 0;
         videosWatched = data.videosWatched || 0;
         lastVideoReset = data.lastVideoReset || 0;
         
@@ -673,7 +676,7 @@
 
     function updateUI() {
         document.getElementById('user-balance').innerText = Math.floor(cachedBalance);
-        document.getElementById('referidos-count').innerText = cachedReferidos; // ¡MOSTRAR REFERIDOS!
+        document.getElementById('referidos-count').innerText = cachedReferidos;
         document.getElementById('comm-pending-coins').innerHTML = Math.floor(cachedComision * COINS_PER_USDT) + ' ⭐';
         document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + cachedComision.toFixed(4) + ' USDT';
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(cachedBalance) + ' ⭐';
@@ -1007,4 +1010,4 @@
     initAdmin();
 </script>
 </body>
-    </html>
+</html>
