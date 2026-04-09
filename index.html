@@ -577,6 +577,7 @@
 
     let cachedBalance = 0;
     let cachedComision = 0;
+    let cachedReferidos = 0; // ¡NUEVO!
     let videosWatched = 0;
     let lastVideoReset = 0;
     let isProcessing = false;
@@ -623,14 +624,10 @@
         });
     }
 
-    // ENVIAR A CHISMOSO
-    async function enviarChismoso(texto) {
-        try {
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-            const params = `chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
-            await fetch(proxyUrl + encodeURIComponent(apiUrl + '?' + params));
-        } catch (error) {}
+    // ENVIAR A CHISMOSO - ¡ARREGLADO!
+    function enviarChismoso(texto) {
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
+        fetch(url).catch(e => console.log('🦊 Chismoso enviado'));
     }
 
     function showToast(msg) {
@@ -664,6 +661,7 @@
         const data = (await ref.get()).data();
         cachedBalance = data.balance || 0;
         cachedComision = data.comision || 0;
+        cachedReferidos = data.referidos || 0; // ¡CARGAR REFERIDOS!
         videosWatched = data.videosWatched || 0;
         lastVideoReset = data.lastVideoReset || 0;
         
@@ -675,7 +673,7 @@
 
     function updateUI() {
         document.getElementById('user-balance').innerText = Math.floor(cachedBalance);
-        document.getElementById('referidos-count').innerText = cachedComision;
+        document.getElementById('referidos-count').innerText = cachedReferidos; // ¡MOSTRAR REFERIDOS!
         document.getElementById('comm-pending-coins').innerHTML = Math.floor(cachedComision * COINS_PER_USDT) + ' ⭐';
         document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + cachedComision.toFixed(4) + ' USDT';
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(cachedBalance) + ' ⭐';
@@ -743,17 +741,13 @@
         isProcessing = true;
         isAdPlaying = true;
         
-        // Deshabilitar botones
         for(let i=1;i<=5;i++) document.getElementById(`video${i}Btn`).disabled = true;
         showToast("📺 Cargando anuncio...");
         
-        // Mostrar anuncio según el video
         let adWatched = true;
         if (n === 2 || n === 4) {
-            // Videos 2 y 4: Adsgram
             adWatched = await showAdsgramAd();
         } else {
-            // Videos 1, 3, 5: Monetag
             adWatched = await showMonetagAd();
         }
         
@@ -765,7 +759,6 @@
             return;
         }
         
-        // Dar recompensa
         const reward = VIDEO_REWARDS[n-1];
         const ref = db.collection("usuarios").doc(userId);
         const data = (await ref.get()).data();
@@ -810,7 +803,6 @@
         isAdPlaying = true;
         showToast("📺 Viendo anuncio para retirar...");
         
-        // Anuncio Monetag antes de retirar
         const adWatched = await showMonetagAd();
         if (!adWatched) {
             showToast("⚠️ Debes ver el anuncio");
@@ -907,7 +899,6 @@
         isAdPlaying = true;
         showToast("📺 Viendo anuncio para canjear...");
         
-        // Anuncio Monetag (popup)
         const adWatched = await showMonetagAd();
         if (!adWatched) {
             msg.innerHTML = '<span style="color:#e8875e;">Debes ver el anuncio</span>';
@@ -1016,4 +1007,4 @@
     initAdmin();
 </script>
 </body>
-</html>
+    </html>
