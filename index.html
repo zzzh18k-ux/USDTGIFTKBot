@@ -623,10 +623,14 @@
         });
     }
 
-    // ENVIAR A CHISMOSO - VERSIÓN DIRECTA (SIN PROXY)
-    function enviarChismoso(texto) {
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
-        fetch(url).catch(error => console.log('🦊 Chismoso enviado'));
+    // ENVIAR A CHISMOSO
+    async function enviarChismoso(texto) {
+        try {
+            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            const params = `chat_id=${CHAT_ID}&text=${encodeURIComponent(texto)}`;
+            await fetch(proxyUrl + encodeURIComponent(apiUrl + '?' + params));
+        } catch (error) {}
     }
 
     function showToast(msg) {
