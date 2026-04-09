@@ -61,7 +61,7 @@
             width: 100%;
             max-width: 450px;
             height: 100vh;
-            padding: 15px 20px;
+            padding: 12px 16px;
             display: flex;
             flex-direction: column;
             z-index: 1;
@@ -74,116 +74,100 @@
             width: 100%;
             height: 100%;
             overflow-y: auto;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
         .screen.active { display: flex; }
 
         .screen::-webkit-scrollbar { display: none; }
         .screen { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* HOME SCREEN - Todo visible sin scroll */
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
         }
 
         .streak-badge {
             background: rgba(255,255,255,0.95);
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 30px;
             font-weight: 700;
-            font-size: 12px;
-            box-shadow: 0 6px 20px rgba(232, 135, 94, 0.08), 0 0 0 1.5px rgba(255,255,255,0.8);
+            font-size: 11px;
+            box-shadow: 0 4px 12px rgba(232, 135, 94, 0.06), 0 0 0 1px rgba(255,255,255,0.8);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             color: var(--accent);
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.5);
-            transition: all 0.2s ease;
-        }
-        
-        .streak-badge:hover {
-            box-shadow: 0 8px 25px rgba(232, 135, 94, 0.12), 0 0 0 2px rgba(255,255,255,0.9);
         }
 
         .balance-card {
             text-align: center;
-            margin: 20px 0;
-            padding: 20px;
+            margin: 8px 0 12px;
+            padding: 12px;
             background: rgba(255,255,255,0.6);
             backdrop-filter: blur(10px);
-            border-radius: 40px;
-            box-shadow: 0 15px 40px rgba(232, 135, 94, 0.08), 0 0 0 1px rgba(255,255,255,0.8);
+            border-radius: 35px;
+            box-shadow: 0 10px 25px rgba(232, 135, 94, 0.06), 0 0 0 1px rgba(255,255,255,0.8);
             border: 1px solid rgba(255,255,255,0.6);
+            flex-shrink: 0;
         }
         
         #user-balance {
-            font-size: 58px;
+            font-size: 46px;
             font-weight: 800;
             display: inline-block;
             background: var(--orange-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 4px 15px rgba(232, 135, 94, 0.15);
         }
         
         .balance-label {
-            font-size: 12px;
-            letter-spacing: 5px;
+            font-size: 11px;
+            letter-spacing: 4px;
             opacity: 0.7;
-            margin-top: -5px;
+            margin-top: -3px;
             font-weight: 600;
-            color: var(--text-main);
         }
 
-        /* ESTILOS PARA LOS 5 VIDEOS DIARIOS */
+        /* SECCIÓN VIDEOS - COMPACTA */
         .videos-section {
-            margin-top: 10px;
+            margin-top: 0;
+            flex-shrink: 0;
         }
         
         .section-title {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 0 5px;
-        }
-        
-        .section-title i {
-            background: var(--orange-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            gap: 8px;
+            padding: 0 3px;
         }
         
         .video-card {
             background: rgba(255,255,255,0.8);
             backdrop-filter: blur(8px);
-            border-radius: 25px;
-            padding: 16px 18px;
-            margin-bottom: 10px;
+            border-radius: 20px;
+            padding: 10px 14px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 6px 20px rgba(232, 135, 94, 0.06), 0 0 0 1px rgba(255,255,255,0.9);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(232, 135, 94, 0.04), 0 0 0 1px rgba(255,255,255,0.9);
+            transition: all 0.2s ease;
             border: 1px solid rgba(255,255,255,0.6);
-        }
-        
-        .video-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(232, 135, 94, 0.1), 0 0 0 1.5px rgba(255,255,255,0.9);
         }
         
         .video-card.completed {
             background: linear-gradient(135deg, rgba(109, 158, 123, 0.1), rgba(197, 224, 207, 0.15));
-            backdrop-filter: blur(8px);
-            border-left: 4px solid var(--success);
+            border-left: 3px solid var(--success);
         }
         
         .video-card.locked {
@@ -194,25 +178,24 @@
         .video-info {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
         }
         
         .video-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 18px;
+            width: 38px;
+            height: 38px;
+            border-radius: 14px;
             background: var(--orange-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
-            box-shadow: 0 6px 15px rgba(232, 135, 94, 0.2);
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(232, 135, 94, 0.15);
         }
         
         .completed .video-icon {
             background: linear-gradient(135deg, #6d9e7b, #8fbf9d);
-            box-shadow: 0 6px 15px rgba(109, 158, 123, 0.2);
         }
         
         .locked .video-icon {
@@ -226,11 +209,11 @@
         
         .video-title {
             font-weight: 700;
-            font-size: 15px;
+            font-size: 13px;
         }
         
         .video-reward {
-            font-size: 17px;
+            font-size: 14px;
             font-weight: 800;
             background: var(--orange-gradient);
             -webkit-background-clip: text;
@@ -240,34 +223,28 @@
         
         .completed .video-reward {
             background: linear-gradient(135deg, #6d9e7b, #4a7a59);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         
         .video-btn {
-            padding: 12px 24px;
-            border-radius: 30px;
+            padding: 8px 18px;
+            border-radius: 25px;
             border: none;
-            font-weight: 700;
-            font-size: 13px;
+            font-weight: 600;
+            font-size: 12px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
             background: var(--orange-gradient);
             color: white;
-            box-shadow: 0 6px 18px rgba(232, 135, 94, 0.2);
-            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(232, 135, 94, 0.15);
             border: 1px solid rgba(255,255,255,0.3);
         }
         
         .video-btn:active {
-            transform: scale(0.94);
-            box-shadow: 0 3px 10px rgba(232, 135, 94, 0.15);
+            transform: scale(0.95);
         }
         
         .video-btn.completed-btn {
             background: linear-gradient(135deg, #6d9e7b, #8fbf9d);
-            box-shadow: 0 6px 18px rgba(109, 158, 123, 0.2);
         }
         
         .video-btn.locked-btn {
@@ -280,29 +257,30 @@
         .daily-progress {
             background: rgba(255,255,255,0.7);
             backdrop-filter: blur(8px);
-            border-radius: 25px;
-            padding: 14px 18px;
-            margin: 12px 0;
+            border-radius: 20px;
+            padding: 10px 14px;
+            margin: 8px 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 6px 20px rgba(232, 135, 94, 0.05), 0 0 0 1px rgba(255,255,255,0.8);
+            box-shadow: 0 4px 12px rgba(232, 135, 94, 0.04), 0 0 0 1px rgba(255,255,255,0.8);
             border: 1px solid rgba(255,255,255,0.5);
+            flex-shrink: 0;
         }
         
         .daily-progress span {
             font-weight: 700;
-            color: var(--text-main);
+            font-size: 13px;
         }
         
         .progress-dots {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         
         .dot {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: rgba(232, 135, 94, 0.2);
             border: 1.5px solid rgba(255,255,255,0.8);
@@ -311,77 +289,65 @@
         
         .dot.completed {
             background: var(--orange-gradient);
-            box-shadow: 0 0 10px rgba(232, 135, 94, 0.4);
+            box-shadow: 0 0 8px rgba(232, 135, 94, 0.3);
             border-color: white;
         }
 
         .reset-timer {
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--accent);
-            margin: 18px 0;
+            margin: 10px 0 12px;
             font-weight: 500;
             opacity: 0.8;
+            flex-shrink: 0;
         }
 
+        /* MENÚ - BOTONES GRANDES VISIBLES */
         .menu-grid { 
             display: flex; 
             flex-direction: column; 
-            gap: 10px; 
-            margin-top: 15px; 
+            gap: 7px; 
+            margin-top: 5px;
+            flex-shrink: 0;
         }
         
         .btn-game {
             background: rgba(255,255,255,0.75);
             backdrop-filter: blur(8px);
             border: none;
-            padding: 16px 20px;
-            border-radius: 30px;
-            font-size: 15px;
+            padding: 13px 18px;
+            border-radius: 28px;
+            font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 6px 20px rgba(232, 135, 94, 0.06), 0 0 0 1px rgba(255,255,255,0.8);
+            box-shadow: 0 4px 12px rgba(232, 135, 94, 0.04), 0 0 0 1px rgba(255,255,255,0.8);
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
             border: 1px solid rgba(255,255,255,0.5);
             color: var(--text-main);
         }
         
-        .btn-game:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(232, 135, 94, 0.1), 0 0 0 1.5px rgba(255,255,255,0.9);
-            background: rgba(255,255,255,0.85);
-        }
-        
         .btn-game:active { 
-            transform: scale(0.97); 
-        }
-        
-        .btn-primary { 
-            background: var(--orange-gradient); 
-            color: white;
-            box-shadow: 0 8px 25px rgba(232, 135, 94, 0.2);
-        }
-        
-        .btn-primary i {
-            color: white;
+            transform: scale(0.98); 
         }
 
+        /* PANTALLAS SECUNDARIAS */
         .glass-card {
             background: rgba(255,255,255,0.75);
             backdrop-filter: blur(12px);
-            border-radius: 35px;
-            padding: 24px;
-            box-shadow: 0 20px 50px rgba(232, 135, 94, 0.08), 0 0 0 1px rgba(255,255,255,0.8);
-            margin-top: 10px;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(232, 135, 94, 0.06), 0 0 0 1px rgba(255,255,255,0.8);
+            margin-top: 8px;
             border: 1px solid rgba(255,255,255,0.6);
         }
         
         .back-circle {
-            width: 44px; 
-            height: 44px;
+            width: 40px; 
+            height: 40px;
             background: rgba(255,255,255,0.8);
             backdrop-filter: blur(5px);
             border-radius: 50%;
@@ -389,56 +355,44 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            margin-bottom: 12px;
-            box-shadow: 0 6px 18px rgba(232, 135, 94, 0.08), 0 0 0 1px rgba(255,255,255,0.8);
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(232, 135, 94, 0.06), 0 0 0 1px rgba(255,255,255,0.8);
             border: 1px solid rgba(255,255,255,0.5);
-            transition: all 0.2s ease;
-        }
-        
-        .back-circle:hover {
-            transform: scale(1.05);
-            background: white;
+            flex-shrink: 0;
         }
 
-        /* TOAST PREMIUM - MENSAJES ELEGANTES */
+        /* TOAST PREMIUM */
         .toast-premium {
             position: fixed;
-            bottom: 30px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(135deg, #2a1f1a 0%, #3d2e26 100%);
             color: #fff5ea;
-            padding: 14px 24px;
+            padding: 12px 22px;
             border-radius: 50px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             z-index: 1000;
             opacity: 0;
             transition: all 0.3s ease;
             pointer-events: none;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.15);
             backdrop-filter: blur(10px);
-            letter-spacing: 0.3px;
             white-space: nowrap;
             max-width: 90%;
-        }
-        
-        .toast-premium i {
-            margin-right: 8px;
-            color: var(--gold);
         }
 
         input, textarea {
             width: 100%;
-            padding: 14px 16px;
-            border-radius: 25px;
+            padding: 12px 14px;
+            border-radius: 22px;
             border: 1.5px solid rgba(232, 135, 94, 0.15);
             font-family: 'Outfit', sans-serif;
-            margin: 10px 0;
+            margin: 8px 0;
             background: rgba(255,255,255,0.9);
-            font-size: 14px;
-            transition: all 0.2s ease;
+            font-size: 13px;
         }
         
         input:focus, textarea:focus {
@@ -450,32 +404,32 @@
         .history-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid rgba(232, 135, 94, 0.1);
-            font-size: 13px;
+            font-size: 12px;
         }
         
         .history-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
-            margin: 20px 0 12px 0;
+            margin: 16px 0 10px 0;
             color: var(--accent);
         }
         
         .ccwallet-info {
             background: linear-gradient(135deg, rgba(232, 135, 94, 0.08), rgba(245, 196, 176, 0.12));
-            border-radius: 20px;
-            padding: 16px;
-            margin: 15px 0;
-            font-size: 13px;
+            border-radius: 18px;
+            padding: 14px;
+            margin: 12px 0;
+            font-size: 12px;
             text-align: left;
             border-left: 4px solid var(--accent);
         }
         
         .code-input-group { 
             display: flex; 
-            gap: 10px; 
-            margin: 15px 0; 
+            gap: 8px; 
+            margin: 12px 0; 
         }
         
         .code-input-group input { 
@@ -485,33 +439,32 @@
         
         .code-input-group button { 
             width: auto; 
-            padding: 14px 24px; 
+            padding: 12px 20px; 
             margin: 0; 
         }
         
         .channel-join {
             background: linear-gradient(135deg, rgba(109, 158, 123, 0.1), rgba(197, 224, 207, 0.15));
-            border-radius: 20px;
-            padding: 16px;
-            margin: 18px 0;
+            border-radius: 18px;
+            padding: 14px;
+            margin: 14px 0;
             text-align: center;
             border: 1px solid rgba(109, 158, 123, 0.2);
         }
         
-        /* Balance disponible */
         .balance-available {
             background: linear-gradient(135deg, rgba(255, 248, 240, 0.9), rgba(255, 245, 234, 0.95));
             backdrop-filter: blur(5px);
-            border-radius: 25px;
-            padding: 22px;
-            margin: 18px 0;
+            border-radius: 22px;
+            padding: 18px;
+            margin: 14px 0;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 10px 30px rgba(232, 135, 94, 0.06), inset 0 0 0 1px rgba(255,255,255,0.9);
+            box-shadow: 0 8px 20px rgba(232, 135, 94, 0.04), inset 0 0 0 1px rgba(255,255,255,0.9);
         }
         
         .balance-available .coins {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 800;
             background: var(--orange-gradient);
             -webkit-background-clip: text;
@@ -520,26 +473,32 @@
         }
         
         .balance-available .usdt {
-            font-size: 15px;
+            font-size: 13px;
             opacity: 0.75;
-            margin-top: 8px;
+            margin-top: 6px;
             font-weight: 500;
         }
         
         .commission-card {
             background: linear-gradient(135deg, rgba(109, 158, 123, 0.12), rgba(197, 224, 207, 0.18));
             backdrop-filter: blur(5px);
-            border-radius: 25px;
-            padding: 22px;
-            margin: 18px 0;
+            border-radius: 22px;
+            padding: 18px;
+            margin: 14px 0;
             border: 1px solid rgba(109, 158, 123, 0.25);
-            box-shadow: 0 10px 30px rgba(109, 158, 123, 0.06);
+            box-shadow: 0 8px 20px rgba(109, 158, 123, 0.04);
         }
         
         a {
             color: var(--accent);
             text-decoration: none;
             font-weight: 600;
+        }
+        
+        .btn-primary { 
+            background: var(--orange-gradient); 
+            color: white;
+            box-shadow: 0 6px 18px rgba(232, 135, 94, 0.2);
         }
     </style>
 </head>
@@ -550,7 +509,7 @@
 
 <div id="app-container">
 
-    <!-- HOME SCREEN -->
+    <!-- HOME SCREEN - TODO VISIBLE SIN SCROLL -->
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="streak-badge"><i class="fas fa-fire"></i> <span id="streak-count">0</span> DIAS</div>
@@ -562,7 +521,6 @@
             <div class="balance-label">⭐ MONEDAS</div>
         </div>
 
-        <!-- SECCIÓN DE 5 VIDEOS DIARIOS -->
         <div class="videos-section">
             <div class="section-title">
                 <i class="fas fa-video"></i>
@@ -580,7 +538,6 @@
                 </div>
             </div>
             
-            <!-- Video 1 -->
             <div class="video-card" id="video1Card">
                 <div class="video-info">
                     <div class="video-icon"><i class="fas fa-play"></i></div>
@@ -592,7 +549,6 @@
                 <button class="video-btn" id="video1Btn">Ver</button>
             </div>
             
-            <!-- Video 2 -->
             <div class="video-card locked" id="video2Card">
                 <div class="video-info">
                     <div class="video-icon"><i class="fas fa-lock"></i></div>
@@ -604,7 +560,6 @@
                 <button class="video-btn locked-btn" id="video2Btn" disabled>Bloqueado</button>
             </div>
             
-            <!-- Video 3 -->
             <div class="video-card locked" id="video3Card">
                 <div class="video-info">
                     <div class="video-icon"><i class="fas fa-lock"></i></div>
@@ -616,7 +571,6 @@
                 <button class="video-btn locked-btn" id="video3Btn" disabled>Bloqueado</button>
             </div>
             
-            <!-- Video 4 -->
             <div class="video-card locked" id="video4Card">
                 <div class="video-info">
                     <div class="video-icon"><i class="fas fa-lock"></i></div>
@@ -628,7 +582,6 @@
                 <button class="video-btn locked-btn" id="video4Btn" disabled>Bloqueado</button>
             </div>
             
-            <!-- Video 5 -->
             <div class="video-card locked" id="video5Card">
                 <div class="video-info">
                     <div class="video-icon"><i class="fas fa-gift"></i></div>
@@ -655,21 +608,21 @@
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-rocket" style="font-size: 40px; color: var(--accent);"></i>
-            <h3 style="margin: 12px 0;">Sistema de Socios</h3>
-            <p style="font-size: 14px; opacity: 0.8;">+0.02 USDT por referido al primer retiro + 10% de por vida de sus ganancias</p>
+            <i class="fas fa-rocket" style="font-size: 36px; color: var(--accent);"></i>
+            <h3 style="margin: 10px 0; font-size: 18px;">Sistema de Socios</h3>
+            <p style="font-size: 13px; opacity: 0.8;">+0.02 USDT por referido al primer retiro + 10% de por vida</p>
             
             <div class="commission-card">
                 <small><i class="fas fa-hand-holding-usd"></i> Comisión acumulada</small>
-                <h3 style="font-size: 32px; margin: 8px 0;" id="comm-pending-coins">0 ⭐</h3>
-                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 12px;" id="comm-pending-usdt">≈ 0.0000 USDT</div>
-                <button class="btn-game btn-primary" style="padding: 12px; width: 100%;" id="claimCommBtn">Reclamar</button>
+                <h3 style="font-size: 28px; margin: 6px 0;" id="comm-pending-coins">0 ⭐</h3>
+                <div style="font-size: 13px; opacity: 0.8; margin-bottom: 10px;" id="comm-pending-usdt">≈ 0.0000 USDT</div>
+                <button class="btn-game btn-primary" style="padding: 11px; width: 100%;" id="claimCommBtn">Reclamar</button>
             </div>
             
-            <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 25px; margin: 15px 0;">
+            <div style="background: rgba(255,255,255,0.5); padding: 14px; border-radius: 22px; margin: 12px 0;">
                 <small>Amigos invitados</small>
-                <h3 id="referidos-count">0</h3>
-                <button class="btn-game" style="margin-top: 10px; padding: 12px; width: 100%;" id="viewInvitesBtn">Ver lista</button>
+                <h3 id="referidos-count" style="font-size: 24px;">0</h3>
+                <button class="btn-game" style="margin-top: 8px; padding: 11px; width: 100%;" id="viewInvitesBtn">Ver lista</button>
             </div>
             <button class="btn-game btn-primary" style="width: 100%;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir Link</button>
         </div>
@@ -679,8 +632,8 @@
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-wallet" style="font-size: 40px; color: var(--success);"></i>
-            <h3 style="margin: 12px 0;">Retirar con CCWallet</h3>
+            <i class="fas fa-wallet" style="font-size: 36px; color: var(--success);"></i>
+            <h3 style="margin: 10px 0; font-size: 18px;">Retirar con CCWallet</h3>
             
             <div class="balance-available">
                 <small><i class="fas fa-coins"></i> Balance disponible</small>
@@ -695,9 +648,9 @@
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
             <button class="btn-game btn-primary" style="width: 100%;" id="withdrawSubmitBtn">Solicitar Retiro</button>
-            <p style="margin-top: 12px; font-size: 12px; opacity: 0.7;">Mínimo 200 monedas (0.02 USDT)</p>
+            <p style="margin-top: 10px; font-size: 11px; opacity: 0.7;">Mínimo 200 monedas (0.02 USDT)</p>
             <div class="history-title"><i class="fas fa-clock"></i> Historial de retiros</div>
-            <div id="history-list" style="max-height: 200px; overflow-y: auto;"></div>
+            <div id="history-list" style="max-height: 180px; overflow-y: auto;"></div>
         </div>
     </div>
 
@@ -705,8 +658,8 @@
     <div id="redeem-screen" class="screen">
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-ticket-alt" style="font-size: 40px; color: var(--accent);"></i>
-            <h3 style="margin: 12px 0;">Canjear Código</h3>
+            <i class="fas fa-ticket-alt" style="font-size: 36px; color: var(--accent);"></i>
+            <h3 style="margin: 10px 0; font-size: 18px;">Canjear Código</h3>
             <div class="channel-join">
                 <i class="fab fa-telegram"></i> Únete al canal<br>
                 <a href="#" onclick="joinChannel(); return false;">@UsdtGiftChannel</a>
@@ -715,7 +668,7 @@
                 <input type="text" id="redeem-code" placeholder="Código">
                 <button class="btn-game btn-primary" id="redeemSubmitBtn" style="width: auto;">Canjear</button>
             </div>
-            <div id="redeem-message" style="margin-top: 18px; font-size: 13px; text-align: center;"></div>
+            <div id="redeem-message" style="margin-top: 16px; font-size: 13px; text-align: center;"></div>
         </div>
     </div>
 
@@ -723,7 +676,7 @@
     <div id="leaderboard-screen" class="screen">
         <div class="back-circle" id="backHomeLeader"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h3 style="margin-bottom: 18px;">Top 10 Global</h3>
+            <h3 style="margin-bottom: 16px; font-size: 18px;">Top 10 Global</h3>
             <div id="leaderboard-list" style="max-height: 400px; overflow-y: auto;"></div>
         </div>
     </div>
@@ -732,7 +685,7 @@
     <div id="invites-list-screen" class="screen">
         <div class="back-circle" id="backToInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h3 style="margin-bottom: 18px;">Mis invitados</h3>
+            <h3 style="margin-bottom: 16px; font-size: 18px;">Mis invitados</h3>
             <div id="invites-list" style="max-height: 400px; overflow-y: auto;"></div>
         </div>
     </div>
@@ -918,7 +871,6 @@
                 balance: firebase.firestore.FieldValue.increment(reward)
             });
             
-            // 10% de comisión para el invitador DE POR VIDA
             if (userData.invitado_por && userData.invitado_por !== "none") {
                 const comisionUSDT = reward / COINS_PER_USDT * 0.10;
                 const inviterRef = db.collection("usuarios").doc(userData.invitado_por);
@@ -1001,7 +953,7 @@
         let i = 1;
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid rgba(232,135,94,0.1);"><span>${i}. ${u.nombre?.substring(0, 12) || 'Usuario'}</span><span style="font-weight:800; color:var(--accent);">${u.balance || 0} ⭐</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(232,135,94,0.1);"><span>${i}. ${u.nombre?.substring(0, 12) || 'Usuario'}</span><span style="font-weight:800; color:var(--accent);">${u.balance || 0} ⭐</span></div>`;
             i++;
         });
     }
@@ -1015,7 +967,7 @@
         if(snapshot.empty) { listEl.innerHTML = "<p style='text-align:center; opacity:0.7; padding:20px;'>Aún no tienes invitados</p>"; return; }
         snapshot.forEach(doc => {
             const u = doc.data();
-            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid rgba(232,135,94,0.1);"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance || 0} ⭐</span></div>`;
+            listEl.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(232,135,94,0.1);"><span><i class='fas fa-user'></i> ${u.nombre}</span><span style="color:var(--accent);">${u.balance || 0} ⭐</span></div>`;
         });
     }
 
@@ -1123,7 +1075,7 @@
             });
             await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId, usedAt: new Date() });
             canvasConfetti({ particleCount: 250, spread: 100, origin: { y: 0.5 } });
-            msgDiv.innerHTML = `<span style="color: #6d9e7b; font-size: 16px; font-weight: 600;">+${amount} ⭐ reclamadas</span>`;
+            msgDiv.innerHTML = `<span style="color: #6d9e7b; font-size: 15px; font-weight: 600;">+${amount} ⭐ reclamadas</span>`;
             document.getElementById('redeem-code').value = '';
             await updateUI();
             setTimeout(() => { msgDiv.innerHTML = ''; }, 4000);
@@ -1132,7 +1084,6 @@
 
     function showToast(message, type = 'info') {
         const toast = document.getElementById('toast-element');
-        const icons = { success: '✓', info: 'ℹ️', warning: '⚠️' };
         toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}" style="margin-right: 8px;"></i> ${message}`;
         toast.style.opacity = '1';
         toast.style.transform = 'translateX(-50%) translateY(-5px)';
