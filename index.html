@@ -368,14 +368,20 @@
     function closeAlertModal() { document.getElementById('alertModal').style.display='none'; }
     function showToast(m) { const t=document.getElementById('toast-element'); t.innerHTML=m; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
 
+    // ==================== PREVENCIÓN DE DUPLICADOS SIMPLIFICADA ====================
     const processedActions = new Set();
     async function executeOnce(id, cb) {
-        if (processedActions.has(id)) return false;
-        const ref = db.collection("actionLogs").doc(id);
-        if ((await ref.get()).exists) { processedActions.add(id); return false; }
+        if (processedActions.has(id)) { console.warn('⛔ Acción duplicada:', id); return false; }
         processedActions.add(id);
-        try { await cb(); await ref.set({ completed: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); return true; }
-        catch (e) { processedActions.delete(id); throw e; }
+        try {
+            await cb();
+            // Registrar acción completada en Firestore para futuras referencias
+            db.collection("actionLogs").doc(id).set({ completed: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).catch(e=>{});
+            return true;
+        } catch (e) {
+            processedActions.delete(id); // Si falla, permitir reintentar
+            throw e;
+        }
     }
 
     async function getNetworkInfo() {
@@ -390,35 +396,29 @@
 
     function initAdsgram() { if (!adsgramInit && window.Adsgrm) { window.Adsgrm.init({ blockId: ADSGRAM_BLOCK_ID }); adsgramInit = true; } }
     
-    // ==================== FUNCIONES DE ANUNCIOS MEJORADAS ====================
-    function showMonetagAd() {
+    // ==================== FUNCIONES DE ANUNCIOS ULTRA-ROBUSTAS ====================
+    async function showMonetagAd() {
+        console.log('📺 Iniciando Monetag...');
         return new Promise((resolve) => {
+            const timeout = setTimeout(() => { console.log('⏰ Monetag timeout'); resolve(true); }, 10000);
             try {
                 if (typeof show_10853207 === 'function') {
-                    show_10853207().then(() => resolve(true)).catch(() => resolve(true));
-                } else {
-                    resolve(true);
-                }
-            } catch (e) {
-                resolve(true);
-            }
-            setTimeout(() => resolve(true), 2000);
+                    show_10853207().then(() => { clearTimeout(timeout); resolve(true); }).catch(() => { clearTimeout(timeout); resolve(true); });
+                } else { clearTimeout(timeout); resolve(true); }
+            } catch (e) { clearTimeout(timeout); resolve(true); }
         });
     }
     
-    function showAdsgramAd() {
+    async function showAdsgramAd() {
+        console.log('📺 Iniciando AdsGram...');
         initAdsgram();
         return new Promise((resolve) => {
+            const timeout = setTimeout(() => { console.log('⏰ AdsGram timeout'); resolve(true); }, 10000);
             try {
                 if (window.Adsgrm && window.Adsgrm.show) {
-                    window.Adsgrm.show().then(() => resolve(true)).catch(() => resolve(true));
-                } else {
-                    resolve(true);
-                }
-            } catch (e) {
-                resolve(true);
-            }
-            setTimeout(() => resolve(true), 2000);
+                    window.Adsgrm.show().then(() => { clearTimeout(timeout); resolve(true); }).catch(() => { clearTimeout(timeout); resolve(true); });
+                } else { clearTimeout(timeout); resolve(true); }
+            } catch (e) { clearTimeout(timeout); resolve(true); }
         });
     }
 
@@ -457,26 +457,66 @@
     function checkReset() { const n = Date.now(); if(!lastVideoReset) { lastVideoReset = n; saveVideos(); } else if((n - lastVideoReset)/3600000 >= 24) { videosWatched = 0; lastVideoReset = n; updateUI(); saveVideos(); } }
     function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
+    // ==================== VER VIDEO (100% FUNCIONAL) ====================
     async function watchVideo(n) {
-        if (isProcessing || isAdPlaying) return;
+        if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
+        if (n !== videosWatched + 1) { showAlert("Orden incorrecto", `Primero debes ver el video #${videosWatched + 1}.`, "exclamation-triangle"); return; }
+        if (videosWatched >= 5) { showAlert("¡Completado!", "Ya has visto los 5 videos de hoy.", "check-circle"); return; }
+        
         const id = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
         await executeOnce(id, async () => {
             isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
             try {
+                console.log(`🎬 Reproduciendo video ${n}...`);
                 let adWatched = (n === 2 || n === 4) ? await showAdsgramAd() : await showMonetagAd();
                 hideAdLoader();
-                if (!adWatched) { showAlert("Anuncio requerido", "Debes ver el anuncio completo para recibir la recompensa.", "exclamation-triangle"); return; }
-                const reward = VIDEO_REWARDS[n-1], ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data();
-                await ref.update({ balance: firebase.firestore.FieldValue.increment(reward), totalEarned: firebase.firestore.FieldValue.increment(reward), totalVideosWatched: firebase.firestore.FieldValue.increment(1) });
+                
+                if (!adWatched) {
+                    showAlert("Anuncio no completado", "Intenta de nuevo. Asegúrate de ver el anuncio completo.", "exclamation-triangle");
+                    return;
+                }
+                
+                const reward = VIDEO_REWARDS[n-1];
+                const ref = db.collection("usuarios").doc(userId);
+                const data = (await ref.get()).data();
+                
+                await ref.update({
+                    balance: firebase.firestore.FieldValue.increment(reward),
+                    totalEarned: firebase.firestore.FieldValue.increment(reward),
+                    totalVideosWatched: firebase.firestore.FieldValue.increment(1)
+                });
+                
                 balance += reward;
-                if(data.invitado_por && data.invitado_por !== "none") await db.collection("usuarios").doc(data.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10) });
-                videosWatched++; await saveVideos();
-                canvasConfetti({ particleCount: 100 }); showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por ver el Video ${n}`, "check-circle");
-                if(videosWatched === 5) { canvasConfetti({ particleCount: 300 }); showAlert("🏆 ¡Día completado!", "Has completado todos los videos de hoy. ¡Sigue así!", "crown"); }
-            } catch (e) { hideAdLoader(); console.error(e); } finally { isProcessing = false; isAdPlaying = false; updateUI(); }
+                if(data.invitado_por && data.invitado_por !== "none") {
+                    await db.collection("usuarios").doc(data.invitado_por).update({
+                        comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
+                    }).catch(()=>{});
+                }
+                
+                videosWatched++;
+                await saveVideos();
+                canvasConfetti({ particleCount: 100 });
+                showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por ver el Video ${n}`, "check-circle");
+                
+                if(videosWatched === 5) {
+                    canvasConfetti({ particleCount: 300 });
+                    showAlert("🏆 ¡Día completado!", "Has completado todos los videos de hoy. ¡Increíble!", "crown");
+                }
+            } catch (e) {
+                hideAdLoader();
+                console.error('Error en video:', e);
+                showAlert("Error inesperado", "No se pudo procesar la recompensa. Intenta de nuevo.", "times-circle");
+            } finally {
+                isProcessing = false; isAdPlaying = false; updateUI();
+            }
+        }).catch(e => {
+            hideAdLoader();
+            isProcessing = false; isAdPlaying = false; updateUI();
+            showAlert("Error", "No se pudo completar la acción. Intenta de nuevo.", "times-circle");
         });
     }
 
+    // ==================== RETIRAR ====================
     async function handleWithdraw() {
         if (isProcessing || isAdPlaying) return;
         const id = `withdraw_${userId}_${Date.now()}`;
@@ -485,7 +525,6 @@
             if (cc.length < 3) { showAlert("ID inválido", "Ingresa un ID de CCWallet válido.", "times-circle"); return; }
             if (balance < 200) { showAlert("Saldo insuficiente", "Necesitas mínimo 200 ⭐ para retirar.", "coins"); return; }
             isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
-            let ok = false;
             try {
                 const ad = await showMonetagAd(); hideAdLoader();
                 if (!ad) { showAlert("Anuncio requerido", "Debes ver el anuncio para completar el retiro.", "exclamation-triangle"); return; }
@@ -493,17 +532,34 @@
                 enviarNotificacion(`🦊 RETIRO SOLICITADO\n👤 ${data.nombre} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${videosWatched}/5\n🏆 Total videos: ${data.totalVideosWatched||0}\n💎 Total ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado por: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
                 await ref.update({ ccwallet_id: cc, balance: 0, hasWithdrawn: true, withdrawHistory: firebase.firestore.FieldValue.arrayUnion({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: "✅ Completado", ccwallet: cc }) });
                 balance = 0;
-                if (first && data.invitado_por && data.invitado_por !== "none") await db.collection("usuarios").doc(data.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(0.02) });
-                ok = true; updateUI(); loadHistory();
+                if (first && data.invitado_por && data.invitado_por !== "none") await db.collection("usuarios").doc(data.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(0.02) }).catch(()=>{});
+                updateUI(); loadHistory();
                 canvasConfetti({ particleCount: 200 }); showAlert("✅ ¡Retiro exitoso!", `${Math.floor(bal)} ⭐ retiradas correctamente.`, "check-circle"); tg.openTelegramLink('https://t.me/cctip_bot');
-            } catch (e) { hideAdLoader(); if (!ok) showAlert("Error", "No se pudo procesar el retiro. Intenta de nuevo.", "times-circle"); } finally { isProcessing = false; isAdPlaying = false; updateUI(); }
-        });
+            } catch (e) { hideAdLoader(); showAlert("Error", "No se pudo procesar el retiro. Intenta de nuevo.", "times-circle"); } finally { isProcessing = false; isAdPlaying = false; updateUI(); }
+        }).catch(e => { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); showAlert("Error", "No se pudo completar la acción.", "times-circle"); });
     }
 
     async function loadHistory() { const d = (await db.collection("usuarios").doc(userId).get()).data(), h = d.withdrawHistory || [], el = document.getElementById('history-list'); el.innerHTML = h.length ? h.reverse().map(i => `<div class="history-item"><span>${i.date}</span><span>${i.amount} ⭐</span><span class="status-badge">${i.status}</span></div>`).join('') : "<p style='text-align:center;'>Sin retiros</p>"; }
-    async function claimCommissions() { if (isProcessing) return; isProcessing = true; try { const ref = db.collection("usuarios").doc(userId), c = (await ref.get()).data().comision || 0; if (c <= 0) { showAlert("Sin comisiones", "Aún no tienes comisiones acumuladas.", "info-circle"); return; } const coins = c * COINS_PER_USDT; await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 }); balance += coins; comision = 0; updateUI(); canvasConfetti({ particleCount: 150 }); showAlert("✨ ¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐ añadidas a tu balance.`, "gift"); } catch (e) { showAlert("Error", "No se pudo reclamar. Intenta de nuevo.", "times-circle"); } finally { isProcessing = false; } }
     
-    // ==================== CANJEAR CÓDIGO (MENSAJES BONITOS) ====================
+    // ==================== RECLAMAR COMISIONES ====================
+    async function claimCommissions() {
+        if (isProcessing) return;
+        const id = `claim_${userId}_${Date.now()}`;
+        await executeOnce(id, async () => {
+            isProcessing = true;
+            try {
+                const ref = db.collection("usuarios").doc(userId), c = (await ref.get()).data().comision || 0;
+                if (c <= 0) { showAlert("Sin comisiones", "Aún no tienes comisiones acumuladas.", "info-circle"); return; }
+                const coins = c * COINS_PER_USDT;
+                await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
+                balance += coins; comision = 0; updateUI();
+                canvasConfetti({ particleCount: 150 });
+                showAlert("✨ ¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐ añadidas a tu balance.`, "gift");
+            } catch (e) { showAlert("Error", "No se pudo reclamar. Intenta de nuevo.", "times-circle"); } finally { isProcessing = false; }
+        }).catch(e => { isProcessing = false; showAlert("Error", "No se pudo completar la acción.", "times-circle"); });
+    }
+    
+    // ==================== CANJEAR CÓDIGO ====================
     async function handleRedeem() {
         if (isProcessing || isAdPlaying) return;
         const id = `redeem_${userId}_${Date.now()}`;
@@ -511,59 +567,25 @@
             const codeInput = document.getElementById('redeem-code');
             const code = codeInput.value.trim().toUpperCase();
             const msgEl = document.getElementById('redeem-message');
-            
-            if (!code) {
-                msgEl.innerHTML = '<span style="color:var(--terracotta);">✏️ Ingresa un código</span>';
-                return;
-            }
-            
+            if (!code) { msgEl.innerHTML = '<span style="color:var(--terracotta);">✏️ Ingresa un código</span>'; return; }
             isProcessing = true; isAdPlaying = true; updateUI();
-            
             try {
                 await showMonetagAd();
-                
                 const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data();
-                if ((data.redeemedCodes || []).includes(code)) {
-                    msgEl.innerHTML = '<span style="color:var(--terracotta);">❌ Ya usaste este código</span>';
-                    return;
-                }
-                
+                if ((data.redeemedCodes || []).includes(code)) { msgEl.innerHTML = '<span style="color:var(--terracotta);">❌ Ya usaste este código</span>'; return; }
                 const codes = await db.collection("giftCodes").where("code", "==", code).get();
-                if (codes.empty) {
-                    msgEl.innerHTML = '<span style="color:var(--terracotta);">❌ Código inválido</span>';
-                    return;
-                }
-                
-                const codeDoc = codes.docs[0], codeData = codeDoc.data();
-                const amount = codeData.amount, maxUses = codeData.maxUses || 1, usedCount = codeData.usedCount || 0;
-                
-                if (usedCount >= maxUses) {
-                    msgEl.innerHTML = '<span style="color:var(--terracotta);">😢 Código agotado</span>';
-                    return;
-                }
-                
-                await ref.update({
-                    balance: firebase.firestore.FieldValue.increment(amount),
-                    redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
-                });
+                if (codes.empty) { msgEl.innerHTML = '<span style="color:var(--terracotta);">❌ Código inválido</span>'; return; }
+                const codeDoc = codes.docs[0], codeData = codeDoc.data(), amount = codeData.amount, maxUses = codeData.maxUses || 1, usedCount = codeData.usedCount || 0;
+                if (usedCount >= maxUses) { msgEl.innerHTML = '<span style="color:var(--terracotta);">😢 Código agotado</span>'; return; }
+                await ref.update({ balance: firebase.firestore.FieldValue.increment(amount), redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code) });
                 await db.collection("giftCodes").doc(codeDoc.id).update({ usedCount: firebase.firestore.FieldValue.increment(1) });
-                
                 balance += amount; updateUI();
-                canvasConfetti({ particleCount: 200 });
-                msgEl.innerHTML = `<span style="color:var(--success);">🎉 ¡Felicidades! +${amount} ⭐</span>`;
-                codeInput.value = '';
-                
+                canvasConfetti({ particleCount: 200 }); msgEl.innerHTML = `<span style="color:var(--success);">🎉 ¡Felicidades! +${amount} ⭐</span>`; codeInput.value = '';
                 enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
                 showAlert("🎁 ¡Código canjeado!", `Has recibido ${amount} ⭐ en tu balance.`, "gift");
                 setTimeout(() => msgEl.innerHTML = '', 3000);
-                
-            } catch (e) {
-                console.error(e);
-                msgEl.innerHTML = '<span style="color:var(--terracotta);">⚠️ Intenta de nuevo</span>';
-            } finally {
-                isProcessing = false; isAdPlaying = false; updateUI();
-            }
-        });
+            } catch (e) { console.error(e); msgEl.innerHTML = '<span style="color:var(--terracotta);">⚠️ Intenta de nuevo</span>'; } finally { isProcessing = false; isAdPlaying = false; updateUI(); }
+        }).catch(e => { isProcessing = false; isAdPlaying = false; updateUI(); showAlert("Error", "No se pudo completar la acción.", "times-circle"); });
     }
 
     function navigate(s) { document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if (s==='withdraw-screen') loadHistory(); if (s==='leaderboard-screen') loadLeaderboard(); if (s==='invites-list-screen') loadInvites(); }
