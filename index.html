@@ -8,7 +8,7 @@
     <!-- Monetag -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     
-    <!-- NUEVOS PROVEEDORES (Onelock y RichInfo) -->
+    <!-- Onelock y RichInfo -->
     <script src="https://api.onelock.com/onestream-ad-admanager/tma.js"></script>
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
     
@@ -432,20 +432,43 @@
         catch (e) { return { ip: 'No disponible', device: navigator.platform || 'Desconocido' }; }
     }
 
-    // ==================== INICIALIZACIÓN DE NUEVOS PROVEEDORES ====================
+    // ==================== INICIALIZACIÓN DE NUEVOS PROVEEDORES (RETRASADA) ====================
     const ONELOCK_SPOT_IDS = ['6116292@usdtgftkbot', '6116293@usdtgftkbot', '6116294@usdtgftkbot'];
     let onelockShows = [];
-    if (typeof window.initCDTma === 'function') {
-        ONELOCK_SPOT_IDS.forEach((spotId, index) => {
-            window.initCDTma({ id: spotId }).then(show => onelockShows[index] = show).catch(e => console.log('Onelock init error:', e));
-        });
+    
+    function initOnelock() {
+        if (typeof window.initCDTma === 'function') {
+            console.log('✅ Onelock SDK disponible');
+            ONELOCK_SPOT_IDS.forEach((spotId, index) => {
+                window.initCDTma({ id: spotId }).then(show => {
+                    onelockShows[index] = show;
+                    console.log(`✅ Onelock spot ${index} inicializado`);
+                }).catch(e => console.log('❌ Onelock init error:', e));
+            });
+        } else {
+            console.warn('⚠️ Onelock SDK no encontrado. Reintentando en 1s...');
+            setTimeout(initOnelock, 1000);
+        }
     }
     
-    if (typeof window.TelegramAdsController !== 'undefined') {
-        window.TelegramAdsController = new TelegramAdsController();
-        window.TelegramAdsController.initialize({ pubId: "995853", appId: "6990" });
+    function initRichInfo() {
+        if (typeof window.TelegramAdsController !== 'undefined') {
+            console.log('✅ RichInfo SDK disponible');
+            window.TelegramAdsController = new TelegramAdsController();
+            window.TelegramAdsController.initialize({ pubId: "995853", appId: "6990" });
+        } else {
+            console.warn('⚠️ RichInfo SDK no encontrado. Reintentando en 1s...');
+            setTimeout(initRichInfo, 1000);
+        }
     }
+    
+    // Retrasar inicialización para asegurar que los scripts externos carguen
+    setTimeout(() => {
+        initOnelock();
+        initRichInfo();
+    }, 500);
 
+    // Monetag (sin cambios)
     async function showMonetagAd() {
         return new Promise((resolve) => {
             const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
@@ -461,20 +484,22 @@
         if (onelockShows[spotIndex]) {
             return onelockShows[spotIndex]().then(() => true).catch(() => false);
         }
-        return false;
+        console.error(`Onelock spot ${spotIndex} no inicializado`);
+        throw new Error("Proveedor Onelock no disponible");
     }
 
     async function showRichInfoAd() {
         if (window.TelegramAdsController && window.TelegramAdsController.show) {
             return window.TelegramAdsController.show().then(() => true).catch(() => false);
         }
-        return false;
+        console.error('RichInfo no inicializado');
+        throw new Error("Proveedor RichInfo no disponible");
     }
 
     // ==================== VARIABLES DE ESTADO (9 VÍDEOS - ORDEN LIBRE) ====================
     const userId = tg.initDataUnsafe?.user?.id?.toString(), userName = tg.initDataUnsafe?.user?.first_name || 'Usuario', userUsername = tg.initDataUnsafe?.user?.username || '';
     let balance = 0, comision = 0, referidos = 0;
-    let watchedVideos = []; // Array de vídeos vistos hoy
+    let watchedVideos = [];
     let lastVideoReset = 0;
     let isProcessing = false, isAdPlaying = false;
     const COINS_PER_USDT = 10000;
@@ -561,7 +586,7 @@
         setTimeout(startTimer, 60000); 
     }
 
-    // ==================== VER VIDEO (ORDEN LIBRE) ====================
+    // ==================== VER VIDEO (CORREGIDO) ====================
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
         if (watchedVideos.includes(n)) { showAlert("Ya visto", `El video #${n} ya lo has visto hoy.`, "info-circle"); return; }
@@ -589,7 +614,8 @@
                 const ref = db.collection("usuarios").doc(userId);
                 const data = (await ref.get()).data();
                 
-                const newWatched = [...(data.watchedVideos || []), n];
+                // CORRECCIÓN: usar data?.watchedVideos || []
+                const newWatched = [...(data?.watchedVideos || []), n];
                 await ref.update({
                     balance: firebase.firestore.FieldValue.increment(reward),
                     totalVideosWatched: firebase.firestore.FieldValue.increment(1),
@@ -720,7 +746,6 @@
         document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
 
-    // Eventos para 9 vídeos
     for(let i=1; i<=TOTAL_VIDEOS; i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
@@ -741,4 +766,4 @@
     initUser(); initAdmin();
 </script>
 </body>
-</html>
+    </html>
