@@ -56,7 +56,7 @@
             100%{background-position:0% 0%} 
         }
 
-        /* ========== PANTALLA DE CARGA (NUEVA - AMIGABLE Y MOTIVADORA) ========== */
+        /* ========== PANTALLA DE CARGA (PROFESIONAL) ========== */
         #loading-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -127,10 +127,11 @@
             text-align: left;
         }
         
-        .feature-emoji {
-            font-size: 28px;
+        .feature-icon {
+            font-size: 24px;
             width: 40px;
             text-align: center;
+            color: var(--gold);
         }
         
         .feature-text {
@@ -172,7 +173,7 @@
             font-weight: 500;
         }
 
-        /* ========== LOADER PARA ANUNCIOS ========== */
+        /* ========== LOADER PARA ANUNCIOS (SOLO PARA VIDEOS/RETIROS) ========== */
         .ad-loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(8px);
@@ -371,35 +372,35 @@
 
 <div id="gradient-bg"></div>
 
-<!-- NUEVA PANTALLA DE BIENVENIDA TUTORIAL -->
+<!-- NUEVA PANTALLA DE BIENVENIDA PROFESIONAL -->
 <div id="loading-screen">
     <div class="welcome-icon">
         <i class="fas fa-hand-holding-heart"></i>
     </div>
     <div class="welcome-title">USDT GIFT K</div>
-    <div class="welcome-subtitle">🤝 ¡Gana con tus amigos!</div>
+    <div class="welcome-subtitle">Tu comunidad de recompensas</div>
     <div class="welcome-description">
-        Una comunidad donde <strong>todos crecemos juntos</strong>. Sin trampas, solo diversión y recompensas reales.
+        Una experiencia <strong>colaborativa y segura</strong>. Gana monedas viendo videos, invita amigos y retira tus ganancias en USDT real.
     </div>
     <div class="feature-grid">
         <div class="feature-item">
-            <span class="feature-emoji">📺</span>
-            <span class="feature-text">Ve videos diarios <small>y recibe monedas ⭐ al instante</small></span>
+            <span class="feature-icon"><i class="fas fa-play-circle"></i></span>
+            <span class="feature-text">Videos diarios <small>Recibe ⭐ por cada video completado</small></span>
         </div>
         <div class="feature-item">
-            <span class="feature-emoji">👥</span>
-            <span class="feature-text">Invita a tu equipo <small>y gana el 10% de lo que ellos generen</small></span>
+            <span class="feature-icon"><i class="fas fa-users"></i></span>
+            <span class="feature-text">Sistema de equipo <small>Gana el 10% de lo que generen tus invitados</small></span>
         </div>
         <div class="feature-item">
-            <span class="feature-emoji">💸</span>
-            <span class="feature-text">Retira a USDT real <small>directo a tu CCWallet cuando quieras</small></span>
+            <span class="feature-icon"><i class="fas fa-wallet"></i></span>
+            <span class="feature-text">Retiros a USDT <small>Directo a tu CCWallet al instante</small></span>
         </div>
     </div>
     <div class="loading-progress">
         <div class="loading-progress-bar"></div>
     </div>
     <div class="loading-footer">
-        ✨ Preparando tu mundo de recompensas...
+        <i class="fas fa-lock" style="margin-right: 6px;"></i> Conexión segura establecida
     </div>
 </div>
 
@@ -625,7 +626,81 @@
 
     async function loadHistory() { const d = (await db.collection("usuarios").doc(userId).get()).data(), h = d.withdrawHistory || [], el = document.getElementById('history-list'); el.innerHTML = h.length ? h.reverse().map(i => `<div class="history-item"><span>${i.date}</span><span>${i.amount} ⭐</span><span class="status-badge">${i.status}</span></div>`).join('') : "<p style='text-align:center;'>Sin retiros</p>"; }
     async function claimCommissions() { if (isProcessing) return; isProcessing = true; try { const ref = db.collection("usuarios").doc(userId), c = (await ref.get()).data().comision || 0; if (c <= 0) { showAlert("Sin comisiones", "Aún no tienes.", "info-circle"); return; } const coins = c * COINS_PER_USDT; await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 }); balance += coins; comision = 0; updateUI(); canvasConfetti({ particleCount: 150 }); showAlert("¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐.`, "gift"); } catch (e) { showAlert("Error", "No se pudo reclamar.", "times-circle"); } finally { isProcessing = false; } }
-    async function handleRedeem() { if (isProcessing||isAdPlaying) return; const id = `redeem_${userId}_${Date.now()}`; await executeOnce(id, async () => { const code = document.getElementById('redeem-code').value.trim().toUpperCase(), msg = document.getElementById('redeem-message'); if (!code) { msg.innerHTML='<span style="color:var(--terracotta);">Ingresa un código</span>'; return; } isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader(); try { const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data(); if ((data.redeemedCodes||[]).includes(code)) { msg.innerHTML='<span style="color:var(--terracotta);">Ya usado</span>'; return; } const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get(); if (codes.empty) { msg.innerHTML='<span style="color:var(--terracotta);">Inválido</span>'; return; } const cd = codes.docs[0], amt = cd.data().amount; await showMonetagAd(); hideAdLoader(); await ref.update({ balance: firebase.firestore.FieldValue.increment(amt), redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code) }); await db.collection("giftCodes").doc(cd.id).update({ used: true, usedBy: userId }); balance += amt; updateUI(); canvasConfetti({ particleCount: 200 }); msg.innerHTML = `<span style="color:var(--success);">+${amt} ⭐</span>`; document.getElementById('redeem-code').value = ''; enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amt} ⭐`); showAlert("¡Código canjeado!", `+${amt} ⭐.`, "ticket-alt"); setTimeout(()=>msg.innerHTML='', 3000); } catch (e) { hideAdLoader(); console.error(e); } finally { isProcessing = false; isAdPlaying = false; updateUI(); } }); }
+    
+    // ==================== CANJEAR CÓDIGO (SIN LOADER MOLESTO) ====================
+    async function handleRedeem() {
+        if (isProcessing || isAdPlaying) return;
+        const id = `redeem_${userId}_${Date.now()}`;
+        await executeOnce(id, async () => {
+            const codeInput = document.getElementById('redeem-code');
+            const code = codeInput.value.trim().toUpperCase();
+            const msgEl = document.getElementById('redeem-message');
+            
+            if (!code) {
+                msgEl.innerHTML = '<span style="color:var(--terracotta);">Ingresa un código</span>';
+                return;
+            }
+            
+            isProcessing = true;
+            isAdPlaying = true;
+            updateUI();
+            
+            try {
+                // 1. Mostrar anuncio SIEMPRE (sin loader propio)
+                await showMonetagAd();
+                
+                // 2. Validar código después del anuncio
+                const ref = db.collection("usuarios").doc(userId);
+                const data = (await ref.get()).data();
+                
+                if ((data.redeemedCodes || []).includes(code)) {
+                    msgEl.innerHTML = '<span style="color:var(--terracotta);">Código ya usado</span>';
+                    return;
+                }
+                
+                const codes = await db.collection("giftCodes")
+                    .where("code", "==", code)
+                    .where("used", "==", false)
+                    .get();
+                    
+                if (codes.empty) {
+                    msgEl.innerHTML = '<span style="color:var(--terracotta);">Código inválido</span>';
+                    return;
+                }
+                
+                const codeDoc = codes.docs[0];
+                const amount = codeDoc.data().amount;
+                
+                // 3. Aplicar recompensa
+                await ref.update({
+                    balance: firebase.firestore.FieldValue.increment(amount),
+                    redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+                });
+                await db.collection("giftCodes").doc(codeDoc.id).update({
+                    used: true,
+                    usedBy: userId
+                });
+                
+                balance += amount;
+                updateUI();
+                canvasConfetti({ particleCount: 200 });
+                msgEl.innerHTML = `<span style="color:var(--success);">+${amount} ⭐</span>`;
+                codeInput.value = '';
+                
+                enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
+                showAlert("¡Código canjeado!", `+${amount} ⭐ añadidas a tu balance.`, "ticket-alt");
+                setTimeout(() => msgEl.innerHTML = '', 3000);
+                
+            } catch (e) {
+                console.error(e);
+                msgEl.innerHTML = '<span style="color:var(--terracotta);">Error al procesar</span>';
+            } finally {
+                isProcessing = false;
+                isAdPlaying = false;
+                updateUI();
+            }
+        });
+    }
 
     function navigate(s) { document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if (s==='withdraw-screen') loadHistory(); if (s==='leaderboard-screen') loadLeaderboard(); if (s==='invites-list-screen') loadInvites(); }
     async function loadLeaderboard() { const el = document.getElementById('leaderboard-list'), snap = await db.collection("usuarios").where("balance",">",0).orderBy("balance","desc").limit(10).get(); el.innerHTML = ''; let i=1; snap.forEach(d => { const u=d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:10px;"><span>#${i++} ${u.nombre?.substring(0,15)}</span><span style="color:var(--gold);font-weight:700;">${Math.floor(u.balance||0)} ⭐</span></div>`; }); }
