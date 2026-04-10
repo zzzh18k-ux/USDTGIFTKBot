@@ -15,20 +15,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* ========== PALETA PREMIUM ========== */
         :root {
-            --gold: #ffcc00;
-            --orange-gradient: linear-gradient(135deg, #e8875e 0%, #f0a080 100%);
-            --bg-color: #fffbf5;
-            --text-main: #4a3728;
-            --accent: #e8875e;
-            --success: #2ecc71;
+            --gold: #D4AF37;
+            --gold-light: #F5E7B2;
+            --cream: #FFFDF7;
+            --terracotta: #D68B7C;
+            --terracotta-soft: #F4D1C7;
+            --text-dark: #3A2C27;
+            --text-soft: #6B4E44;
+            --success: #6BAF92;
+            --shadow-soft: 0 8px 20px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: var(--bg-color);
+            background: var(--cream);
             height: 100vh;
             overflow: hidden;
             display: flex;
@@ -38,10 +43,10 @@
         #gradient-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #fffbf5 0%, #fff5ea 25%, #ffe8d9 50%, #fff5ea 75%, #fffbf5 100%);
+            background: linear-gradient(145deg, #FFFDF7 0%, #FDF6EC 30%, #FCF0E3 70%, #FDF6EC 100%);
             background-size: 300% 300%;
             z-index: -1;
-            animation: gradientMove 12s ease infinite;
+            animation: gradientMove 14s ease infinite;
         }
         @keyframes gradientMove { 
             0%{background-position:0% 0%} 
@@ -55,7 +60,7 @@
             width: 100%;
             max-width: 450px;
             height: 100vh;
-            padding: 8px 14px;
+            padding: 10px 16px;
             display: flex;
             flex-direction: column;
             z-index: 1;
@@ -68,6 +73,7 @@
             width: 100%;
             height: 100%;
             overflow-y: auto;
+            padding-bottom: 10px;
         }
         .screen.active { display: flex; }
         .screen::-webkit-scrollbar { display: none; }
@@ -77,309 +83,397 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             flex-shrink: 0;
         }
 
         .streak-badge {
-            background: rgba(255,255,255,0.95);
-            padding: 5px 10px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 10px;
-            box-shadow: 0 2px 8px rgba(232, 135, 94, 0.06);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 11px;
+            box-shadow: var(--shadow-soft);
             display: flex;
             align-items: center;
-            gap: 4px;
-            color: var(--accent);
-            border: 1px solid rgba(255,255,255,0.5);
+            gap: 6px;
+            color: var(--terracotta);
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .balance-card {
             text-align: center;
-            margin: 5px 0 8px;
-            padding: 8px;
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            box-shadow: 0 6px 15px rgba(232, 135, 94, 0.04);
-            border: 1px solid rgba(255,255,255,0.6);
+            margin: 8px 0 12px;
+            padding: 16px 8px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             flex-shrink: 0;
             cursor: pointer;
         }
         
         #user-balance {
-            font-size: 38px;
+            font-size: 48px;
             font-weight: 800;
-            background: var(--orange-gradient);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 80%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
         
         .balance-label {
-            font-size: 10px;
-            letter-spacing: 3px;
+            font-size: 11px;
+            letter-spacing: 4px;
             opacity: 0.7;
+            color: var(--text-soft);
+            font-weight: 400;
         }
 
         .section-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             flex-shrink: 0;
+            color: var(--text-dark);
         }
         
         .daily-progress {
-            background: rgba(255,255,255,0.7);
-            border-radius: 18px;
-            padding: 6px 12px;
-            margin: 4px 0 6px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            padding: 8px 16px;
+            margin: 6px 0 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border: 1px solid rgba(255,255,255,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             flex-shrink: 0;
         }
         
         .daily-progress span {
             font-weight: 700;
             font-size: 12px;
+            color: var(--text-dark);
         }
         
-        .progress-dots { display: flex; gap: 5px; }
+        .progress-dots { display: flex; gap: 6px; }
         .dot {
-            width: 8px; height: 8px;
+            width: 10px; height: 10px;
             border-radius: 50%;
-            background: rgba(232, 135, 94, 0.2);
-            border: 1px solid rgba(255,255,255,0.8);
+            background: rgba(214, 139, 124, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.9);
         }
         .dot.completed {
-            background: var(--orange-gradient);
-            box-shadow: 0 0 6px rgba(232, 135, 94, 0.3);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
+            box-shadow: 0 2px 8px rgba(214, 139, 124, 0.3);
         }
 
         .video-card {
-            background: rgba(255,255,255,0.8);
-            border-radius: 16px;
-            padding: 6px 12px;
-            margin-bottom: 4px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 22px;
+            padding: 8px 16px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border: 1px solid rgba(255,255,255,0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             flex-shrink: 0;
+            box-shadow: var(--shadow-soft);
         }
         
         .video-card.completed {
-            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.15));
-            border-left: 3px solid var(--success);
+            background: linear-gradient(135deg, rgba(107, 175, 146, 0.12), rgba(107, 175, 146, 0.18));
+            border-left: 4px solid var(--success);
         }
         
-        .video-card.locked { opacity: 0.6; }
-        .video-info { display: flex; align-items: center; gap: 8px; }
+        .video-card.locked { opacity: 0.5; }
+        .video-info { display: flex; align-items: center; gap: 12px; }
         
         .video-icon {
-            width: 30px; height: 30px;
-            border-radius: 10px;
-            background: var(--orange-gradient);
+            width: 38px; height: 38px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 13px;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(214, 139, 124, 0.2);
         }
-        .completed .video-icon { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        .locked .video-icon { background: linear-gradient(135deg, #c4a89c, #d4beb2); }
+        .completed .video-icon { background: linear-gradient(135deg, var(--success), #4A8C74); }
+        .locked .video-icon { background: linear-gradient(135deg, #B5A69D, #CBBDB4); }
         
-        .video-title { font-weight: 700; font-size: 12px; }
+        .video-title { font-weight: 700; font-size: 13px; color: var(--text-dark); }
         .video-reward {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 800;
-            background: var(--orange-gradient);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         .completed .video-reward {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            background: linear-gradient(135deg, var(--success), #4A8C74);
         }
         
         .video-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 8px 18px;
+            border-radius: 30px;
             border: none;
-            font-weight: 600;
-            font-size: 11px;
+            font-weight: 700;
+            font-size: 12px;
             cursor: pointer;
-            background: var(--orange-gradient);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(214, 139, 124, 0.25);
+            transition: all 0.2s ease;
         }
-        .video-btn:active { transform: scale(0.95); }
-        .video-btn.completed-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .video-btn:active { transform: scale(0.95); box-shadow: 0 2px 6px rgba(214, 139, 124, 0.2); }
+        .video-btn.completed-btn { background: linear-gradient(135deg, var(--success), #4A8C74); }
         .video-btn.locked-btn {
-            background: #c4a89c;
+            background: #B5A69D;
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.6;
+            box-shadow: none;
         }
         .video-btn:disabled {
-            opacity: 0.7;
+            opacity: 0.6;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         .reset-timer {
             text-align: center;
-            font-size: 10px;
-            color: var(--accent);
-            margin: 6px 0 8px;
+            font-size: 11px;
+            color: var(--text-soft);
+            margin: 8px 0 12px;
             flex-shrink: 0;
+            font-weight: 500;
         }
 
         .menu-grid { 
             display: flex; 
             flex-direction: column; 
-            gap: 5px; 
+            gap: 8px; 
             flex-shrink: 0;
         }
         
         .btn-game {
-            background: rgba(255,255,255,0.75);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
             border: none;
-            padding: 10px 16px;
-            border-radius: 24px;
-            font-size: 13px;
+            padding: 14px 20px;
+            border-radius: 40px;
+            font-size: 14px;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.5);
-            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            color: var(--text-dark);
+            box-shadow: var(--shadow-soft);
+            transition: all 0.2s ease;
         }
-        .btn-game:active { transform: scale(0.98); }
+        .btn-game:active { transform: scale(0.98); background: rgba(255, 255, 255, 0.95); }
 
         .glass-card {
-            background: rgba(255,255,255,0.75);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(12px);
-            border-radius: 25px;
-            padding: 16px;
-            margin-top: 5px;
-            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 35px;
+            padding: 20px;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: var(--shadow-soft);
         }
         
         .back-circle {
-            width: 36px; height: 36px;
-            background: rgba(255,255,255,0.8);
+            width: 40px; height: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            margin-bottom: 6px;
-            border: 1px solid rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
             flex-shrink: 0;
+            color: var(--terracotta);
+            box-shadow: var(--shadow-soft);
         }
 
+        /* ========== MODAL DE ALERTAS IMPACTANTES ========== */
+        .alert-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+        }
+        
+        .alert-content {
+            background: var(--cream);
+            border-radius: 40px;
+            padding: 28px 24px;
+            width: 85%;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .alert-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .alert-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+        
+        .alert-message {
+            font-size: 15px;
+            color: var(--text-soft);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+        
+        .alert-btn {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 6px 18px rgba(214, 139, 124, 0.3);
+        }
+
+        /* ========== OTROS ELEMENTOS ========== */
         .toast-premium {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #2a1f1a 0%, #3d2e26 100%);
-            color: #fff5ea;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-size: 12px;
+            background: linear-gradient(135deg, var(--text-dark) 0%, #4A3A32 100%);
+            color: var(--cream);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 13px;
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
             white-space: nowrap;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         input, textarea {
             width: 100%;
-            padding: 10px 12px;
-            border-radius: 18px;
-            border: 1.5px solid rgba(232, 135, 94, 0.15);
-            margin: 6px 0;
-            background: rgba(255,255,255,0.9);
-            font-size: 12px;
+            padding: 14px 16px;
+            border-radius: 25px;
+            border: 1.5px solid rgba(214, 139, 124, 0.2);
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            color: var(--text-dark);
         }
         
         .history-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid rgba(232, 135, 94, 0.1);
-            font-size: 11px;
+            padding: 10px;
+            border-bottom: 1px solid rgba(214, 139, 124, 0.15);
+            font-size: 12px;
+            color: var(--text-soft);
         }
         
         .history-title {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
-            margin: 12px 0 8px 0;
-            color: var(--accent);
+            margin: 16px 0 10px 0;
+            color: var(--text-dark);
         }
         
         .ccwallet-info {
-            background: linear-gradient(135deg, rgba(232, 135, 94, 0.08), rgba(245, 196, 176, 0.12));
-            border-radius: 15px;
-            padding: 10px;
-            margin: 8px 0;
-            font-size: 11px;
-            border-left: 3px solid var(--accent);
+            background: linear-gradient(135deg, rgba(214, 139, 124, 0.06), rgba(212, 175, 55, 0.08));
+            border-radius: 20px;
+            padding: 14px;
+            margin: 12px 0;
+            font-size: 12px;
+            border-left: 4px solid var(--gold);
+            color: var(--text-soft);
         }
         
-        .code-input-group { display: flex; gap: 6px; margin: 8px 0; }
+        .code-input-group { display: flex; gap: 8px; margin: 12px 0; }
         .code-input-group input { flex: 1; margin: 0; }
-        .code-input-group button { width: auto; padding: 10px 16px; }
+        .code-input-group button { width: auto; padding: 14px 22px; }
         
         .channel-join {
-            background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.15));
-            border-radius: 15px;
-            padding: 10px;
-            margin: 10px 0;
+            background: linear-gradient(135deg, rgba(107, 175, 146, 0.1), rgba(107, 175, 146, 0.18));
+            border-radius: 20px;
+            padding: 14px;
+            margin: 14px 0;
             text-align: center;
-            font-size: 12px;
+            font-size: 13px;
+            color: var(--text-dark);
         }
         
         .balance-available {
-            background: linear-gradient(135deg, rgba(255, 248, 240, 0.9), rgba(255, 245, 234, 0.95));
-            border-radius: 18px;
-            padding: 14px;
-            margin: 10px 0;
+            background: linear-gradient(135deg, rgba(255, 253, 247, 0.95), rgba(255, 250, 240, 0.98));
+            border-radius: 25px;
+            padding: 18px;
+            margin: 14px 0;
             text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
         
-        .balance-available .coins { font-size: 30px; font-weight: 800; }
-        .balance-available .usdt { font-size: 12px; opacity: 0.75; }
+        .balance-available .coins { font-size: 34px; font-weight: 800; }
+        .balance-available .usdt { font-size: 13px; opacity: 0.75; color: var(--text-soft); }
         
         .commission-card {
-            background: linear-gradient(135deg, rgba(46, 204, 113, 0.12), rgba(46, 204, 113, 0.18));
-            border-radius: 18px;
-            padding: 14px;
-            margin: 10px 0;
+            background: linear-gradient(135deg, rgba(107, 175, 146, 0.12), rgba(107, 175, 146, 0.18));
+            border-radius: 25px;
+            padding: 18px;
+            margin: 14px 0;
         }
         
-        a { color: var(--accent); text-decoration: none; font-weight: 600; }
-        .btn-primary { background: var(--orange-gradient); color: white; }
-        .btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; }
+        a { color: var(--terracotta); text-decoration: none; font-weight: 600; }
+        .btn-primary { background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); color: white; }
+        .btn-success { background: linear-gradient(135deg, var(--success), #4A8C74); color: white; }
         
         .status-badge {
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 9px;
-            font-weight: 600;
-            background: #2ecc71;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 700;
+            background: var(--success);
             color: white;
         }
 
         .admin-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(6px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -387,20 +481,57 @@
         }
         
         .admin-modal-content {
-            background: white;
-            border-radius: 25px;
-            padding: 20px;
+            background: var(--cream);
+            border-radius: 40px;
+            padding: 24px;
             width: 90%;
-            max-width: 350px;
+            max-width: 360px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
         
         .admin-modal h3 {
-            margin-bottom: 15px;
-            color: var(--accent);
+            margin-bottom: 18px;
+            color: var(--text-dark);
         }
         
         .admin-modal input {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
+        }
+        
+        /* ========== MOTIVACIÓN SOCIAL ========== */
+        .invite-highlight {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(214, 139, 124, 0.12));
+            border-radius: 25px;
+            padding: 20px 16px;
+            margin: 16px 0;
+            text-align: center;
+            border: 1px dashed rgba(212, 175, 55, 0.4);
+        }
+        
+        .invite-highlight h4 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .invite-highlight p {
+            font-size: 13px;
+            color: var(--text-soft);
+            margin-bottom: 4px;
+        }
+        
+        .earn-tag {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.15);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--terracotta);
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -409,6 +540,17 @@
 <div id="gradient-bg"></div>
 <div id="toast-element" class="toast-premium"></div>
 
+<!-- MODAL DE ALERTAS IMPACTANTES -->
+<div id="alertModal" class="alert-modal">
+    <div class="alert-content">
+        <div class="alert-icon"><i class="fas fa-bell"></i></div>
+        <div class="alert-title" id="alertTitle">Aviso</div>
+        <div class="alert-message" id="alertMessage">Mensaje</div>
+        <button class="alert-btn" onclick="closeAlertModal()">Entendido</button>
+    </div>
+</div>
+
+<!-- MODAL ADMIN -->
 <div id="adminModal" class="admin-modal">
     <div class="admin-modal-content">
         <h3><i class="fas fa-crown"></i> Acceso Restringido</h3>
@@ -459,29 +601,38 @@
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-rocket" style="font-size: 32px; color: var(--accent);"></i>
-            <h3 style="margin: 8px 0; font-size: 16px;">Sistema de Socios</h3>
-            <p style="font-size: 12px;">+0.02 USDT al primer retiro + 10% de por vida</p>
+            <i class="fas fa-rocket" style="font-size: 36px; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            <h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Crece con tu Equipo</h3>
+            <p style="font-size: 13px; color: var(--text-soft);">Invita, gana y multiplica tus recompensas juntos.</p>
+            
+            <div class="invite-highlight">
+                <h4>🌟 +0.02 USDT</h4>
+                <p>por cada amigo en su primer retiro</p>
+                <h4 style="margin-top: 12px;">💎 +10%</h4>
+                <p>de comisión por cada video que vean, ¡para siempre!</p>
+                <div class="earn-tag">🌱 Tu red, tu ingreso pasivo</div>
+            </div>
+            
             <div class="commission-card">
                 <small>Comisión acumulada</small>
-                <h3 style="font-size: 26px;" id="comm-pending-coins">0 ⭐</h3>
-                <div style="font-size: 12px;" id="comm-pending-usdt">≈ 0.0000 USDT</div>
-                <button class="btn-game btn-primary" style="padding: 10px; width: 100%;" id="claimCommBtn">Reclamar</button>
+                <h3 style="font-size: 30px; font-weight: 800;" id="comm-pending-coins">0 ⭐</h3>
+                <div style="font-size: 13px;" id="comm-pending-usdt">≈ 0.0000 USDT</div>
+                <button class="btn-game btn-primary" style="padding: 12px; width: 100%; margin-top: 14px;" id="claimCommBtn">Reclamar ahora</button>
             </div>
-            <div style="background: rgba(255,255,255,0.5); padding: 12px; border-radius: 18px; margin: 10px 0;">
-                <small>Amigos invitados</small>
-                <h3 id="referidos-count" style="font-size: 22px;">0</h3>
-                <button class="btn-game" style="margin-top: 8px; padding: 10px; width: 100%;" id="viewInvitesBtn">Ver lista</button>
+            <div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 25px; margin: 16px 0;">
+                <small>Amigos que confiaron en ti</small>
+                <h3 id="referidos-count" style="font-size: 28px; font-weight: 800; color: var(--text-dark);">0</h3>
+                <button class="btn-game" style="margin-top: 12px; padding: 12px; width: 100%;" id="viewInvitesBtn">Ver lista</button>
             </div>
-            <button class="btn-game btn-primary" style="width: 100%;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir Link</button>
+            <button class="btn-game btn-primary" style="width: 100%; padding: 16px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Invitar y empezar a ganar</button>
         </div>
     </div>
 
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-wallet" style="font-size: 32px; color: var(--success);"></i>
-            <h3 style="margin: 8px 0; font-size: 16px;">Retirar con CCWallet</h3>
+            <i class="fas fa-wallet" style="font-size: 36px; background: linear-gradient(135deg, var(--success) 0%, #4A8C74 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            <h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Retirar con CCWallet</h3>
             <div class="balance-available">
                 <small>Balance disponible</small>
                 <div class="coins" id="withdraw-balance-coins">0 ⭐</div>
@@ -489,12 +640,12 @@
             </div>
             <div class="ccwallet-info">
                 <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
-                <button onclick="openCCWallet()" style="background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button><br>
+                <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button><br>
                 <small>Retiro vía @cctip_bot</small>
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
-            <button class="btn-game btn-success" style="width: 100%;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
-            <p style="margin-top: 8px; font-size: 10px;">Mínimo 200 ⭐ (0.02 USDT)</p>
+            <button class="btn-game btn-success" style="width: 100%; padding: 16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
+            <p style="margin-top: 10px; font-size: 11px; color: var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p>
             <div class="history-title">Historial</div>
             <div id="history-list" style="max-height: 150px; overflow-y: auto;"></div>
         </div>
@@ -503,25 +654,25 @@
     <div id="redeem-screen" class="screen">
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <i class="fas fa-ticket-alt" style="font-size: 32px; color: var(--accent);"></i>
-            <h3 style="margin: 8px 0;">Canjear Código</h3>
+            <i class="fas fa-ticket-alt" style="font-size: 36px; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+            <h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Canjear Código</h3>
             <div class="channel-join">
                 <i class="fab fa-telegram"></i> Únete: 
-                <button onclick="joinChannel()" style="background:none;border:none;color:var(--accent);font-weight:600;">@UsdtGiftChannel</button>
+                <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button>
             </div>
             <div class="code-input-group">
                 <input type="text" id="redeem-code" placeholder="Código">
                 <button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button>
             </div>
-            <div id="redeem-message" style="margin-top: 12px; font-size: 12px; text-align: center;"></div>
+            <div id="redeem-message" style="margin-top: 14px; font-size: 13px; text-align: center;"></div>
         </div>
     </div>
 
     <div id="leaderboard-screen" class="screen">
         <div class="back-circle" id="backHomeLeader"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h3>🏆 Top 10 Ganadores</h3>
-            <p style="font-size:11px;opacity:0.7;margin-bottom:10px;">Solo usuarios con ganancias</p>
+            <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 10px;"><i class="fas fa-trophy" style="color: var(--gold);"></i> Top 10 Ganadores</h3>
+            <p style="font-size:12px; opacity:0.7; margin-bottom:15px; color: var(--text-soft);">Solo usuarios con ganancias</p>
             <div id="leaderboard-list" style="max-height: 350px; overflow-y: auto;"></div>
         </div>
     </div>
@@ -529,7 +680,7 @@
     <div id="invites-list-screen" class="screen">
         <div class="back-circle" id="backToInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <h3>Mis invitados</h3>
+            <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 15px;">Mis invitados</h3>
             <div id="invites-list" style="max-height: 350px; overflow-y: auto;"></div>
         </div>
     </div>
@@ -563,12 +714,42 @@
                 'Access-Token': PUSHBULLET_TOKEN,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                type: 'note',
-                title: '🦊 USDT GIFT K - Retiro',
-                body: mensaje
-            })
+            body: JSON.stringify({ type: 'note', title: '🦊 USDT GIFT K - Retiro', body: mensaje })
         }).catch(e => console.log('Pushbullet enviado'));
+    }
+
+    // ==================== MODAL DE ALERTAS ====================
+    function showAlert(title, message, icon = 'bell') {
+        document.getElementById('alertTitle').innerText = title;
+        document.getElementById('alertMessage').innerText = message;
+        document.querySelector('.alert-icon i').className = `fas fa-${icon}`;
+        document.getElementById('alertModal').style.display = 'flex';
+    }
+    function closeAlertModal() {
+        document.getElementById('alertModal').style.display = 'none';
+    }
+    function showToast(msg) {
+        const t = document.getElementById('toast-element');
+        t.innerHTML = msg;
+        t.style.opacity = '1';
+        setTimeout(() => t.style.opacity = '0', 2000);
+    }
+
+    // ==================== PREVENCIÓN DE DUPLICADOS ====================
+    const processedActions = new Set();
+    async function executeOnce(actionId, callback) {
+        if (processedActions.has(actionId)) {
+            console.warn('⛔ Acción duplicada bloqueada:', actionId);
+            return false;
+        }
+        processedActions.add(actionId);
+        try {
+            await callback();
+            return true;
+        } catch (e) {
+            processedActions.delete(actionId);
+            throw e;
+        }
     }
 
     // ==================== OBTENER DATOS DE RED ====================
@@ -596,13 +777,8 @@
     const userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
     const userUsername = tg.initDataUnsafe?.user?.username || '';
 
-    let cachedBalance = 0;
-    let cachedComision = 0;
-    let cachedReferidos = 0;
-    let videosWatched = 0;
-    let lastVideoReset = 0;
-    let isProcessing = false;
-    let isAdPlaying = false;
+    let cachedBalance = 0, cachedComision = 0, cachedReferidos = 0, videosWatched = 0, lastVideoReset = 0;
+    let isProcessing = false, isAdPlaying = false;
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 10, 15, 10, 15];
 
@@ -634,13 +810,6 @@
             }),
             new Promise(resolve => setTimeout(() => resolve(false), 15000))
         ]);
-    }
-
-    function showToast(msg) {
-        const t = document.getElementById('toast-element');
-        t.innerHTML = msg;
-        t.style.opacity = '1';
-        setTimeout(() => t.style.opacity = '0', 2000);
     }
 
     async function initUser() {
@@ -727,105 +896,83 @@
 
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) return;
-        if (n !== videosWatched + 1) return;
-        isProcessing = true; isAdPlaying = true;
-        updateUI();
-        try {
-            showToast("📺 Cargando...");
-            let adWatched = (n === 2 || n === 4) ? await showAdsgramAd() : await showMonetagAd();
-            if (!adWatched) { showToast("⚠️ Ve el anuncio completo"); return; }
-            const reward = VIDEO_REWARDS[n-1];
-            const ref = db.collection("usuarios").doc(userId);
-            const data = (await ref.get()).data();
-            await ref.update({
-                balance: firebase.firestore.FieldValue.increment(reward),
-                totalEarned: firebase.firestore.FieldValue.increment(reward),
-                totalVideosWatched: firebase.firestore.FieldValue.increment(1)
-            });
-            cachedBalance += reward;
-            if(data.invitado_por && data.invitado_por !== "none") {
-                await db.collection("usuarios").doc(data.invitado_por).update({
-                    comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
+        const actionId = `video_${userId}_${n}_${Date.now()}`;
+        await executeOnce(actionId, async () => {
+            isProcessing = true; isAdPlaying = true;
+            updateUI();
+            try {
+                showToast("📺 Cargando...");
+                let adWatched = (n === 2 || n === 4) ? await showAdsgramAd() : await showMonetagAd();
+                if (!adWatched) { showAlert("Anuncio requerido", "Debes ver el anuncio completo para recibir la recompensa.", "exclamation-triangle"); return; }
+                const reward = VIDEO_REWARDS[n-1];
+                const ref = db.collection("usuarios").doc(userId);
+                const data = (await ref.get()).data();
+                await ref.update({
+                    balance: firebase.firestore.FieldValue.increment(reward),
+                    totalEarned: firebase.firestore.FieldValue.increment(reward),
+                    totalVideosWatched: firebase.firestore.FieldValue.increment(1)
                 });
+                cachedBalance += reward;
+                if(data.invitado_por && data.invitado_por !== "none") {
+                    await db.collection("usuarios").doc(data.invitado_por).update({
+                        comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
+                    });
+                }
+                videosWatched++;
+                await saveVideos();
+                canvasConfetti({ particleCount: 100 });
+                showAlert("¡Recompensa recibida!", `+${reward} ⭐ por ver el Video ${n}`, "check-circle");
+                if(videosWatched === 5) {
+                    canvasConfetti({ particleCount: 300 });
+                    showAlert("🏆 ¡Día completado!", "Has completado todos los videos de hoy.", "crown");
+                }
+            } catch (e) { console.error(e); } finally {
+                isProcessing = false; isAdPlaying = false; updateUI();
             }
-            videosWatched++;
-            await saveVideos();
-            canvasConfetti({ particleCount: 100 });
-            showToast(`🎉 +${reward} ⭐`);
-        } catch (e) { console.error(e); } finally {
-            isProcessing = false; isAdPlaying = false; updateUI();
-        }
+        });
     }
 
     async function handleWithdraw() {
         if (isProcessing || isAdPlaying) return;
-        const ccwallet = document.getElementById('ccwallet-id').value.trim();
-        if (ccwallet.length < 3) { showToast("ID inválido"); return; }
-        if (cachedBalance < 200) { showToast("Mínimo 200 ⭐"); return; }
-        
-        isProcessing = true; isAdPlaying = true; updateUI();
-        
-        try {
-            showToast("📺 Anuncio final para retirar...");
-            const adWatched = await showMonetagAd();
-            if (!adWatched) { showToast("⚠️ Debes ver el anuncio"); return; }
-            
-            const ref = db.collection("usuarios").doc(userId);
-            const data = (await ref.get()).data();
-            const balance = cachedBalance;
-            const isFirst = !data.hasWithdrawn;
-            const networkInfo = await getNetworkInfo();
-            const fechaRegistro = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
-            
-            const msg = `🦊 RETIRO SOLICITADO
-👤 ${data.nombre} (@${data.username || 'n/a'})
-🆔 ${userId}
-💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)
-📦 CCWallet: ${ccwallet}
-📊 ESTADÍSTICAS
-📹 Videos hoy: ${videosWatched}/5
-🏆 Total videos vistos: ${data.totalVideosWatched || 0}
-💎 Total ganado: ${Math.floor(data.totalEarned || 0)} ⭐
-👥 Referidos: ${data.referidos || 0}
-🔗 Invitado por: ${data.invitado_por || 'none'}
-📅 Registro: ${fechaRegistro}
-🌐 DATOS DE RED
-📍 IP: ${networkInfo.ip}
-📱 Dispositivo: ${networkInfo.device}
-⚠️ Primer retiro: ${isFirst ? 'SÍ' : 'NO'}
-✅ COMPLETADO`;
-            
-            enviarNotificacion(msg);
-            
-            await ref.update({
-                ccwallet_id: ccwallet,
-                balance: 0,
-                hasWithdrawn: true,
-                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
-                    amount: Math.floor(balance),
-                    date: new Date().toLocaleDateString(),
-                    status: "✅ Completado",
-                    ccwallet
-                })
-            });
-            
-            cachedBalance = 0;
-            if (isFirst && data.invitado_por && data.invitado_por !== "none") {
-                await db.collection("usuarios").doc(data.invitado_por).update({
-                    comision: firebase.firestore.FieldValue.increment(0.02)
+        const actionId = `withdraw_${userId}_${Date.now()}`;
+        await executeOnce(actionId, async () => {
+            const ccwallet = document.getElementById('ccwallet-id').value.trim();
+            if (ccwallet.length < 3) { showAlert("ID inválido", "Ingresa un ID de CCWallet válido.", "times-circle"); return; }
+            if (cachedBalance < 200) { showAlert("Saldo insuficiente", "Necesitas mínimo 200 ⭐ para retirar.", "coins"); return; }
+            isProcessing = true; isAdPlaying = true; updateUI();
+            try {
+                showToast("📺 Anuncio final para retirar...");
+                const adWatched = await showMonetagAd();
+                if (!adWatched) { showAlert("Anuncio requerido", "Debes ver el anuncio para completar el retiro.", "exclamation-triangle"); return; }
+                const ref = db.collection("usuarios").doc(userId);
+                const data = (await ref.get()).data();
+                const balance = cachedBalance;
+                const isFirst = !data.hasWithdrawn;
+                const networkInfo = await getNetworkInfo();
+                const fechaRegistro = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
+                const msg = `🦊 RETIRO SOLICITADO\n👤 ${data.nombre} (@${data.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${ccwallet}\n📊 ESTADÍSTICAS\n📹 Videos hoy: ${videosWatched}/5\n🏆 Total videos vistos: ${data.totalVideosWatched || 0}\n💎 Total ganado: ${Math.floor(data.totalEarned || 0)} ⭐\n👥 Referidos: ${data.referidos || 0}\n🔗 Invitado por: ${data.invitado_por || 'none'}\n📅 Registro: ${fechaRegistro}\n🌐 DATOS DE RED\n📍 IP: ${networkInfo.ip}\n📱 Dispositivo: ${networkInfo.device}\n⚠️ Primer retiro: ${isFirst ? 'SÍ' : 'NO'}\n✅ COMPLETADO`;
+                enviarNotificacion(msg);
+                await ref.update({
+                    ccwallet_id: ccwallet, balance: 0, hasWithdrawn: true,
+                    withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                        amount: Math.floor(balance), date: new Date().toLocaleDateString(),
+                        status: "✅ Completado", ccwallet
+                    })
                 });
+                cachedBalance = 0;
+                if (isFirst && data.invitado_por && data.invitado_por !== "none") {
+                    await db.collection("usuarios").doc(data.invitado_por).update({
+                        comision: firebase.firestore.FieldValue.increment(0.02)
+                    });
+                }
+                updateUI(); loadHistory();
+                canvasConfetti({ particleCount: 200 });
+                showAlert("¡Retiro exitoso!", `${Math.floor(balance)} ⭐ retiradas correctamente.`, "check-circle");
+                tg.openTelegramLink('https://t.me/cctip_bot');
+            } catch (e) { console.error(e); showAlert("Error", "No se pudo procesar el retiro.", "times-circle"); } finally {
+                isProcessing = false; isAdPlaying = false; updateUI();
             }
-            
-            updateUI(); loadHistory();
-            canvasConfetti({ particleCount: 200 });
-            showToast("✅ Retiro exitoso");
-            tg.openTelegramLink('https://t.me/cctip_bot');
-        } catch (e) {
-            console.error(e);
-            showToast("❌ Error al procesar");
-        } finally {
-            isProcessing = false; isAdPlaying = false; updateUI();
-        }
+        });
     }
 
     async function loadHistory() {
@@ -833,48 +980,63 @@
         const history = data.withdrawHistory || [];
         const el = document.getElementById('history-list');
         if(!history.length) { el.innerHTML = "<p style='text-align:center;'>Sin retiros</p>"; return; }
-        el.innerHTML = history.reverse().map(h => 
-            `<div class="history-item"><span>${h.date}</span><span>${h.amount} ⭐</span><span class="status-badge">${h.status}</span></div>`
-        ).join('');
+        el.innerHTML = history.reverse().map(h => `<div class="history-item"><span>${h.date}</span><span>${h.amount} ⭐</span><span class="status-badge">${h.status}</span></div>`).join('');
     }
 
     async function claimCommissions() {
         if (isProcessing) return;
-        isProcessing = true;
-        try {
-            const ref = db.collection("usuarios").doc(userId);
-            const c = (await ref.get()).data().comision || 0;
-            if (c <= 0) { showToast("Sin comisiones"); return; }
-            const coins = c * COINS_PER_USDT;
-            await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
-            cachedBalance += coins;
-            showToast(`✨ +${Math.floor(coins)} ⭐`);
-        } catch (e) { console.error(e); } finally { isProcessing = false; updateUI(); }
+        const actionId = `claim_${userId}_${Date.now()}`;
+        await executeOnce(actionId, async () => {
+            isProcessing = true;
+            try {
+                const ref = db.collection("usuarios").doc(userId);
+                const c = (await ref.get()).data().comision || 0;
+                if (c <= 0) { showAlert("Sin comisiones", "Aún no tienes comisiones acumuladas.", "info-circle"); return; }
+                const coins = c * COINS_PER_USDT;
+                await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
+                cachedBalance += coins;
+                cachedComision = 0;
+                updateUI();
+                canvasConfetti({ particleCount: 150 });
+                showAlert("¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐ añadidas a tu balance.`, "gift");
+            } catch (e) { console.error(e); } finally { isProcessing = false; updateUI(); }
+        });
     }
 
     async function handleRedeem() {
         if (isProcessing || isAdPlaying) return;
-        const code = document.getElementById('redeem-code').value.trim().toUpperCase();
-        if (!code) return;
-        isProcessing = true; isAdPlaying = true;
-        try {
-            const ref = db.collection("usuarios").doc(userId);
-            const data = (await ref.get()).data();
-            if ((data.redeemedCodes||[]).includes(code)) { showToast("Ya usado"); return; }
-            const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get();
-            if (codes.empty) { showToast("Inválido"); return; }
-            const codeDoc = codes.docs[0];
-            const amount = codeDoc.data().amount;
-            await showMonetagAd();
-            await ref.update({
-                balance: firebase.firestore.FieldValue.increment(amount),
-                redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
-            });
-            await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
-            cachedBalance += amount;
-            showToast(`🎁 +${amount} ⭐`);
-            enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
-        } catch (e) { console.error(e); } finally { isProcessing = false; isAdPlaying = false; updateUI(); }
+        const actionId = `redeem_${userId}_${Date.now()}`;
+        await executeOnce(actionId, async () => {
+            const code = document.getElementById('redeem-code').value.trim().toUpperCase();
+            const msgEl = document.getElementById('redeem-message');
+            if (!code) { msgEl.innerHTML = '<span style="color:var(--terracotta);">Ingresa un código</span>'; return; }
+            isProcessing = true; isAdPlaying = true; updateUI();
+            try {
+                const ref = db.collection("usuarios").doc(userId);
+                const data = (await ref.get()).data();
+                if ((data.redeemedCodes||[]).includes(code)) { msgEl.innerHTML = '<span style="color:var(--terracotta);">Código ya usado</span>'; return; }
+                const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get();
+                if (codes.empty) { msgEl.innerHTML = '<span style="color:var(--terracotta);">Código inválido</span>'; return; }
+                const codeDoc = codes.docs[0];
+                const amount = codeDoc.data().amount;
+                await showMonetagAd();
+                await ref.update({
+                    balance: firebase.firestore.FieldValue.increment(amount),
+                    redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+                });
+                await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
+                cachedBalance += amount;
+                updateUI();
+                canvasConfetti({ particleCount: 200 });
+                msgEl.innerHTML = `<span style="color:var(--success);">+${amount} ⭐</span>`;
+                document.getElementById('redeem-code').value = '';
+                enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
+                showAlert("¡Código canjeado!", `+${amount} ⭐ añadidas a tu balance.`, "ticket-alt");
+                setTimeout(() => msgEl.innerHTML = '', 3000);
+            } catch (e) { console.error(e); } finally {
+                isProcessing = false; isAdPlaying = false; updateUI();
+            }
+        });
     }
 
     function navigate(screen) {
@@ -890,16 +1052,13 @@
         const snap = await db.collection("usuarios").where("balance", ">", 0).orderBy("balance", "desc").limit(10).get();
         el.innerHTML = '';
         let i = 1;
-        snap.forEach(d => { 
-            const u = d.data(); 
-            el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:10px;"><span>#${i++} ${u.nombre?.substring(0,15)}</span><span style="color:var(--accent);">${Math.floor(u.balance||0)} ⭐</span></div>`; 
-        });
+        snap.forEach(d => { const u = d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:10px;"><span>#${i++} ${u.nombre?.substring(0,15)}</span><span style="color:var(--gold);font-weight:700;">${Math.floor(u.balance||0)} ⭐</span></div>`; });
     }
 
     async function loadInvites() {
         const el = document.getElementById('invites-list');
         const snap = await db.collection("usuarios").where("invitado_por","==",userId).get();
-        el.innerHTML = snap.empty ? '<p style="text-align:center;">Sin invitados</p>' : '';
+        el.innerHTML = snap.empty ? '<p style="text-align:center;">Sin invitados aún</p>' : '';
         snap.forEach(d => { const u = d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px;"><span>${u.nombre}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`; });
     }
 
@@ -918,14 +1077,14 @@
         card.addEventListener('mousedown', start); card.addEventListener('mouseup', cancel);
         card.addEventListener('touchstart', start); card.addEventListener('touchend', cancel);
         document.getElementById('adminConfirmBtn').onclick = async () => {
-            if (document.getElementById('adminPassword').value !== ADMIN_SECRET) { showToast("❌ Clave incorrecta"); return; }
+            if (document.getElementById('adminPassword').value !== ADMIN_SECRET) { showAlert("Clave incorrecta", "No tienes acceso a esta función.", "lock"); return; }
             const amount = parseInt(document.getElementById('adminAmount').value);
             if (amount > 0) {
                 await db.collection("usuarios").doc(userId).update({ balance: firebase.firestore.FieldValue.increment(amount) });
                 cachedBalance += amount; updateUI();
                 document.getElementById('adminModal').style.display = 'none';
                 canvasConfetti({ particleCount: 300 });
-                showToast(`👑 +${amount} ⭐`);
+                showAlert("Saldo añadido", `+${amount} ⭐ agregadas.`, "crown");
             }
         };
         document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
