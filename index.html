@@ -392,37 +392,26 @@
 
     function initAdsgram() { if (!adsgramInit && window.Adsgrm) { window.Adsgrm.init({ blockId: ADSGRAM_BLOCK_ID }); adsgramInit = true; } }
     
-    // ==================== FUNCIONES DE ANUNCIOS ARREGLADAS ====================
     async function showMonetagAd() {
         return new Promise((resolve) => {
+            const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
             try {
                 if (typeof show_10853207 === 'function') {
-                    show_10853207().then(() => { hideAdLoader(); resolve(true); }).catch(() => { hideAdLoader(); resolve(false); });
-                } else {
-                    resolve(true);
-                }
-            } catch (e) {
-                resolve(true);
-            }
-            // Temporizador de seguridad solo si el anuncio no responde
-            setTimeout(() => { hideAdLoader(); resolve(true); }, 8000);
+                    show_10853207().then(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); }).catch(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); });
+                } else { clearTimeout(timeout); hideAdLoader(); resolve(true); }
+            } catch (e) { clearTimeout(timeout); hideAdLoader(); resolve(true); }
         });
     }
     
     async function showAdsgramAd() {
         initAdsgram();
         return new Promise((resolve) => {
+            const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
             try {
                 if (window.Adsgrm && window.Adsgrm.show) {
-                    window.Adsgrm.show().then(() => { hideAdLoader(); resolve(true); }).catch(() => { hideAdLoader(); resolve(false); });
-                } else {
-                    resolve(true);
-                }
-            } catch (e) {
-                resolve(true);
-            }
-            // Temporizador de seguridad solo si el anuncio no responde
-            setTimeout(() => { hideAdLoader(); resolve(true); }, 8000);
+                    window.Adsgrm.show().then(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); }).catch(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); });
+                } else { clearTimeout(timeout); hideAdLoader(); resolve(true); }
+            } catch (e) { clearTimeout(timeout); hideAdLoader(); resolve(true); }
         });
     }
 
@@ -461,41 +450,68 @@
     function checkReset() { const n = Date.now(); if(!lastVideoReset) { lastVideoReset = n; saveVideos(); } else if((n - lastVideoReset)/3600000 >= 24) { videosWatched = 0; lastVideoReset = n; updateUI(); saveVideos(); } }
     function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
-    // ==================== VER VIDEO ====================
+    // ==================== VER VIDEO (REEMPLAZADA SEGÚN INSTRUCCIÓN EXACTA) ====================
     async function watchVideo(n) {
-        if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
-        if (n !== videosWatched + 1) { showAlert("Orden incorrecto", `Primero debes ver el video #${videosWatched + 1}.`, "exclamation-triangle"); return; }
-        if (videosWatched >= 5) { showAlert("¡Completado!", "Ya has visto los 5 videos de hoy.", "check-circle"); return; }
-        
-        const id = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
-        isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
+        // 1. Verificación básica
+        if (n !== videosWatched + 1) {
+            showAlert("Orden incorrecto", `Mira primero el video #${videosWatched + 1}`, "exclamation-triangle");
+            return;
+        }
+
+        // 2. Desbloqueo de emergencia: Si se queda pegado más de 15 segundos, se libera
+        if (isProcessing) {
+            showToast("⏳ Reintentando conexión...");
+            setTimeout(() => { isProcessing = false; isAdPlaying = false; hideAdLoader(); }, 15000);
+            if (isAdPlaying) return; 
+        }
+
+        isProcessing = true;
+        isAdPlaying = true;
+        updateUI();
+        showAdLoader();
+
         try {
-            await executeOnce(id, async () => {
-                let adWatched = (n === 2 || n === 4) ? await showAdsgramAd() : await showMonetagAd();
-                if (!adWatched) throw new Error("Anuncio no completado");
-                
+            let adResult = false;
+            
+            // 3. Intento de mostrar el anuncio
+            if (n === 2 || n === 4) {
+                console.log("Cargando Adsgram...");
+                adResult = await showAdsgramAd();
+            } else {
+                console.log("Cargando Monetag...");
+                adResult = await showMonetagAd();
+            }
+
+            // 4. Si el anuncio devolvió algo (aunque sea error), seguimos
+            if (adResult === true) {
                 const reward = VIDEO_REWARDS[n-1];
                 const ref = db.collection("usuarios").doc(userId);
-                const data = (await ref.get()).data();
                 
                 await ref.update({
                     balance: firebase.firestore.FieldValue.increment(reward),
-                    totalEarned: firebase.firestore.FieldValue.increment(reward),
-                    totalVideosWatched: firebase.firestore.FieldValue.increment(1)
+                    totalVideosWatched: firebase.firestore.FieldValue.increment(1),
+                    videosWatched: n
                 });
-                
+
                 balance += reward;
-                if(data.invitado_por && data.invitado_por !== "none") {
-                    await db.collection("usuarios").doc(data.invitado_por).update({
-                        comision: firebase.firestore.FieldValue.increment(reward / COINS_PER_USDT * 0.10)
-                    }).catch(()=>{});
-                }
-                videosWatched++; await saveVideos();
-                showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por ver el Video ${n}`, "check-circle");
-                if(videosWatched === 5) showAlert("🏆 ¡Día completado!", "Has completado todos los videos de hoy. ¡Increíble!", "crown");
-            });
-        } catch (e) { showAlert("Error", e.message || "No se pudo completar el video. Intenta de nuevo.", "times-circle"); } 
-        finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); }
+                videosWatched = n;
+                await saveVideos();
+                showAlert("¡Éxito!", `Ganaste ${reward} ⭐`, "check-circle");
+            } else {
+                // Si el anuncio falló o no había stock en Venezuela
+                showAlert("Sin anuncios", "No hay videos disponibles en este momento. Intenta de nuevo en un minuto.", "info-circle");
+            }
+
+        } catch (e) {
+            console.error("Error crítico:", e);
+            showAlert("Error de red", "La conexión con el servidor de anuncios falló.");
+        } finally {
+            // 5. LO MÁS IMPORTANTE: Limpiar todo para que el botón vuelva a funcionar
+            isProcessing = false;
+            isAdPlaying = false;
+            hideAdLoader();
+            updateUI();
+        }
     }
 
     // ==================== RETIRAR ====================
@@ -545,7 +561,7 @@
         finally { isProcessing = false; }
     }
     
-    // ==================== CANJEAR CÓDIGO (MUESTRA MONEDAS GANADAS) ====================
+    // ==================== CANJEAR CÓDIGO ====================
     async function handleRedeem() {
         if (isProcessing || isAdPlaying) return;
         const codeInput = document.getElementById('redeem-code');
