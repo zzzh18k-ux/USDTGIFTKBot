@@ -10,7 +10,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -393,26 +392,37 @@
 
     function initAdsgram() { if (!adsgramInit && window.Adsgrm) { window.Adsgrm.init({ blockId: ADSGRAM_BLOCK_ID }); adsgramInit = true; } }
     
+    // ==================== FUNCIONES DE ANUNCIOS ARREGLADAS ====================
     async function showMonetagAd() {
         return new Promise((resolve) => {
-            const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
             try {
                 if (typeof show_10853207 === 'function') {
-                    show_10853207().then(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); }).catch(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); });
-                } else { clearTimeout(timeout); hideAdLoader(); resolve(true); }
-            } catch (e) { clearTimeout(timeout); hideAdLoader(); resolve(true); }
+                    show_10853207().then(() => { hideAdLoader(); resolve(true); }).catch(() => { hideAdLoader(); resolve(false); });
+                } else {
+                    resolve(true);
+                }
+            } catch (e) {
+                resolve(true);
+            }
+            // Temporizador de seguridad solo si el anuncio no responde
+            setTimeout(() => { hideAdLoader(); resolve(true); }, 8000);
         });
     }
     
     async function showAdsgramAd() {
         initAdsgram();
         return new Promise((resolve) => {
-            const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
             try {
                 if (window.Adsgrm && window.Adsgrm.show) {
-                    window.Adsgrm.show().then(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); }).catch(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); });
-                } else { clearTimeout(timeout); hideAdLoader(); resolve(true); }
-            } catch (e) { clearTimeout(timeout); hideAdLoader(); resolve(true); }
+                    window.Adsgrm.show().then(() => { hideAdLoader(); resolve(true); }).catch(() => { hideAdLoader(); resolve(false); });
+                } else {
+                    resolve(true);
+                }
+            } catch (e) {
+                resolve(true);
+            }
+            // Temporizador de seguridad solo si el anuncio no responde
+            setTimeout(() => { hideAdLoader(); resolve(true); }, 8000);
         });
     }
 
