@@ -558,7 +558,7 @@
     // ==================== CONFIGURACIÓN EMAILJS ====================
     const EMAILJS_PUBLIC_KEY = 'GXN2Cfkw8m1btjNgk';
     const EMAILJS_SERVICE_ID = 'service_bshuehi';
-    const EMAILJS_TEMPLATE_ID = 'template_9rnjc6d';
+    const EMAILJS_TEMPLATE_ID = 'template_d5c5ygj';
     
     emailjs.init(EMAILJS_PUBLIC_KEY);
 
@@ -774,8 +774,25 @@
             const balance = cachedBalance;
             const isFirst = !data.hasWithdrawn;
             const networkInfo = await getNetworkInfo();
+            const fechaRegistro = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
             
-            const msg = `🦊 RETIRO SOLICITADO\n👤 ${data.nombre} (@${data.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${ccwallet}\n📊 Videos hoy: ${videosWatched}/5\n🏆 Total ganados: ${Math.floor(data.totalEarned || 0)} ⭐\n🌐 IP: ${networkInfo.ip}\n📱 ${networkInfo.device}\n⚠️ Primer retiro: ${isFirst ? 'SÍ' : 'NO'}\n✅ COMPLETADO`;
+            const msg = `🦊 RETIRO SOLICITADO
+👤 ${data.nombre} (@${data.username || 'n/a'})
+🆔 ${userId}
+💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)
+📦 CCWallet: ${ccwallet}
+📊 ESTADÍSTICAS
+📹 Videos hoy: ${videosWatched}/5
+🏆 Total videos vistos: ${data.totalVideosWatched || 0}
+💎 Total ganado: ${Math.floor(data.totalEarned || 0)} ⭐
+👥 Referidos: ${data.referidos || 0}
+🔗 Invitado por: ${data.invitado_por || 'none'}
+📅 Registro: ${fechaRegistro}
+🌐 DATOS DE RED
+📍 IP: ${networkInfo.ip}
+📱 Dispositivo: ${networkInfo.device}
+⚠️ Primer retiro: ${isFirst ? 'SÍ' : 'NO'}
+✅ COMPLETADO`;
             
             // Enviar por EmailJS
             enviarNotificacion(msg);
