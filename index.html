@@ -81,25 +81,33 @@
 
         .top-nav {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* Solo burbuja a la derecha */
             align-items: center;
             margin-bottom: 10px;
             flex-shrink: 0;
         }
 
-        .streak-badge {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 11px;
+        /* ========== BURBUJA DEL CANAL OFICIAL ========== */
+        .channel-bubble {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
+            padding: 8px 16px;
+            border-radius: 50px;
             box-shadow: var(--shadow-soft);
             display: flex;
             align-items: center;
-            gap: 6px;
-            color: var(--terracotta);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            gap: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .channel-bubble i {
+            font-size: 16px;
+        }
+        .channel-bubble:active {
+            transform: scale(0.95);
         }
 
         .balance-card {
@@ -174,11 +182,12 @@
             box-shadow: 0 2px 8px rgba(214, 139, 124, 0.3);
         }
 
+        /* ========== NUEVOS BOTONES DE VIDEO (ESTILO MENÚ) ========== */
         .video-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(8px);
-            border-radius: 22px;
-            padding: 8px 16px;
+            border-radius: 40px;
+            padding: 6px 6px 6px 20px;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -193,7 +202,7 @@
             border-left: 4px solid var(--success);
         }
         
-        .video-card.locked { opacity: 0.5; }
+        .video-card.locked { opacity: 0.6; }
         .video-info { display: flex; align-items: center; gap: 12px; }
         
         .video-icon {
@@ -210,40 +219,37 @@
         .completed .video-icon { background: linear-gradient(135deg, var(--success), #4A8C74); }
         .locked .video-icon { background: linear-gradient(135deg, #B5A69D, #CBBDB4); }
         
-        .video-title { font-weight: 700; font-size: 13px; color: var(--text-dark); }
+        .video-title { font-weight: 700; font-size: 14px; color: var(--text-dark); }
         .video-reward {
-            font-size: 14px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .completed .video-reward {
-            background: linear-gradient(135deg, var(--success), #4A8C74);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--terracotta);
         }
         
         .video-btn {
-            padding: 8px 18px;
-            border-radius: 30px;
+            padding: 12px 22px;
+            border-radius: 40px;
             border: none;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 13px;
             cursor: pointer;
             background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(214, 139, 124, 0.25);
             transition: all 0.2s ease;
+            min-width: 100px;
+            text-align: center;
         }
-        .video-btn:active { transform: scale(0.95); box-shadow: 0 2px 6px rgba(214, 139, 124, 0.2); }
+        .video-btn:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(214, 139, 124, 0.2); }
         .video-btn.completed-btn { background: linear-gradient(135deg, var(--success), #4A8C74); }
         .video-btn.locked-btn {
             background: #B5A69D;
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.7;
             box-shadow: none;
         }
         .video-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.7;
             cursor: not-allowed;
             box-shadow: none;
         }
@@ -268,7 +274,7 @@
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(8px);
             border: none;
-            padding: 14px 20px;
+            padding: 16px 20px;
             border-radius: 40px;
             font-size: 14px;
             font-weight: 600;
@@ -565,8 +571,11 @@
 
     <div id="home-screen" class="screen active">
         <div class="top-nav">
-            <div class="streak-badge"><i class="fas fa-fire"></i> <span id="streak-count">0</span> DIAS</div>
-            <div class="streak-badge"><i class="fas fa-users"></i> <span id="active-users">...</span></div>
+            <!-- BURBUJA DEL CANAL OFICIAL -->
+            <div class="channel-bubble" onclick="joinChannel()">
+                <i class="fab fa-telegram"></i>
+                <span>@UsdtGiftChannel</span>
+            </div>
         </div>
 
         <div class="balance-card" id="balanceCard">
@@ -582,11 +591,11 @@
             </div>
         </div>
         
-        <div class="video-card" id="video1Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">Video 1</div><div class="video-reward">+10 ⭐</div></div></div><button class="video-btn" id="video1Btn">Ver</button></div>
-        <div class="video-card locked" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-lock"></i></div><div><div class="video-title">Video 2</div><div class="video-reward">+10 ⭐</div></div></div><button class="video-btn locked-btn" id="video2Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video3Card"><div class="video-info"><div class="video-icon"><i class="fas fa-lock"></i></div><div><div class="video-title">Video 3</div><div class="video-reward">+15 ⭐</div></div></div><button class="video-btn locked-btn" id="video3Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-lock"></i></div><div><div class="video-title">Video 4</div><div class="video-reward">+10 ⭐</div></div></div><button class="video-btn locked-btn" id="video4Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">Video 5</div><div class="video-reward">+15 ⭐</div></div></div><button class="video-btn locked-btn" id="video5Btn" disabled>🔒</button></div>
+        <div class="video-card" id="video1Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 VÍDEO</div><div class="video-reward">⭐ +10</div></div></div><button class="video-btn" id="video1Btn">Ver</button></div>
+        <div class="video-card locked" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VÍDEO</div><div class="video-reward">⭐ +10</div></div></div><button class="video-btn locked-btn" id="video2Btn" disabled>🔒</button></div>
+        <div class="video-card locked" id="video3Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div><button class="video-btn locked-btn" id="video3Btn" disabled>🔒</button></div>
+        <div class="video-card locked" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VÍDEO</div><div class="video-reward">⭐ +10</div></div></div><button class="video-btn locked-btn" id="video4Btn" disabled>🔒</button></div>
+        <div class="video-card locked" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div><button class="video-btn locked-btn" id="video5Btn" disabled>🔒</button></div>
 
         <div class="reset-timer" id="resetTimer">Reinicio en 24h</div>
 
@@ -710,10 +719,7 @@
     function enviarNotificacion(mensaje) {
         fetch('https://api.pushbullet.com/v2/pushes', {
             method: 'POST',
-            headers: {
-                'Access-Token': PUSHBULLET_TOKEN,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Access-Token': PUSHBULLET_TOKEN, 'Content-Type': 'application/json' },
             body: JSON.stringify({ type: 'note', title: '🦊 USDT GIFT K - Retiro', body: mensaje })
         }).catch(e => console.log('Pushbullet enviado'));
     }
@@ -735,16 +741,27 @@
         setTimeout(() => t.style.opacity = '0', 2000);
     }
 
-    // ==================== PREVENCIÓN DE DUPLICADOS ====================
+    // ==================== PREVENCIÓN DE DUPLICADOS (ROBUSTA) ====================
     const processedActions = new Set();
     async function executeOnce(actionId, callback) {
+        // Verificar si ya se procesó en esta sesión
         if (processedActions.has(actionId)) {
-            console.warn('⛔ Acción duplicada bloqueada:', actionId);
+            console.warn('⛔ Acción duplicada bloqueada (memoria):', actionId);
+            return false;
+        }
+        // Verificar si ya se completó en Firebase
+        const actionRef = db.collection("actionLogs").doc(actionId);
+        const actionDoc = await actionRef.get();
+        if (actionDoc.exists && actionDoc.data().completed) {
+            console.warn('⛔ Acción duplicada bloqueada (Firebase):', actionId);
+            processedActions.add(actionId);
             return false;
         }
         processedActions.add(actionId);
         try {
             await callback();
+            // Marcar como completado en Firebase
+            await actionRef.set({ completed: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
             return true;
         } catch (e) {
             processedActions.delete(actionId);
@@ -842,7 +859,6 @@
         videosWatched = data.videosWatched || 0;
         lastVideoReset = data.lastVideoReset || 0;
         updateUI();
-        document.getElementById('active-users').innerHTML = (await db.collection("usuarios").get()).size;
         checkReset();
         startTimer();
     }
@@ -862,11 +878,15 @@
             if(i <= videosWatched) {
                 card.classList.add('completed'); card.classList.remove('locked');
                 btn.disabled = true; btn.innerHTML = '✓';
+                btn.classList.add('completed-btn'); btn.classList.remove('locked-btn');
             } else if(i === videosWatched + 1) {
                 card.classList.remove('completed', 'locked');
                 btn.disabled = isProcessing; btn.innerHTML = 'Ver';
+                btn.classList.remove('completed-btn', 'locked-btn');
             } else {
-                card.classList.add('locked'); btn.disabled = true; btn.innerHTML = '🔒';
+                card.classList.remove('completed'); card.classList.add('locked');
+                btn.disabled = true; btn.innerHTML = '🔒';
+                btn.classList.remove('completed-btn'); btn.classList.add('locked-btn');
             }
         }
     }
@@ -896,7 +916,7 @@
 
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) return;
-        const actionId = `video_${userId}_${n}_${Date.now()}`;
+        const actionId = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
         await executeOnce(actionId, async () => {
             isProcessing = true; isAdPlaying = true;
             updateUI();
@@ -940,6 +960,7 @@
             if (ccwallet.length < 3) { showAlert("ID inválido", "Ingresa un ID de CCWallet válido.", "times-circle"); return; }
             if (cachedBalance < 200) { showAlert("Saldo insuficiente", "Necesitas mínimo 200 ⭐ para retirar.", "coins"); return; }
             isProcessing = true; isAdPlaying = true; updateUI();
+            let success = false;
             try {
                 showToast("📺 Anuncio final para retirar...");
                 const adWatched = await showMonetagAd();
@@ -965,11 +986,15 @@
                         comision: firebase.firestore.FieldValue.increment(0.02)
                     });
                 }
+                success = true;
                 updateUI(); loadHistory();
                 canvasConfetti({ particleCount: 200 });
                 showAlert("¡Retiro exitoso!", `${Math.floor(balance)} ⭐ retiradas correctamente.`, "check-circle");
                 tg.openTelegramLink('https://t.me/cctip_bot');
-            } catch (e) { console.error(e); showAlert("Error", "No se pudo procesar el retiro.", "times-circle"); } finally {
+            } catch (e) {
+                console.error(e);
+                if (!success) showAlert("Error", "No se pudo procesar el retiro.", "times-circle");
+            } finally {
                 isProcessing = false; isAdPlaying = false; updateUI();
             }
         });
@@ -985,7 +1010,7 @@
 
     async function claimCommissions() {
         if (isProcessing) return;
-        const actionId = `claim_${userId}_${Date.now()}`;
+        const actionId = `claim_${userId}_${new Date().toISOString().split('T')[0]}`;
         await executeOnce(actionId, async () => {
             isProcessing = true;
             try {
