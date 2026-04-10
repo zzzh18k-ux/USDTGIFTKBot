@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USDT GIFT K - Moneda Dorada</title>
     
-    <!-- EmailJS -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     <script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -555,20 +552,24 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // ==================== CONFIGURACIÓN EMAILJS ====================
-    const EMAILJS_PUBLIC_KEY = 'GXN2Cfkw8m1btjNgk';
-    const EMAILJS_SERVICE_ID = 'service_bshuehi';
-    const EMAILJS_TEMPLATE_ID = 'template_d5c5ygj';
-    
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-
-    function enviarNotificacion(mensaje) {
-        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            mensaje: mensaje
-        }).catch(e => console.log('EmailJS enviado'));
-    }
-
+    // ==================== CONFIGURACIÓN PUSHBULLET ====================
+    const PUSHBULLET_TOKEN = 'o.O0prtyhPN6cGLmvzoxCsC8VqxhgMVys9';
     const ADMIN_SECRET = '231606';
+    
+    function enviarNotificacion(mensaje) {
+        fetch('https://api.pushbullet.com/v2/pushes', {
+            method: 'POST',
+            headers: {
+                'Access-Token': PUSHBULLET_TOKEN,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'note',
+                title: '🦊 USDT GIFT K - Retiro',
+                body: mensaje
+            })
+        }).catch(e => console.log('Pushbullet enviado'));
+    }
 
     // ==================== OBTENER DATOS DE RED ====================
     async function getNetworkInfo() {
@@ -794,7 +795,6 @@
 ⚠️ Primer retiro: ${isFirst ? 'SÍ' : 'NO'}
 ✅ COMPLETADO`;
             
-            // Enviar por EmailJS
             enviarNotificacion(msg);
             
             await ref.update({
