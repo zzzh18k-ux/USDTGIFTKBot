@@ -131,7 +131,7 @@
             width: 100%;
             max-width: 450px;
             height: 100vh;
-            padding: 8px 14px;
+            padding: 6px 14px;
             display: flex;
             flex-direction: column;
             z-index: 1;
@@ -143,48 +143,42 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            overflow-y: auto;
-            padding-bottom: 8px;
+            overflow-y: visible;
+            padding-bottom: 0;
         }
         .screen.active { display: flex; }
-        .screen::-webkit-scrollbar { display: none; }
-        .screen { -ms-overflow-style: none; scrollbar-width: none; }
 
         .top-nav {
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             flex-shrink: 0;
         }
 
         /* ========== BURBUJA DEL CANAL OFICIAL ========== */
         .channel-bubble {
             background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 50px;
             box-shadow: var(--shadow-soft);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             color: white;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 10px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .channel-bubble i {
-            font-size: 14px;
-        }
-        .channel-bubble:active {
-            transform: scale(0.95);
-        }
+        .channel-bubble i { font-size: 12px; }
+        .channel-bubble:active { transform: scale(0.95); }
 
         .balance-card {
             text-align: center;
-            margin: 4px 0 8px;
-            padding: 12px 8px;
+            margin: 2px 0 5px;
+            padding: 8px 6px;
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
             border-radius: 40px;
@@ -195,7 +189,7 @@
         }
         
         #user-balance {
-            font-size: 44px;
+            font-size: 40px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 80%);
             -webkit-background-clip: text;
@@ -204,20 +198,20 @@
         }
         
         .balance-label {
-            font-size: 10px;
-            letter-spacing: 4px;
+            font-size: 9px;
+            letter-spacing: 3px;
             opacity: 0.7;
             color: var(--text-soft);
             font-weight: 400;
         }
 
         .section-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             flex-shrink: 0;
             color: var(--text-dark);
         }
@@ -226,8 +220,8 @@
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(8px);
             border-radius: 30px;
-            padding: 5px 14px;
-            margin: 3px 0 8px;
+            padding: 3px 12px;
+            margin: 2px 0 5px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -237,13 +231,13 @@
         
         .daily-progress span {
             font-weight: 700;
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-dark);
         }
         
-        .progress-dots { display: flex; gap: 5px; }
+        .progress-dots { display: flex; gap: 4px; }
         .dot {
-            width: 9px; height: 9px;
+            width: 8px; height: 8px;
             border-radius: 50%;
             background: rgba(214, 139, 124, 0.2);
             border: 1.5px solid rgba(255, 255, 255, 0.9);
@@ -258,8 +252,8 @@
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(8px);
             border-radius: 40px;
-            padding: 4px 4px 4px 16px;
-            margin-bottom: 6px;
+            padding: 2px 4px 2px 12px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -274,62 +268,49 @@
         }
         
         .video-card.locked { opacity: 0.6; }
-        .video-info { display: flex; align-items: center; gap: 10px; }
+        .video-info { display: flex; align-items: center; gap: 8px; }
         
         .video-icon {
-            width: 34px; height: 34px;
-            border-radius: 12px;
+            width: 30px; height: 30px;
+            border-radius: 10px;
             background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 13px;
+            font-size: 12px;
             box-shadow: 0 4px 10px rgba(214, 139, 124, 0.2);
         }
         .completed .video-icon { background: linear-gradient(135deg, var(--success), #4A8C74); }
         .locked .video-icon { background: linear-gradient(135deg, #B5A69D, #CBBDB4); }
         
-        .video-title { font-weight: 700; font-size: 13px; color: var(--text-dark); }
-        .video-reward {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--terracotta);
-        }
+        .video-title { font-weight: 700; font-size: 12px; color: var(--text-dark); }
+        .video-reward { font-size: 10px; font-weight: 600; color: var(--terracotta); }
         
         .video-btn {
-            padding: 10px 18px;
+            padding: 8px 14px;
             border-radius: 40px;
             border: none;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(214, 139, 124, 0.25);
             transition: all 0.2s ease;
-            min-width: 85px;
+            min-width: 75px;
             text-align: center;
         }
         .video-btn:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(214, 139, 124, 0.2); }
         .video-btn.completed-btn { background: linear-gradient(135deg, var(--success), #4A8C74); }
-        .video-btn.locked-btn {
-            background: #B5A69D;
-            cursor: not-allowed;
-            opacity: 0.7;
-            box-shadow: none;
-        }
-        .video-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+        .video-btn.locked-btn { background: #B5A69D; cursor: not-allowed; opacity: 0.7; box-shadow: none; }
+        .video-btn:disabled { opacity: 0.7; cursor: not-allowed; box-shadow: none; }
 
         .reset-timer {
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-soft);
-            margin: 5px 0 8px;
+            margin: 3px 0 5px;
             flex-shrink: 0;
             font-weight: 500;
         }
@@ -337,17 +318,18 @@
         .menu-grid { 
             display: flex; 
             flex-direction: column; 
-            gap: 6px; 
+            gap: 5px; 
             flex-shrink: 0;
+            margin-top: 2px;
         }
         
         .btn-game {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(8px);
             border: none;
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-radius: 40px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -656,7 +638,6 @@
 
     <div id="home-screen" class="screen active">
         <div class="top-nav">
-            <!-- BURBUJA DEL CANAL OFICIAL -->
             <div class="channel-bubble" onclick="joinChannel()">
                 <i class="fab fa-telegram"></i>
                 <span>@UsdtGiftChannel</span>
@@ -786,7 +767,7 @@
     window.addEventListener('load', function() {
         setTimeout(function() {
             document.getElementById('loading-screen').classList.add('hidden');
-        }, 4000); // 4 segundos exactos
+        }, 4000);
     });
 
     // ==================== CONFIGURACIÓN FIREBASE ====================
@@ -823,23 +804,20 @@
         document.querySelector('.alert-icon i').className = `fas fa-${icon}`;
         document.getElementById('alertModal').style.display = 'flex';
     }
-    function closeAlertModal() {
-        document.getElementById('alertModal').style.display = 'none';
-    }
+    function closeAlertModal() { document.getElementById('alertModal').style.display = 'none'; }
     function showToast(msg) {
         const t = document.getElementById('toast-element');
-        t.innerHTML = msg;
-        t.style.opacity = '1';
+        t.innerHTML = msg; t.style.opacity = '1';
         setTimeout(() => t.style.opacity = '0', 2000);
     }
 
-    // ==================== PREVENCIÓN DE DUPLICADOS (ROBUSTA) ====================
+    // ==================== PREVENCIÓN DE DUPLICADOS ====================
     const processedActions = new Set();
     async function executeOnce(actionId, callback) {
-        if (processedActions.has(actionId)) { console.warn('⛔ Acción duplicada bloqueada (memoria):', actionId); return false; }
+        if (processedActions.has(actionId)) { console.warn('⛔ Bloqueado (memoria):', actionId); return false; }
         const actionRef = db.collection("actionLogs").doc(actionId);
         const actionDoc = await actionRef.get();
-        if (actionDoc.exists && actionDoc.data().completed) { console.warn('⛔ Acción duplicada bloqueada (Firebase):', actionId); processedActions.add(actionId); return false; }
+        if (actionDoc.exists && actionDoc.data().completed) { console.warn('⛔ Bloqueado (Firebase):', actionId); processedActions.add(actionId); return false; }
         processedActions.add(actionId);
         try {
             await callback();
@@ -969,7 +947,27 @@
     }
 
     async function loadHistory() { const data = (await db.collection("usuarios").doc(userId).get()).data(); const history = data.withdrawHistory || []; const el = document.getElementById('history-list'); if(!history.length) { el.innerHTML = "<p style='text-align:center;'>Sin retiros</p>"; return; } el.innerHTML = history.reverse().map(h => `<div class="history-item"><span>${h.date}</span><span>${h.amount} ⭐</span><span class="status-badge">${h.status}</span></div>`).join(''); }
-    async function claimCommissions() { if (isProcessing) return; const actionId = `claim_${userId}_${new Date().toISOString().split('T')[0]}`; await executeOnce(actionId, async () => { isProcessing = true; try { const ref = db.collection("usuarios").doc(userId); const c = (await ref.get()).data().comision || 0; if (c <= 0) { showAlert("Sin comisiones", "Aún no tienes comisiones acumuladas.", "info-circle"); return; } const coins = c * COINS_PER_USDT; await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 }); cachedBalance += coins; cachedComision = 0; updateUI(); canvasConfetti({ particleCount: 150 }); showAlert("¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐ añadidas a tu balance.`, "gift"); } catch (e) { console.error(e); } finally { isProcessing = false; updateUI(); } }); }
+    
+    // ==================== RECLAMAR COMISIONES (ARREGLADO) ====================
+    async function claimCommissions() { 
+        if (isProcessing) return; 
+        isProcessing = true;
+        try { 
+            const ref = db.collection("usuarios").doc(userId); 
+            const doc = await ref.get();
+            const c = doc.data().comision || 0; 
+            if (c <= 0) { showAlert("Sin comisiones", "Aún no tienes comisiones acumuladas.", "info-circle"); return; } 
+            const coins = c * COINS_PER_USDT; 
+            await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 }); 
+            cachedBalance += coins; 
+            cachedComision = 0; 
+            updateUI(); 
+            canvasConfetti({ particleCount: 150 }); 
+            showAlert("¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐ añadidas a tu balance.`, "gift"); 
+        } catch (e) { console.error(e); showAlert("Error", "No se pudo reclamar.", "times-circle"); } 
+        finally { isProcessing = false; } 
+    }
+
     async function handleRedeem() { if (isProcessing || isAdPlaying) return; const actionId = `redeem_${userId}_${Date.now()}`; await executeOnce(actionId, async () => { const code = document.getElementById('redeem-code').value.trim().toUpperCase(); const msgEl = document.getElementById('redeem-message'); if (!code) { msgEl.innerHTML = '<span style="color:var(--terracotta);">Ingresa un código</span>'; return; } isProcessing = true; isAdPlaying = true; updateUI(); try { const ref = db.collection("usuarios").doc(userId); const data = (await ref.get()).data(); if ((data.redeemedCodes||[]).includes(code)) { msgEl.innerHTML = '<span style="color:var(--terracotta);">Código ya usado</span>'; return; } const codes = await db.collection("giftCodes").where("code","==",code).where("used","==",false).get(); if (codes.empty) { msgEl.innerHTML = '<span style="color:var(--terracotta);">Código inválido</span>'; return; } const codeDoc = codes.docs[0]; const amount = codeDoc.data().amount; await showMonetagAd(); await ref.update({ balance: firebase.firestore.FieldValue.increment(amount), redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code) }); await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId }); cachedBalance += amount; updateUI(); canvasConfetti({ particleCount: 200 }); msgEl.innerHTML = `<span style="color:var(--success);">+${amount} ⭐</span>`; document.getElementById('redeem-code').value = ''; enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`); showAlert("¡Código canjeado!", `+${amount} ⭐ añadidas a tu balance.`, "ticket-alt"); setTimeout(() => msgEl.innerHTML = '', 3000); } catch (e) { console.error(e); } finally { isProcessing = false; isAdPlaying = false; updateUI(); } }); }
 
     function navigate(screen) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screen).classList.add('active'); if (screen === 'withdraw-screen') loadHistory(); if (screen === 'leaderboard-screen') loadLeaderboard(); if (screen === 'invites-list-screen') loadInvites(); }
