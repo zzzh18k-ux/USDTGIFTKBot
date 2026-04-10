@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USDT GIFT K - Moneda Dorada</title>
     
-    <!-- SDKs existentes -->
+    <!-- Monetag -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
-    <script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
     
-    <!-- NUEVOS SDKs (según instrucción exacta) -->
-    <script src="https://js.onclckvd.com/in-stream-ad-admanager/tma.js"></script>
+    <!-- NUEVOS PROVEEDORES (Onelock y RichInfo) -->
+    <script src="https://api.onelock.com/onestream-ad-admanager/tma.js"></script>
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -156,7 +155,7 @@
         .daily-progress span { font-weight: 700; font-size: 10px; color: var(--text-dark); }
         .progress-dots { display: flex; gap: 4px; }
         .dot {
-            width: 6px; height: 6px;
+            width: 7px; height: 7px;
             border-radius: 50%;
             background: rgba(214,139,124,0.2);
             border: 1.5px solid rgba(255,255,255,0.9);
@@ -165,8 +164,6 @@
             background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             box-shadow: 0 2px 8px rgba(214,139,124,0.3);
         }
-
-        /* Tarjetas de video (estilo base) */
         .video-card {
             background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-radius: 40px; padding: 2px 4px 2px 12px;
             margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between;
@@ -185,15 +182,12 @@
         .locked .video-icon { background: linear-gradient(135deg, #B5A69D, #CBBDB4); }
         .video-title { font-weight: 700; font-size: 12px; color: var(--text-dark); }
         .video-reward { font-size: 10px; font-weight: 600; color: var(--terracotta); }
-
-        /* Botones de video (base) */
         .video-btn {
             padding: 8px 14px; border-radius: 40px; border: none; font-weight: 700; font-size: 11px;
             cursor: pointer; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
             color: white; box-shadow: 0 4px 12px rgba(214,139,124,0.25); transition: all 0.2s ease;
             min-width: 75px; text-align: center;
         }
-        /* Botones más pequeños para nuevos vídeos (instrucción exacta) */
         .video-btn.small-btn {
             padding: 5px 10px;
             font-size: 10px;
@@ -203,7 +197,6 @@
         .video-btn.completed-btn { background: linear-gradient(135deg, var(--success), #4A8C74); }
         .video-btn.locked-btn { background: #B5A69D; cursor: not-allowed; opacity: 0.7; box-shadow: none; }
         .video-btn:disabled { opacity: 0.7; cursor: not-allowed; box-shadow: none; }
-
         .reset-timer { text-align: center; font-size: 9px; color: var(--text-soft); margin: 3px 0 5px; flex-shrink: 0; font-weight: 500; }
         .menu-grid { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; margin-top: 2px; }
         .btn-game {
@@ -349,28 +342,40 @@
         <div class="balance-card" id="balanceCard"><div id="user-balance">0</div><div class="balance-label">⭐ MONEDAS</div></div>
         <div class="section-title"><i class="fas fa-video"></i><span>Videos diarios</span></div>
         <div class="daily-progress">
-            <span><span id="videosWatchedToday">0</span>/11 videos</span>
+            <span><span id="videosWatchedToday">0</span>/9 videos</span>
             <div class="progress-dots" id="videoDots">
-                <!-- 11 dots -->
+                <!-- 9 dots -->
                 <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
         </div>
         
-        <!-- VÍDEOS ORIGINALES (1-5). AdsGram en 2 y 4 permanecen bloqueados por instrucción -->
+        <!-- VÍDEO 1 (Monetag) -->
         <div class="video-card" id="video1Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 VÍDEO</div><div class="video-reward">⭐ +10</div></div></div><button class="video-btn" id="video1Btn">Ver</button></div>
-        <div class="video-card locked" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VÍDEO (AdsGram🔒)</div><div class="video-reward">⭐ +10</div></div></div><button class="video-btn locked-btn" id="video2Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 2 (Onelock) -->
+        <div class="video-card locked" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video2Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 3 (Monetag) -->
         <div class="video-card locked" id="video3Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div><button class="video-btn locked-btn" id="video3Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VÍDEO (AdsGram🔒)</div><div class="video-reward">⭐ +10</div></div></div><button class="video-btn locked-btn" id="video4Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 4 (RichInfo) -->
+        <div class="video-card locked" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video4Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 5 (Monetag) -->
         <div class="video-card locked" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div><button class="video-btn locked-btn" id="video5Btn" disabled>🔒</button></div>
-
-        <!-- NUEVOS 6 VÍDEOS (6-11) CON BOTONES MÁS PEQUEÑOS -->
-        <div class="video-card locked" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VÍDEO (Nuevo)</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video6Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video7Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#7 VÍDEO (Nuevo)</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video7Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video8Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#8 VÍDEO (Nuevo)</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video8Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video9Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#9 VÍDEO (Nuevo)</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video9Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video10Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#10 VÍDEO (Nuevo)</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video10Btn" disabled>🔒</button></div>
-        <div class="video-card locked" id="video11Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#11 VÍDEO (Nuevo)</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video11Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 6 (Onelock) -->
+        <div class="video-card locked" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video6Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 7 (RichInfo) -->
+        <div class="video-card locked" id="video7Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#7 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video7Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 8 (Onelock) -->
+        <div class="video-card locked" id="video8Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#8 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video8Btn" disabled>🔒</button></div>
+        
+        <!-- VÍDEO 9 (RichInfo) -->
+        <div class="video-card locked" id="video9Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#9 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn locked-btn" id="video9Btn" disabled>🔒</button></div>
 
         <div class="reset-timer" id="resetTimer">Reinicio en 24h</div>
         <div class="menu-grid">
@@ -381,7 +386,7 @@
         </div>
     </div>
 
-    <!-- Las demás pantallas se mantienen idénticas -->
+    <!-- Pantallas de invitados, retiro, canje, etc. (se mantienen igual) -->
     <div id="invite-screen" class="screen"><div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-rocket" style="font-size: 36px; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Crece con tu Equipo</h3><p style="font-size: 13px; color: var(--text-soft);">Invita, gana y multiplica tus recompensas juntos.</p><div class="invite-highlight"><h4>🌟 +0.02 USDT</h4><p>por cada amigo en su primer retiro</p><h4 style="margin-top: 12px;">💎 +10%</h4><p>de comisión por cada video que vean, ¡para siempre!</p><div class="earn-tag">🌱 Tu red, tu ingreso pasivo</div></div><div class="commission-card"><small>Comisión acumulada</small><h3 style="font-size: 30px; font-weight: 800;" id="comm-pending-coins">0 ⭐</h3><div style="font-size: 13px;" id="comm-pending-usdt">≈ 0.0000 USDT</div><button class="btn-game btn-primary" style="padding: 12px; width: 100%; margin-top: 14px;" id="claimCommBtn">Reclamar ahora</button></div><div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 25px; margin: 16px 0;"><small>Amigos que confiaron en ti</small><h3 id="referidos-count" style="font-size: 28px; font-weight: 800; color: var(--text-dark);">0</h3><button class="btn-game" style="margin-top: 12px; padding: 12px; width: 100%;" id="viewInvitesBtn">Ver lista</button></div><button class="btn-game btn-primary" style="width: 100%; padding: 16px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Invitar y empezar a ganar</button></div></div>
     <div id="withdraw-screen" class="screen"><div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-wallet" style="font-size: 36px; background: linear-gradient(135deg, var(--success) 0%, #4A8C74 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Retirar con CCWallet</h3><div class="balance-available"><small>Balance disponible</small><div class="coins" id="withdraw-balance-coins">0 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div><div class="ccwallet-info"><i class="fas fa-info-circle"></i> ¿No tienes CCWallet? <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button><br><small>Retiro vía @cctip_bot</small></div><textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea><button class="btn-game btn-success" style="width: 100%; padding: 16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button><p style="margin-top: 10px; font-size: 11px; color: var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p><div class="history-title">Historial</div><div id="history-list" style="max-height: 150px; overflow-y: auto;"></div></div></div>
     <div id="redeem-screen" class="screen"><div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-ticket-alt" style="font-size: 36px; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Canjear Código</h3><div class="channel-join"><i class="fab fa-telegram"></i> Únete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div><div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div><div id="redeem-message" style="margin-top: 14px; font-size: 13px; text-align: center;"></div></div></div>
@@ -429,20 +434,23 @@
         catch (e) { return { ip: 'No disponible', device: navigator.platform || 'Desconocido' }; }
     }
 
-    // ==================== INICIALIZACIÓN DE NUEVOS PROVEEDORES (SEGÚN INSTRUCCIÓN) ====================
-    // CdTma
-    window.initCdTma?.({ id: 'Your Spot ID' }).then(show => window.cdtmaShow = show).catch(e => console.log('CdTma init error:', e));
+    // ==================== INICIALIZACIÓN DE NUEVOS PROVEEDORES ====================
+    // Onelock (CdTma)
+    const ONELOCK_SPOT_IDS = ['6116292@usdtgftkbot', '6116293@usdtgftkbot', '6116294@usdtgftkbot'];
+    let onelockShows = [];
+    if (typeof window.initCDTma === 'function') {
+        ONELOCK_SPOT_IDS.forEach((spotId, index) => {
+            window.initCDTma({ id: spotId }).then(show => onelockShows[index] = show).catch(e => console.log('Onelock init error:', e));
+        });
+    }
+    
     // RichInfo
     if (typeof window.TelegramAdsController !== 'undefined') {
         window.TelegramAdsController = new TelegramAdsController();
-        window.TelegramAdsController.initialize({ pubId: "", appId: "" });
+        window.TelegramAdsController.initialize({ pubId: "995853", appId: "6990" });
     }
 
-    // AdsGram (mantenido pero no usado por ahora)
-    const ADSGRAM_BLOCK_ID = '27292'; let adsgramInit = false;
-    function initAdsgram() { if (!adsgramInit && window.Adsgrm) { window.Adsgrm.init({ blockId: ADSGRAM_BLOCK_ID }); adsgramInit = true; } }
-    
-    // Monetag
+    // Monetag (sin cambios)
     async function showMonetagAd() {
         return new Promise((resolve) => {
             const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
@@ -454,44 +462,27 @@
         });
     }
 
-    // ==================== FUNCIONES PARA NUEVOS PROVEEDORES ====================
-    async function showCdTmaAd() {
-        return new Promise((resolve) => {
-            if (window.cdtmaShow) {
-                window.cdtmaShow().then(() => resolve(true)).catch(() => resolve(false));
-            } else {
-                resolve(false);
-            }
-        });
-    }
-
-    async function showOnclckvdAd() {
-        return new Promise((resolve) => {
-            // Onclckvd expone el método show en window.show después de initCdTma, pero usaremos el mismo enfoque
-            if (window.show) {
-                window.show().then(() => resolve(true)).catch(() => resolve(false));
-            } else {
-                resolve(false);
-            }
-        });
+    // Funciones para nuevos proveedores
+    async function showOnelockAd(spotIndex) {
+        if (onelockShows[spotIndex]) {
+            return onelockShows[spotIndex]().then(() => true).catch(() => false);
+        }
+        return false;
     }
 
     async function showRichInfoAd() {
-        return new Promise((resolve) => {
-            if (window.TelegramAdsController && window.TelegramAdsController.show) {
-                window.TelegramAdsController.show().then(() => resolve(true)).catch(() => resolve(false));
-            } else {
-                resolve(false);
-            }
-        });
+        if (window.TelegramAdsController && window.TelegramAdsController.show) {
+            return window.TelegramAdsController.show().then(() => true).catch(() => false);
+        }
+        return false;
     }
 
-    // ==================== VARIABLES DE ESTADO (11 VÍDEOS) ====================
+    // ==================== VARIABLES DE ESTADO (9 VÍDEOS) ====================
     const userId = tg.initDataUnsafe?.user?.id?.toString(), userName = tg.initDataUnsafe?.user?.first_name || 'Usuario', userUsername = tg.initDataUnsafe?.user?.username || '';
     let balance = 0, comision = 0, referidos = 0, videosWatched = 0, lastVideoReset = 0, isProcessing = false, isAdPlaying = false;
     const COINS_PER_USDT = 10000;
-    // Recompensas para 11 vídeos
-    const VIDEO_REWARDS = [10, 10, 15, 10, 15, 5, 5, 5, 5, 5, 5];
+    // Recompensas para 9 vídeos: 1,3,5 -> 10,15,15 ; nuevos -> 5
+    const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5, 5, 5, 5];
 
     async function initUser() {
         if(!userId) return;
@@ -519,7 +510,7 @@
         const dots = document.querySelectorAll('.dot');
         dots.forEach((d, i) => d.classList.toggle('completed', i < videosWatched));
         
-        for(let i=1; i<=11; i++) {
+        for(let i=1; i<=9; i++) {
             const card = document.getElementById(`video${i}Card`);
             const btn = document.getElementById(`video${i}Btn`);
             if (!card || !btn) continue;
@@ -544,11 +535,11 @@
     function checkReset() { const n = Date.now(); if(!lastVideoReset) { lastVideoReset = n; saveVideos(); } else if((n - lastVideoReset)/3600000 >= 24) { videosWatched = 0; lastVideoReset = n; updateUI(); saveVideos(); } }
     function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
-    // ==================== VER VIDEO (MODIFICADO PARA 11 VÍDEOS Y NUEVOS PROVEEDORES) ====================
+    // ==================== VER VIDEO (LÓGICA FINAL CON 9 VÍDEOS) ====================
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
         if (n !== videosWatched + 1) { showAlert("Orden incorrecto", `Mira primero el video #${videosWatched + 1}`, "exclamation-triangle"); return; }
-        if (videosWatched >= 11) { showAlert("¡Completado!", "Ya has visto todos los videos de hoy.", "check-circle"); return; }
+        if (videosWatched >= 9) { showAlert("¡Completado!", "Ya has visto todos los videos de hoy.", "check-circle"); return; }
         
         const id = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
         isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
@@ -556,19 +547,19 @@
             await executeOnce(id, async () => {
                 let adResult = false;
                 
-                // Lógica de selección de proveedor según el número de video
+                // Lógica de selección de proveedor
                 if (n === 1 || n === 3 || n === 5) {
-                    // Monetag (vídeos originales)
+                    // Monetag
                     adResult = await showMonetagAd();
-                } else if (n === 2 || n === 4) {
-                    // AdsGram bloqueado por instrucción: siempre falla
-                    adResult = false;
                 } else {
-                    // Nuevos vídeos (6-11): rotar entre CdTma, Onclckvd, RichInfo
-                    const providerIndex = (n - 6) % 3;
-                    if (providerIndex === 0) adResult = await showCdTmaAd();
-                    else if (providerIndex === 1) adResult = await showOnclckvdAd();
-                    else adResult = await showRichInfoAd();
+                    // Nuevos vídeos: rotar entre Onelock y RichInfo
+                    // Mapeo: n=2 -> Onelock[0], n=4 -> RichInfo, n=6 -> Onelock[1], n=7 -> RichInfo, n=8 -> Onelock[2], n=9 -> RichInfo
+                    if (n === 2) adResult = await showOnelockAd(0);
+                    else if (n === 4) adResult = await showRichInfoAd();
+                    else if (n === 6) adResult = await showOnelockAd(1);
+                    else if (n === 7) adResult = await showRichInfoAd();
+                    else if (n === 8) adResult = await showOnelockAd(2);
+                    else if (n === 9) adResult = await showRichInfoAd();
                 }
                 
                 if (!adResult) {
@@ -590,7 +581,7 @@
                 videosWatched = n;
                 await saveVideos();
                 showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por ver el Video ${n}`, "check-circle");
-                if(videosWatched === 11) showAlert("🏆 ¡Día completado!", "Has completado todos los videos de hoy. ¡Increíble!", "crown");
+                if(videosWatched === 9) showAlert("🏆 ¡Día completado!", "Has completado todos los videos de hoy. ¡Increíble!", "crown");
             });
         } catch (e) {
             showAlert("Error", e.message || "No se pudo completar el video. Intenta de nuevo.", "times-circle");
@@ -614,7 +605,7 @@
                 if (!ad) throw new Error("Anuncio no completado");
                 
                 const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data(), bal = balance, first = !data.hasWithdrawn, net = await getNetworkInfo(), fecha = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
-                enviarNotificacion(`🦊 RETIRO SOLICITADO\n👤 ${data.nombre} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${videosWatched}/11\n🏆 Total videos: ${data.totalVideosWatched||0}\n💎 Total ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado por: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
+                enviarNotificacion(`🦊 RETIRO SOLICITADO\n👤 ${data.nombre} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${videosWatched}/9\n🏆 Total videos: ${data.totalVideosWatched||0}\n💎 Total ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado por: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
                 await ref.update({ ccwallet_id: cc, balance: 0, hasWithdrawn: true, withdrawHistory: firebase.firestore.FieldValue.arrayUnion({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: "✅ Completado", ccwallet: cc }) });
                 balance = 0;
                 if (first && data.invitado_por && data.invitado_por !== "none") await db.collection("usuarios").doc(data.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(0.02) }).catch(()=>{});
@@ -709,8 +700,8 @@
         document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
 
-    // Eventos para 11 vídeos
-    for(let i=1; i<=11; i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
+    // Eventos para 9 vídeos
+    for(let i=1; i<=9; i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
