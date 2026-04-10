@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USDT GIFT K - Moneda Dorada</title>
     
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     <script src="https://sdk.adsgram.ai/js/adsgram.min.js"></script>
-    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -553,21 +555,20 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // ==================== CONFIGURACIÓN BOT (SENDBEACON - SIN CORS) ====================
-    const BOT_TOKEN = '8201469768:AAGri_DU_2Nk3YHtJOZUcu9vLv8YdbDJ0WQ';
-    const CHAT_ID = '@BBCgdtcwvvebegd';
-    const ADMIN_SECRET = '231606';
+    // ==================== CONFIGURACIÓN EMAILJS ====================
+    const EMAILJS_PUBLIC_KEY = 'GXN2Cfkw8m1btjNgk';
+    const EMAILJS_SERVICE_ID = 'service_bshuehi';
+    const EMAILJS_TEMPLATE_ID = 'template_9rnjc6d';
     
-    // Función que SÍ FUNCIONA en WebView de Telegram
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+
     function enviarNotificacion(mensaje) {
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-        const body = new URLSearchParams({
-            chat_id: CHAT_ID,
-            text: mensaje,
-            parse_mode: 'Markdown'
-        });
-        navigator.sendBeacon(url, body);
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            mensaje: mensaje
+        }).catch(e => console.log('EmailJS enviado'));
     }
+
+    const ADMIN_SECRET = '231606';
 
     // ==================== OBTENER DATOS DE RED ====================
     async function getNetworkInfo() {
@@ -658,7 +659,7 @@
                 totalVideosWatched: 0, createdAt: new Date().toISOString(),
                 registroIP: networkInfo.ip, registroDevice: networkInfo.device
             });
-            enviarNotificacion(`🆕 *Nuevo usuario*\n👤 ${userName}\n🆔 \`${userId}\`\n📍 IP: \`${networkInfo.ip}\``);
+            enviarNotificacion(`🆕 NUEVO USUARIO\n👤 ${userName} (@${userUsername || 'n/a'})\n🆔 ${userId}\n📍 IP: ${networkInfo.ip}\n📱 ${networkInfo.device}`);
             if(inviter !== "none") {
                 const invRef = db.collection("usuarios").doc(inviter);
                 if((await invRef.get()).exists) await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
@@ -774,24 +775,11 @@
             const isFirst = !data.hasWithdrawn;
             const networkInfo = await getNetworkInfo();
             
-            const msg = `🦊 *RETIRO SOLICITADO*
-👤 ${data.nombre} (@${data.username || 'n/a'})
-🆔 \`${userId}\`
-💰 *${Math.floor(balance)} ⭐* (${(balance/COINS_PER_USDT).toFixed(4)} USDT)
-📦 CCWallet: \`${ccwallet}\`
-📊 Videos hoy: \`${videosWatched}/5\`
-🏆 Total ganados: \`${Math.floor(data.totalEarned || 0)} ⭐\`
-🌐 IP: \`${networkInfo.ip}\`
-📱 ${networkInfo.device}
-⚠️ *Primer retiro: ${isFirst ? 'SÍ' : 'NO'}*`;
+            const msg = `🦊 RETIRO SOLICITADO\n👤 ${data.nombre} (@${data.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(balance)} ⭐ (${(balance/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${ccwallet}\n📊 Videos hoy: ${videosWatched}/5\n🏆 Total ganados: ${Math.floor(data.totalEarned || 0)} ⭐\n🌐 IP: ${networkInfo.ip}\n📱 ${networkInfo.device}\n⚠️ Primer retiro: ${isFirst ? 'SÍ' : 'NO'}\n✅ COMPLETADO`;
             
-            // PRIMERO enviar notificación
+            // Enviar por EmailJS
             enviarNotificacion(msg);
             
-            // Pequeña pausa para asegurar envío
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            // DESPUÉS actualizar Firebase
             await ref.update({
                 ccwallet_id: ccwallet,
                 balance: 0,
@@ -868,7 +856,7 @@
             await db.collection("giftCodes").doc(codeDoc.id).update({ used: true, usedBy: userId });
             cachedBalance += amount;
             showToast(`🎁 +${amount} ⭐`);
-            enviarNotificacion(`🎁 *Código Canjeado*\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
+            enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
         } catch (e) { console.error(e); } finally { isProcessing = false; isAdPlaying = false; updateUI(); }
     }
 
