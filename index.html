@@ -301,7 +301,7 @@
             margin: 0 5px;
         }
         .stat-number {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 800;
             color: var(--gold);
         }
@@ -351,27 +351,24 @@
     </div>
 </div>
 
-<!-- NUEVO MODAL ADMIN -->
+<!-- MODAL ADMIN -->
 <div id="adminModal" class="admin-modal">
     <div class="admin-modal-content">
         <h3><i class="fas fa-crown"></i> Panel Admin</h3>
         <input type="password" id="adminPassword" placeholder="Clave secreta" style="margin-bottom:15px;">
         
-        <!-- Pestañas -->
         <div style="display:flex;gap:5px;margin-bottom:15px;">
             <button class="admin-tab active" data-tab="saldo">➕ Saldo</button>
             <button class="admin-tab" data-tab="codigos">🎫 Códigos</button>
             <button class="admin-tab" data-tab="stats">📊 Stats</button>
         </div>
         
-        <!-- Panel Saldo -->
         <div id="tab-saldo" class="admin-tab-content">
             <input type="text" id="adminUserId" placeholder="ID de usuario">
             <input type="number" id="adminAmount" placeholder="Monto en ⭐">
             <button class="btn-game btn-primary" id="adminAddBalanceBtn" style="width:100%;">Agregar Saldo</button>
         </div>
         
-        <!-- Panel Códigos -->
         <div id="tab-codigos" class="admin-tab-content" style="display:none;">
             <input type="text" id="giftCode" placeholder="Código (ej: PREMIUM50)">
             <input type="number" id="giftAmount" placeholder="Monto en ⭐">
@@ -380,7 +377,6 @@
             <div id="giftCodesList" style="margin-top:15px;max-height:200px;overflow-y:auto;"></div>
         </div>
         
-        <!-- Panel Stats -->
         <div id="tab-stats" class="admin-tab-content" style="display:none;">
             <div style="text-align:center;">
                 <p style="font-size:14px;color:var(--text-soft);">Total pagado en bonos por referidos</p>
@@ -443,6 +439,10 @@
                 <div class="stat-box">
                     <div class="stat-number" id="totalInvitados">0</div>
                     <div class="stat-label">Invitados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalGanadoRef">0 ⭐</div>
+                    <div class="stat-label">Ganado por referidos</div>
                 </div>
             </div>
             
@@ -561,7 +561,7 @@
         
         userData = (await ref.get()).data();
         checkReset();
-        updateUI();
+        await updateUI();
         startTimer();
         document.getElementById('loading-screen').classList.add('hidden');
     }
@@ -596,6 +596,17 @@
             }
         }
         loadHistory();
+        
+        // Calcular total ganado por referidos
+        if (userId) {
+            const refSnap = await db.collection("usuarios")
+                .where("invitado_por", "==", userId)
+                .where("hasWithdrawn", "==", true)
+                .get();
+            const ganado = refSnap.size * BONO_REFERIDOR;
+            const el = document.getElementById('totalGanadoRef');
+            if (el) el.innerText = ganado + ' ⭐';
+        }
     }
 
     function startTimer() {
@@ -704,7 +715,7 @@
             if (!userData.withdrawHistory) userData.withdrawHistory = [];
             userData.withdrawHistory.push({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: '✅ Completado' });
             
-            updateUI();
+            await updateUI();
             enviarNotificacion('🦊 RETIRO', `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}`);
             showAlert('✅ ¡Retiro exitoso!', `${Math.floor(bal)} ⭐ retiradas`, 'check-circle');
             tg.openTelegramLink('https://t.me/cctip_bot');
@@ -762,7 +773,7 @@
             if (!userData.redeemedCodes) userData.redeemedCodes = [];
             userData.redeemedCodes.push(code);
             
-            updateUI();
+            await updateUI();
             msg.innerHTML = `<span style="color:var(--success);">🎉 +${codeData.amount} ⭐</span>`;
             input.value = '';
             showAlert('🎁 ¡Código canjeado!', `+${codeData.amount} ⭐`, 'gift');
@@ -797,7 +808,7 @@
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ==================== NUEVO ADMIN ====================
+    // ==================== ADMIN ====================
     function initAdmin() {
         const card = document.querySelector('.balance-card');
         let t;
@@ -806,86 +817,57 @@
         card.addEventListener('touchstart', () => t = setTimeout(() => document.getElementById('adminModal').style.display = 'flex', 8000));
         card.addEventListener('touchend', () => clearTimeout(t));
         
-        // Pestañas
         document.querySelectorAll('.admin-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                document.querySelectorAll('.admin-tab').forEach(t => {
-                    t.classList.remove('active');
-                });
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                
                 document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
                 document.getElementById(`tab-${tab.dataset.tab}`).style.display = 'block';
-                
                 if (tab.dataset.tab === 'stats') loadRefStats();
                 if (tab.dataset.tab === 'codigos') loadGiftCodes();
             });
         });
         
-        // Agregar saldo
         document.getElementById('adminAddBalanceBtn').onclick = async () => {
             const pwd = document.getElementById('adminPassword').value;
             const targetId = document.getElementById('adminUserId').value.trim();
             const amt = parseInt(document.getElementById('adminAmount').value);
-            
             if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
             if (!targetId || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
-            
             try {
-                await db.collection("usuarios").doc(targetId).update({ 
-                    balance: firebase.firestore.FieldValue.increment(amt) 
-                });
+                await db.collection("usuarios").doc(targetId).update({ balance: firebase.firestore.FieldValue.increment(amt) });
                 showAlert('Saldo añadido', `+${amt} ⭐ a ${targetId}`, 'crown');
                 document.getElementById('adminUserId').value = '';
                 document.getElementById('adminAmount').value = '';
-            } catch (e) {
-                showAlert('Error', 'Usuario no encontrado', 'times-circle');
-            }
+            } catch (e) { showAlert('Error', 'Usuario no encontrado', 'times-circle'); }
         };
         
-        // Crear código
         document.getElementById('createGiftCodeBtn').onclick = async () => {
             const pwd = document.getElementById('adminPassword').value;
             const code = document.getElementById('giftCode').value.trim().toUpperCase();
             const amt = parseInt(document.getElementById('giftAmount').value);
             const max = parseInt(document.getElementById('giftMaxUses').value) || 1;
-            
             if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
             if (!code || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
-            
             try {
-                await db.collection("giftCodes").doc(code).set({
-                    amount: amt,
-                    maxUses: max,
-                    usedCount: 0,
-                    createdAt: Date.now()
-                });
+                await db.collection("giftCodes").doc(code).set({ amount: amt, maxUses: max, usedCount: 0, createdAt: Date.now() });
                 showAlert('Código creado', `${code} por ${amt} ⭐ (${max} usos)`, 'gift');
                 document.getElementById('giftCode').value = '';
                 document.getElementById('giftAmount').value = '';
                 document.getElementById('giftMaxUses').value = '';
                 loadGiftCodes();
-            } catch (e) {
-                showAlert('Error', 'No se pudo crear', 'times-circle');
-            }
+            } catch (e) { showAlert('Error', 'No se pudo crear', 'times-circle'); }
         };
         
-        document.getElementById('adminCancelBtn').onclick = () => {
-            document.getElementById('adminModal').style.display = 'none';
-        };
+        document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
 
     async function loadGiftCodes() {
         const el = document.getElementById('giftCodesList');
         el.innerHTML = '<p style="text-align:center;">Cargando...</p>';
-        
         try {
             const snap = await db.collection("giftCodes").get();
-            if (snap.empty) {
-                el.innerHTML = '<p style="text-align:center;">No hay códigos</p>';
-                return;
-            }
-            
+            if (snap.empty) { el.innerHTML = '<p style="text-align:center;">No hay códigos</p>'; return; }
             let html = '';
             snap.forEach(doc => {
                 const d = doc.data();
@@ -895,28 +877,17 @@
                 </div>`;
             });
             el.innerHTML = html;
-        } catch (e) {
-            el.innerHTML = '<p style="text-align:center;">Error al cargar</p>';
-        }
+        } catch (e) { el.innerHTML = '<p style="text-align:center;">Error al cargar</p>'; }
     }
 
     async function loadRefStats() {
         try {
             const snap = await db.collection("usuarios").where("hasWithdrawn", "==", true).get();
             let totalPagado = 0;
-            
-            snap.forEach(doc => {
-                const d = doc.data();
-                if (d.invitado_por) {
-                    totalPagado += BONO_REFERIDOR;
-                }
-            });
-            
+            snap.forEach(doc => { if (doc.data().invitado_por) totalPagado += BONO_REFERIDOR; });
             document.getElementById('totalRefGanancias').innerText = totalPagado + ' ⭐';
             document.getElementById('totalRefUSDT').innerText = (totalPagado / COINS_PER_USDT).toFixed(4);
-        } catch (e) {
-            console.error('Error cargando stats:', e);
-        }
+        } catch (e) { console.error('Error cargando stats:', e); }
     }
 
     // ==================== EVENT LISTENERS ====================
