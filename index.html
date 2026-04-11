@@ -550,7 +550,8 @@
                 hasWithdrawn: false,
                 ccwallet_id: '',
                 withdrawHistory: [],
-                redeemedCodes: []
+                redeemedCodes: [],
+                lastReferidoWithdraw: 0
             });
             if (inv) {
                 const invRef = db.collection("usuarios").doc(inv);
@@ -707,6 +708,7 @@
             if (firstWithdraw && userData.invitado_por) {
                 const invRef = db.collection("usuarios").doc(userData.invitado_por);
                 await invRef.update({ balance: firebase.firestore.FieldValue.increment(BONO_REFERIDOR) });
+                await invRef.update({ lastReferidoWithdraw: Date.now() });
                 enviarNotificacion('🎁 BONO REFERIDO', `👤 ${userName} hizo su primer retiro\n💰 +200 ⭐ para ${userData.invitado_por}`);
             }
             
