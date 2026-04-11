@@ -8,7 +8,7 @@
     <!-- Monetag -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     
-    <!-- Onelock y RichInfo (con crossorigin para evitar CORS) -->
+    <!-- Onelock y RichInfo -->
     <script src="https://api.onelock.com/onestream-ad-admanager/tma.js" crossorigin="anonymous"></script>
     <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js" crossorigin="anonymous"></script>
     
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== PALETA PREMIUM (sin cambios) ========== */
+        /* ========== PALETA PREMIUM ========== */
         :root {
             --gold: #D4AF37;
             --gold-light: #F5E7B2;
@@ -365,14 +365,31 @@
             <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Crecer Equipo</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Retirar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="leaderboardNavBtn"><span><i class="fas fa-trophy"></i> Top Usuarios</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="tasksNavBtn"><span><i class="fas fa-tasks"></i> Tareas</span> <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
     <div id="invite-screen" class="screen"><div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-rocket" style="font-size: 36px; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Crece con tu Equipo</h3><p style="font-size: 13px; color: var(--text-soft);">Invita, gana y multiplica tus recompensas juntos.</p><div class="invite-highlight"><h4>🌟 +0.02 USDT</h4><p>por cada amigo en su primer retiro</p><h4 style="margin-top: 12px;">💎 +10%</h4><p>de comisión por cada video que vean, ¡para siempre!</p><div class="earn-tag">🌱 Tu red, tu ingreso pasivo</div></div><div class="commission-card"><small>Comisión acumulada</small><h3 style="font-size: 30px; font-weight: 800;" id="comm-pending-coins">0 ⭐</h3><div style="font-size: 13px;" id="comm-pending-usdt">≈ 0.0000 USDT</div><button class="btn-game btn-primary" style="padding: 12px; width: 100%; margin-top: 14px;" id="claimCommBtn">Reclamar ahora</button></div><div style="background: rgba(255,255,255,0.5); padding: 16px; border-radius: 25px; margin: 16px 0;"><small>Amigos que confiaron en ti</small><h3 id="referidos-count" style="font-size: 28px; font-weight: 800; color: var(--text-dark);">0</h3><button class="btn-game" style="margin-top: 12px; padding: 12px; width: 100%;" id="viewInvitesBtn">Ver lista</button></div><button class="btn-game btn-primary" style="width: 100%; padding: 16px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Invitar y empezar a ganar</button></div></div>
     <div id="withdraw-screen" class="screen"><div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-wallet" style="font-size: 36px; background: linear-gradient(135deg, var(--success) 0%, #4A8C74 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Retirar con CCWallet</h3><div class="balance-available"><small>Balance disponible</small><div class="coins" id="withdraw-balance-coins">0 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div><div class="ccwallet-info"><i class="fas fa-info-circle"></i> ¿No tienes CCWallet? <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button><br><small>Retiro vía @cctip_bot</small></div><textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea><button class="btn-game btn-success" style="width: 100%; padding: 16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button><p style="margin-top: 10px; font-size: 11px; color: var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p><div class="history-title">Historial</div><div id="history-list" style="max-height: 150px; overflow-y: auto;"></div></div></div>
     <div id="redeem-screen" class="screen"><div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-ticket-alt" style="font-size: 36px; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Canjear Código</h3><div class="channel-join"><i class="fab fa-telegram"></i> Únete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div><div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div><div id="redeem-message" style="margin-top: 14px; font-size: 13px; text-align: center;"></div></div></div>
-    <div id="leaderboard-screen" class="screen"><div class="back-circle" id="backHomeLeader"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 10px;"><i class="fas fa-trophy" style="color: var(--gold);"></i> Top 10 Ganadores</h3><p style="font-size:12px; opacity:0.7; margin-bottom:15px; color: var(--text-soft);">Solo usuarios con ganancias</p><div id="leaderboard-list" style="max-height: 350px; overflow-y: auto;"></div></div></div>
+    
+    <!-- NUEVA PANTALLA DE TAREAS -->
+    <div id="tasks-screen" class="screen">
+        <div class="back-circle" id="backHomeTasks"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 10px;">
+                <i class="fas fa-list-check" style="color: var(--gold);"></i> Tareas de Invitación
+            </h3>
+            <p style="font-size:13px; color: var(--text-soft); margin-bottom: 20px;">
+                Invita amigos que vean al menos 1 video. ¡Cumple metas y reclama tu recompensa!
+            </p>
+            <div id="tasks-list" style="max-height: 400px; overflow-y: auto;"></div>
+            <p style="font-size:11px; color: var(--text-soft); margin-top: 15px; text-align: center;">
+                <i class="fas fa-users"></i> Activo = vio 1 video
+            </p>
+        </div>
+    </div>
+
     <div id="invites-list-screen" class="screen"><div class="back-circle" id="backToInvite"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 15px;">Mis invitados</h3><div id="invites-list" style="max-height: 350px; overflow-y: auto;"></div></div></div>
 </div>
 
@@ -390,7 +407,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const tg = window.Telegram.WebApp;
-    // 👉 Obligatorio para Mini Apps: notificar que la app está lista
     tg.ready();
     tg.expand();
 
@@ -416,50 +432,25 @@
     }
 
     // ==================== INICIALIZACIÓN DE PROVEEDORES ====================
-    const ONELOCK_SPOT_IDS = [
-        '6116292@usdtgftkbot', 
-        '6116293@usdtgftkbot', 
-        '6116294@usdtgftkbot',
-        '6116295@usdtgftkbot'
-    ];
+    const ONELOCK_SPOT_IDS = ['6116292@usdtgftkbot', '6116293@usdtgftkbot', '6116294@usdtgftkbot', '6116295@usdtgftkbot'];
     let onelockShows = [];
     
     function initOnelock() {
         if (typeof window.initCDTma === 'function') {
-            console.log('✅ Onclicka SDK detectado. Inicializando spots...');
             ONELOCK_SPOT_IDS.forEach((spotId, index) => {
-                window.initCDTma({ id: spotId })
-                    .then(show => {
-                        onelockShows[index] = show;
-                        console.log(`✅ Spot Onclicka ${index} listo (${spotId})`);
-                    })
-                    .catch(e => {
-                        console.warn(`⚠️ Falló spot ${spotId}. Puede estar pausado.`);
-                        onelockShows[index] = null;
-                    });
+                window.initCDTma({ id: spotId }).then(show => { onelockShows[index] = show; }).catch(e => { onelockShows[index] = null; });
             });
-        } else {
-            setTimeout(initOnelock, 1500);
-        }
+        } else { setTimeout(initOnelock, 1500); }
     }
     
     function initRichInfo() {
-        // 👉 En Telegram Mini Apps a veces se llama TelegramAds en lugar de TelegramAdsController
         const AdController = window.TelegramAdsController || window.TelegramAds;
         if (typeof AdController !== 'undefined') {
-            console.log('✅ RichInfo SDK disponible');
             if (!window.adsController) {
                 window.adsController = new AdController();
-                window.adsController.initialize({ 
-                    pubId: "995853", 
-                    appId: "6990",
-                    type: 'miniApp'   // 👉 Indica que es un Mini App
-                });
-                console.log('✅ RichInfo controlador inicializado para Mini App');
+                window.adsController.initialize({ pubId: "995853", appId: "6990", type: 'miniApp' });
             }
-        } else {
-            setTimeout(initRichInfo, 1500);
-        }
+        } else { setTimeout(initRichInfo, 1500); }
     }
     
     setTimeout(() => { initOnelock(); initRichInfo(); }, 500);
@@ -477,25 +468,14 @@
 
     async function showOnelockAd(spotIndex) {
         const show = onelockShows[spotIndex];
-        if (!show) {
-            console.warn(`Onelock spot ${spotIndex} no disponible`);
-            return false;
-        }
-        try {
-            // 👉 Pasar el tipo de anuncio requerido (rewarded o interstitial)
-            await show({ type: 'rewarded' });
-            return true;
-        } catch (e) {
-            console.error('Error Onelock:', e);
-            return false;
-        }
+        if (!show) return false;
+        try { await show({ type: 'rewarded' }); return true; } catch (e) { return false; }
     }
 
     async function showRichInfoAd() {
         if (window.adsController && window.adsController.show) {
             return window.adsController.show().then(() => true).catch(() => false);
         }
-        console.error('RichInfo no inicializado');
         return false;
     }
 
@@ -510,7 +490,7 @@
         if (!doc.exists) {
             let inv = (start && start !== userId) ? start : "none";
             const net = await getNetworkInfo();
-            await ref.set({ nombre: userName, username: userUsername, balance: 0, comision: 0, invitado_por: inv, referidos: 0, ccwallet_id: "", withdrawHistory: [], redeemedCodes: [], watchedVideos: [], lastVideoReset: 0, hasWithdrawn: false, totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString(), registroIP: net.ip, registroDevice: net.device });
+            await ref.set({ nombre: userName, username: userUsername, balance: 0, comision: 0, invitado_por: inv, referidos: 0, ccwallet_id: "", withdrawHistory: [], redeemedCodes: [], claimedTasks: [], watchedVideos: [], lastVideoReset: 0, hasWithdrawn: false, totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString(), registroIP: net.ip, registroDevice: net.device });
             enviarNotificacion(`🆕 NUEVO USUARIO\n👤 ${userName} (@${userUsername||'n/a'})\n🆔 ${userId}\n📍 IP: ${net.ip}\n📱 ${net.device}`);
             if(inv !== "none" && (await db.collection("usuarios").doc(inv).get()).exists) await db.collection("usuarios").doc(inv).update({ referidos: firebase.firestore.FieldValue.increment(1) });
         }
@@ -547,84 +527,34 @@
     function checkReset() { const n = Date.now(); if(!lastVideoReset) { lastVideoReset = n; saveWatchedVideos(); } else if((n - lastVideoReset)/3600000 >= 24) { watchedVideos = []; lastVideoReset = n; updateUI(); saveWatchedVideos(); } }
     function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
-    // ==================== VER VIDEO (CON FALLBACK AUTOMÁTICO) ====================
     async function watchVideo(n) {
-        if (isProcessing || isAdPlaying) {
-            showToast("⏳ Espera un momento...");
-            return;
-        }
-        if (watchedVideos.includes(n)) {
-            showAlert("Video completado", `El video #${n} ya fue visto hoy. Vuelve mañana.`, "info-circle");
-            return;
-        }
-
+        if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
+        if (watchedVideos.includes(n)) { showAlert("Video completado", `El video #${n} ya fue visto hoy.`, "info-circle"); return; }
         const id = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
-        isProcessing = true;
-        isAdPlaying = true;
-        updateUI();
-        showAdLoader();
-
+        isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
         try {
             await executeOnce(id, async () => {
                 let adResult = false;
-
-                // Asignación con fallback a Monetag si el proveedor principal falla
-                if (n === 1 || n === 3 || n === 5) {
-                    adResult = await showMonetagAd();
-                } else if (n === 2) {
-                    adResult = await showOnelockAd(0);
-                    if (!adResult) adResult = await showMonetagAd();
-                } else if (n === 6) {
-                    adResult = await showOnelockAd(1);
-                    if (!adResult) adResult = await showMonetagAd();
-                } else if (n === 8) {
-                    adResult = await showOnelockAd(2);
-                    if (!adResult) adResult = await showMonetagAd();
-                } else if (n === 9) {
-                    adResult = await showOnelockAd(3);
-                    if (!adResult) adResult = await showMonetagAd();
-                } else if (n === 4 || n === 7) {
-                    adResult = await showRichInfoAd();
-                    if (!adResult) adResult = await showMonetagAd();
-                }
-
-                if (!adResult) {
-                    throw new Error("No se pudo mostrar ningún anuncio. Intenta más tarde.");
-                }
-
-                // --- Recompensa ---
-                const reward = VIDEO_REWARDS[n - 1];
+                if (n === 1 || n === 3 || n === 5) adResult = await showMonetagAd();
+                else if (n === 2) { adResult = await showOnelockAd(0); if (!adResult) adResult = await showMonetagAd(); }
+                else if (n === 6) { adResult = await showOnelockAd(1); if (!adResult) adResult = await showMonetagAd(); }
+                else if (n === 8) { adResult = await showOnelockAd(2); if (!adResult) adResult = await showMonetagAd(); }
+                else if (n === 9) { adResult = await showOnelockAd(3); if (!adResult) adResult = await showMonetagAd(); }
+                else if (n === 4 || n === 7) { adResult = await showRichInfoAd(); if (!adResult) adResult = await showMonetagAd(); }
+                if (!adResult) throw new Error("No se pudo mostrar ningún anuncio.");
+                const reward = VIDEO_REWARDS[n-1];
                 const ref = db.collection("usuarios").doc(userId);
                 const data = (await ref.get()).data();
                 const newWatched = [...(data?.watchedVideos || []), n];
-
-                await ref.update({
-                    balance: firebase.firestore.FieldValue.increment(reward),
-                    totalVideosWatched: firebase.firestore.FieldValue.increment(1),
-                    totalEarned: firebase.firestore.FieldValue.increment(reward),
-                    watchedVideos: newWatched
-                });
-
-                balance += reward;
-                watchedVideos = newWatched;
-                updateUI();
+                await ref.update({ balance: firebase.firestore.FieldValue.increment(reward), totalVideosWatched: firebase.firestore.FieldValue.increment(1), totalEarned: firebase.firestore.FieldValue.increment(reward), watchedVideos: newWatched });
+                balance += reward; watchedVideos = newWatched; updateUI();
                 showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por el Video ${n}`, "check-circle");
-
-                if (watchedVideos.length === TOTAL_VIDEOS) {
-                    showAlert("🏆 ¡Día perfecto!", "Has completado los 9 videos de hoy. ¡Increíble!", "crown");
-                }
+                if (watchedVideos.length === TOTAL_VIDEOS) showAlert("🏆 ¡Día perfecto!", "Has completado los 9 videos de hoy.", "crown");
             });
-        } catch (e) {
-            showAlert("Aviso del sistema", e.message, "exclamation-triangle");
-        } finally {
-            hideAdLoader();
-            isProcessing = false;
-            isAdPlaying = false;
-            updateUI();
-        }
+        } catch (e) { showAlert("Aviso del sistema", e.message, "exclamation-triangle"); } 
+        finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); }
     }
 
-    // ==================== RETIRAR, COMISIONES, CANJEAR ====================
     async function handleWithdraw() {
         if (isProcessing || isAdPlaying) return;
         const cc = document.getElementById('ccwallet-id').value.trim();
@@ -636,7 +566,7 @@
             await executeOnce(id, async () => {
                 if (!await showMonetagAd()) throw new Error("Anuncio no completado");
                 const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data(), bal = balance, first = !data.hasWithdrawn, net = await getNetworkInfo(), fecha = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
-                enviarNotificacion(`🦊 RETIRO\n👤 ${data.nombre} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${watchedVideos.length}/${TOTAL_VIDEOS}\n🏆 Total: ${data.totalVideosWatched||0}\n💎 Ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
+                enviarNotificacion(`🦊 RETIRO\n👤 ${data.nombre || 'Usuario'} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${watchedVideos.length}/${TOTAL_VIDEOS}\n🏆 Total: ${data.totalVideosWatched||0}\n💎 Ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
                 await ref.update({ ccwallet_id: cc, balance: 0, hasWithdrawn: true, withdrawHistory: firebase.firestore.FieldValue.arrayUnion({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: "✅ Completado", ccwallet: cc }) });
                 balance = 0;
                 if (first && data.invitado_por && data.invitado_por !== "none") await db.collection("usuarios").doc(data.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(0.02) }).catch(()=>{});
@@ -661,8 +591,7 @@
                 balance += coins; comision = 0; updateUI();
                 showAlert("✨ ¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐`, "gift");
             });
-        } catch (e) { showAlert("Error", e.message, "times-circle"); } 
-        finally { isProcessing = false; }
+        } catch (e) { showAlert("Error", e.message, "times-circle"); } finally { isProcessing = false; }
     }
     async function handleRedeem() {
         if (isProcessing || isAdPlaying) return;
@@ -691,9 +620,62 @@
         finally { isProcessing = false; isAdPlaying = false; updateUI(); }
     }
 
-    function navigate(s) { document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if (s==='withdraw-screen') loadHistory(); if (s==='leaderboard-screen') loadLeaderboard(); if (s==='invites-list-screen') loadInvites(); }
-    async function loadLeaderboard() { const el = document.getElementById('leaderboard-list'), snap = await db.collection("usuarios").where("balance",">",0).orderBy("balance","desc").limit(10).get(); el.innerHTML = ''; let i=1; snap.forEach(d => { const u=d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:10px;"><span>#${i++} ${u.nombre?.substring(0,15)}</span><span style="color:var(--gold);font-weight:700;">${Math.floor(u.balance||0)} ⭐</span></div>`; }); }
-    async function loadInvites() { const el = document.getElementById('invites-list'), snap = await db.collection("usuarios").where("invitado_por","==",userId).get(); el.innerHTML = snap.empty ? '<p style="text-align:center;">Sin invitados</p>' : ''; snap.forEach(d => { const u=d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px;"><span>${u.nombre}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`; }); }
+    function navigate(s) { document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if (s==='withdraw-screen') loadHistory(); if (s==='tasks-screen') loadTasks(); if (s==='invites-list-screen') loadInvites(); }
+    
+    // ==================== TAREAS ====================
+    const TASKS = [
+        { target: 20, reward: 100 },
+        { target: 50, reward: 250 },
+        { target: 100, reward: 500 },
+        { target: 200, reward: 1000 },
+        { target: 500, reward: 2500 },
+        { target: 1000, reward: 5000 },
+        { target: 2000, reward: 10000 },
+        { target: 5000, reward: 25000 }
+    ];
+
+    async function loadTasks() {
+        const el = document.getElementById('tasks-list');
+        el.innerHTML = '<p style="text-align:center;">Cargando...</p>';
+        const refSnap = await db.collection("usuarios").where("invitado_por", "==", userId).get();
+        const referidos = refSnap.docs.map(d => d.data());
+        const activos = referidos.filter(r => (r.totalVideosWatched || 0) > 0).length; // 1 video = activo
+        const userDoc = await db.collection("usuarios").doc(userId).get();
+        const claimedTasks = userDoc.data()?.claimedTasks || [];
+        let html = `<p style="margin-bottom:15px;"><strong>👥 Invitados activos: ${activos}</strong></p>`;
+        TASKS.forEach(task => {
+            const completed = activos >= task.target;
+            const claimed = claimedTasks.includes(task.target);
+            let status = '', button = '';
+            if (claimed) status = '<span style="color:var(--success);"><i class="fas fa-check-circle"></i> Reclamado</span>';
+            else if (completed) { button = `<button class="video-btn small-btn" style="margin-left:10px;" onclick="claimTask(${task.target}, ${task.reward})">Reclamar ${task.reward} ⭐</button>`; status = '<span style="color:var(--gold);">¡Disponible!</span>'; }
+            else { const falta = task.target - activos; status = `<span style="color:var(--text-soft);">Faltan ${falta} activos</span>`; }
+            html += `<div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.5); border-radius:20px; padding:12px; margin-bottom:8px;"><div><div style="font-weight:700;">Invitar ${task.target} amigos activos</div><div style="font-size:12px; color:var(--terracotta);">Recompensa: ${task.reward} ⭐ (${(task.reward/10000).toFixed(4)} USDT)</div></div><div style="display:flex; align-items:center;">${status}${button}</div></div>`;
+        });
+        el.innerHTML = html;
+    }
+
+    async function claimTask(target, reward) {
+        if (isProcessing) return;
+        isProcessing = true;
+        try {
+            const ref = db.collection("usuarios").doc(userId);
+            const doc = await ref.get();
+            const data = doc.data();
+            const claimedTasks = data.claimedTasks || [];
+            if (claimedTasks.includes(target)) { showAlert("Ya reclamada", "Esta recompensa ya la obtuviste.", "info-circle"); return; }
+            const refSnap = await db.collection("usuarios").where("invitado_por", "==", userId).get();
+            const activos = refSnap.docs.filter(d => (d.data().totalVideosWatched || 0) > 0).length;
+            if (activos < target) { showAlert("No cumples", `Necesitas ${target} invitados activos. Tienes ${activos}.`, "times-circle"); return; }
+            await ref.update({ balance: firebase.firestore.FieldValue.increment(reward), claimedTasks: firebase.firestore.FieldValue.arrayUnion(target) });
+            balance += reward; updateUI();
+            showAlert("🎉 ¡Tarea completada!", `Has ganado ${reward} ⭐`, "check-circle");
+            loadTasks();
+        } catch (e) { showAlert("Error", e.message, "times-circle"); } 
+        finally { isProcessing = false; }
+    }
+
+    async function loadInvites() { const el = document.getElementById('invites-list'), snap = await db.collection("usuarios").where("invitado_por","==",userId).get(); el.innerHTML = snap.empty ? '<p style="text-align:center;">Sin invitados</p>' : ''; snap.forEach(d => { const u=d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px;"><span>${u.nombre || 'Usuario'}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`; }); }
     function copyRefLink() { tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana monedas viendo videos`); }
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
@@ -723,10 +705,10 @@
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
-    document.getElementById('leaderboardNavBtn').onclick = () => navigate('leaderboard-screen');
+    document.getElementById('tasksNavBtn').onclick = () => navigate('tasks-screen');
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
     document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
-    document.getElementById('backHomeLeader').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeTasks').onclick = () => navigate('home-screen');
     document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
     document.getElementById('backToInvite').onclick = () => navigate('invite-screen');
     document.getElementById('claimCommBtn').onclick = claimCommissions;
@@ -734,6 +716,7 @@
     document.getElementById('viewInvitesBtn').onclick = () => navigate('invites-list-screen');
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
+    window.claimTask = claimTask;
 
     setInterval(checkReset, 60000);
     initUser(); initAdmin();
