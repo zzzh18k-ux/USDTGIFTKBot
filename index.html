@@ -542,11 +542,31 @@
                 else if (n === 9) { adResult = await showOnelockAd(3); if (!adResult) adResult = await showMonetagAd(); }
                 else if (n === 4 || n === 7) { adResult = await showRichInfoAd(); if (!adResult) adResult = await showMonetagAd(); }
                 if (!adResult) throw new Error("No se pudo mostrar ningún anuncio.");
+                
                 const reward = VIDEO_REWARDS[n-1];
                 const ref = db.collection("usuarios").doc(userId);
                 const data = (await ref.get()).data();
                 const newWatched = [...(data?.watchedVideos || []), n];
-                await ref.update({ balance: firebase.firestore.FieldValue.increment(reward), totalVideosWatched: firebase.firestore.FieldValue.increment(1), totalEarned: firebase.firestore.FieldValue.increment(reward), watchedVideos: newWatched });
+                
+                await ref.update({ 
+                    balance: firebase.firestore.FieldValue.increment(reward), 
+                    totalVideosWatched: firebase.firestore.FieldValue.increment(1), 
+                    totalEarned: firebase.firestore.FieldValue.increment(reward), 
+                    watchedVideos: newWatched 
+                });
+                
+                // 👉 COMISIÓN DEL 10% PARA EL REFERIDOR
+                const userData = (await ref.get()).data();
+                if (userData.invitado_por && userData.invitado_por !== "none") {
+                    const comisionCoins = Math.floor(reward * 0.1);
+                    if (comisionCoins > 0) {
+                        const referidorRef = db.collection("usuarios").doc(userData.invitado_por);
+                        await referidorRef.update({
+                            comision: firebase.firestore.FieldValue.increment(comisionCoins / COINS_PER_USDT)
+                        });
+                    }
+                }
+                
                 balance += reward; watchedVideos = newWatched; updateUI();
                 showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por el Video ${n}`, "check-circle");
                 if (watchedVideos.length === TOTAL_VIDEOS) showAlert("🏆 ¡Día perfecto!", "Has completado los 9 videos de hoy.", "crown");
@@ -639,7 +659,7 @@
         el.innerHTML = '<p style="text-align:center;">Cargando...</p>';
         const refSnap = await db.collection("usuarios").where("invitado_por", "==", userId).get();
         const referidos = refSnap.docs.map(d => d.data());
-        const activos = referidos.filter(r => (r.totalVideosWatched || 0) > 0).length; // 1 video = activo
+        const activos = referidos.filter(r => (r.totalVideosWatched || 0) >= 9).length; // 9 videos = activo
         const userDoc = await db.collection("usuarios").doc(userId).get();
         const claimedTasks = userDoc.data()?.claimedTasks || [];
         let html = `<p style="margin-bottom:15px;"><strong>👥 Invitados activos: ${activos}</strong></p>`;
@@ -665,7 +685,7 @@
             const claimedTasks = data.claimedTasks || [];
             if (claimedTasks.includes(target)) { showAlert("Ya reclamada", "Esta recompensa ya la obtuviste.", "info-circle"); return; }
             const refSnap = await db.collection("usuarios").where("invitado_por", "==", userId).get();
-            const activos = refSnap.docs.filter(d => (d.data().totalVideosWatched || 0) > 0).length;
+            const activos = refSnap.docs.filter(d => (d.data().totalVideosWatched || 0) >= 9).length;
             if (activos < target) { showAlert("No cumples", `Necesitas ${target} invitados activos. Tienes ${activos}.`, "times-circle"); return; }
             await ref.update({ balance: firebase.firestore.FieldValue.increment(reward), claimedTasks: firebase.firestore.FieldValue.arrayUnion(target) });
             balance += reward; updateUI();
