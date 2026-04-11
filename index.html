@@ -8,9 +8,9 @@
     <!-- Monetag -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     
-    <!-- Onelock y RichInfo -->
-    <script src="https://api.onelock.com/onestream-ad-admanager/tma.js"></script>
-    <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js"></script>
+    <!-- Onelock y RichInfo (con crossorigin para evitar CORS) -->
+    <script src="https://api.onelock.com/onestream-ad-admanager/tma.js" crossorigin="anonymous"></script>
+    <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js" crossorigin="anonymous"></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== PALETA PREMIUM ========== */
+        /* ========== PALETA PREMIUM (sin cambios) ========== */
         :root {
             --gold: #D4AF37;
             --gold-light: #F5E7B2;
@@ -389,7 +389,10 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const tg = window.Telegram.WebApp; tg.expand();
+    const tg = window.Telegram.WebApp;
+    // 👉 Obligatorio para Mini Apps: notificar que la app está lista
+    tg.ready();
+    tg.expand();
 
     const PUSHBULLET_TOKEN = 'o.O0prtyhPN6cGLmvzoxCsC8VqxhgMVys9', ADMIN_SECRET = '231606';
     function enviarNotificacion(m) { fetch('https://api.pushbullet.com/v2/pushes', { method:'POST', headers:{'Access-Token':PUSHBULLET_TOKEN,'Content-Type':'application/json'}, body:JSON.stringify({type:'note',title:'🦊 USDT GIFT K - Retiro',body:m}) }).catch(e=>{}); }
@@ -413,16 +416,14 @@
     }
 
     // ==================== INICIALIZACIÓN DE PROVEEDORES ====================
-    // 👉 CORRECCIÓN 1: Incluir el cuarto spot de Onclicka
     const ONELOCK_SPOT_IDS = [
         '6116292@usdtgftkbot', 
         '6116293@usdtgftkbot', 
         '6116294@usdtgftkbot',
-        '6116295@usdtgftkbot'   // ✅ Spot para el botón #9
+        '6116295@usdtgftkbot'
     ];
     let onelockShows = [];
     
-    // 👉 CORRECCIÓN 2: Inicialización robusta con reintentos
     function initOnelock() {
         if (typeof window.initCDTma === 'function') {
             console.log('✅ Onclicka SDK detectado. Inicializando spots...');
@@ -443,12 +444,18 @@
     }
     
     function initRichInfo() {
-        if (typeof TelegramAdsController !== 'undefined') {
+        // 👉 En Telegram Mini Apps a veces se llama TelegramAds en lugar de TelegramAdsController
+        const AdController = window.TelegramAdsController || window.TelegramAds;
+        if (typeof AdController !== 'undefined') {
             console.log('✅ RichInfo SDK disponible');
             if (!window.adsController) {
-                window.adsController = new TelegramAdsController();
-                window.adsController.initialize({ pubId: "995853", appId: "6990" });
-                console.log('✅ RichInfo controlador inicializado');
+                window.adsController = new AdController();
+                window.adsController.initialize({ 
+                    pubId: "995853", 
+                    appId: "6990",
+                    type: 'miniApp'   // 👉 Indica que es un Mini App
+                });
+                console.log('✅ RichInfo controlador inicializado para Mini App');
             }
         } else {
             setTimeout(initRichInfo, 1500);
@@ -469,9 +476,19 @@
     }
 
     async function showOnelockAd(spotIndex) {
-        if (onelockShows[spotIndex]) return onelockShows[spotIndex]().then(() => true).catch(() => false);
-        console.error(`Onelock spot ${spotIndex} no inicializado`);
-        throw new Error("Proveedor Onelock no disponible");
+        const show = onelockShows[spotIndex];
+        if (!show) {
+            console.warn(`Onelock spot ${spotIndex} no disponible`);
+            return false;
+        }
+        try {
+            // 👉 Pasar el tipo de anuncio requerido (rewarded o interstitial)
+            await show({ type: 'rewarded' });
+            return true;
+        } catch (e) {
+            console.error('Error Onelock:', e);
+            return false;
+        }
     }
 
     async function showRichInfoAd() {
@@ -479,7 +496,7 @@
             return window.adsController.show().then(() => true).catch(() => false);
         }
         console.error('RichInfo no inicializado');
-        throw new Error("Proveedor RichInfo no disponible");
+        return false;
     }
 
     // ==================== ESTADO ====================
@@ -530,7 +547,7 @@
     function checkReset() { const n = Date.now(); if(!lastVideoReset) { lastVideoReset = n; saveWatchedVideos(); } else if((n - lastVideoReset)/3600000 >= 24) { watchedVideos = []; lastVideoReset = n; updateUI(); saveWatchedVideos(); } }
     function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
-    // ==================== VER VIDEO (CORRECCIÓN 3: Lógica final) ====================
+    // ==================== VER VIDEO (CON FALLBACK AUTOMÁTICO) ====================
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) {
             showToast("⏳ Espera un momento...");
@@ -551,23 +568,28 @@
             await executeOnce(id, async () => {
                 let adResult = false;
 
-                // 🟡 ASIGNACIÓN CORRECTA SEGÚN EL BOTÓN PRESIONADO
+                // Asignación con fallback a Monetag si el proveedor principal falla
                 if (n === 1 || n === 3 || n === 5) {
                     adResult = await showMonetagAd();
                 } else if (n === 2) {
-                    adResult = await showOnelockAd(0);  // Spot 6116292
+                    adResult = await showOnelockAd(0);
+                    if (!adResult) adResult = await showMonetagAd();
                 } else if (n === 6) {
-                    adResult = await showOnelockAd(1);  // Spot 6116293
+                    adResult = await showOnelockAd(1);
+                    if (!adResult) adResult = await showMonetagAd();
                 } else if (n === 8) {
-                    adResult = await showOnelockAd(2);  // Spot 6116294
+                    adResult = await showOnelockAd(2);
+                    if (!adResult) adResult = await showMonetagAd();
                 } else if (n === 9) {
-                    adResult = await showOnelockAd(3);  // ✅ Spot 6116295 (el nuevo)
+                    adResult = await showOnelockAd(3);
+                    if (!adResult) adResult = await showMonetagAd();
                 } else if (n === 4 || n === 7) {
                     adResult = await showRichInfoAd();
+                    if (!adResult) adResult = await showMonetagAd();
                 }
 
                 if (!adResult) {
-                    throw new Error("El anunciante no tiene publicidad disponible en este momento. Prueba otro video.");
+                    throw new Error("No se pudo mostrar ningún anuncio. Intenta más tarde.");
                 }
 
                 // --- Recompensa ---
