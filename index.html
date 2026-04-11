@@ -406,6 +406,18 @@
     tg.ready();
     tg.expand();
 
+    // 👉 PROTECCIÓN ANTI-BLOQUEO - Se ejecuta cada 2 segundos
+    window.__adBlockerRecovery = function() {
+        if (window.isProcessing || window.isAdPlaying) {
+            console.warn('🔄 Recuperando estado bloqueado...');
+            window.isProcessing = false;
+            window.isAdPlaying = false;
+            hideAdLoader();
+            if (typeof updateUI === 'function') updateUI();
+        }
+    };
+    setInterval(window.__adBlockerRecovery, 2000);
+
     const PUSHBULLET_TOKEN = 'o.O0prtyhPN6cGLmvzoxCsC8VqxhgMVys9', ADMIN_SECRET = '231606';
     function enviarNotificacion(m) { fetch('https://api.pushbullet.com/v2/pushes', { method:'POST', headers:{'Access-Token':PUSHBULLET_TOKEN,'Content-Type':'application/json'}, body:JSON.stringify({type:'note',title:'🦊 USDT GIFT K - Retiro',body:m}) }).catch(e=>{}); }
 
@@ -427,20 +439,48 @@
         catch (e) { return { ip: 'No disponible', device: navigator.platform || 'Desconocido' }; }
     }
 
+    // 👉 NUEVA FUNCIÓN showMonetagAd CORREGIDA
     async function showMonetagAd() {
-        return new Promise((resolve) => {
-            const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
-            try {
-                if (typeof show_10853207 === 'function') {
-                    show_10853207().then(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); }).catch(() => { clearTimeout(timeout); hideAdLoader(); resolve(true); });
-                } else { clearTimeout(timeout); hideAdLoader(); resolve(true); }
-            } catch (e) { clearTimeout(timeout); hideAdLoader(); resolve(true); }
+        return new Promise((resolve, reject) => {
+            if (typeof show_10853207 !== 'function') {
+                console.error('❌ Monetag SDK no cargado');
+                reject(new Error('SDK no disponible'));
+                return;
+            }
+            
+            let adShown = false;
+            const timeout = setTimeout(() => {
+                if (!adShown) {
+                    hideAdLoader();
+                    reject(new Error('Timeout del anuncio'));
+                }
+            }, 8000);
+            
+            show_10853207()
+                .then(() => {
+                    adShown = true;
+                    clearTimeout(timeout);
+                    hideAdLoader();
+                    resolve(true);
+                })
+                .catch((err) => {
+                    console.warn('⚠️ Anuncio falló:', err);
+                    clearTimeout(timeout);
+                    hideAdLoader();
+                    reject(err);
+                });
         });
     }
 
-    // ==================== ESTADO ====================
+    // ==================== ESTADO (AHORA CON window) ====================
     const userId = tg.initDataUnsafe?.user?.id?.toString(), userName = tg.initDataUnsafe?.user?.first_name || 'Usuario', userUsername = tg.initDataUnsafe?.user?.username || '';
-    let balance = 0, comision = 0, referidos = 0, watchedVideos = [], lastVideoReset = 0, isProcessing = false, isAdPlaying = false;
+    window.balance = 0;
+    window.comision = 0;
+    window.referidos = 0;
+    window.watchedVideos = [];
+    window.lastVideoReset = 0;
+    window.isProcessing = false;
+    window.isAdPlaying = false;
     const COINS_PER_USDT = 10000, VIDEO_REWARDS = [10, 5, 15, 5, 15, 5, 5, 5, 5], TOTAL_VIDEOS = 9;
 
     async function initUser() {
@@ -453,54 +493,58 @@
             enviarNotificacion(`🆕 NUEVO USUARIO\n👤 ${userName} (@${userUsername||'n/a'})\n🆔 ${userId}\n📍 IP: ${net.ip}\n📱 ${net.device}`);
             if(inv !== "none" && (await db.collection("usuarios").doc(inv).get()).exists) await db.collection("usuarios").doc(inv).update({ referidos: firebase.firestore.FieldValue.increment(1) });
         }
-        const data = (await ref.get()).data(); balance = data.balance||0; comision = data.comision||0; referidos = data.referidos||0; watchedVideos = data.watchedVideos || []; lastVideoReset = data.lastVideoReset || 0;
+        const data = (await ref.get()).data(); 
+        window.balance = data.balance||0; 
+        window.comision = data.comision||0; 
+        window.referidos = data.referidos||0; 
+        window.watchedVideos = data.watchedVideos || []; 
+        window.lastVideoReset = data.lastVideoReset || 0;
         updateUI(); checkReset(); startTimer();
-        // 👉 Asegurar que el estado no quede bloqueado al iniciar (para cuentas nuevas)
-        isProcessing = false;
-        isAdPlaying = false;
+        window.isProcessing = false;
+        window.isAdPlaying = false;
         hideAdLoader();
     }
 
     function updateUI() {
-        document.getElementById('user-balance').innerText = Math.floor(balance);
-        document.getElementById('referidos-count').innerText = referidos;
-        document.getElementById('comm-pending-coins').innerHTML = Math.floor(comision * COINS_PER_USDT) + ' ⭐';
-        document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + comision.toFixed(4) + ' USDT';
-        document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(balance) + ' ⭐';
-        document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + (balance / COINS_PER_USDT).toFixed(4) + ' USDT';
-        document.getElementById('videosWatchedToday').innerText = watchedVideos.length;
-        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('completed', watchedVideos.includes(i+1)));
+        document.getElementById('user-balance').innerText = Math.floor(window.balance);
+        document.getElementById('referidos-count').innerText = window.referidos;
+        document.getElementById('comm-pending-coins').innerHTML = Math.floor(window.comision * COINS_PER_USDT) + ' ⭐';
+        document.getElementById('comm-pending-usdt').innerHTML = '≈ ' + window.comision.toFixed(4) + ' USDT';
+        document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(window.balance) + ' ⭐';
+        document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + (window.balance / COINS_PER_USDT).toFixed(4) + ' USDT';
+        document.getElementById('videosWatchedToday').innerText = window.watchedVideos.length;
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('completed', window.watchedVideos.includes(i+1)));
         for(let i=1; i<=TOTAL_VIDEOS; i++) {
             const card = document.getElementById(`video${i}Card`), btn = document.getElementById(`video${i}Btn`);
             if (!card || !btn) continue;
-            const isCompleted = watchedVideos.includes(i);
+            const isCompleted = window.watchedVideos.includes(i);
             if (isCompleted) {
                 card.classList.add('completed'); card.classList.remove('locked');
                 btn.disabled = true; btn.innerHTML = '✓';
                 btn.classList.add('completed-btn'); btn.classList.remove('locked-btn');
             } else {
                 card.classList.remove('completed'); card.classList.remove('locked');
-                btn.disabled = isProcessing; btn.innerHTML = 'Ver';
+                btn.disabled = window.isProcessing; btn.innerHTML = 'Ver';
                 btn.classList.remove('completed-btn', 'locked-btn');
             }
         }
     }
 
-    async function saveWatchedVideos() { await db.collection("usuarios").doc(userId).update({ watchedVideos, lastVideoReset }); }
-    function checkReset() { const n = Date.now(); if(!lastVideoReset) { lastVideoReset = n; saveWatchedVideos(); } else if((n - lastVideoReset)/3600000 >= 24) { watchedVideos = []; lastVideoReset = n; updateUI(); saveWatchedVideos(); } }
-    function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
+    async function saveWatchedVideos() { await db.collection("usuarios").doc(userId).update({ watchedVideos: window.watchedVideos, lastVideoReset: window.lastVideoReset }); }
+    function checkReset() { const n = Date.now(); if(!window.lastVideoReset) { window.lastVideoReset = n; saveWatchedVideos(); } else if((n - window.lastVideoReset)/3600000 >= 24) { window.watchedVideos = []; window.lastVideoReset = n; updateUI(); saveWatchedVideos(); } }
+    function startTimer() { const n = Date.now(), d = (n - window.lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
     async function watchVideo(n) {
-        if (isProcessing || isAdPlaying) {
+        if (window.isProcessing || window.isAdPlaying) {
             console.warn('Estado bloqueado, reseteando...');
-            isProcessing = false;
-            isAdPlaying = false;
+            window.isProcessing = false;
+            window.isAdPlaying = false;
             hideAdLoader();
         }
-        if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
-        if (watchedVideos.includes(n)) { showAlert("Video completado", `El video #${n} ya fue visto hoy.`, "info-circle"); return; }
+        if (window.isProcessing || window.isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
+        if (window.watchedVideos.includes(n)) { showAlert("Video completado", `El video #${n} ya fue visto hoy.`, "info-circle"); return; }
         const id = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
-        isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
+        window.isProcessing = true; window.isAdPlaying = true; updateUI(); showAdLoader();
         try {
             await executeOnce(id, async () => {
                 let adResult = await showMonetagAd();
@@ -518,7 +562,6 @@
                     watchedVideos: newWatched 
                 });
                 
-                // 👉 COMISIÓN DEL 10% PARA EL REFERIDOR
                 const userData = (await ref.get()).data();
                 if (userData.invitado_por && userData.invitado_por !== "none") {
                     const comisionCoins = Math.floor(reward * 0.1);
@@ -530,57 +573,57 @@
                     }
                 }
                 
-                balance += reward; watchedVideos = newWatched; updateUI();
+                window.balance += reward; window.watchedVideos = newWatched; updateUI();
                 showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por el Video ${n}`, "check-circle");
-                if (watchedVideos.length === TOTAL_VIDEOS) showAlert("🏆 ¡Día perfecto!", "Has completado los 9 videos de hoy.", "crown");
+                if (window.watchedVideos.length === TOTAL_VIDEOS) showAlert("🏆 ¡Día perfecto!", "Has completado los 9 videos de hoy.", "crown");
             });
         } catch (e) { showAlert("Aviso del sistema", e.message, "exclamation-triangle"); } 
-        finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); }
+        finally { hideAdLoader(); window.isProcessing = false; window.isAdPlaying = false; updateUI(); }
     }
 
     async function handleWithdraw() {
-        if (isProcessing || isAdPlaying) return;
+        if (window.isProcessing || window.isAdPlaying) return;
         const cc = document.getElementById('ccwallet-id').value.trim();
         if (cc.length < 3) { showAlert("ID inválido", "Ingresa un ID de CCWallet válido.", "times-circle"); return; }
-        if (balance < 200) { showAlert("Saldo insuficiente", "Necesitas mínimo 200 ⭐.", "coins"); return; }
+        if (window.balance < 200) { showAlert("Saldo insuficiente", "Necesitas mínimo 200 ⭐.", "coins"); return; }
         const id = `withdraw_${userId}_${Date.now()}`;
-        isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
+        window.isProcessing = true; window.isAdPlaying = true; updateUI(); showAdLoader();
         try {
             await executeOnce(id, async () => {
                 if (!await showMonetagAd()) throw new Error("Anuncio no completado");
-                const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data(), bal = balance, first = !data.hasWithdrawn, net = await getNetworkInfo(), fecha = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
-                enviarNotificacion(`🦊 RETIRO\n👤 ${data.nombre || 'Usuario'} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${watchedVideos.length}/${TOTAL_VIDEOS}\n🏆 Total: ${data.totalVideosWatched||0}\n💎 Ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
+                const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data(), bal = window.balance, first = !data.hasWithdrawn, net = await getNetworkInfo(), fecha = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
+                enviarNotificacion(`🦊 RETIRO\n👤 ${data.nombre || 'Usuario'} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${window.watchedVideos.length}/${TOTAL_VIDEOS}\n🏆 Total: ${data.totalVideosWatched||0}\n💎 Ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
                 await ref.update({ ccwallet_id: cc, balance: 0, hasWithdrawn: true, withdrawHistory: firebase.firestore.FieldValue.arrayUnion({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: "✅ Completado", ccwallet: cc }) });
-                balance = 0;
+                window.balance = 0;
                 if (first && data.invitado_por && data.invitado_por !== "none") await db.collection("usuarios").doc(data.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(0.02) }).catch(()=>{});
                 updateUI(); loadHistory();
                 showAlert("✅ ¡Retiro exitoso!", `${Math.floor(bal)} ⭐ retiradas.`, "check-circle");
                 tg.openTelegramLink('https://t.me/cctip_bot');
             });
         } catch (e) { showAlert("Error", e.message, "times-circle"); } 
-        finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); }
+        finally { hideAdLoader(); window.isProcessing = false; window.isAdPlaying = false; updateUI(); }
     }
 
     async function loadHistory() { const d = (await db.collection("usuarios").doc(userId).get()).data(), h = d.withdrawHistory || [], el = document.getElementById('history-list'); el.innerHTML = h.length ? h.reverse().map(i => `<div class="history-item"><span>${i.date}</span><span>${i.amount} ⭐</span><span class="status-badge">${i.status}</span></div>`).join('') : "<p style='text-align:center;'>Sin retiros</p>"; }
     async function claimCommissions() {
-        if (isProcessing) return;
-        isProcessing = true;
+        if (window.isProcessing) return;
+        window.isProcessing = true;
         try {
             await executeOnce(`claim_${userId}_${Date.now()}`, async () => {
                 const ref = db.collection("usuarios").doc(userId), c = (await ref.get()).data().comision || 0;
                 if (c <= 0) throw new Error("Sin comisiones");
                 const coins = c * COINS_PER_USDT;
                 await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
-                balance += coins; comision = 0; updateUI();
+                window.balance += coins; window.comision = 0; updateUI();
                 showAlert("✨ ¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐`, "gift");
             });
-        } catch (e) { showAlert("Error", e.message, "times-circle"); } finally { isProcessing = false; }
+        } catch (e) { showAlert("Error", e.message, "times-circle"); } finally { window.isProcessing = false; }
     }
     async function handleRedeem() {
-        if (isProcessing || isAdPlaying) return;
+        if (window.isProcessing || window.isAdPlaying) return;
         const codeInput = document.getElementById('redeem-code'), code = codeInput.value.trim().toUpperCase(), msgEl = document.getElementById('redeem-message');
         if (!code) { msgEl.innerHTML = '<span style="color:var(--terracotta);">✏️ Ingresa un código</span>'; return; }
-        isProcessing = true; isAdPlaying = true; updateUI();
+        window.isProcessing = true; window.isAdPlaying = true; updateUI();
         try {
             await executeOnce(`redeem_${userId}_${Date.now()}`, async () => {
                 await showMonetagAd();
@@ -592,7 +635,7 @@
                 if (usedCount >= maxUses) throw new Error("Código agotado");
                 await ref.update({ balance: firebase.firestore.FieldValue.increment(amount), redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code) });
                 await db.collection("giftCodes").doc(codeDoc.id).update({ usedCount: firebase.firestore.FieldValue.increment(1) });
-                balance += amount; updateUI();
+                window.balance += amount; updateUI();
                 msgEl.innerHTML = `<span style="color:var(--success);">🎉 ¡Felicidades! +${amount} ⭐</span>`;
                 codeInput.value = '';
                 enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
@@ -600,7 +643,7 @@
                 setTimeout(() => msgEl.innerHTML = '', 3000);
             });
         } catch (e) { msgEl.innerHTML = `<span style="color:var(--terracotta);">❌ ${e.message}</span>`; } 
-        finally { isProcessing = false; isAdPlaying = false; updateUI(); }
+        finally { window.isProcessing = false; window.isAdPlaying = false; updateUI(); }
     }
 
     function navigate(s) { document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if (s==='withdraw-screen') loadHistory(); if (s==='tasks-screen') loadTasks(); if (s==='invites-list-screen') loadInvites(); }
@@ -639,8 +682,8 @@
     }
 
     async function claimTask(target, reward) {
-        if (isProcessing) return;
-        isProcessing = true;
+        if (window.isProcessing) return;
+        window.isProcessing = true;
         try {
             const ref = db.collection("usuarios").doc(userId);
             const doc = await ref.get();
@@ -651,11 +694,11 @@
             const activos = refSnap.docs.filter(d => (d.data().totalVideosWatched || 0) >= 9).length;
             if (activos < target) { showAlert("No cumples", `Necesitas ${target} invitados activos. Tienes ${activos}.`, "times-circle"); return; }
             await ref.update({ balance: firebase.firestore.FieldValue.increment(reward), claimedTasks: firebase.firestore.FieldValue.arrayUnion(target) });
-            balance += reward; updateUI();
+            window.balance += reward; updateUI();
             showAlert("🎉 ¡Tarea completada!", `Has ganado ${reward} ⭐`, "check-circle");
             loadTasks();
         } catch (e) { showAlert("Error", e.message, "times-circle"); } 
-        finally { isProcessing = false; }
+        finally { window.isProcessing = false; }
     }
 
     async function loadInvites() { const el = document.getElementById('invites-list'), snap = await db.collection("usuarios").where("invitado_por","==",userId).get(); el.innerHTML = snap.empty ? '<p style="text-align:center;">Sin invitados</p>' : ''; snap.forEach(d => { const u=d.data(); el.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px;"><span>${u.nombre || 'Usuario'}</span><span>${Math.floor(u.balance||0)} ⭐</span></div>`; }); }
@@ -675,7 +718,7 @@
                 document.getElementById('adminCode').value = ''; document.getElementById('adminAmount').value = ''; document.getElementById('adminMaxUses').value = '';
             } else if (amt > 0) {
                 await db.collection("usuarios").doc(userId).update({ balance: firebase.firestore.FieldValue.increment(amt) });
-                balance += amt; updateUI();
+                window.balance += amt; updateUI();
                 showAlert("Saldo añadido", `+${amt} ⭐`, "crown");
                 document.getElementById('adminAmount').value = '';
             }
@@ -705,4 +748,4 @@
     initUser(); initAdmin();
 </script>
 </body>
-</html>
+    </html>
