@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USDT GIFT K - Moneda Dorada</title>
     
-    <!-- Monetag -->
+    <!-- Monetag (único proveedor) -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
-    
-    <!-- Onelock y RichInfo -->
-    <script src="https://api.onelock.com/onestream-ad-admanager/tma.js" crossorigin="anonymous"></script>
-    <script src="https://richinfo.co/richpartners/telegram/js/tg-ob.js" crossorigin="anonymous"></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -373,7 +369,7 @@
     <div id="withdraw-screen" class="screen"><div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-wallet" style="font-size: 36px; background: linear-gradient(135deg, var(--success) 0%, #4A8C74 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Retirar con CCWallet</h3><div class="balance-available"><small>Balance disponible</small><div class="coins" id="withdraw-balance-coins">0 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div><div class="ccwallet-info"><i class="fas fa-info-circle"></i> ¿No tienes CCWallet? <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button><br><small>Retiro vía @cctip_bot</small></div><textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea><button class="btn-game btn-success" style="width: 100%; padding: 16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button><p style="margin-top: 10px; font-size: 11px; color: var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p><div class="history-title">Historial</div><div id="history-list" style="max-height: 150px; overflow-y: auto;"></div></div></div>
     <div id="redeem-screen" class="screen"><div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div><div class="glass-card"><i class="fas fa-ticket-alt" style="font-size: 36px; background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i><h3 style="margin: 10px 0; font-size: 20px; font-weight: 800; color: var(--text-dark);">Canjear Código</h3><div class="channel-join"><i class="fab fa-telegram"></i> Únete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div><div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div><div id="redeem-message" style="margin-top: 14px; font-size: 13px; text-align: center;"></div></div></div>
     
-    <!-- NUEVA PANTALLA DE TAREAS -->
+    <!-- PANTALLA DE TAREAS -->
     <div id="tasks-screen" class="screen">
         <div class="back-circle" id="backHomeTasks"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -431,30 +427,6 @@
         catch (e) { return { ip: 'No disponible', device: navigator.platform || 'Desconocido' }; }
     }
 
-    // ==================== INICIALIZACIÓN DE PROVEEDORES ====================
-    const ONELOCK_SPOT_IDS = ['6116292@usdtgftkbot', '6116293@usdtgftkbot', '6116294@usdtgftkbot', '6116295@usdtgftkbot'];
-    let onelockShows = [];
-    
-    function initOnelock() {
-        if (typeof window.initCDTma === 'function') {
-            ONELOCK_SPOT_IDS.forEach((spotId, index) => {
-                window.initCDTma({ id: spotId }).then(show => { onelockShows[index] = show; }).catch(e => { onelockShows[index] = null; });
-            });
-        } else { setTimeout(initOnelock, 1500); }
-    }
-    
-    function initRichInfo() {
-        const AdController = window.TelegramAdsController || window.TelegramAds;
-        if (typeof AdController !== 'undefined') {
-            if (!window.adsController) {
-                window.adsController = new AdController();
-                window.adsController.initialize({ pubId: "995853", appId: "6990", type: 'miniApp' });
-            }
-        } else { setTimeout(initRichInfo, 1500); }
-    }
-    
-    setTimeout(() => { initOnelock(); initRichInfo(); }, 500);
-
     async function showMonetagAd() {
         return new Promise((resolve) => {
             const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
@@ -464,19 +436,6 @@
                 } else { clearTimeout(timeout); hideAdLoader(); resolve(true); }
             } catch (e) { clearTimeout(timeout); hideAdLoader(); resolve(true); }
         });
-    }
-
-    async function showOnelockAd(spotIndex) {
-        const show = onelockShows[spotIndex];
-        if (!show) return false;
-        try { await show({ type: 'rewarded' }); return true; } catch (e) { return false; }
-    }
-
-    async function showRichInfoAd() {
-        if (window.adsController && window.adsController.show) {
-            return window.adsController.show().then(() => true).catch(() => false);
-        }
-        return false;
     }
 
     // ==================== ESTADO ====================
@@ -496,6 +455,10 @@
         }
         const data = (await ref.get()).data(); balance = data.balance||0; comision = data.comision||0; referidos = data.referidos||0; watchedVideos = data.watchedVideos || []; lastVideoReset = data.lastVideoReset || 0;
         updateUI(); checkReset(); startTimer();
+        // 👉 Asegurar que el estado no quede bloqueado al iniciar (para cuentas nuevas)
+        isProcessing = false;
+        isAdPlaying = false;
+        hideAdLoader();
     }
 
     function updateUI() {
@@ -528,7 +491,6 @@
     function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
     async function watchVideo(n) {
-        // 👉 Forzar reset si está bloqueado
         if (isProcessing || isAdPlaying) {
             console.warn('Estado bloqueado, reseteando...');
             isProcessing = false;
@@ -541,14 +503,8 @@
         isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
         try {
             await executeOnce(id, async () => {
-                let adResult = false;
-                if (n === 1 || n === 3 || n === 5) adResult = await showMonetagAd();
-                else if (n === 2) { adResult = await showOnelockAd(0); if (!adResult) adResult = await showMonetagAd(); }
-                else if (n === 6) { adResult = await showOnelockAd(1); if (!adResult) adResult = await showMonetagAd(); }
-                else if (n === 8) { adResult = await showOnelockAd(2); if (!adResult) adResult = await showMonetagAd(); }
-                else if (n === 9) { adResult = await showOnelockAd(3); if (!adResult) adResult = await showMonetagAd(); }
-                else if (n === 4 || n === 7) { adResult = await showRichInfoAd(); if (!adResult) adResult = await showMonetagAd(); }
-                if (!adResult) throw new Error("No se pudo mostrar ningún anuncio.");
+                let adResult = await showMonetagAd();
+                if (!adResult) throw new Error("No se pudo mostrar el anuncio.");
                 
                 const reward = VIDEO_REWARDS[n-1];
                 const ref = db.collection("usuarios").doc(userId);
@@ -666,7 +622,7 @@
         el.innerHTML = '<p style="text-align:center;">Cargando...</p>';
         const refSnap = await db.collection("usuarios").where("invitado_por", "==", userId).get();
         const referidos = refSnap.docs.map(d => d.data());
-        const activos = referidos.filter(r => (r.totalVideosWatched || 0) >= 9).length; // 9 videos = activo
+        const activos = referidos.filter(r => (r.totalVideosWatched || 0) >= 9).length;
         const userDoc = await db.collection("usuarios").doc(userId).get();
         const claimedTasks = userDoc.data()?.claimedTasks || [];
         let html = `<p style="margin-bottom:15px;"><strong>👥 Invitados activos: ${activos}</strong></p>`;
