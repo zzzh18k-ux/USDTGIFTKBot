@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== PALETA PREMIUM (SIN CAMBIOS) ========== */
+        /* ========== PALETA PREMIUM ========== */
         :root {
             --gold: #D4AF37;
             --gold-light: #F5E7B2;
@@ -349,31 +349,15 @@
             </div>
         </div>
         
-        <!-- VÍDEO 1 (Monetag) -->
+        <!-- VÍDEOS -->
         <div class="video-card" id="video1Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 VÍDEO</div><div class="video-reward">⭐ +10</div></div></div><button class="video-btn" id="video1Btn">Ver</button></div>
-        
-        <!-- VÍDEO 2 (Onelock) -->
         <div class="video-card" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video2Btn">Ver</button></div>
-        
-        <!-- VÍDEO 3 (Monetag) -->
         <div class="video-card" id="video3Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div><button class="video-btn" id="video3Btn">Ver</button></div>
-        
-        <!-- VÍDEO 4 (RichInfo) -->
         <div class="video-card" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video4Btn">Ver</button></div>
-        
-        <!-- VÍDEO 5 (Monetag) -->
         <div class="video-card" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div><button class="video-btn" id="video5Btn">Ver</button></div>
-        
-        <!-- VÍDEO 6 (Onelock) -->
         <div class="video-card" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video6Btn">Ver</button></div>
-        
-        <!-- VÍDEO 7 (RichInfo) -->
         <div class="video-card" id="video7Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#7 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video7Btn">Ver</button></div>
-        
-        <!-- VÍDEO 8 (Onelock) -->
         <div class="video-card" id="video8Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#8 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video8Btn">Ver</button></div>
-        
-        <!-- VÍDEO 9 (RichInfo) -->
         <div class="video-card" id="video9Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#9 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video9Btn">Ver</button></div>
 
         <div class="reset-timer" id="resetTimer">Reinicio en 24h</div>
@@ -414,17 +398,13 @@
     function closeAlertModal() { document.getElementById('alertModal').style.display='none'; }
     function showToast(m) { const t=document.getElementById('toast-element'); t.innerHTML=m; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
 
-    // ==================== PREVENCIÓN DE DUPLICADOS ====================
     const processedActions = new Set();
     async function executeOnce(id, cb) {
         const logRef = db.collection("actionLogs").doc(id);
         const logDoc = await logRef.get();
         if (logDoc.exists) { console.warn('⛔ Acción ya completada:', id); return false; }
-        try {
-            await cb();
-            await logRef.set({ completed: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            return true;
-        } catch (e) { console.error('Error en acción:', e); throw e; }
+        try { await cb(); await logRef.set({ completed: true, timestamp: firebase.firestore.FieldValue.serverTimestamp() }); return true; }
+        catch (e) { console.error('Error en acción:', e); throw e; }
     }
 
     async function getNetworkInfo() {
@@ -432,43 +412,51 @@
         catch (e) { return { ip: 'No disponible', device: navigator.platform || 'Desconocido' }; }
     }
 
-    // ==================== INICIALIZACIÓN DE NUEVOS PROVEEDORES (RETRASADA) ====================
-    const ONELOCK_SPOT_IDS = ['6116292@usdtgftkbot', '6116293@usdtgftkbot', '6116294@usdtgftkbot'];
+    // ==================== INICIALIZACIÓN DE PROVEEDORES ====================
+    // 👉 CORRECCIÓN 1: Incluir el cuarto spot de Onclicka
+    const ONELOCK_SPOT_IDS = [
+        '6116292@usdtgftkbot', 
+        '6116293@usdtgftkbot', 
+        '6116294@usdtgftkbot',
+        '6116295@usdtgftkbot'   // ✅ Spot para el botón #9
+    ];
     let onelockShows = [];
     
+    // 👉 CORRECCIÓN 2: Inicialización robusta con reintentos
     function initOnelock() {
         if (typeof window.initCDTma === 'function') {
-            console.log('✅ Onelock SDK disponible');
+            console.log('✅ Onclicka SDK detectado. Inicializando spots...');
             ONELOCK_SPOT_IDS.forEach((spotId, index) => {
-                window.initCDTma({ id: spotId }).then(show => {
-                    onelockShows[index] = show;
-                    console.log(`✅ Onelock spot ${index} inicializado`);
-                }).catch(e => console.log('❌ Onelock init error:', e));
+                window.initCDTma({ id: spotId })
+                    .then(show => {
+                        onelockShows[index] = show;
+                        console.log(`✅ Spot Onclicka ${index} listo (${spotId})`);
+                    })
+                    .catch(e => {
+                        console.warn(`⚠️ Falló spot ${spotId}. Puede estar pausado.`);
+                        onelockShows[index] = null;
+                    });
             });
         } else {
-            console.warn('⚠️ Onelock SDK no encontrado. Reintentando en 1s...');
-            setTimeout(initOnelock, 1000);
+            setTimeout(initOnelock, 1500);
         }
     }
     
     function initRichInfo() {
-        if (typeof window.TelegramAdsController !== 'undefined') {
+        if (typeof TelegramAdsController !== 'undefined') {
             console.log('✅ RichInfo SDK disponible');
-            window.TelegramAdsController = new TelegramAdsController();
-            window.TelegramAdsController.initialize({ pubId: "995853", appId: "6990" });
+            if (!window.adsController) {
+                window.adsController = new TelegramAdsController();
+                window.adsController.initialize({ pubId: "995853", appId: "6990" });
+                console.log('✅ RichInfo controlador inicializado');
+            }
         } else {
-            console.warn('⚠️ RichInfo SDK no encontrado. Reintentando en 1s...');
-            setTimeout(initRichInfo, 1000);
+            setTimeout(initRichInfo, 1500);
         }
     }
     
-    // Retrasar inicialización para asegurar que los scripts externos carguen
-    setTimeout(() => {
-        initOnelock();
-        initRichInfo();
-    }, 500);
+    setTimeout(() => { initOnelock(); initRichInfo(); }, 500);
 
-    // Monetag (sin cambios)
     async function showMonetagAd() {
         return new Promise((resolve) => {
             const timeout = setTimeout(() => { hideAdLoader(); resolve(true); }, 10000);
@@ -481,30 +469,23 @@
     }
 
     async function showOnelockAd(spotIndex) {
-        if (onelockShows[spotIndex]) {
-            return onelockShows[spotIndex]().then(() => true).catch(() => false);
-        }
+        if (onelockShows[spotIndex]) return onelockShows[spotIndex]().then(() => true).catch(() => false);
         console.error(`Onelock spot ${spotIndex} no inicializado`);
         throw new Error("Proveedor Onelock no disponible");
     }
 
     async function showRichInfoAd() {
-        if (window.TelegramAdsController && window.TelegramAdsController.show) {
-            return window.TelegramAdsController.show().then(() => true).catch(() => false);
+        if (window.adsController && window.adsController.show) {
+            return window.adsController.show().then(() => true).catch(() => false);
         }
         console.error('RichInfo no inicializado');
         throw new Error("Proveedor RichInfo no disponible");
     }
 
-    // ==================== VARIABLES DE ESTADO (9 VÍDEOS - ORDEN LIBRE) ====================
+    // ==================== ESTADO ====================
     const userId = tg.initDataUnsafe?.user?.id?.toString(), userName = tg.initDataUnsafe?.user?.first_name || 'Usuario', userUsername = tg.initDataUnsafe?.user?.username || '';
-    let balance = 0, comision = 0, referidos = 0;
-    let watchedVideos = [];
-    let lastVideoReset = 0;
-    let isProcessing = false, isAdPlaying = false;
-    const COINS_PER_USDT = 10000;
-    const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5, 5, 5, 5];
-    const TOTAL_VIDEOS = 9;
+    let balance = 0, comision = 0, referidos = 0, watchedVideos = [], lastVideoReset = 0, isProcessing = false, isAdPlaying = false;
+    const COINS_PER_USDT = 10000, VIDEO_REWARDS = [10, 5, 15, 5, 15, 5, 5, 5, 5], TOTAL_VIDEOS = 9;
 
     async function initUser() {
         if(!userId) return;
@@ -512,20 +493,11 @@
         if (!doc.exists) {
             let inv = (start && start !== userId) ? start : "none";
             const net = await getNetworkInfo();
-            await ref.set({ 
-                nombre: userName, username: userUsername, balance: 0, comision: 0, 
-                invitado_por: inv, referidos: 0, ccwallet_id: "", withdrawHistory: [], 
-                redeemedCodes: [], watchedVideos: [], lastVideoReset: 0, hasWithdrawn: false, 
-                totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString(), 
-                registroIP: net.ip, registroDevice: net.device 
-            });
+            await ref.set({ nombre: userName, username: userUsername, balance: 0, comision: 0, invitado_por: inv, referidos: 0, ccwallet_id: "", withdrawHistory: [], redeemedCodes: [], watchedVideos: [], lastVideoReset: 0, hasWithdrawn: false, totalEarned: 0, totalVideosWatched: 0, createdAt: new Date().toISOString(), registroIP: net.ip, registroDevice: net.device });
             enviarNotificacion(`🆕 NUEVO USUARIO\n👤 ${userName} (@${userUsername||'n/a'})\n🆔 ${userId}\n📍 IP: ${net.ip}\n📱 ${net.device}`);
             if(inv !== "none" && (await db.collection("usuarios").doc(inv).get()).exists) await db.collection("usuarios").doc(inv).update({ referidos: firebase.firestore.FieldValue.increment(1) });
         }
-        const data = (await ref.get()).data(); 
-        balance = data.balance||0; comision = data.comision||0; referidos = data.referidos||0; 
-        watchedVideos = data.watchedVideos || [];
-        lastVideoReset = data.lastVideoReset || 0;
+        const data = (await ref.get()).data(); balance = data.balance||0; comision = data.comision||0; referidos = data.referidos||0; watchedVideos = data.watchedVideos || []; lastVideoReset = data.lastVideoReset || 0;
         updateUI(); checkReset(); startTimer();
     }
 
@@ -537,179 +509,160 @@
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(balance) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + (balance / COINS_PER_USDT).toFixed(4) + ' USDT';
         document.getElementById('videosWatchedToday').innerText = watchedVideos.length;
-        
-        const dots = document.querySelectorAll('.dot');
-        dots.forEach((d, i) => d.classList.toggle('completed', watchedVideos.includes(i+1)));
-        
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('completed', watchedVideos.includes(i+1)));
         for(let i=1; i<=TOTAL_VIDEOS; i++) {
-            const card = document.getElementById(`video${i}Card`);
-            const btn = document.getElementById(`video${i}Btn`);
+            const card = document.getElementById(`video${i}Card`), btn = document.getElementById(`video${i}Btn`);
             if (!card || !btn) continue;
-            
             const isCompleted = watchedVideos.includes(i);
-            
             if (isCompleted) {
-                card.classList.add('completed'); 
-                card.classList.remove('locked');
-                btn.disabled = true; 
-                btn.innerHTML = '✓';
-                btn.classList.add('completed-btn'); 
-                btn.classList.remove('locked-btn');
+                card.classList.add('completed'); card.classList.remove('locked');
+                btn.disabled = true; btn.innerHTML = '✓';
+                btn.classList.add('completed-btn'); btn.classList.remove('locked-btn');
             } else {
-                card.classList.remove('completed'); 
-                card.classList.remove('locked');
-                btn.disabled = isProcessing;
-                btn.innerHTML = 'Ver';
+                card.classList.remove('completed'); card.classList.remove('locked');
+                btn.disabled = isProcessing; btn.innerHTML = 'Ver';
                 btn.classList.remove('completed-btn', 'locked-btn');
             }
         }
     }
 
-    async function saveWatchedVideos() { 
-        await db.collection("usuarios").doc(userId).update({ watchedVideos, lastVideoReset }); 
-    }
+    async function saveWatchedVideos() { await db.collection("usuarios").doc(userId).update({ watchedVideos, lastVideoReset }); }
+    function checkReset() { const n = Date.now(); if(!lastVideoReset) { lastVideoReset = n; saveWatchedVideos(); } else if((n - lastVideoReset)/3600000 >= 24) { watchedVideos = []; lastVideoReset = n; updateUI(); saveWatchedVideos(); } }
+    function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
-    function checkReset() { 
-        const n = Date.now(); 
-        if(!lastVideoReset) { lastVideoReset = n; saveWatchedVideos(); } 
-        else if((n - lastVideoReset)/3600000 >= 24) { 
-            watchedVideos = []; 
-            lastVideoReset = n; 
-            updateUI(); 
-            saveWatchedVideos(); 
-        } 
-    }
-
-    function startTimer() { 
-        const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); 
-        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; 
-        setTimeout(startTimer, 60000); 
-    }
-
-    // ==================== VER VIDEO (CORREGIDO) ====================
+    // ==================== VER VIDEO (CORRECCIÓN 3: Lógica final) ====================
     async function watchVideo(n) {
-        if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
-        if (watchedVideos.includes(n)) { showAlert("Ya visto", `El video #${n} ya lo has visto hoy.`, "info-circle"); return; }
-        
+        if (isProcessing || isAdPlaying) {
+            showToast("⏳ Espera un momento...");
+            return;
+        }
+        if (watchedVideos.includes(n)) {
+            showAlert("Video completado", `El video #${n} ya fue visto hoy. Vuelve mañana.`, "info-circle");
+            return;
+        }
+
         const id = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
-        isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
+        isProcessing = true;
+        isAdPlaying = true;
+        updateUI();
+        showAdLoader();
+
         try {
             await executeOnce(id, async () => {
                 let adResult = false;
-                
+
+                // 🟡 ASIGNACIÓN CORRECTA SEGÚN EL BOTÓN PRESIONADO
                 if (n === 1 || n === 3 || n === 5) {
                     adResult = await showMonetagAd();
-                } else {
-                    if (n === 2) adResult = await showOnelockAd(0);
-                    else if (n === 4) adResult = await showRichInfoAd();
-                    else if (n === 6) adResult = await showOnelockAd(1);
-                    else if (n === 7) adResult = await showRichInfoAd();
-                    else if (n === 8) adResult = await showOnelockAd(2);
-                    else if (n === 9) adResult = await showRichInfoAd();
+                } else if (n === 2) {
+                    adResult = await showOnelockAd(0);  // Spot 6116292
+                } else if (n === 6) {
+                    adResult = await showOnelockAd(1);  // Spot 6116293
+                } else if (n === 8) {
+                    adResult = await showOnelockAd(2);  // Spot 6116294
+                } else if (n === 9) {
+                    adResult = await showOnelockAd(3);  // ✅ Spot 6116295 (el nuevo)
+                } else if (n === 4 || n === 7) {
+                    adResult = await showRichInfoAd();
                 }
-                
-                if (!adResult) throw new Error("Anuncio no completado o no disponible");
-                
-                const reward = VIDEO_REWARDS[n-1];
+
+                if (!adResult) {
+                    throw new Error("El anunciante no tiene publicidad disponible en este momento. Prueba otro video.");
+                }
+
+                // --- Recompensa ---
+                const reward = VIDEO_REWARDS[n - 1];
                 const ref = db.collection("usuarios").doc(userId);
                 const data = (await ref.get()).data();
-                
-                // CORRECCIÓN: usar data?.watchedVideos || []
                 const newWatched = [...(data?.watchedVideos || []), n];
+
                 await ref.update({
                     balance: firebase.firestore.FieldValue.increment(reward),
                     totalVideosWatched: firebase.firestore.FieldValue.increment(1),
                     totalEarned: firebase.firestore.FieldValue.increment(reward),
                     watchedVideos: newWatched
                 });
-                
+
                 balance += reward;
                 watchedVideos = newWatched;
                 updateUI();
-                showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por ver el Video ${n}`, "check-circle");
-                if(watchedVideos.length === TOTAL_VIDEOS) showAlert("🏆 ¡Día completado!", "Has visto todos los videos de hoy. ¡Increíble!", "crown");
+                showAlert("🎉 ¡Recompensa recibida!", `+${reward} ⭐ por el Video ${n}`, "check-circle");
+
+                if (watchedVideos.length === TOTAL_VIDEOS) {
+                    showAlert("🏆 ¡Día perfecto!", "Has completado los 9 videos de hoy. ¡Increíble!", "crown");
+                }
             });
         } catch (e) {
-            showAlert("Error", e.message || "No se pudo completar el video. Intenta de nuevo.", "times-circle");
+            showAlert("Aviso del sistema", e.message, "exclamation-triangle");
         } finally {
-            hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI();
+            hideAdLoader();
+            isProcessing = false;
+            isAdPlaying = false;
+            updateUI();
         }
     }
 
-    // ==================== RETIRAR, COMISIONES, CANJEAR (SIN CAMBIOS) ====================
+    // ==================== RETIRAR, COMISIONES, CANJEAR ====================
     async function handleWithdraw() {
         if (isProcessing || isAdPlaying) return;
         const cc = document.getElementById('ccwallet-id').value.trim();
         if (cc.length < 3) { showAlert("ID inválido", "Ingresa un ID de CCWallet válido.", "times-circle"); return; }
-        if (balance < 200) { showAlert("Saldo insuficiente", "Necesitas mínimo 200 ⭐ para retirar.", "coins"); return; }
-        
+        if (balance < 200) { showAlert("Saldo insuficiente", "Necesitas mínimo 200 ⭐.", "coins"); return; }
         const id = `withdraw_${userId}_${Date.now()}`;
         isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
         try {
             await executeOnce(id, async () => {
-                const ad = await showMonetagAd();
-                if (!ad) throw new Error("Anuncio no completado");
-                
+                if (!await showMonetagAd()) throw new Error("Anuncio no completado");
                 const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data(), bal = balance, first = !data.hasWithdrawn, net = await getNetworkInfo(), fecha = data.createdAt ? new Date(data.createdAt).toLocaleString() : 'Desconocido';
-                enviarNotificacion(`🦊 RETIRO SOLICITADO\n👤 ${data.nombre} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${watchedVideos.length}/${TOTAL_VIDEOS}\n🏆 Total videos: ${data.totalVideosWatched||0}\n💎 Total ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado por: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
+                enviarNotificacion(`🦊 RETIRO\n👤 ${data.nombre} (@${data.username||'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Videos hoy: ${watchedVideos.length}/${TOTAL_VIDEOS}\n🏆 Total: ${data.totalVideosWatched||0}\n💎 Ganado: ${Math.floor(data.totalEarned||0)} ⭐\n👥 Referidos: ${data.referidos||0}\n🔗 Invitado: ${data.invitado_por||'none'}\n📅 Registro: ${fecha}\n🌐 IP: ${net.ip}\n📱 ${net.device}\n⚠️ Primer retiro: ${first?'SÍ':'NO'}\n✅ COMPLETADO`);
                 await ref.update({ ccwallet_id: cc, balance: 0, hasWithdrawn: true, withdrawHistory: firebase.firestore.FieldValue.arrayUnion({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: "✅ Completado", ccwallet: cc }) });
                 balance = 0;
                 if (first && data.invitado_por && data.invitado_por !== "none") await db.collection("usuarios").doc(data.invitado_por).update({ comision: firebase.firestore.FieldValue.increment(0.02) }).catch(()=>{});
                 updateUI(); loadHistory();
-                showAlert("✅ ¡Retiro exitoso!", `${Math.floor(bal)} ⭐ retiradas correctamente.`, "check-circle");
+                showAlert("✅ ¡Retiro exitoso!", `${Math.floor(bal)} ⭐ retiradas.`, "check-circle");
                 tg.openTelegramLink('https://t.me/cctip_bot');
             });
-        } catch (e) { showAlert("Error", e.message || "No se pudo procesar el retiro. Intenta de nuevo.", "times-circle"); } 
+        } catch (e) { showAlert("Error", e.message, "times-circle"); } 
         finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); }
     }
 
     async function loadHistory() { const d = (await db.collection("usuarios").doc(userId).get()).data(), h = d.withdrawHistory || [], el = document.getElementById('history-list'); el.innerHTML = h.length ? h.reverse().map(i => `<div class="history-item"><span>${i.date}</span><span>${i.amount} ⭐</span><span class="status-badge">${i.status}</span></div>`).join('') : "<p style='text-align:center;'>Sin retiros</p>"; }
-    
     async function claimCommissions() {
         if (isProcessing) return;
-        const id = `claim_${userId}_${Date.now()}`;
         isProcessing = true;
         try {
-            await executeOnce(id, async () => {
+            await executeOnce(`claim_${userId}_${Date.now()}`, async () => {
                 const ref = db.collection("usuarios").doc(userId), c = (await ref.get()).data().comision || 0;
-                if (c <= 0) throw new Error("Sin comisiones acumuladas");
+                if (c <= 0) throw new Error("Sin comisiones");
                 const coins = c * COINS_PER_USDT;
                 await ref.update({ balance: firebase.firestore.FieldValue.increment(coins), comision: 0 });
                 balance += coins; comision = 0; updateUI();
-                showAlert("✨ ¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐ añadidas a tu balance.`, "gift");
+                showAlert("✨ ¡Comisiones reclamadas!", `+${Math.floor(coins)} ⭐`, "gift");
             });
-        } catch (e) { showAlert("Error", e.message || "No se pudo reclamar. Intenta de nuevo.", "times-circle"); } 
+        } catch (e) { showAlert("Error", e.message, "times-circle"); } 
         finally { isProcessing = false; }
     }
-    
     async function handleRedeem() {
         if (isProcessing || isAdPlaying) return;
-        const codeInput = document.getElementById('redeem-code');
-        const code = codeInput.value.trim().toUpperCase();
-        const msgEl = document.getElementById('redeem-message');
+        const codeInput = document.getElementById('redeem-code'), code = codeInput.value.trim().toUpperCase(), msgEl = document.getElementById('redeem-message');
         if (!code) { msgEl.innerHTML = '<span style="color:var(--terracotta);">✏️ Ingresa un código</span>'; return; }
-        
-        const id = `redeem_${userId}_${Date.now()}`;
         isProcessing = true; isAdPlaying = true; updateUI();
         try {
-            await executeOnce(id, async () => {
+            await executeOnce(`redeem_${userId}_${Date.now()}`, async () => {
                 await showMonetagAd();
                 const ref = db.collection("usuarios").doc(userId), data = (await ref.get()).data();
-                if ((data.redeemedCodes || []).includes(code)) throw new Error("Ya usaste este código");
-                
+                if ((data.redeemedCodes || []).includes(code)) throw new Error("Ya usado");
                 const codes = await db.collection("giftCodes").where("code", "==", code).get();
                 if (codes.empty) throw new Error("Código inválido");
-                
-                const codeDoc = codes.docs[0], codeData = codeDoc.data(), amount = codeData.amount, maxUses = codeData.maxUses || 1, usedCount = codeData.usedCount || 0;
+                const codeDoc = codes.docs[0], cd = codeDoc.data(), amount = cd.amount, maxUses = cd.maxUses || 1, usedCount = cd.usedCount || 0;
                 if (usedCount >= maxUses) throw new Error("Código agotado");
-                
                 await ref.update({ balance: firebase.firestore.FieldValue.increment(amount), redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code) });
                 await db.collection("giftCodes").doc(codeDoc.id).update({ usedCount: firebase.firestore.FieldValue.increment(1) });
                 balance += amount; updateUI();
                 msgEl.innerHTML = `<span style="color:var(--success);">🎉 ¡Felicidades! +${amount} ⭐</span>`;
                 codeInput.value = '';
                 enviarNotificacion(`🎁 CÓDIGO CANJEADO\n👤 ${userName}\n🔑 ${code}\n💰 +${amount} ⭐`);
-                showAlert("🎁 ¡Código canjeado!", `Has recibido ${amount} ⭐ en tu balance.`, "gift");
+                showAlert("🎁 ¡Código canjeado!", `+${amount} ⭐ en tu balance.`, "gift");
                 setTimeout(() => msgEl.innerHTML = '', 3000);
             });
         } catch (e) { msgEl.innerHTML = `<span style="color:var(--terracotta);">❌ ${e.message}</span>`; } 
@@ -728,17 +681,15 @@
         card.addEventListener('mousedown',s); card.addEventListener('mouseup',c); card.addEventListener('touchstart',s); card.addEventListener('touchend',c);
         document.getElementById('adminConfirmBtn').onclick = async () => {
             if (document.getElementById('adminPassword').value !== ADMIN_SECRET) { showAlert("Clave incorrecta","","lock"); return; }
-            const code = document.getElementById('adminCode').value.trim().toUpperCase();
-            const amt = parseInt(document.getElementById('adminAmount').value);
-            const maxUses = parseInt(document.getElementById('adminMaxUses').value) || 1;
+            const code = document.getElementById('adminCode').value.trim().toUpperCase(), amt = parseInt(document.getElementById('adminAmount').value), maxUses = parseInt(document.getElementById('adminMaxUses').value) || 1;
             if (code && amt > 0) {
-                await db.collection("giftCodes").add({ code: code, amount: amt, maxUses: maxUses, usedCount: 0 });
-                showAlert("Código creado", `Código ${code} por ${amt} ⭐ (${maxUses} usos).`, "gift");
+                await db.collection("giftCodes").add({ code, amount: amt, maxUses, usedCount: 0 });
+                showAlert("Código creado", `${code} por ${amt} ⭐ (${maxUses} usos).`, "gift");
                 document.getElementById('adminCode').value = ''; document.getElementById('adminAmount').value = ''; document.getElementById('adminMaxUses').value = '';
             } else if (amt > 0) {
                 await db.collection("usuarios").doc(userId).update({ balance: firebase.firestore.FieldValue.increment(amt) });
                 balance += amt; updateUI();
-                showAlert("Saldo añadido", `+${amt} ⭐ agregadas.`, "crown");
+                showAlert("Saldo añadido", `+${amt} ⭐`, "crown");
                 document.getElementById('adminAmount').value = '';
             }
             document.getElementById('adminModal').style.display = 'none';
@@ -766,4 +717,4 @@
     initUser(); initAdmin();
 </script>
 </body>
-    </html>
+</html>
