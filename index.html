@@ -8,6 +8,10 @@
     <!-- Monetag -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +19,6 @@
     <style>
         :root {
             --gold: #D4AF37;
-            --gold-light: #F5E7B2;
             --cream: #FFFDF7;
             --terracotta: #D68B7C;
             --text-dark: #3A2C27;
@@ -94,7 +97,7 @@
             width: 0%;
             background: linear-gradient(90deg, var(--gold), var(--terracotta));
             border-radius: 10px;
-            animation: progress 4s ease-out forwards;
+            animation: progress 3s ease-out forwards;
         }
         @keyframes progress { 0%{width:0%;} 100%{width:100%;} }
         .loading-footer { margin-top: 20px; font-size: 13px; color: var(--terracotta); font-weight: 500; }
@@ -229,13 +232,6 @@
             border-radius: 20px; padding: 14px; margin: 12px 0; font-size: 12px;
             border-left: 4px solid var(--gold); color: var(--text-soft);
         }
-        .code-input-group { display: flex; gap: 8px; margin: 12px 0; }
-        .code-input-group input { flex: 1; margin: 0; }
-        .code-input-group button { width: auto; padding: 14px 22px; }
-        .channel-join {
-            background: linear-gradient(135deg, rgba(107,175,146,0.1), rgba(107,175,146,0.18));
-            border-radius: 20px; padding: 14px; margin: 14px 0; text-align: center; font-size: 13px;
-        }
         .balance-available {
             background: linear-gradient(135deg, rgba(255,253,247,0.95), rgba(255,250,240,0.98));
             border-radius: 25px; padding: 18px; margin: 14px 0; text-align: center;
@@ -243,10 +239,6 @@
         }
         .balance-available .coins { font-size: 34px; font-weight: 800; }
         .balance-available .usdt { font-size: 13px; opacity: 0.75; color: var(--text-soft); }
-        .commission-card {
-            background: linear-gradient(135deg, rgba(107,175,146,0.12), rgba(107,175,146,0.18));
-            border-radius: 25px; padding: 18px; margin: 14px 0;
-        }
         .btn-primary { background: linear-gradient(135deg, var(--gold), var(--terracotta)); color: white; }
         .btn-success { background: linear-gradient(135deg, var(--success), #4A8C74); color: white; }
         .status-badge { padding: 4px 10px; border-radius: 30px; font-size: 10px; font-weight: 700; background: var(--success); color: white; }
@@ -310,7 +302,7 @@
     <div class="welcome-description">Una experiencia <strong>colaborativa y segura</strong>. Gana monedas viendo videos, invita amigos y retira tus ganancias en USDT real.</div>
     <div class="feature-grid">
         <div class="feature-item"><span class="feature-icon"><i class="fas fa-play-circle"></i></span><span class="feature-text">Videos diarios <small>Recibe ⭐ por cada video completado</small></span></div>
-        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">Sistema de equipo <small>Gana 25 ⭐ por cada amigo que invite</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">Sistema de equipo <small>Gana 10% de lo que generen tus invitados</small></span></div>
         <div class="feature-item"><span class="feature-icon"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros a USDT <small>Directo a tu CCWallet al instante</small></span></div>
     </div>
     <div class="loading-progress"><div class="loading-progress-bar"></div></div>
@@ -336,10 +328,9 @@
     <div class="admin-modal-content">
         <h3><i class="fas fa-crown"></i> Panel Admin</h3>
         <input type="password" id="adminPassword" placeholder="Clave secreta">
-        <input type="text" id="adminCode" placeholder="Código (ej: REGALO50)">
-        <input type="number" id="adminAmount" placeholder="Monto en ⭐ (ej: 50)">
-        <input type="number" id="adminMaxUses" placeholder="Límite de usos (ej: 100)">
-        <button class="btn-game btn-primary" id="adminConfirmBtn">Crear Código / Agregar Saldo</button>
+        <input type="text" id="adminUserId" placeholder="ID de usuario">
+        <input type="number" id="adminAmount" placeholder="Monto en ⭐">
+        <button class="btn-game btn-primary" id="adminAddBalanceBtn">Agregar Saldo</button>
         <button class="btn-game" id="adminCancelBtn" style="margin-top:8px;">Cancelar</button>
     </div>
 </div>
@@ -373,7 +364,6 @@
         <div class="menu-grid">
             <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Invitar y Ganar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Retirar</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
@@ -382,12 +372,12 @@
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
             <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Invita y Gana</h3>
-            <p style="font-size:13px;color:var(--text-soft);">Comparte tu enlace y gana recompensas por cada amigo que se una.</p>
+            <p style="font-size:13px;color:var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos retiren.</p>
             
             <div class="invite-highlight">
-                <h4>🎁 +50 ⭐ para ti</h4><p>por cada amigo que se registre con tu enlace</p>
-                <h4 style="margin-top:12px;">🎉 +25 ⭐ para tu amigo</h4><p>como bono de bienvenida</p>
-                <div class="earn-tag">💰 ¡Ganan los dos!</div>
+                <h4>💎 +10% de comisión</h4><p>por cada video que vean tus invitados</p>
+                <h4 style="margin-top:12px;">🌟 +0.02 USDT</h4><p>cuando tu amigo haga su primer retiro</p>
+                <div class="earn-tag">💰 ¡Ingresos pasivos!</div>
             </div>
             
             <div class="invite-stats">
@@ -395,17 +385,13 @@
                     <div class="stat-number" id="totalInvitados">0</div>
                     <div class="stat-label">Invitados</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-number" id="gananciasInvitados">0</div>
-                    <div class="stat-label">⭐ Ganadas</div>
-                </div>
             </div>
             
             <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn">
                 <i class="fas fa-share-alt"></i> Compartir enlace de invitación
             </button>
             <p style="font-size:11px;color:var(--text-soft);margin-top:10px;text-align:center;">
-                <i class="fas fa-shield-alt"></i> Sistema anti-multicuentas activado
+                <i class="fas fa-check-circle"></i> El bono se acredita al primer retiro de tu invitado
             </p>
         </div>
     </div>
@@ -432,31 +418,36 @@
             <div id="history-list" style="max-height:150px;overflow-y:auto;"></div>
         </div>
     </div>
-
-    <div id="redeem-screen" class="screen">
-        <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
-        <div class="glass-card">
-            <i class="fas fa-ticket-alt" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
-            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Canjear Código</h3>
-            <div class="channel-join"><i class="fab fa-telegram"></i> Únete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div>
-            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
-            <div id="redeem-message" style="margin-top:14px;font-size:13px;text-align:center;"></div>
-        </div>
-    </div>
 </div>
 
 <script>
-    // ==================== CONFIGURACIÓN ====================
-    const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/69d9f44936566621a89f6081';
-    const JSONBIN_KEY = '$2a$10$H6uoMqYJMP/G2sSbv6Gj2OPehyjIkGONb/RhrcAzdtaX2cTvbGKTS';
+    // ==================== CONFIGURACIÓN FIREBASE ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
+        authDomain: "usdt-8b129.firebaseapp.com",
+        projectId: "usdt-8b129",
+        storageBucket: "usdt-8b129.firebasestorage.app",
+        messagingSenderId: "816855613636",
+        appId: "1:816855613636:web:7891ba3996acef2c91c991"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    
+    const PUSHBULLET_TOKEN = 'o.O0prtyhPN6cGLmvzoxCsC8VqxhgMVys9';
     const ADMIN_SECRET = '231606';
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5, 5, 5, 5];
     const TOTAL_VIDEOS = 9;
-    const BONO_REGISTRO = 50; // ⭐ para el nuevo usuario
-    const BONO_INVITADOR = 50; // ⭐ para quien invita
+    const BONO_REFERIDOR = 200; // 0.02 USDT en ⭐
 
-    // ==================== ESTADO GLOBAL ====================
+    function enviarNotificacion(titulo, mensaje) {
+        fetch('https://api.pushbullet.com/v2/pushes', {
+            method: 'POST',
+            headers: { 'Access-Token': PUSHBULLET_TOKEN, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'note', title: titulo, body: mensaje })
+        }).catch(e => console.error('Error Pushbullet:', e));
+    }
+
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
@@ -466,109 +457,41 @@
     const userUsername = tg.initDataUnsafe?.user?.username || '';
     
     let userData = null;
-    let allData = { usuarios: {}, giftCodes: {}, actionLogs: {} };
     let isProcessing = false;
     let isAdPlaying = false;
 
-    // ==================== FUNCIONES DE JSONBIN ====================
-    async function loadAllData() {
-        try {
-            const res = await fetch(JSONBIN_URL + '/latest', {
-                headers: { 'X-Master-Key': JSONBIN_KEY }
-            });
-            if (!res.ok) throw new Error('Error al cargar datos');
-            const json = await res.json();
-            allData = json.record || { usuarios: {}, giftCodes: {}, actionLogs: {} };
-            if (!allData.usuarios) allData.usuarios = {};
-            if (!allData.giftCodes) allData.giftCodes = {};
-            if (!allData.actionLogs) allData.actionLogs = {};
-            userData = allData.usuarios[userId] || null;
-        } catch (e) {
-            console.error('Error cargando datos:', e);
-            allData = { usuarios: {}, giftCodes: {}, actionLogs: {} };
-        }
-    }
-
-    async function saveAllData() {
-        try {
-            await fetch(JSONBIN_URL, {
-                method: 'PUT',
-                headers: {
-                    'X-Master-Key': JSONBIN_KEY,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(allData)
-            });
-        } catch (e) {
-            console.error('Error guardando:', e);
-        }
-    }
-
-    // ==================== BLOQUEO MULTICUENTA ====================
-    function esMultiCuenta(invitadorId, invitadoId) {
-        if (invitadorId === invitadoId) return true;
-        const invitador = allData.usuarios[invitadorId];
-        const invitado = allData.usuarios[invitadoId];
-        if (!invitador || !invitado) return false;
-        if (invitador.invitado_por === invitadoId) return true;
-        if (invitado.invitado_por === invitadorId) return true;
-        return false;
-    }
-
-    // ==================== INICIALIZACIÓN ====================
     async function initUser() {
         if (!userId) return;
-        await loadAllData();
         
+        const ref = db.collection("usuarios").doc(userId);
+        const doc = await ref.get();
         const start = tg.initDataUnsafe?.start_param;
-        let bonoAplicado = false;
         
-        if (!allData.usuarios[userId]) {
-            let inv = (start && start !== userId) ? start : null;
-            
-            // Validar multicuenta
-            if (inv && allData.usuarios[inv]) {
-                if (esMultiCuenta(inv, userId)) {
-                    inv = null; // Anular invitación si es multicuenta
-                }
-            }
-            
-            allData.usuarios[userId] = {
+        if (!doc.exists) {
+            const inv = (start && start !== userId) ? start : null;
+            await ref.set({
                 nombre: userName,
                 username: userUsername,
-                balance: BONO_REGISTRO,
+                balance: 0,
                 invitado_por: inv,
                 referidos: 0,
                 watchedVideos: [],
                 lastVideoReset: Date.now(),
                 hasWithdrawn: false,
-                totalEarned: BONO_REGISTRO,
-                totalVideosWatched: 0,
                 ccwallet_id: '',
-                withdrawHistory: [],
-                redeemedCodes: [],
-                bonoReclamado: true
-            };
-            
-            // Bono para el invitador
-            if (inv && allData.usuarios[inv] && !esMultiCuenta(inv, userId)) {
-                allData.usuarios[inv].balance = (allData.usuarios[inv].balance || 0) + BONO_INVITADOR;
-                allData.usuarios[inv].referidos = (allData.usuarios[inv].referidos || 0) + 1;
-                bonoAplicado = true;
+                withdrawHistory: []
+            });
+            if (inv) {
+                const invRef = db.collection("usuarios").doc(inv);
+                await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
             }
-            
-            await saveAllData();
+            enviarNotificacion('🆕 NUEVO USUARIO', `👤 ${userName} (@${userUsername || 'n/a'})\n🆔 ${userId}\n🔗 Invitado por: ${inv || 'nadie'}`);
         }
         
-        userData = allData.usuarios[userId];
+        userData = (await ref.get()).data();
         checkReset();
         updateUI();
         startTimer();
-        
-        if (bonoAplicado) {
-            showAlert('🎉 ¡Bono aplicado!', `+${BONO_REGISTRO} ⭐ por registrarte`, 'gift');
-        }
-        
         document.getElementById('loading-screen').classList.add('hidden');
     }
 
@@ -579,14 +502,14 @@
         } else if ((now - userData.lastVideoReset) / 3600000 >= 24) {
             userData.watchedVideos = [];
             userData.lastVideoReset = now;
+            db.collection("usuarios").doc(userId).update({ watchedVideos: [], lastVideoReset: now });
         }
     }
 
-    function updateUI() {
+    async function updateUI() {
         if (!userData) return;
         document.getElementById('user-balance').innerText = Math.floor(userData.balance || 0);
         document.getElementById('totalInvitados').innerText = userData.referidos || 0;
-        document.getElementById('gananciasInvitados').innerText = (userData.referidos || 0) * BONO_INVITADOR;
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + ((userData.balance || 0) / COINS_PER_USDT).toFixed(4) + ' USDT';
         document.getElementById('videosWatchedToday').innerText = (userData.watchedVideos || []).length;
@@ -614,36 +537,23 @@
         setTimeout(startTimer, 60000);
     }
 
-    // ==================== ANUNCIOS ====================
     function showAdLoader() { document.getElementById('adLoader').style.display = 'flex'; }
     function hideAdLoader() { document.getElementById('adLoader').style.display = 'none'; }
 
     async function showMonetagAd() {
         return new Promise((resolve, reject) => {
-            if (typeof show_10853207 !== 'function') {
-                reject(new Error('SDK no disponible'));
-                return;
-            }
+            if (typeof show_10853207 !== 'function') { reject(new Error('SDK no disponible')); return; }
             let adShown = false;
-            const timeout = setTimeout(() => {
-                if (!adShown) { hideAdLoader(); reject(new Error('Timeout')); }
-            }, 8000);
+            const timeout = setTimeout(() => { if (!adShown) { hideAdLoader(); reject(new Error('Timeout')); } }, 8000);
             show_10853207()
                 .then(() => { adShown = true; clearTimeout(timeout); hideAdLoader(); resolve(true); })
                 .catch((err) => { clearTimeout(timeout); hideAdLoader(); reject(err); });
         });
     }
 
-    // ==================== VER VIDEO ====================
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if ((userData.watchedVideos || []).includes(n)) {
-            showAlert('Video completado', `#${n} ya visto`, 'info-circle');
-            return;
-        }
-        
-        const actionId = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
-        if (allData.actionLogs[actionId]) {
             showAlert('Video completado', `#${n} ya visto`, 'info-circle');
             return;
         }
@@ -657,14 +567,16 @@
             await showMonetagAd();
             
             const reward = VIDEO_REWARDS[n - 1];
-            userData.balance = (userData.balance || 0) + reward;
-            userData.totalEarned = (userData.totalEarned || 0) + reward;
-            userData.totalVideosWatched = (userData.totalVideosWatched || 0) + 1;
-            if (!userData.watchedVideos) userData.watchedVideos = [];
-            userData.watchedVideos.push(n);
+            const ref = db.collection("usuarios").doc(userId);
+            const newWatched = [...(userData.watchedVideos || []), n];
             
-            allData.actionLogs[actionId] = true;
-            await saveAllData();
+            await ref.update({
+                balance: firebase.firestore.FieldValue.increment(reward),
+                watchedVideos: newWatched
+            });
+            
+            userData.balance += reward;
+            userData.watchedVideos = newWatched;
             
             updateUI();
             showAlert('🎉 ¡Recompensa!', `+${reward} ⭐`, 'check-circle');
@@ -681,7 +593,6 @@
         }
     }
 
-    // ==================== RETIRO ====================
     async function handleWithdraw() {
         if (isProcessing) return;
         const cc = document.getElementById('ccwallet-id').value.trim();
@@ -694,20 +605,36 @@
         try {
             await showMonetagAd();
             
+            const ref = db.collection("usuarios").doc(userId);
             const bal = userData.balance;
-            userData.balance = 0;
-            userData.hasWithdrawn = true;
-            userData.ccwallet_id = cc;
-            if (!userData.withdrawHistory) userData.withdrawHistory = [];
-            userData.withdrawHistory.push({
-                amount: Math.floor(bal),
-                date: new Date().toLocaleDateString(),
-                status: '✅ Completado',
-                ccwallet: cc
+            const firstWithdraw = !userData.hasWithdrawn;
+            
+            await ref.update({
+                balance: 0,
+                hasWithdrawn: true,
+                ccwallet_id: cc,
+                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                    amount: Math.floor(bal),
+                    date: new Date().toLocaleDateString(),
+                    status: '✅ Completado',
+                    ccwallet: cc
+                })
             });
             
-            await saveAllData();
+            // BONO AL REFERIDOR (solo en primer retiro)
+            if (firstWithdraw && userData.invitado_por) {
+                const invRef = db.collection("usuarios").doc(userData.invitado_por);
+                await invRef.update({ balance: firebase.firestore.FieldValue.increment(BONO_REFERIDOR) });
+                enviarNotificacion('🎁 BONO REFERIDO', `👤 ${userName} hizo su primer retiro\n💰 +200 ⭐ para ${userData.invitado_por}`);
+            }
+            
+            userData.balance = 0;
+            userData.hasWithdrawn = true;
+            if (!userData.withdrawHistory) userData.withdrawHistory = [];
+            userData.withdrawHistory.push({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: '✅ Completado' });
+            
             updateUI();
+            enviarNotificacion('🦊 RETIRO', `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}`);
             showAlert('✅ ¡Retiro exitoso!', `${Math.floor(bal)} ⭐ retiradas`, 'check-circle');
             tg.openTelegramLink('https://t.me/cctip_bot');
         } catch (e) {
@@ -726,43 +653,6 @@
         ).join('') : '<p style="text-align:center;">Sin retiros</p>';
     }
 
-    // ==================== CANJEAR CÓDIGO ====================
-    async function handleRedeem() {
-        const input = document.getElementById('redeem-code');
-        const code = input.value.trim().toUpperCase();
-        const msg = document.getElementById('redeem-message');
-        if (!code) { msg.innerHTML = '<span style="color:var(--terracotta);">Ingresa un código</span>'; return; }
-        if ((userData.redeemedCodes || []).includes(code)) {
-            msg.innerHTML = '<span style="color:var(--terracotta);">Ya usado</span>';
-            return;
-        }
-        
-        isProcessing = true;
-        try {
-            await showMonetagAd();
-            
-            const codeData = allData.giftCodes[code];
-            if (!codeData) throw new Error('Código inválido');
-            if ((codeData.usedCount || 0) >= (codeData.maxUses || 1)) throw new Error('Código agotado');
-            
-            userData.balance = (userData.balance || 0) + codeData.amount;
-            if (!userData.redeemedCodes) userData.redeemedCodes = [];
-            userData.redeemedCodes.push(code);
-            codeData.usedCount = (codeData.usedCount || 0) + 1;
-            
-            await saveAllData();
-            updateUI();
-            msg.innerHTML = `<span style="color:var(--success);">🎉 +${codeData.amount} ⭐</span>`;
-            input.value = '';
-            showAlert('🎁 ¡Código canjeado!', `+${codeData.amount} ⭐`, 'gift');
-        } catch (e) {
-            msg.innerHTML = `<span style="color:var(--terracotta);">❌ ${e.message}</span>`;
-        } finally {
-            isProcessing = false;
-        }
-    }
-
-    // ==================== UTILIDADES ====================
     function showAlert(t, m, i = 'bell') {
         document.getElementById('alertTitle').innerText = t;
         document.getElementById('alertMessage').innerText = m;
@@ -782,12 +672,11 @@
         if (s === 'withdraw-screen') loadHistory();
     }
     function copyRefLink() {
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana 50 ⭐ por registrarte y 50 ⭐ por cada amigo que invites. ¡Retira en USDT!`);
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. ¡Invita amigos y gana 10%% de comisión + 0.02 USDT cuando retiren!`);
     }
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ==================== ADMIN ====================
     function initAdmin() {
         const card = document.querySelector('.balance-card');
         let t;
@@ -796,42 +685,35 @@
         card.addEventListener('touchstart', () => t = setTimeout(() => document.getElementById('adminModal').style.display = 'flex', 8000));
         card.addEventListener('touchend', () => clearTimeout(t));
         
-        document.getElementById('adminConfirmBtn').onclick = async () => {
-            if (document.getElementById('adminPassword').value !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
-            const code = document.getElementById('adminCode').value.trim().toUpperCase();
+        document.getElementById('adminAddBalanceBtn').onclick = async () => {
+            const pwd = document.getElementById('adminPassword').value;
+            const targetId = document.getElementById('adminUserId').value.trim();
             const amt = parseInt(document.getElementById('adminAmount').value);
-            const max = parseInt(document.getElementById('adminMaxUses').value) || 1;
             
-            if (code && amt > 0) {
-                allData.giftCodes[code] = { amount: amt, maxUses: max, usedCount: 0 };
-                await saveAllData();
-                showAlert('Código creado', `${code} por ${amt} ⭐`, 'gift');
-            } else if (amt > 0) {
-                userData.balance = (userData.balance || 0) + amt;
-                await saveAllData();
-                updateUI();
-                showAlert('Saldo añadido', `+${amt} ⭐`, 'crown');
+            if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
+            if (!targetId || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
+            
+            try {
+                await db.collection("usuarios").doc(targetId).update({ balance: firebase.firestore.FieldValue.increment(amt) });
+                showAlert('Saldo añadido', `+${amt} ⭐ a ${targetId}`, 'crown');
+                document.getElementById('adminModal').style.display = 'none';
+            } catch (e) {
+                showAlert('Error', 'Usuario no encontrado', 'times-circle');
             }
-            document.getElementById('adminModal').style.display = 'none';
         };
         document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
 
-    // ==================== EVENT LISTENERS ====================
     for (let i = 1; i <= TOTAL_VIDEOS; i++) {
         document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     }
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
-    document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
     document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
-    document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
     document.getElementById('shareRefBtn').onclick = copyRefLink;
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
-    document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
 
-    // ==================== INICIAR ====================
     initUser();
     initAdmin();
 </script>
