@@ -250,9 +250,29 @@
         .admin-modal-content {
             background: var(--cream); border-radius: 40px; padding: 24px; width: 90%;
             max-width: 360px; border: 1px solid rgba(212,175,55,0.3);
+            max-height: 80vh;
+            overflow-y: auto;
         }
-        .admin-modal h3 { margin-bottom: 18px; color: var(--text-dark); }
-        .admin-modal input { margin-bottom: 12px; }
+        .admin-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .admin-tab.active {
+            background: var(--gold);
+            color: white;
+        }
+        .admin-tab:not(.active) {
+            background: rgba(255,255,255,0.5);
+            color: var(--text-dark);
+        }
+        .admin-tab-content {
+            margin-top: 10px;
+        }
         .invite-highlight {
             background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(214,139,124,0.12));
             border-radius: 25px; padding: 20px 16px; margin: 16px 0; text-align: center;
@@ -289,6 +309,13 @@
             font-size: 11px;
             color: var(--text-soft);
         }
+        .code-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -324,14 +351,45 @@
     </div>
 </div>
 
+<!-- NUEVO MODAL ADMIN -->
 <div id="adminModal" class="admin-modal">
     <div class="admin-modal-content">
         <h3><i class="fas fa-crown"></i> Panel Admin</h3>
-        <input type="password" id="adminPassword" placeholder="Clave secreta">
-        <input type="text" id="adminUserId" placeholder="ID de usuario">
-        <input type="number" id="adminAmount" placeholder="Monto en ⭐">
-        <button class="btn-game btn-primary" id="adminAddBalanceBtn">Agregar Saldo</button>
-        <button class="btn-game" id="adminCancelBtn" style="margin-top:8px;">Cancelar</button>
+        <input type="password" id="adminPassword" placeholder="Clave secreta" style="margin-bottom:15px;">
+        
+        <!-- Pestañas -->
+        <div style="display:flex;gap:5px;margin-bottom:15px;">
+            <button class="admin-tab active" data-tab="saldo">➕ Saldo</button>
+            <button class="admin-tab" data-tab="codigos">🎫 Códigos</button>
+            <button class="admin-tab" data-tab="stats">📊 Stats</button>
+        </div>
+        
+        <!-- Panel Saldo -->
+        <div id="tab-saldo" class="admin-tab-content">
+            <input type="text" id="adminUserId" placeholder="ID de usuario">
+            <input type="number" id="adminAmount" placeholder="Monto en ⭐">
+            <button class="btn-game btn-primary" id="adminAddBalanceBtn" style="width:100%;">Agregar Saldo</button>
+        </div>
+        
+        <!-- Panel Códigos -->
+        <div id="tab-codigos" class="admin-tab-content" style="display:none;">
+            <input type="text" id="giftCode" placeholder="Código (ej: PREMIUM50)">
+            <input type="number" id="giftAmount" placeholder="Monto en ⭐">
+            <input type="number" id="giftMaxUses" placeholder="Límite de usos">
+            <button class="btn-game btn-primary" id="createGiftCodeBtn" style="width:100%;">Crear Código</button>
+            <div id="giftCodesList" style="margin-top:15px;max-height:200px;overflow-y:auto;"></div>
+        </div>
+        
+        <!-- Panel Stats -->
+        <div id="tab-stats" class="admin-tab-content" style="display:none;">
+            <div style="text-align:center;">
+                <p style="font-size:14px;color:var(--text-soft);">Total pagado en bonos por referidos</p>
+                <h2 style="font-size:36px;font-weight:800;color:var(--gold);" id="totalRefGanancias">0 ⭐</h2>
+                <p style="font-size:12px;color:var(--text-soft);">≈ <span id="totalRefUSDT">0.0000</span> USDT</p>
+            </div>
+        </div>
+        
+        <button class="btn-game" id="adminCancelBtn" style="margin-top:15px;width:100%;">Cancelar</button>
     </div>
 </div>
 
@@ -364,6 +422,7 @@
         <div class="menu-grid">
             <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Invitar y Ganar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Retirar</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
@@ -418,10 +477,21 @@
             <div id="history-list" style="max-height:150px;overflow-y:auto;"></div>
         </div>
     </div>
+
+    <div id="redeem-screen" class="screen">
+        <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card">
+            <i class="fas fa-ticket-alt" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
+            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Canjear Código</h3>
+            <div class="channel-join"><i class="fab fa-telegram"></i> Únete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div>
+            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
+            <div id="redeem-message" style="margin-top:14px;font-size:13px;text-align:center;"></div>
+        </div>
+    </div>
 </div>
 
 <script>
-    // ==================== CONFIGURACIÓN FIREBASE ====================
+    // ==================== CONFIGURACIÓN ====================
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -479,7 +549,8 @@
                 lastVideoReset: Date.now(),
                 hasWithdrawn: false,
                 ccwallet_id: '',
-                withdrawHistory: []
+                withdrawHistory: [],
+                redeemedCodes: []
             });
             if (inv) {
                 const invRef = db.collection("usuarios").doc(inv);
@@ -653,6 +724,55 @@
         ).join('') : '<p style="text-align:center;">Sin retiros</p>';
     }
 
+    async function handleRedeem() {
+        const input = document.getElementById('redeem-code');
+        const code = input.value.trim().toUpperCase();
+        const msg = document.getElementById('redeem-message');
+        
+        if (!code) { msg.innerHTML = '<span style="color:var(--terracotta);">Ingresa un código</span>'; return; }
+        
+        const redeemed = userData.redeemedCodes || [];
+        if (redeemed.includes(code)) {
+            msg.innerHTML = '<span style="color:var(--terracotta);">Ya usaste este código</span>';
+            return;
+        }
+        
+        isProcessing = true;
+        try {
+            await showMonetagAd();
+            
+            const codeRef = db.collection("giftCodes").doc(code);
+            const codeDoc = await codeRef.get();
+            
+            if (!codeDoc.exists) throw new Error('Código inválido');
+            
+            const codeData = codeDoc.data();
+            if (codeData.usedCount >= codeData.maxUses) throw new Error('Código agotado');
+            
+            await db.runTransaction(async (transaction) => {
+                const userRef = db.collection("usuarios").doc(userId);
+                transaction.update(userRef, { 
+                    balance: firebase.firestore.FieldValue.increment(codeData.amount),
+                    redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+                });
+                transaction.update(codeRef, { usedCount: firebase.firestore.FieldValue.increment(1) });
+            });
+            
+            userData.balance += codeData.amount;
+            if (!userData.redeemedCodes) userData.redeemedCodes = [];
+            userData.redeemedCodes.push(code);
+            
+            updateUI();
+            msg.innerHTML = `<span style="color:var(--success);">🎉 +${codeData.amount} ⭐</span>`;
+            input.value = '';
+            showAlert('🎁 ¡Código canjeado!', `+${codeData.amount} ⭐`, 'gift');
+        } catch (e) {
+            msg.innerHTML = `<span style="color:var(--terracotta);">❌ ${e.message}</span>`;
+        } finally {
+            isProcessing = false;
+        }
+    }
+
     function showAlert(t, m, i = 'bell') {
         document.getElementById('alertTitle').innerText = t;
         document.getElementById('alertMessage').innerText = m;
@@ -677,6 +797,7 @@
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
+    // ==================== NUEVO ADMIN ====================
     function initAdmin() {
         const card = document.querySelector('.balance-card');
         let t;
@@ -685,6 +806,23 @@
         card.addEventListener('touchstart', () => t = setTimeout(() => document.getElementById('adminModal').style.display = 'flex', 8000));
         card.addEventListener('touchend', () => clearTimeout(t));
         
+        // Pestañas
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+                document.getElementById(`tab-${tab.dataset.tab}`).style.display = 'block';
+                
+                if (tab.dataset.tab === 'stats') loadRefStats();
+                if (tab.dataset.tab === 'codigos') loadGiftCodes();
+            });
+        });
+        
+        // Agregar saldo
         document.getElementById('adminAddBalanceBtn').onclick = async () => {
             const pwd = document.getElementById('adminPassword').value;
             const targetId = document.getElementById('adminUserId').value.trim();
@@ -694,25 +832,106 @@
             if (!targetId || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
             
             try {
-                await db.collection("usuarios").doc(targetId).update({ balance: firebase.firestore.FieldValue.increment(amt) });
+                await db.collection("usuarios").doc(targetId).update({ 
+                    balance: firebase.firestore.FieldValue.increment(amt) 
+                });
                 showAlert('Saldo añadido', `+${amt} ⭐ a ${targetId}`, 'crown');
-                document.getElementById('adminModal').style.display = 'none';
+                document.getElementById('adminUserId').value = '';
+                document.getElementById('adminAmount').value = '';
             } catch (e) {
                 showAlert('Error', 'Usuario no encontrado', 'times-circle');
             }
         };
-        document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
+        
+        // Crear código
+        document.getElementById('createGiftCodeBtn').onclick = async () => {
+            const pwd = document.getElementById('adminPassword').value;
+            const code = document.getElementById('giftCode').value.trim().toUpperCase();
+            const amt = parseInt(document.getElementById('giftAmount').value);
+            const max = parseInt(document.getElementById('giftMaxUses').value) || 1;
+            
+            if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
+            if (!code || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
+            
+            try {
+                await db.collection("giftCodes").doc(code).set({
+                    amount: amt,
+                    maxUses: max,
+                    usedCount: 0,
+                    createdAt: Date.now()
+                });
+                showAlert('Código creado', `${code} por ${amt} ⭐ (${max} usos)`, 'gift');
+                document.getElementById('giftCode').value = '';
+                document.getElementById('giftAmount').value = '';
+                document.getElementById('giftMaxUses').value = '';
+                loadGiftCodes();
+            } catch (e) {
+                showAlert('Error', 'No se pudo crear', 'times-circle');
+            }
+        };
+        
+        document.getElementById('adminCancelBtn').onclick = () => {
+            document.getElementById('adminModal').style.display = 'none';
+        };
     }
 
+    async function loadGiftCodes() {
+        const el = document.getElementById('giftCodesList');
+        el.innerHTML = '<p style="text-align:center;">Cargando...</p>';
+        
+        try {
+            const snap = await db.collection("giftCodes").get();
+            if (snap.empty) {
+                el.innerHTML = '<p style="text-align:center;">No hay códigos</p>';
+                return;
+            }
+            
+            let html = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                html += `<div class="code-item">
+                    <span><strong>${doc.id}</strong><br><small>${d.amount} ⭐ | ${d.usedCount}/${d.maxUses} usos</small></span>
+                    <span style="color:${d.usedCount >= d.maxUses ? 'var(--terracotta)' : 'var(--success)'};">${d.usedCount >= d.maxUses ? 'Agotado' : 'Activo'}</span>
+                </div>`;
+            });
+            el.innerHTML = html;
+        } catch (e) {
+            el.innerHTML = '<p style="text-align:center;">Error al cargar</p>';
+        }
+    }
+
+    async function loadRefStats() {
+        try {
+            const snap = await db.collection("usuarios").where("hasWithdrawn", "==", true).get();
+            let totalPagado = 0;
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                if (d.invitado_por) {
+                    totalPagado += BONO_REFERIDOR;
+                }
+            });
+            
+            document.getElementById('totalRefGanancias').innerText = totalPagado + ' ⭐';
+            document.getElementById('totalRefUSDT').innerText = (totalPagado / COINS_PER_USDT).toFixed(4);
+        } catch (e) {
+            console.error('Error cargando stats:', e);
+        }
+    }
+
+    // ==================== EVENT LISTENERS ====================
     for (let i = 1; i <= TOTAL_VIDEOS; i++) {
         document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     }
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
+    document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
     document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
+    document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
     document.getElementById('shareRefBtn').onclick = copyRefLink;
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
+    document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
 
     initUser();
     initAdmin();
