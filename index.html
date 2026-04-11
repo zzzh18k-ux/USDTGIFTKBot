@@ -15,6 +15,7 @@
     <style>
         :root {
             --gold: #D4AF37;
+            --gold-light: #F5E7B2;
             --cream: #FFFDF7;
             --terracotta: #D68B7C;
             --text-dark: #3A2C27;
@@ -52,6 +53,8 @@
             align-items: center;
             z-index: 99999;
             transition: opacity 0.5s ease;
+            padding: 20px;
+            text-align: center;
         }
         #loading-screen.hidden { opacity: 0; pointer-events: none; }
         .welcome-icon {
@@ -71,6 +74,13 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 16px;
         }
+        .welcome-subtitle { font-size: 18px; font-weight: 600; color: var(--text-dark); margin-bottom: 24px; }
+        .welcome-description { font-size: 15px; color: var(--text-soft); margin-bottom: 32px; line-height: 1.5; max-width: 320px; }
+        .feature-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; width: 100%; max-width: 300px; }
+        .feature-item { display: flex; align-items: center; gap: 12px; text-align: left; }
+        .feature-icon { font-size: 24px; width: 40px; text-align: center; color: var(--gold); }
+        .feature-text { font-size: 14px; font-weight: 500; color: var(--text-dark); }
+        .feature-text small { display: block; font-size: 12px; font-weight: 400; color: var(--text-soft); margin-top: 2px; }
         .loading-progress {
             width: 200px;
             height: 4px;
@@ -87,6 +97,7 @@
             animation: progress 4s ease-out forwards;
         }
         @keyframes progress { 0%{width:0%;} 100%{width:100%;} }
+        .loading-footer { margin-top: 20px; font-size: 13px; color: var(--terracotta); font-weight: 500; }
         .ad-loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); backdrop-filter: blur(8px);
@@ -117,7 +128,7 @@
         .balance-card {
             text-align: center; margin: 2px 0 5px; padding: 8px 6px;
             background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); border-radius: 40px;
-            box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.8); cursor: pointer;
         }
         #user-balance {
             font-size: 40px; font-weight: 800;
@@ -232,6 +243,10 @@
         }
         .balance-available .coins { font-size: 34px; font-weight: 800; }
         .balance-available .usdt { font-size: 13px; opacity: 0.75; color: var(--text-soft); }
+        .commission-card {
+            background: linear-gradient(135deg, rgba(107,175,146,0.12), rgba(107,175,146,0.18));
+            border-radius: 25px; padding: 18px; margin: 14px 0;
+        }
         .btn-primary { background: linear-gradient(135deg, var(--gold), var(--terracotta)); color: white; }
         .btn-success { background: linear-gradient(135deg, var(--success), #4A8C74); color: white; }
         .status-badge { padding: 4px 10px; border-radius: 30px; font-size: 10px; font-weight: 700; background: var(--success); color: white; }
@@ -260,6 +275,28 @@
             display: inline-block; background: rgba(212,175,55,0.15); padding: 6px 16px;
             border-radius: 40px; font-weight: 700; font-size: 14px; color: var(--terracotta); margin-top: 10px;
         }
+        .invite-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .stat-box {
+            text-align: center;
+            background: rgba(255,255,255,0.5);
+            padding: 12px;
+            border-radius: 20px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
     </style>
 </head>
 <body>
@@ -270,8 +307,14 @@
     <div class="welcome-icon"><i class="fas fa-hand-holding-heart"></i></div>
     <div class="welcome-title">USDT GIFT K</div>
     <div class="welcome-subtitle">Tu comunidad de recompensas</div>
+    <div class="welcome-description">Una experiencia <strong>colaborativa y segura</strong>. Gana monedas viendo videos, invita amigos y retira tus ganancias en USDT real.</div>
+    <div class="feature-grid">
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-play-circle"></i></span><span class="feature-text">Videos diarios <small>Recibe ⭐ por cada video completado</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">Sistema de equipo <small>Gana 25 ⭐ por cada amigo que invite</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros a USDT <small>Directo a tu CCWallet al instante</small></span></div>
+    </div>
     <div class="loading-progress"><div class="loading-progress-bar"></div></div>
-    <div class="loading-footer"><i class="fas fa-lock" style="margin-right:6px;"></i> Conexión segura</div>
+    <div class="loading-footer"><i class="fas fa-lock" style="margin-right:6px;"></i> Conexión segura establecida</div>
 </div>
 
 <div id="adLoader" class="ad-loader-overlay">
@@ -306,7 +349,7 @@
         <div class="top-nav">
             <div class="channel-bubble" onclick="joinChannel()"><i class="fab fa-telegram"></i><span>@UsdtGiftChannel</span></div>
         </div>
-        <div class="balance-card"><div id="user-balance">0</div><div class="balance-label">⭐ MONEDAS</div></div>
+        <div class="balance-card" id="balanceCard"><div id="user-balance">0</div><div class="balance-label">⭐ MONEDAS</div></div>
         <div class="section-title"><i class="fas fa-video"></i><span>Videos diarios</span></div>
         <div class="daily-progress">
             <span><span id="videosWatchedToday">0</span>/9 videos</span>
@@ -328,7 +371,7 @@
 
         <div class="reset-timer" id="resetTimer">Reinicio en 24h</div>
         <div class="menu-grid">
-            <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Crecer Equipo</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Invitar y Ganar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Retirar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
         </div>
@@ -338,17 +381,32 @@
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
-            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Crece con tu Equipo</h3>
-            <p style="font-size:13px;color:var(--text-soft);">Invita, gana y multiplica tus recompensas juntos.</p>
+            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Invita y Gana</h3>
+            <p style="font-size:13px;color:var(--text-soft);">Comparte tu enlace y gana recompensas por cada amigo que se una.</p>
+            
             <div class="invite-highlight">
-                <h4>💎 +10%</h4><p>de comisión por cada video que vean tus invitados</p>
-                <div class="earn-tag">🌱 Tu red, tu ingreso pasivo</div>
+                <h4>🎁 +50 ⭐ para ti</h4><p>por cada amigo que se registre con tu enlace</p>
+                <h4 style="margin-top:12px;">🎉 +25 ⭐ para tu amigo</h4><p>como bono de bienvenida</p>
+                <div class="earn-tag">💰 ¡Ganan los dos!</div>
             </div>
-            <div style="background:rgba(255,255,255,0.5);padding:16px;border-radius:25px;margin:16px 0;">
-                <small>Amigos que confiaron en ti</small>
-                <h3 id="referidos-count" style="font-size:28px;font-weight:800;color:var(--text-dark);">0</h3>
+            
+            <div class="invite-stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalInvitados">0</div>
+                    <div class="stat-label">Invitados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="gananciasInvitados">0</div>
+                    <div class="stat-label">⭐ Ganadas</div>
+                </div>
             </div>
-            <button class="btn-game btn-primary" style="width:100%;padding:16px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Invitar y empezar a ganar</button>
+            
+            <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn">
+                <i class="fas fa-share-alt"></i> Compartir enlace de invitación
+            </button>
+            <p style="font-size:11px;color:var(--text-soft);margin-top:10px;text-align:center;">
+                <i class="fas fa-shield-alt"></i> Sistema anti-multicuentas activado
+            </p>
         </div>
     </div>
 
@@ -395,6 +453,8 @@
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5, 5, 5, 5];
     const TOTAL_VIDEOS = 9;
+    const BONO_REGISTRO = 50; // ⭐ para el nuevo usuario
+    const BONO_INVITADOR = 50; // ⭐ para quien invita
 
     // ==================== ESTADO GLOBAL ====================
     const tg = window.Telegram.WebApp;
@@ -444,39 +504,71 @@
         }
     }
 
+    // ==================== BLOQUEO MULTICUENTA ====================
+    function esMultiCuenta(invitadorId, invitadoId) {
+        if (invitadorId === invitadoId) return true;
+        const invitador = allData.usuarios[invitadorId];
+        const invitado = allData.usuarios[invitadoId];
+        if (!invitador || !invitado) return false;
+        if (invitador.invitado_por === invitadoId) return true;
+        if (invitado.invitado_por === invitadorId) return true;
+        return false;
+    }
+
     // ==================== INICIALIZACIÓN ====================
     async function initUser() {
         if (!userId) return;
         await loadAllData();
         
         const start = tg.initDataUnsafe?.start_param;
+        let bonoAplicado = false;
+        
         if (!allData.usuarios[userId]) {
-            const inv = (start && start !== userId) ? start : null;
+            let inv = (start && start !== userId) ? start : null;
+            
+            // Validar multicuenta
+            if (inv && allData.usuarios[inv]) {
+                if (esMultiCuenta(inv, userId)) {
+                    inv = null; // Anular invitación si es multicuenta
+                }
+            }
+            
             allData.usuarios[userId] = {
                 nombre: userName,
                 username: userUsername,
-                balance: 0,
+                balance: BONO_REGISTRO,
                 invitado_por: inv,
                 referidos: 0,
                 watchedVideos: [],
                 lastVideoReset: Date.now(),
                 hasWithdrawn: false,
-                totalEarned: 0,
+                totalEarned: BONO_REGISTRO,
                 totalVideosWatched: 0,
                 ccwallet_id: '',
                 withdrawHistory: [],
                 redeemedCodes: [],
-                claimedTasks: []
+                bonoReclamado: true
             };
-            if (inv && allData.usuarios[inv]) {
+            
+            // Bono para el invitador
+            if (inv && allData.usuarios[inv] && !esMultiCuenta(inv, userId)) {
+                allData.usuarios[inv].balance = (allData.usuarios[inv].balance || 0) + BONO_INVITADOR;
                 allData.usuarios[inv].referidos = (allData.usuarios[inv].referidos || 0) + 1;
+                bonoAplicado = true;
             }
+            
             await saveAllData();
         }
+        
         userData = allData.usuarios[userId];
         checkReset();
         updateUI();
         startTimer();
+        
+        if (bonoAplicado) {
+            showAlert('🎉 ¡Bono aplicado!', `+${BONO_REGISTRO} ⭐ por registrarte`, 'gift');
+        }
+        
         document.getElementById('loading-screen').classList.add('hidden');
     }
 
@@ -493,7 +585,8 @@
     function updateUI() {
         if (!userData) return;
         document.getElementById('user-balance').innerText = Math.floor(userData.balance || 0);
-        document.getElementById('referidos-count').innerText = userData.referidos || 0;
+        document.getElementById('totalInvitados').innerText = userData.referidos || 0;
+        document.getElementById('gananciasInvitados').innerText = (userData.referidos || 0) * BONO_INVITADOR;
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + ((userData.balance || 0) / COINS_PER_USDT).toFixed(4) + ' USDT';
         document.getElementById('videosWatchedToday').innerText = (userData.watchedVideos || []).length;
@@ -541,7 +634,7 @@
         });
     }
 
-    // ==================== VER VIDEO (CON COMISIÓN DEL 10%) ====================
+    // ==================== VER VIDEO ====================
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if ((userData.watchedVideos || []).includes(n)) {
@@ -569,14 +662,6 @@
             userData.totalVideosWatched = (userData.totalVideosWatched || 0) + 1;
             if (!userData.watchedVideos) userData.watchedVideos = [];
             userData.watchedVideos.push(n);
-            
-            // 👉 COMISIÓN DEL 10% PARA EL REFERIDOR
-            if (userData.invitado_por && allData.usuarios[userData.invitado_por]) {
-                const comision = Math.floor(reward * 0.1);
-                if (comision > 0) {
-                    allData.usuarios[userData.invitado_por].balance = (allData.usuarios[userData.invitado_por].balance || 0) + comision;
-                }
-            }
             
             allData.actionLogs[actionId] = true;
             await saveAllData();
@@ -697,7 +782,7 @@
         if (s === 'withdraw-screen') loadHistory();
     }
     function copyRefLink() {
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana monedas viendo videos`);
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana 50 ⭐ por registrarte y 50 ⭐ por cada amigo que invites. ¡Retira en USDT!`);
     }
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
