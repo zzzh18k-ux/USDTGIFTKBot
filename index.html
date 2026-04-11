@@ -528,6 +528,13 @@
     function startTimer() { const n = Date.now(), d = (n - lastVideoReset)/3600000, r = Math.max(0, 24 - d), h = Math.floor(r), m = Math.floor((r-h)*60); document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2,'0')}`; setTimeout(startTimer, 60000); }
 
     async function watchVideo(n) {
+        // 👉 Forzar reset si está bloqueado
+        if (isProcessing || isAdPlaying) {
+            console.warn('Estado bloqueado, reseteando...');
+            isProcessing = false;
+            isAdPlaying = false;
+            hideAdLoader();
+        }
         if (isProcessing || isAdPlaying) { showToast("⏳ Espera un momento..."); return; }
         if (watchedVideos.includes(n)) { showAlert("Video completado", `El video #${n} ya fue visto hoy.`, "info-circle"); return; }
         const id = `video_${userId}_${n}_${new Date().toISOString().split('T')[0]}`;
