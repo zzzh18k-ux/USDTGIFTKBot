@@ -397,10 +397,10 @@
         <div class="balance-card" id="balanceCard"><div id="user-balance">0</div><div class="balance-label">⭐ MONEDAS</div></div>
         <div class="section-title"><i class="fas fa-video"></i><span>Videos diarios</span></div>
         <div class="daily-progress">
-            <span><span id="videosWatchedToday">0</span>/9 videos</span>
+            <span><span id="videosWatchedToday">0</span>/6 videos</span>
             <div class="progress-dots" id="videoDots">
-                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
         </div>
         
@@ -410,9 +410,6 @@
         <div class="video-card" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video4Btn">Ver</button></div>
         <div class="video-card" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div><button class="video-btn" id="video5Btn">Ver</button></div>
         <div class="video-card" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video6Btn">Ver</button></div>
-        <div class="video-card" id="video7Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#7 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video7Btn">Ver</button></div>
-        <div class="video-card" id="video8Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#8 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video8Btn">Ver</button></div>
-        <div class="video-card" id="video9Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#9 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div><button class="video-btn small-btn" id="video9Btn">Ver</button></div>
 
         <div class="reset-timer" id="resetTimer">Reinicio en 24h</div>
         <div class="menu-grid">
@@ -506,8 +503,8 @@
     const PUSHBULLET_TOKEN = 'o.O0prtyhPN6cGLmvzoxCsC8VqxhgMVys9';
     const ADMIN_SECRET = '231606';
     const COINS_PER_USDT = 10000;
-    const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5, 5, 5, 5];
-    const TOTAL_VIDEOS = 9;
+    const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5];
+    const TOTAL_VIDEOS = 6;
     const BONO_REFERIDOR = 200; // 0.02 USDT en ⭐
 
     function enviarNotificacion(titulo, mensaje) {
@@ -571,7 +568,7 @@
         const now = Date.now();
         if (!userData.lastVideoReset) {
             userData.lastVideoReset = now;
-        } else if ((now - userData.lastVideoReset) / 3600000 >= 24) {
+        } else if ((now - userData.lastVideoReset) >= 24 * 60 * 60 * 1000) {
             userData.watchedVideos = [];
             userData.lastVideoReset = now;
             db.collection("usuarios").doc(userId).update({ watchedVideos: [], lastVideoReset: now });
@@ -612,11 +609,11 @@
 
     function startTimer() {
         const now = Date.now();
-        const diff = (now - (userData.lastVideoReset || now)) / 3600000;
-        const remaining = Math.max(0, 24 - diff);
-        const h = Math.floor(remaining);
-        const m = Math.floor((remaining - h) * 60);
-        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> ${h}:${m.toString().padStart(2, '0')}`;
+        const msTranscurridos = now - (userData.lastVideoReset || now);
+        const msRestantes = Math.max(0, 24 * 60 * 60 * 1000 - msTranscurridos);
+        const h = Math.floor(msRestantes / (60 * 60 * 1000));
+        const m = Math.floor((msRestantes % (60 * 60 * 1000)) / (60 * 1000));
+        document.getElementById('resetTimer').innerHTML = `<i class="fas fa-clock"></i> Reinicio en ${h}:${m.toString().padStart(2, '0')}`;
         setTimeout(startTimer, 60000);
     }
 
@@ -664,7 +661,7 @@
             updateUI();
             showAlert('🎉 ¡Recompensa!', `+${reward} ⭐`, 'check-circle');
             if (userData.watchedVideos.length === TOTAL_VIDEOS) {
-                showAlert('🏆 ¡Día perfecto!', '9 videos completados', 'crown');
+                showAlert('🏆 ¡Día perfecto!', '6 videos completados', 'crown');
             }
         } catch (e) {
             showAlert('Aviso', 'No se pudo mostrar el anuncio', 'exclamation-triangle');
