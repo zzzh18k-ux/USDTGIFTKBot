@@ -24,6 +24,7 @@
             --text-dark: #3A2C27;
             --text-soft: #6B4E44;
             --success: #6BAF92;
+            --danger: #E86A6A;
             --shadow-soft: 0 8px 20px rgba(0,0,0,0.04);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -338,6 +339,119 @@
             border-bottom: 1px solid rgba(0,0,0,0.1);
             font-size: 13px;
         }
+        
+        /* Estilos del juego DOBLE O NADA */
+        .game-apuesta-display {
+            background: linear-gradient(135deg, var(--gold), var(--terracotta));
+            border-radius: 25px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            color: white;
+        }
+        .game-apuesta-display .apuesta-label {
+            font-size: 14px;
+            opacity: 0.9;
+            letter-spacing: 2px;
+        }
+        .game-apuesta-display .apuesta-valor {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 5px 0;
+        }
+        .game-apuesta-display .ganancia-valor {
+            font-size: 18px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 30px;
+        }
+        .game-botones-container {
+            display: flex;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        .game-btn {
+            flex: 1;
+            padding: 14px 0;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.9);
+            color: var(--text-dark);
+            box-shadow: var(--shadow-soft);
+            transition: all 0.2s ease;
+        }
+        .game-btn:active { transform: scale(0.97); background: rgba(255,255,255,0.95); }
+        .game-btn.highlight {
+            background: linear-gradient(135deg, var(--gold), var(--terracotta));
+            color: white;
+        }
+        .game-btn.danger {
+            background: linear-gradient(135deg, var(--danger), #C55A5A);
+            color: white;
+        }
+        .game-jugar-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--success), #4A8C74);
+            color: white;
+            box-shadow: 0 6px 18px rgba(107,175,146,0.3);
+            margin: 10px 0;
+            transition: all 0.2s ease;
+        }
+        .game-jugar-btn:active { transform: scale(0.98); }
+        .game-jugar-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .racha-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .racha-actual { color: var(--gold); }
+        .racha-record { color: var(--terracotta); }
+        .historial-juego {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .historial-item {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            background: rgba(255,255,255,0.6);
+        }
+        .historial-item.win {
+            background: var(--success);
+            color: white;
+        }
+        .historial-item.lose {
+            background: var(--danger);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -413,6 +527,7 @@
 </div>
 
 <div id="app-container">
+    <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="channel-bubble" onclick="joinChannel()"><i class="fab fa-telegram"></i><span>@UsdtGiftChannel</span></div>
@@ -428,42 +543,42 @@
         </div>
         
         <div class="video-card" id="video1Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 VÍDEO</div><div class="video-reward">⭐ +10</div></div></div>
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 VIDEO</div><div class="video-reward">⭐ +10</div></div></div>
             <div class="video-btn-container">
                 <button class="video-btn" id="video1Btn">Ver</button>
                 <span class="unlock-time" id="video1Unlock"></span>
             </div>
         </div>
         <div class="video-card" id="video2Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div>
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VIDEO</div><div class="video-reward">⭐ +5</div></div></div>
             <div class="video-btn-container">
                 <button class="video-btn small-btn" id="video2Btn">Ver</button>
                 <span class="unlock-time" id="video2Unlock"></span>
             </div>
         </div>
         <div class="video-card" id="video3Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div>
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 VIDEO</div><div class="video-reward">⭐ +15</div></div></div>
             <div class="video-btn-container">
                 <button class="video-btn" id="video3Btn">Ver</button>
                 <span class="unlock-time" id="video3Unlock"></span>
             </div>
         </div>
         <div class="video-card" id="video4Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div>
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VIDEO</div><div class="video-reward">⭐ +5</div></div></div>
             <div class="video-btn-container">
                 <button class="video-btn small-btn" id="video4Btn">Ver</button>
                 <span class="unlock-time" id="video4Unlock"></span>
             </div>
         </div>
         <div class="video-card" id="video5Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div>
+            <div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VIDEO</div><div class="video-reward">⭐ +15</div></div></div>
             <div class="video-btn-container">
                 <button class="video-btn" id="video5Btn">Ver</button>
                 <span class="unlock-time" id="video5Unlock"></span>
             </div>
         </div>
         <div class="video-card" id="video6Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div>
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VIDEO</div><div class="video-reward">⭐ +5</div></div></div>
             <div class="video-btn-container">
                 <button class="video-btn small-btn" id="video6Btn">Ver</button>
                 <span class="unlock-time" id="video6Unlock"></span>
@@ -471,9 +586,54 @@
         </div>
 
         <div class="menu-grid">
+            <button class="btn-game" id="gameNavBtn"><span><i class="fas fa-gamepad"></i> Doble o Nada</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Invitar y Ganar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Retirar</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Codigo</span> <i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN: DOBLE O NADA -->
+    <div id="game-screen" class="screen">
+        <div class="back-circle" id="backHomeGame"><i class="fas fa-arrow-left"></i></div>
+        <div class="glass-card" style="padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                <i class="fas fa-gamepad" style="font-size: 28px; background: linear-gradient(135deg, var(--gold), var(--terracotta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark);">Doble o Nada</h3>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 10px;">
+                <span style="font-size: 14px; color: var(--text-soft);">Balance disponible</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--gold);" id="game-balance">0 ⭐</div>
+            </div>
+            
+            <div class="game-apuesta-display">
+                <div class="apuesta-label">APOSTANDO</div>
+                <div class="apuesta-valor" id="game-apuesta-actual">10</div>
+                <div class="ganancia-valor" id="game-ganancia">Ganas 20 ⭐</div>
+            </div>
+            
+            <div class="game-botones-container">
+                <button class="game-btn" id="game-minimo">MINIMO<br><small>10</small></button>
+                <button class="game-btn highlight" id="game-doblar">x2<br><small>Duplicar</small></button>
+                <button class="game-btn danger" id="game-maximo">MAXIMO<br><small>Todo</small></button>
+            </div>
+            
+            <button class="game-jugar-btn" id="game-jugar">JUGAR DOBLE O NADA</button>
+            
+            <div class="racha-container">
+                <span>Racha actual: <span class="racha-actual" id="game-racha">0</span></span>
+                <span>Record: <span class="racha-record" id="game-record">0</span></span>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 5px;">Ultimas jugadas</div>
+                <div class="historial-juego" id="game-historial"></div>
+            </div>
+            
+            <p style="font-size: 10px; color: var(--text-soft); margin-top: 15px; text-align: center;">
+                50% probabilidad de duplicar tu apuesta
+            </p>
         </div>
     </div>
 
@@ -485,9 +645,9 @@
             <p style="font-size:13px;color:var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos retiren.</p>
             
             <div class="invite-highlight">
-                <h4>💎 +10% de comisión</h4><p>por cada video que vean tus invitados</p>
+                <h4>💎 +10% de comision</h4><p>por cada video que vean tus invitados</p>
                 <h4 style="margin-top:12px;">🌟 +0.02 USDT</h4><p>cuando tu amigo haga su primer retiro</p>
-                <div class="earn-tag">💰 ¡Ingresos pasivos!</div>
+                <div class="earn-tag">💰 Ingresos pasivos!</div>
             </div>
             
             <div class="invite-stats">
@@ -502,7 +662,7 @@
             </div>
             
             <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn">
-                <i class="fas fa-share-alt"></i> Compartir enlace de invitación
+                <i class="fas fa-share-alt"></i> Compartir enlace de invitacion
             </button>
             <p style="font-size:11px;color:var(--text-soft);margin-top:10px;text-align:center;">
                 <i class="fas fa-check-circle"></i> El bono se acredita al primer retiro de tu invitado
@@ -521,13 +681,13 @@
                 <div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div>
             </div>
             <div class="ccwallet-info">
-                <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
-                <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button>
-                <br><small>Retiro vía @cctip_bot</small>
+                <i class="fas fa-info-circle"></i> No tienes CCWallet? 
+                <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aqui</button>
+                <br><small>Retiro via @cctip_bot</small>
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
             <button class="btn-game btn-success" style="width:100%;padding:16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
-            <p style="margin-top:10px;font-size:11px;color:var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p>
+            <p style="margin-top:10px;font-size:11px;color:var(--text-soft);">Minimo 200 ⭐ (0.02 USDT)</p>
             <div class="history-title">Historial</div>
             <div id="history-list" style="max-height:150px;overflow-y:auto;"></div>
         </div>
@@ -537,16 +697,16 @@
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-ticket-alt" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
-            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Canjear Código</h3>
-            <div class="channel-join"><i class="fab fa-telegram"></i> Únete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div>
-            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
+            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Canjear Codigo</h3>
+            <div class="channel-join"><i class="fab fa-telegram"></i> Unete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div>
+            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Codigo"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
             <div id="redeem-message" style="margin-top:14px;font-size:13px;text-align:center;"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // ==================== CONFIGURACIÓN ====================
+    // ==================== CONFIGURACION ====================
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -566,7 +726,7 @@
     const BONO_REFERIDOR = 200;
     const UNLOCK_HOURS = 24;
 
-    // ==================== SISTEMA HÍBRIDO LOCALSTORAGE + FIREBASE ====================
+    // ==================== SISTEMA HIBRIDO LOCALSTORAGE + FIREBASE ====================
     const STORAGE_KEY = 'usdtgiftk_userdata';
     
     function saveToLocal(data) {
@@ -595,7 +755,7 @@
             document.getElementById('syncStatus').style.opacity = '1';
             return true;
         } catch (e) {
-            document.getElementById('syncStatus').innerHTML = '⚠️ Sin conexión';
+            document.getElementById('syncStatus').innerHTML = '⚠️ Sin conexion';
             return false;
         }
     }
@@ -620,6 +780,12 @@
     let isProcessing = false;
     let isAdPlaying = false;
     let unlockTimers = [];
+    
+    // Variables del juego
+    let gameApuesta = 10;
+    let gameRacha = 0;
+    let gameRecord = 0;
+    let gameHistorial = [];
 
     async function initUser() {
         if (!userId) return;
@@ -641,7 +807,10 @@
                 ccwallet_id: '',
                 withdrawHistory: [],
                 redeemedCodes: [],
-                lastReferidoWithdraw: 0
+                lastReferidoWithdraw: 0,
+                createdAt: Date.now(),
+                gameRecord: 0,
+                gameHistorial: []
             };
             await ref.set(initialData);
             userData = initialData;
@@ -655,10 +824,8 @@
             const firebaseData = doc.data();
             const localData = loadFromLocal();
             
-            // Combinar datos: Firebase es la fuente principal, pero respetamos unlocks locales más recientes
             if (localData && localData.userId === userId) {
                 userData = { ...firebaseData };
-                // Mantener los unlockTimes más recientes
                 if (localData.videoUnlockTimes) {
                     for (let i = 1; i <= TOTAL_VIDEOS; i++) {
                         const localTime = localData.videoUnlockTimes[i];
@@ -669,10 +836,8 @@
                         }
                     }
                 }
-                // Sincronizar el balance combinado
                 if (localData.pendingBalance) {
                     userData.balance = (userData.balance || 0) + localData.pendingBalance;
-                    // Intentar sincronizar el balance pendiente
                     if (localData.pendingBalance > 0) {
                         syncToFirebase({ balance: userData.balance });
                     }
@@ -682,10 +847,20 @@
             }
             
             if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {};
+            if (!userData.createdAt) {
+                userData.createdAt = Date.now();
+                syncToFirebase({ createdAt: userData.createdAt });
+            }
+            
+            // Cargar datos del juego
+            gameRecord = userData.gameRecord || 0;
+            gameHistorial = userData.gameHistorial || [];
+            
             saveToLocal({ ...userData, userId });
         }
         
         await updateUI();
+        updateGameUI();
         startUnlockTimers();
         document.getElementById('loading-screen').classList.add('hidden');
     }
@@ -734,6 +909,7 @@
     async function updateUI() {
         if (!userData) return;
         document.getElementById('user-balance').innerText = Math.floor(userData.balance || 0);
+        document.getElementById('game-balance').innerText = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('totalInvitados').innerText = userData.referidos || 0;
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + ((userData.balance || 0) / COINS_PER_USDT).toFixed(4) + ' USDT';
@@ -787,6 +963,96 @@
             if (el) el.innerText = ganado + ' ⭐';
         }
     }
+    
+    function updateGameUI() {
+        document.getElementById('game-apuesta-actual').innerText = gameApuesta;
+        document.getElementById('game-ganancia').innerText = `Ganas ${gameApuesta * 2} ⭐`;
+        document.getElementById('game-racha').innerText = gameRacha;
+        document.getElementById('game-record').innerText = gameRecord;
+        
+        const historialEl = document.getElementById('game-historial');
+        historialEl.innerHTML = gameHistorial.slice(-6).map(r => 
+            `<div class="historial-item ${r === 'win' ? 'win' : 'lose'}">${r === 'win' ? '✓' : '✗'}</div>`
+        ).join('');
+    }
+    
+    function setMinimo() {
+        gameApuesta = 10;
+        updateGameUI();
+    }
+    
+    function doblarApuesta() {
+        gameApuesta = Math.min(gameApuesta * 2, userData.balance || 0);
+        if (gameApuesta < 10) gameApuesta = 10;
+        updateGameUI();
+    }
+    
+    function setMaximo() {
+        gameApuesta = userData.balance || 10;
+        if (gameApuesta < 10) gameApuesta = 10;
+        updateGameUI();
+    }
+    
+    async function jugarDobleONada() {
+        if (isProcessing) return;
+        if (gameApuesta > (userData.balance || 0)) {
+            showAlert('Saldo insuficiente', 'No tienes suficientes ⭐ para apostar', 'coins');
+            return;
+        }
+        if (gameApuesta < 10) {
+            gameApuesta = 10;
+            updateGameUI();
+        }
+        
+        isProcessing = true;
+        document.getElementById('game-jugar').disabled = true;
+        
+        try {
+            const gano = Math.random() < 0.5; // 50% probabilidad
+            
+            if (gano) {
+                userData.balance += gameApuesta;
+                gameRacha++;
+                if (gameRacha > gameRecord) {
+                    gameRecord = gameRacha;
+                    userData.gameRecord = gameRecord;
+                }
+                gameHistorial.push('win');
+                showAlert('GANASTE', `+${gameApuesta} ⭐`, 'crown');
+            } else {
+                userData.balance -= gameApuesta;
+                gameRacha = 0;
+                gameHistorial.push('lose');
+                showAlert('Perdiste', `-${gameApuesta} ⭐`, 'times-circle');
+            }
+            
+            if (gameHistorial.length > 20) gameHistorial.shift();
+            userData.gameHistorial = gameHistorial;
+            
+            saveToLocal({ ...userData, userId });
+            await updateUI();
+            updateGameUI();
+            
+            // Sincronizar con Firebase
+            await syncToFirebase({
+                balance: userData.balance,
+                gameRecord: gameRecord,
+                gameHistorial: gameHistorial
+            });
+            
+            // Resetear apuesta si es mayor al balance
+            if (gameApuesta > userData.balance) {
+                gameApuesta = Math.max(10, userData.balance);
+                updateGameUI();
+            }
+            
+        } catch (e) {
+            showAlert('Error', 'No se pudo completar la jugada', 'times-circle');
+        } finally {
+            isProcessing = false;
+            document.getElementById('game-jugar').disabled = false;
+        }
+    }
 
     function showAdLoader() { document.getElementById('adLoader').style.display = 'flex'; }
     function hideAdLoader() { document.getElementById('adLoader').style.display = 'none'; }
@@ -805,7 +1071,7 @@
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if (isVideoLocked(n)) {
-            showAlert('Video bloqueado', `El video #${n} estará disponible en ${getUnlockTimeString(n)}`, 'clock');
+            showAlert('Video bloqueado', `El video #${n} estara disponible en ${getUnlockTimeString(n)}`, 'clock');
             return;
         }
         
@@ -820,20 +1086,16 @@
             const reward = VIDEO_REWARDS[n - 1];
             const unlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
             
-            // Actualizar datos locales
             const newUnlockTimes = { ...(userData.videoUnlockTimes || {}) };
             newUnlockTimes[n] = unlockTime;
             userData.videoUnlockTimes = newUnlockTimes;
             userData.balance += reward;
             
-            // Guardar en localStorage PRIMERO (instantáneo)
             saveToLocal({ ...userData, userId, pendingBalance: 0 });
             
-            // Actualizar UI inmediatamente
             updateUI();
-            showAlert('🎉 ¡Recompensa!', `+${reward} ⭐`, 'check-circle');
+            showAlert('🎉 Recompensa', `+${reward} ⭐`, 'check-circle');
             
-            // Sincronizar con Firebase en segundo plano
             syncToFirebase({
                 balance: firebase.firestore.FieldValue.increment(reward),
                 videoUnlockTimes: newUnlockTimes
@@ -852,8 +1114,8 @@
     async function handleWithdraw() {
         if (isProcessing) return;
         const cc = document.getElementById('ccwallet-id').value.trim();
-        if (cc.length < 3) { showAlert('ID inválido', 'Ingresa CCWallet', 'times-circle'); return; }
-        if ((userData.balance || 0) < 200) { showAlert('Saldo insuficiente', 'Mínimo 200 ⭐', 'coins'); return; }
+        if (cc.length < 3) { showAlert('ID invalido', 'Ingresa CCWallet', 'times-circle'); return; }
+        if ((userData.balance || 0) < 200) { showAlert('Saldo insuficiente', 'Minimo 200 ⭐', 'coins'); return; }
         
         isProcessing = true;
         showAdLoader();
@@ -891,9 +1153,39 @@
             
             saveToLocal({ ...userData, userId });
             await updateUI();
+            updateGameUI();
             
-            enviarNotificacion('🦊 RETIRO', `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}`);
-            showAlert('✅ ¡Retiro exitoso!', `${Math.floor(bal)} ⭐ retiradas`, 'check-circle');
+            const videosHoy = Object.values(userData.videoUnlockTimes || {}).filter(t => Date.now() < t).length;
+            const totalVideosVistos = Object.keys(userData.videoUnlockTimes || {}).length;
+            const ganadoHoy = Object.entries(userData.videoUnlockTimes || {})
+                .filter(([_, t]) => Date.now() < t)
+                .reduce((sum, [videoNum]) => sum + VIDEO_REWARDS[parseInt(videoNum) - 1], 0);
+            
+            const fechaRegistro = userData.createdAt ? new Date(userData.createdAt).toLocaleString() : 'Desconocida';
+            const primerRetiro = firstWithdraw ? 'SI' : 'NO';
+            const dispositivo = /Android/i.test(navigator.userAgent) ? 'Android' : 
+                              /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'iOS' : 'Web';
+            const resolucion = `${window.screen.width}x${window.screen.height}`;
+            const zonaHoraria = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            
+            const mensajeDetallado = 
+                `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n` +
+                `🆔 Telegram: ${userId}\n` +
+                `💰 Retiro: ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n` +
+                `📦 CCWallet: ${cc}\n` +
+                `📊 Videos hoy: ${videosHoy}/${TOTAL_VIDEOS}\n` +
+                `🏆 Total videos vistos: ${totalVideosVistos}\n` +
+                `💎 Ganado hoy: ${ganadoHoy} ⭐\n` +
+                `👥 Referidos: ${userData.referidos || 0}\n` +
+                `🔗 Invitado por: ${userData.invitado_por || 'nadie'}\n` +
+                `📅 Registro: ${fechaRegistro}\n` +
+                `📱 ${dispositivo} | ${resolucion} | ${zonaHoraria}\n` +
+                `⚠️ Primer retiro: ${primerRetiro}\n` +
+                `✅ COMPLETADO`;
+            
+            enviarNotificacion('🦊 USDT GIFT K - Retiro', mensajeDetallado);
+            
+            showAlert('✅ Retiro exitoso', `${Math.floor(bal)} ⭐ retiradas`, 'check-circle');
             tg.openTelegramLink('https://t.me/cctip_bot');
         } catch (e) {
             showAlert('Error', 'No se pudo completar', 'times-circle');
@@ -916,11 +1208,11 @@
         const code = input.value.trim().toUpperCase();
         const msg = document.getElementById('redeem-message');
         
-        if (!code) { msg.innerHTML = '<span style="color:var(--terracotta);">Ingresa un código</span>'; return; }
+        if (!code) { msg.innerHTML = '<span style="color:var(--terracotta);">Ingresa un codigo</span>'; return; }
         
         const redeemed = userData.redeemedCodes || [];
         if (redeemed.includes(code)) {
-            msg.innerHTML = '<span style="color:var(--terracotta);">Ya usaste este código</span>';
+            msg.innerHTML = '<span style="color:var(--terracotta);">Ya usaste este codigo</span>';
             return;
         }
         
@@ -931,10 +1223,10 @@
             const codeRef = db.collection("giftCodes").doc(code);
             const codeDoc = await codeRef.get();
             
-            if (!codeDoc.exists) throw new Error('Código inválido');
+            if (!codeDoc.exists) throw new Error('Codigo invalido');
             
             const codeData = codeDoc.data();
-            if (codeData.usedCount >= codeData.maxUses) throw new Error('Código agotado');
+            if (codeData.usedCount >= codeData.maxUses) throw new Error('Codigo agotado');
             
             await db.runTransaction(async (transaction) => {
                 const userRef = db.collection("usuarios").doc(userId);
@@ -951,9 +1243,10 @@
             
             saveToLocal({ ...userData, userId });
             await updateUI();
+            updateGameUI();
             msg.innerHTML = `<span style="color:var(--success);">🎉 +${codeData.amount} ⭐</span>`;
             input.value = '';
-            showAlert('🎁 ¡Código canjeado!', `+${codeData.amount} ⭐`, 'gift');
+            showAlert('🎁 Codigo canjeado', `+${codeData.amount} ⭐`, 'gift');
         } catch (e) {
             msg.innerHTML = `<span style="color:var(--terracotta);">❌ ${e.message}</span>`;
         } finally {
@@ -978,9 +1271,10 @@
         document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active'));
         document.getElementById(s).classList.add('active');
         if (s === 'withdraw-screen') loadHistory();
+        if (s === 'game-screen') updateGameUI();
     }
     function copyRefLink() {
-        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. ¡Invita amigos y gana 10%% de comisión + 0.02 USDT cuando retiren!`);
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana 10%% de comision + 0.02 USDT cuando retiren!`);
     }
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
@@ -1010,7 +1304,7 @@
             const targetId = document.getElementById('adminUserId').value.trim();
             const amt = parseInt(document.getElementById('adminAmount').value);
             if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
-            if (!targetId || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
+            if (!targetId || amt <= 0) { showAlert('Datos invalidos', '', 'times-circle'); return; }
             try {
                 await db.collection("usuarios").doc(targetId).update({ balance: firebase.firestore.FieldValue.increment(amt) });
                 showAlert('Saldo añadido', `+${amt} ⭐ a ${targetId}`, 'crown');
@@ -1025,10 +1319,10 @@
             const amt = parseInt(document.getElementById('giftAmount').value);
             const max = parseInt(document.getElementById('giftMaxUses').value) || 1;
             if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
-            if (!code || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
+            if (!code || amt <= 0) { showAlert('Datos invalidos', '', 'times-circle'); return; }
             try {
                 await db.collection("giftCodes").doc(code).set({ amount: amt, maxUses: max, usedCount: 0, createdAt: Date.now() });
-                showAlert('Código creado', `${code} por ${amt} ⭐ (${max} usos)`, 'gift');
+                showAlert('Codigo creado', `${code} por ${amt} ⭐ (${max} usos)`, 'gift');
                 document.getElementById('giftCode').value = '';
                 document.getElementById('giftAmount').value = '';
                 document.getElementById('giftMaxUses').value = '';
@@ -1044,7 +1338,7 @@
         el.innerHTML = '<p style="text-align:center;">Cargando...</p>';
         try {
             const snap = await db.collection("giftCodes").get();
-            if (snap.empty) { el.innerHTML = '<p style="text-align:center;">No hay códigos</p>'; return; }
+            if (snap.empty) { el.innerHTML = '<p style="text-align:center;">No hay codigos</p>'; return; }
             let html = '';
             snap.forEach(doc => {
                 const d = doc.data();
@@ -1071,12 +1365,24 @@
     for (let i = 1; i <= TOTAL_VIDEOS; i++) {
         document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     }
+    
+    // Navegacion
+    document.getElementById('gameNavBtn').onclick = () => navigate('game-screen');
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
+    
+    document.getElementById('backHomeGame').onclick = () => navigate('home-screen');
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
     document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
     document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
+    
+    // Juego
+    document.getElementById('game-minimo').onclick = setMinimo;
+    document.getElementById('game-doblar').onclick = doblarApuesta;
+    document.getElementById('game-maximo').onclick = setMaximo;
+    document.getElementById('game-jugar').onclick = jugarDobleONada;
+    
     document.getElementById('shareRefBtn').onclick = copyRefLink;
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
@@ -1085,4 +1391,4 @@
     initAdmin();
 </script>
 </body>
-</html>
+    </html>
