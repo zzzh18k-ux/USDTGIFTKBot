@@ -609,12 +609,12 @@
             
             <div class="game-apuesta-display">
                 <div class="apuesta-label">APOSTANDO</div>
-                <div class="apuesta-valor" id="game-apuesta-actual">10</div>
-                <div class="ganancia-valor" id="game-ganancia">Ganas 20 ⭐</div>
+                <div class="apuesta-valor" id="game-apuesta-actual">5</div>
+                <div class="ganancia-valor" id="game-ganancia">Ganas 10 ⭐</div>
             </div>
             
             <div class="game-botones-container">
-                <button class="game-btn" id="game-minimo">MINIMO<br><small>10</small></button>
+                <button class="game-btn" id="game-minimo">MINIMO<br><small>5</small></button>
                 <button class="game-btn highlight" id="game-doblar">x2<br><small>Duplicar</small></button>
                 <button class="game-btn danger" id="game-maximo">MAXIMO<br><small>Todo</small></button>
             </div>
@@ -632,7 +632,7 @@
             </div>
             
             <p style="font-size: 10px; color: var(--text-soft); margin-top: 15px; text-align: center;">
-                50% probabilidad de duplicar tu apuesta
+                30% probabilidad de duplicar tu apuesta
             </p>
         </div>
     </div>
@@ -772,9 +772,18 @@
     tg.ready();
     tg.expand();
     
-    const userId = tg.initDataUnsafe?.user?.id?.toString();
-    const userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
-    const userUsername = tg.initDataUnsafe?.user?.username || '';
+    // ✅ MODO PRUEBA PARA NAVEGADOR
+    let userId, userName, userUsername;
+    if (!tg.initDataUnsafe?.user) {
+        console.warn('⚠️ MODO PRUEBA: No estás en Telegram');
+        userId = 'test_' + Date.now();
+        userName = 'Test User';
+        userUsername = 'testuser';
+    } else {
+        userId = tg.initDataUnsafe?.user?.id?.toString();
+        userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
+        userUsername = tg.initDataUnsafe?.user?.username || '';
+    }
     
     let userData = null;
     let isProcessing = false;
@@ -782,7 +791,7 @@
     let unlockTimers = [];
     
     // Variables del juego
-    let gameApuesta = 10;
+    let gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
     let gameRacha = 0;
     let gameRecord = 0;
     let gameHistorial = [];
@@ -977,19 +986,19 @@
     }
     
     function setMinimo() {
-        gameApuesta = 10;
+        gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
         updateGameUI();
     }
     
     function doblarApuesta() {
         gameApuesta = Math.min(gameApuesta * 2, userData.balance || 0);
-        if (gameApuesta < 10) gameApuesta = 10;
+        if (gameApuesta < 5) gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
         updateGameUI();
     }
     
     function setMaximo() {
-        gameApuesta = userData.balance || 10;
-        if (gameApuesta < 10) gameApuesta = 10;
+        gameApuesta = userData.balance || 5;
+        if (gameApuesta < 5) gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
         updateGameUI();
     }
     
@@ -999,8 +1008,8 @@
             showAlert('Saldo insuficiente', 'No tienes suficientes ⭐ para apostar', 'coins');
             return;
         }
-        if (gameApuesta < 10) {
-            gameApuesta = 10;
+        if (gameApuesta < 5) {  // ✅ CAMBIADO: 10 -> 5
+            gameApuesta = 5;
             updateGameUI();
         }
         
@@ -1008,7 +1017,7 @@
         document.getElementById('game-jugar').disabled = true;
         
         try {
-            const gano = Math.random() < 0.5; // 50% probabilidad
+            const gano = Math.random() < 0.3; // ✅ CAMBIADO: 0.5 -> 0.3 (30% probabilidad)
             
             if (gano) {
                 userData.balance += gameApuesta;
@@ -1042,7 +1051,7 @@
             
             // Resetear apuesta si es mayor al balance
             if (gameApuesta > userData.balance) {
-                gameApuesta = Math.max(10, userData.balance);
+                gameApuesta = Math.max(5, userData.balance);  // ✅ CAMBIADO: 10 -> 5
                 updateGameUI();
             }
             
