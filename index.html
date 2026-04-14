@@ -190,7 +190,18 @@
             color: var(--text-soft);
             white-space: nowrap;
         }
-        .reset-timer { text-align: center; font-size: 9px; color: var(--text-soft); margin: 3px 0 5px; font-weight: 500; }
+        .sync-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: var(--success);
+            background: rgba(255,255,255,0.8);
+            padding: 4px 8px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+        }
         .menu-grid { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
         .btn-game {
             background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); border: none; padding: 12px 16px;
@@ -332,6 +343,7 @@
 <body>
 
 <div id="gradient-bg"></div>
+<div id="syncStatus" class="sync-status">⚡ Sincronizado</div>
 
 <div id="loading-screen">
     <div class="welcome-icon"><i class="fas fa-hand-holding-heart"></i></div>
@@ -406,7 +418,7 @@
             <div class="channel-bubble" onclick="joinChannel()"><i class="fab fa-telegram"></i><span>@UsdtGiftChannel</span></div>
         </div>
         <div class="balance-card" id="balanceCard"><div id="user-balance">0</div><div class="balance-label">⭐ MONEDAS</div></div>
-        <div class="section-title"><i class="fas fa-video"></i><span>Videos (se desbloquean 24h después de verlos)</span></div>
+        <div class="section-title"><i class="fas fa-video"></i><span>Videos (24h de espera por video)</span></div>
         <div class="daily-progress">
             <span><span id="videosWatchedCount">0</span>/6 videos vistos</span>
             <div class="progress-dots" id="videoDots">
@@ -554,6 +566,40 @@
     const BONO_REFERIDOR = 200;
     const UNLOCK_HOURS = 24;
 
+    // ==================== SISTEMA HÍBRIDO LOCALSTORAGE + FIREBASE ====================
+    const STORAGE_KEY = 'usdtgiftk_userdata';
+    
+    function saveToLocal(data) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            document.getElementById('syncStatus').innerHTML = '💾 Local';
+        } catch (e) {}
+    }
+    
+    function loadFromLocal() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+    
+    async function syncToFirebase(data) {
+        if (!userId) return false;
+        try {
+            document.getElementById('syncStatus').innerHTML = '☁️ Sincronizando...';
+            await db.collection("usuarios").doc(userId).update(data);
+            document.getElementById('syncStatus').innerHTML = '✅ Sincronizado';
+            setTimeout(() => document.getElementById('syncStatus').style.opacity = '0', 2000);
+            document.getElementById('syncStatus').style.opacity = '1';
+            return true;
+        } catch (e) {
+            document.getElementById('syncStatus').innerHTML = '⚠️ Sin conexión';
+            return false;
+        }
+    }
+
     function enviarNotificacion(titulo, mensaje) {
         fetch('https://api.pushbullet.com/v2/pushes', {
             method: 'POST',
@@ -584,7 +630,7 @@
         
         if (!doc.exists) {
             const inv = (start && start !== userId) ? start : null;
-            await ref.set({
+            const initialData = {
                 nombre: userName,
                 username: userUsername,
                 balance: 0,
@@ -596,16 +642,48 @@
                 withdrawHistory: [],
                 redeemedCodes: [],
                 lastReferidoWithdraw: 0
-            });
+            };
+            await ref.set(initialData);
+            userData = initialData;
+            saveToLocal(initialData);
             if (inv) {
                 const invRef = db.collection("usuarios").doc(inv);
                 await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
             }
             enviarNotificacion('🆕 NUEVO USUARIO', `👤 ${userName} (@${userUsername || 'n/a'})\n🆔 ${userId}\n🔗 Invitado por: ${inv || 'nadie'}`);
+        } else {
+            const firebaseData = doc.data();
+            const localData = loadFromLocal();
+            
+            // Combinar datos: Firebase es la fuente principal, pero respetamos unlocks locales más recientes
+            if (localData && localData.userId === userId) {
+                userData = { ...firebaseData };
+                // Mantener los unlockTimes más recientes
+                if (localData.videoUnlockTimes) {
+                    for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+                        const localTime = localData.videoUnlockTimes[i];
+                        const firebaseTime = firebaseData.videoUnlockTimes?.[i];
+                        if (localTime && (!firebaseTime || localTime > firebaseTime)) {
+                            if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {};
+                            userData.videoUnlockTimes[i] = localTime;
+                        }
+                    }
+                }
+                // Sincronizar el balance combinado
+                if (localData.pendingBalance) {
+                    userData.balance = (userData.balance || 0) + localData.pendingBalance;
+                    // Intentar sincronizar el balance pendiente
+                    if (localData.pendingBalance > 0) {
+                        syncToFirebase({ balance: userData.balance });
+                    }
+                }
+            } else {
+                userData = firebaseData;
+            }
+            
+            if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {};
+            saveToLocal({ ...userData, userId });
         }
-        
-        userData = (await ref.get()).data();
-        if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {};
         
         await updateUI();
         startUnlockTimers();
@@ -740,22 +818,27 @@
             await showMonetagAd();
             
             const reward = VIDEO_REWARDS[n - 1];
-            const ref = db.collection("usuarios").doc(userId);
             const unlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
             
+            // Actualizar datos locales
             const newUnlockTimes = { ...(userData.videoUnlockTimes || {}) };
             newUnlockTimes[n] = unlockTime;
+            userData.videoUnlockTimes = newUnlockTimes;
+            userData.balance += reward;
             
-            await ref.update({
+            // Guardar en localStorage PRIMERO (instantáneo)
+            saveToLocal({ ...userData, userId, pendingBalance: 0 });
+            
+            // Actualizar UI inmediatamente
+            updateUI();
+            showAlert('🎉 ¡Recompensa!', `+${reward} ⭐`, 'check-circle');
+            
+            // Sincronizar con Firebase en segundo plano
+            syncToFirebase({
                 balance: firebase.firestore.FieldValue.increment(reward),
                 videoUnlockTimes: newUnlockTimes
             });
             
-            userData.balance += reward;
-            userData.videoUnlockTimes = newUnlockTimes;
-            
-            updateUI();
-            showAlert('🎉 ¡Recompensa!', `+${reward} ⭐`, 'check-circle');
         } catch (e) {
             showAlert('Aviso', 'No se pudo mostrar el anuncio', 'exclamation-triangle');
         } finally {
@@ -806,7 +889,9 @@
             if (!userData.withdrawHistory) userData.withdrawHistory = [];
             userData.withdrawHistory.push({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: '✅ Completado' });
             
+            saveToLocal({ ...userData, userId });
             await updateUI();
+            
             enviarNotificacion('🦊 RETIRO', `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}`);
             showAlert('✅ ¡Retiro exitoso!', `${Math.floor(bal)} ⭐ retiradas`, 'check-circle');
             tg.openTelegramLink('https://t.me/cctip_bot');
@@ -864,6 +949,7 @@
             if (!userData.redeemedCodes) userData.redeemedCodes = [];
             userData.redeemedCodes.push(code);
             
+            saveToLocal({ ...userData, userId });
             await updateUI();
             msg.innerHTML = `<span style="color:var(--success);">🎉 +${codeData.amount} ⭐</span>`;
             input.value = '';
@@ -999,4 +1085,4 @@
     initAdmin();
 </script>
 </body>
-    </html>
+</html>
