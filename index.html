@@ -791,7 +791,7 @@
     let unlockTimers = [];
     
     // Variables del juego
-    let gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
+    let gameApuesta = 5;
     let gameRacha = 0;
     let gameRecord = 0;
     let gameHistorial = [];
@@ -986,19 +986,19 @@
     }
     
     function setMinimo() {
-        gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
+        gameApuesta = 5;
         updateGameUI();
     }
     
     function doblarApuesta() {
         gameApuesta = Math.min(gameApuesta * 2, userData.balance || 0);
-        if (gameApuesta < 5) gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
+        if (gameApuesta < 5) gameApuesta = 5;
         updateGameUI();
     }
     
     function setMaximo() {
         gameApuesta = userData.balance || 5;
-        if (gameApuesta < 5) gameApuesta = 5;  // ✅ CAMBIADO: 10 -> 5
+        if (gameApuesta < 5) gameApuesta = 5;
         updateGameUI();
     }
     
@@ -1008,7 +1008,7 @@
             showAlert('Saldo insuficiente', 'No tienes suficientes ⭐ para apostar', 'coins');
             return;
         }
-        if (gameApuesta < 5) {  // ✅ CAMBIADO: 10 -> 5
+        if (gameApuesta < 5) {
             gameApuesta = 5;
             updateGameUI();
         }
@@ -1017,7 +1017,7 @@
         document.getElementById('game-jugar').disabled = true;
         
         try {
-            const gano = Math.random() < 0.3; // ✅ CAMBIADO: 0.5 -> 0.3 (30% probabilidad)
+            const gano = Math.random() < 0.3;
             
             if (gano) {
                 userData.balance += gameApuesta;
@@ -1042,16 +1042,14 @@
             await updateUI();
             updateGameUI();
             
-            // Sincronizar con Firebase
             await syncToFirebase({
                 balance: userData.balance,
                 gameRecord: gameRecord,
                 gameHistorial: gameHistorial
             });
             
-            // Resetear apuesta si es mayor al balance
             if (gameApuesta > userData.balance) {
-                gameApuesta = Math.max(5, userData.balance);  // ✅ CAMBIADO: 10 -> 5
+                gameApuesta = Math.max(5, userData.balance);
                 updateGameUI();
             }
             
@@ -1066,17 +1064,19 @@
     function showAdLoader() { document.getElementById('adLoader').style.display = 'flex'; }
     function hideAdLoader() { document.getElementById('adLoader').style.display = 'none'; }
 
-    async function showMonetagAd() {
-        return new Promise((resolve, reject) => {
-            if (typeof show_10853207 !== 'function') { reject(new Error('SDK no disponible')); return; }
-            let adShown = false;
-            const timeout = setTimeout(() => { if (!adShown) { hideAdLoader(); reject(new Error('Timeout')); } }, 8000);
-            show_10853207()
-                .then(() => { adShown = true; clearTimeout(timeout); hideAdLoader(); resolve(true); })
-                .catch((err) => { clearTimeout(timeout); hideAdLoader(); reject(err); });
-        });
+    // ✅ FUNCIÓN CORREGIDA - SIN ESPERAR PROMESAS
+    function showMonetagAd() {
+        try {
+            if (typeof window.show_10853207 === 'function') {
+                window.show_10853207();
+            }
+        } catch (e) {
+            console.log('Error al llamar anuncio:', e);
+        }
+        return Promise.resolve(true);
     }
 
+    // ✅ FUNCIÓN CORREGIDA - DISPARA Y OLVIDA
     async function watchVideo(n) {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if (isVideoLocked(n)) {
@@ -1089,35 +1089,44 @@
         updateUI();
         showAdLoader();
         
-        try {
-            await showMonetagAd();
-            
-            const reward = VIDEO_REWARDS[n - 1];
-            const unlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
-            
-            const newUnlockTimes = { ...(userData.videoUnlockTimes || {}) };
-            newUnlockTimes[n] = unlockTime;
-            userData.videoUnlockTimes = newUnlockTimes;
-            userData.balance += reward;
-            
-            saveToLocal({ ...userData, userId, pendingBalance: 0 });
-            
-            updateUI();
-            showAlert('🎉 Recompensa', `+${reward} ⭐`, 'check-circle');
-            
-            syncToFirebase({
-                balance: firebase.firestore.FieldValue.increment(reward),
-                videoUnlockTimes: newUnlockTimes
-            });
-            
-        } catch (e) {
-            showAlert('Aviso', 'No se pudo mostrar el anuncio', 'exclamation-triangle');
-        } finally {
+        // Mostrar anuncio (sin await)
+        showMonetagAd();
+        
+        // Dar recompensa después de 1.5 segundos
+        setTimeout(async () => {
+            try {
+                const reward = VIDEO_REWARDS[n - 1];
+                const unlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
+                
+                const newUnlockTimes = { ...(userData.videoUnlockTimes || {}) };
+                newUnlockTimes[n] = unlockTime;
+                userData.videoUnlockTimes = newUnlockTimes;
+                userData.balance += reward;
+                
+                saveToLocal({ ...userData, userId, pendingBalance: 0 });
+                
+                updateUI();
+                showAlert('🎉 Recompensa', `+${reward} ⭐`, 'check-circle');
+                
+                syncToFirebase({
+                    balance: firebase.firestore.FieldValue.increment(reward),
+                    videoUnlockTimes: newUnlockTimes
+                });
+                
+            } catch (e) {
+                showAlert('Aviso', 'Error al guardar recompensa', 'exclamation-triangle');
+            } finally {
+                hideAdLoader();
+                isProcessing = false;
+                isAdPlaying = false;
+                updateUI();
+            }
+        }, 1500);
+        
+        // Seguridad: ocultar loader después de 5 segundos
+        setTimeout(() => {
             hideAdLoader();
-            isProcessing = false;
-            isAdPlaying = false;
-            updateUI();
-        }
+        }, 5000);
     }
 
     async function handleWithdraw() {
@@ -1130,7 +1139,7 @@
         showAdLoader();
         
         try {
-            await showMonetagAd();
+            showMonetagAd();
             
             const ref = db.collection("usuarios").doc(userId);
             const bal = userData.balance;
@@ -1227,7 +1236,7 @@
         
         isProcessing = true;
         try {
-            await showMonetagAd();
+            showMonetagAd();
             
             const codeRef = db.collection("giftCodes").doc(code);
             const codeDoc = await codeRef.get();
@@ -1400,4 +1409,4 @@
     initAdmin();
 </script>
 </body>
-    </html>
+</html>
