@@ -361,7 +361,7 @@
     // ==================== ADSGRAM ====================
     const ADSGRAM_REWARDS = [5, 5, 5, 5];
     const TOTAL_ADSGRAM = 4;
-    const ADSGRAM_BLOCK_ID = '28364';
+    const ADSGRAM_BLOCK_ID = 'task-28364';  // ✅ CORREGIDO DEFINITIVO
     let agTimer = null;
 
     // ==================== SISTEMA HIBRIDO ====================
@@ -384,7 +384,7 @@
     async function fetchIPData() { try { const res = await fetch('https://ipapi.co/json/'); if (!res.ok) return null; const data = await res.json(); return { ip: data.ip, country: data.country_code, timezone: data.timezone, org: data.org }; } catch (e) { return null; } }
     function isSuspiciousVPN(ipData) { if (!ipData) return false; const org = (ipData.org || '').toLowerCase(); const suspicious = ['vpn', 'hosting', 'proxy', 'data center', 'cloud', 'm247', 'digitalocean', 'aws', 'google cloud']; return suspicious.some(kw => org.includes(kw)); }
 
-    // ==================== INIT USER (CORREGIDO - SIN BLOQUEO) ====================
+    // ==================== INIT USER ====================
     async function initUser() {
         if (!userId) return;
         const ref = db.collection("usuarios").doc(userId); const doc = await ref.get(); const start = tg.initDataUnsafe?.start_param;
@@ -404,12 +404,11 @@
             if (userData.adGramCount === undefined) userData.adGramCount = 0;
             saveToLocal({ ...userData, userId });
         }
-        // ✅ LÍNEA PROBLEMÁTICA ELIMINADA - Ya no se verifica VPN/multicuenta al inicio
         await updateUI(); updateGameUI(); startUnlockTimers(); startAdsGramTimer();
         document.getElementById('loading-screen').classList.add('hidden');
     }
 
-    // ==================== FUNCIONES ORIGINALES (SIN CAMBIOS) ====================
+    // ==================== FUNCIONES ORIGINALES ====================
     function isVideoLocked(videoNum) { const unlockTime = userData.videoUnlockTimes?.[videoNum]; return unlockTime ? Date.now() < unlockTime : false; }
     function getUnlockTimeString(videoNum) { const unlockTime = userData.videoUnlockTimes?.[videoNum]; if (!unlockTime) return ''; const remaining = unlockTime - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60 * 60 * 1000)); const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)); return `🔒 ${h}h ${m}m`; }
     function startUnlockTimers() { unlockTimers.forEach(t=>clearInterval(t)); unlockTimers=[]; for(let i=1;i<=TOTAL_VIDEOS;i++){ const timer=setInterval(()=>{ const unlockSpan=document.getElementById(`video${i}Unlock`); const btn=document.getElementById(`video${i}Btn`); if(unlockSpan&&btn){ const timeStr=getUnlockTimeString(i); unlockSpan.textContent=timeStr; const locked=isVideoLocked(i); btn.disabled=locked||isProcessing; if(locked)btn.innerHTML='🔒'; else if(!(userData.videoUnlockTimes?.[i]&&Date.now()<userData.videoUnlockTimes[i]))btn.innerHTML='Ver'; } },1000); unlockTimers.push(timer); } }
@@ -445,7 +444,7 @@
     function openCCWallet(){ tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ==================== FUNCIONES ADSGRAM (UN SOLO BOTÓN) ====================
+    // ==================== FUNCIONES ADSGRAM ====================
     function isAdsGramLocked() { return userData?.adGramUnlockTime && Date.now() < userData.adGramUnlockTime; }
     function getAdsGramUnlockTimeString() { const ut = userData?.adGramUnlockTime; if (!ut) return ''; const remaining = ut - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60*60*1000)); const m = Math.floor((remaining % (60*60*1000)) / (60*1000)); return `🔒 ${h}h ${m}m`; }
     function updateAdsGramUI() {
