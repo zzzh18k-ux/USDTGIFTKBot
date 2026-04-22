@@ -328,7 +328,14 @@
             saveToLocal({ ...userData, userId });
         }
         await updateUI(); updateGameUI(); startUnlockTimers(); startAdsGramTimer();
+        
+        // Intento normal de ocultar
         document.getElementById('loading-screen').classList.add('hidden');
+        
+        // ✅ SEGURO DE VIDA: Si después de 5 segundos sigue visible, lo ocultamos a la fuerza
+        setTimeout(() => {
+            document.getElementById('loading-screen').classList.add('hidden');
+        }, 5000);
     }
 
     // ==================== FUNCIONES ORIGINALES ====================
