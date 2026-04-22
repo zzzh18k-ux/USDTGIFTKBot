@@ -206,14 +206,6 @@
     </div>
 </div>
 
-<!-- COMPONENTE ADSGRAM TASK -->
-<adsgram-task 
-    id="adsgramTask"
-    data-block-id="task-28364"
-    data-debug="true"
-    style="display: none;">
-</adsgram-task>
-
 <div id="app-container">
     <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
@@ -335,9 +327,10 @@
     const BONO_REFERIDOR = 200;
     const UNLOCK_HOURS = 24;
 
-    // ==================== ADSGRAM ====================
+    // ==================== ADSGRAM REWARD AD ====================
     const ADSGRAM_REWARDS = [5, 5, 5, 5];
     const TOTAL_ADSGRAM = 4;
+    const ADSGRAM_BLOCK_ID = '28418';  // ✅ TU BLOCK ID CORRECTO
     let agTimer = null;
 
     // ==================== SISTEMA HIBRIDO ====================
@@ -420,7 +413,7 @@
     function openCCWallet(){ tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ==================== FUNCIONES ADSGRAM (COMPONENTE WEB) ====================
+    // ==================== FUNCIONES ADSGRAM REWARD AD ====================
     function isAdsGramLocked() { return userData?.adGramUnlockTime && Date.now() < userData.adGramUnlockTime; }
     function getAdsGramUnlockTimeString() { const ut = userData?.adGramUnlockTime; if (!ut) return ''; const remaining = ut - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60*60*1000)); const m = Math.floor((remaining % (60*60*1000)) / (60*1000)); return `🔒 ${h}h ${m}m`; }
     function updateAdsGramUI() {
@@ -448,10 +441,11 @@
         const nextAd = count + 1;
         isProcessing = true; isAdPlaying = true; updateUI(); updateAdsGramUI(); showAdLoader();
         
-        const taskElement = document.getElementById('adsgramTask');
-        
-        const onReward = async (event) => {
-            cleanup();
+        try {
+            // ✅ MÉTODO CORRECTO PARA REWARD ADS
+            const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+            await AdController.show();
+            
             const reward = ADSGRAM_REWARDS[nextAd - 1];
             userData.adGramCount = nextAd;
             userData.balance += reward;
@@ -466,25 +460,12 @@
             showAlert('🎁 ¡Recompensa!', message, 'check-circle');
             syncToFirebase({ balance: userData.balance, adGramCount: userData.adGramCount, adGramUnlockTime: userData.adGramUnlockTime });
             
+        } catch (error) {
+            console.error('Error AdsGram:', error);
+            showAlert('Aviso', 'Anuncio no completado. Intenta de nuevo.', 'exclamation-triangle');
+        } finally {
             hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI();
-        };
-        
-        const onError = (event) => {
-            cleanup();
-            console.error('Error AdsGram:', event.detail);
-            showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle');
-            hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI();
-        };
-        
-        const cleanup = () => {
-            taskElement.removeEventListener('reward', onReward);
-            taskElement.removeEventListener('onError', onError);
-            taskElement.style.display = 'none';
-        };
-        
-        taskElement.addEventListener('reward', onReward);
-        taskElement.addEventListener('onError', onError);
-        taskElement.style.display = 'block';
+        }
     }
 
     // ==================== ADMIN Y OTROS ====================
