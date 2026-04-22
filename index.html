@@ -12,17 +12,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     
-    <!-- Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- AdsGram SDK -->
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== ESTILOS (SIN CAMBIOS) ========== */
         :root {
             --gold: #D4AF37;
             --cream: #FFFDF7;
@@ -30,7 +24,6 @@
             --text-dark: #3A2C27;
             --text-soft: #6B4E44;
             --success: #6BAF92;
-            --danger: #E86A6A;
             --shadow-soft: 0 8px 20px rgba(0,0,0,0.04);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -345,57 +338,6 @@
             border-bottom: 1px solid rgba(0,0,0,0.1);
             font-size: 13px;
         }
-        .game-apuesta-display {
-            background: linear-gradient(135deg, var(--gold), var(--terracotta));
-            border-radius: 25px;
-            padding: 20px;
-            margin: 15px 0;
-            text-align: center;
-            color: white;
-        }
-        .game-apuesta-display .apuesta-label { font-size: 14px; opacity: 0.9; letter-spacing: 2px; }
-        .game-apuesta-display .apuesta-valor { font-size: 48px; font-weight: 800; margin: 5px 0; }
-        .game-apuesta-display .ganancia-valor {
-            font-size: 18px; font-weight: 600;
-            background: rgba(255,255,255,0.2);
-            display: inline-block;
-            padding: 5px 20px;
-            border-radius: 30px;
-        }
-        .game-botones-container { display: flex; gap: 8px; margin: 15px 0; }
-        .game-btn {
-            flex: 1; padding: 14px 0; border: none; border-radius: 40px; font-weight: 700; font-size: 14px;
-            cursor: pointer; background: rgba(255,255,255,0.8); backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.9); color: var(--text-dark); box-shadow: var(--shadow-soft);
-            transition: all 0.2s ease;
-        }
-        .game-btn:active { transform: scale(0.97); background: rgba(255,255,255,0.95); }
-        .game-btn.highlight { background: linear-gradient(135deg, var(--gold), var(--terracotta)); color: white; }
-        .game-btn.danger { background: linear-gradient(135deg, var(--danger), #C55A5A); color: white; }
-        .game-jugar-btn {
-            width: 100%; padding: 18px; border: none; border-radius: 50px; font-weight: 800; font-size: 18px;
-            cursor: pointer; background: linear-gradient(135deg, var(--success), #4A8C74);
-            color: white; box-shadow: 0 6px 18px rgba(107,175,146,0.3); margin: 10px 0; transition: all 0.2s ease;
-        }
-        .game-jugar-btn:active { transform: scale(0.98); }
-        .game-jugar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .racha-container {
-            display: flex; justify-content: space-between; margin: 10px 0; padding: 10px;
-            background: rgba(255,255,255,0.5); border-radius: 20px; font-size: 13px; font-weight: 600;
-        }
-        .racha-actual { color: var(--gold); }
-        .racha-record { color: var(--terracotta); }
-        .historial-juego { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
-        .historial-item {
-            width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 12px; background: rgba(255,255,255,0.6);
-        }
-        .historial-item.win { background: var(--success); color: white; }
-        .historial-item.lose { background: var(--danger); color: white; }
-        .warning-text {
-            color: var(--danger); font-size: 11px; margin-top: 5px; padding: 5px;
-            background: rgba(232,106,106,0.1); border-radius: 20px;
-        }
     </style>
 </head>
 <body>
@@ -437,16 +379,19 @@
     <div class="admin-modal-content">
         <h3><i class="fas fa-crown"></i> Panel Admin</h3>
         <input type="password" id="adminPassword" placeholder="Clave secreta" style="margin-bottom:15px;">
+        
         <div style="display:flex;gap:5px;margin-bottom:15px;">
             <button class="admin-tab active" data-tab="saldo">➕ Saldo</button>
             <button class="admin-tab" data-tab="codigos">🎫 Códigos</button>
             <button class="admin-tab" data-tab="stats">📊 Stats</button>
         </div>
+        
         <div id="tab-saldo" class="admin-tab-content">
             <input type="text" id="adminUserId" placeholder="ID de usuario">
             <input type="number" id="adminAmount" placeholder="Monto en ⭐">
             <button class="btn-game btn-primary" id="adminAddBalanceBtn" style="width:100%;">Agregar Saldo</button>
         </div>
+        
         <div id="tab-codigos" class="admin-tab-content" style="display:none;">
             <input type="text" id="giftCode" placeholder="Código (ej: PREMIUM50)">
             <input type="number" id="giftAmount" placeholder="Monto en ⭐">
@@ -454,6 +399,7 @@
             <button class="btn-game btn-primary" id="createGiftCodeBtn" style="width:100%;">Crear Código</button>
             <div id="giftCodesList" style="margin-top:15px;max-height:200px;overflow-y:auto;"></div>
         </div>
+        
         <div id="tab-stats" class="admin-tab-content" style="display:none;">
             <div style="text-align:center;">
                 <p style="font-size:14px;color:var(--text-soft);">Total pagado en bonos por referidos</p>
@@ -461,19 +407,17 @@
                 <p style="font-size:12px;color:var(--text-soft);">≈ <span id="totalRefUSDT">0.0000</span> USDT</p>
             </div>
         </div>
+        
         <button class="btn-game" id="adminCancelBtn" style="margin-top:15px;width:100%;">Cancelar</button>
     </div>
 </div>
 
 <div id="app-container">
-    <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="channel-bubble" onclick="joinChannel()"><i class="fab fa-telegram"></i><span>@UsdtGiftChannel</span></div>
         </div>
         <div class="balance-card" id="balanceCard"><div id="user-balance">0</div><div class="balance-label">⭐ MONEDAS</div></div>
-        
-        <!-- ===== VIDEOS ORIGINALES (SIN TOCAR) ===== -->
         <div class="section-title"><i class="fas fa-video"></i><span>Videos (24h de espera por video)</span></div>
         <div class="daily-progress">
             <span><span id="videosWatchedCount">0</span>/6 videos vistos</span>
@@ -482,125 +426,127 @@
                 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
         </div>
-        <div class="video-card" id="video1Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 VIDEO</div><div class="video-reward">⭐ +10</div></div></div><div class="video-btn-container"><button class="video-btn" id="video1Btn">Ver</button><span class="unlock-time" id="video1Unlock"></span></div></div>
-        <div class="video-card" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VIDEO</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video2Btn">Ver</button><span class="unlock-time" id="video2Unlock"></span></div></div>
-        <div class="video-card" id="video3Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 VIDEO</div><div class="video-reward">⭐ +15</div></div></div><div class="video-btn-container"><button class="video-btn" id="video3Btn">Ver</button><span class="unlock-time" id="video3Unlock"></span></div></div>
-        <div class="video-card" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VIDEO</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video4Btn">Ver</button><span class="unlock-time" id="video4Unlock"></span></div></div>
-        <div class="video-card" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VIDEO</div><div class="video-reward">⭐ +15</div></div></div><div class="video-btn-container"><button class="video-btn" id="video5Btn">Ver</button><span class="unlock-time" id="video5Unlock"></span></div></div>
-        <div class="video-card" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VIDEO</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video6Btn">Ver</button><span class="unlock-time" id="video6Unlock"></span></div></div>
-
-        <!-- ===== NUEVA SECCIÓN: BONO ADSGRAM (4 x 5⭐) ===== -->
-        <div class="section-title" style="margin-top: 15px;"><i class="fas fa-gift"></i><span>🎁 BONO DIARIO (4 x 5⭐)</span></div>
-        <div class="daily-progress">
-            <span><span id="adsGramWatchedCount">0</span>/4 anuncios vistos</span>
-            <div class="progress-dots" id="adsGramDots">
-                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        
+        <div class="video-card" id="video1Card">
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 VÍDEO</div><div class="video-reward">⭐ +10</div></div></div>
+            <div class="video-btn-container">
+                <button class="video-btn" id="video1Btn">Ver</button>
+                <span class="unlock-time" id="video1Unlock"></span>
             </div>
         </div>
-        <!-- Anuncio 1 -->
-        <div class="video-card" id="agAd1Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-ad"></i></div><div><div class="video-title">#1 ANUNCIO</div><div class="video-reward">⭐ +5</div></div></div>
-            <div class="video-btn-container"><button class="video-btn" id="agAd1Btn">Ver</button><span class="unlock-time" id="agAd1Unlock"></span></div>
+        <div class="video-card" id="video2Card">
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div>
+            <div class="video-btn-container">
+                <button class="video-btn small-btn" id="video2Btn">Ver</button>
+                <span class="unlock-time" id="video2Unlock"></span>
+            </div>
         </div>
-        <!-- Anuncio 2 -->
-        <div class="video-card" id="agAd2Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-ad"></i></div><div><div class="video-title">#2 ANUNCIO</div><div class="video-reward">⭐ +5</div></div></div>
-            <div class="video-btn-container"><button class="video-btn small-btn" id="agAd2Btn">Ver</button><span class="unlock-time" id="agAd2Unlock"></span></div>
+        <div class="video-card" id="video3Card">
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div>
+            <div class="video-btn-container">
+                <button class="video-btn" id="video3Btn">Ver</button>
+                <span class="unlock-time" id="video3Unlock"></span>
+            </div>
         </div>
-        <!-- Anuncio 3 -->
-        <div class="video-card" id="agAd3Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-ad"></i></div><div><div class="video-title">#3 ANUNCIO</div><div class="video-reward">⭐ +5</div></div></div>
-            <div class="video-btn-container"><button class="video-btn" id="agAd3Btn">Ver</button><span class="unlock-time" id="agAd3Unlock"></span></div>
+        <div class="video-card" id="video4Card">
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div>
+            <div class="video-btn-container">
+                <button class="video-btn small-btn" id="video4Btn">Ver</button>
+                <span class="unlock-time" id="video4Unlock"></span>
+            </div>
         </div>
-        <!-- Anuncio 4 -->
-        <div class="video-card" id="agAd4Card">
-            <div class="video-info"><div class="video-icon"><i class="fas fa-ad"></i></div><div><div class="video-title">#4 ANUNCIO</div><div class="video-reward">⭐ +5</div></div></div>
-            <div class="video-btn-container"><button class="video-btn small-btn" id="agAd4Btn">Ver</button><span class="unlock-time" id="agAd4Unlock"></span></div>
+        <div class="video-card" id="video5Card">
+            <div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VÍDEO</div><div class="video-reward">⭐ +15</div></div></div>
+            <div class="video-btn-container">
+                <button class="video-btn" id="video5Btn">Ver</button>
+                <span class="unlock-time" id="video5Unlock"></span>
+            </div>
+        </div>
+        <div class="video-card" id="video6Card">
+            <div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VÍDEO</div><div class="video-reward">⭐ +5</div></div></div>
+            <div class="video-btn-container">
+                <button class="video-btn small-btn" id="video6Btn">Ver</button>
+                <span class="unlock-time" id="video6Unlock"></span>
+            </div>
         </div>
 
         <div class="menu-grid">
-            <button class="btn-game" id="gameNavBtn"><span><i class="fas fa-gamepad"></i> Doble o Nada</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-heart"></i> Invitar y Ganar</span> <i class="fas fa-chevron-right"></i></button>
             <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-coins"></i> Retirar</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Codigo</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket-alt"></i> Canjea Código</span> <i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 
-    <!-- GAME SCREEN -->
-    <div id="game-screen" class="screen">
-        <div class="back-circle" id="backHomeGame"><i class="fas fa-arrow-left"></i></div>
-        <div class="glass-card" style="padding: 16px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                <i class="fas fa-gamepad" style="font-size: 28px; background: linear-gradient(135deg, var(--gold), var(--terracotta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-                <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark);">Doble o Nada</h3>
-            </div>
-            <div style="text-align: center; margin-bottom: 10px;"><span style="font-size: 14px; color: var(--text-soft);">Balance disponible</span><div style="font-size: 32px; font-weight: 800; color: var(--gold);" id="game-balance">0 ⭐</div></div>
-            <div class="game-apuesta-display"><div class="apuesta-label">APOSTANDO</div><div class="apuesta-valor" id="game-apuesta-actual">5</div><div class="ganancia-valor" id="game-ganancia">Ganas 10 ⭐</div></div>
-            <div class="game-botones-container">
-                <button class="game-btn" id="game-minimo">MINIMO<br><small>5</small></button>
-                <button class="game-btn highlight" id="game-doblar">x2<br><small>Duplicar</small></button>
-                <button class="game-btn danger" id="game-maximo">MAXIMO<br><small>Todo</small></button>
-            </div>
-            <button class="game-jugar-btn" id="game-jugar">JUGAR DOBLE O NADA</button>
-            <div class="racha-container"><span>Racha actual: <span class="racha-actual" id="game-racha">0</span></span><span>Record: <span class="racha-record" id="game-record">0</span></span></div>
-            <div style="margin-top: 10px;"><div style="font-size: 11px; color: var(--text-soft); margin-bottom: 5px;">Ultimas jugadas</div><div class="historial-juego" id="game-historial"></div></div>
-            <p style="font-size: 10px; color: var(--text-soft); margin-top: 15px; text-align: center;">30% probabilidad de duplicar tu apuesta</p>
-        </div>
-    </div>
-
-    <!-- INVITE SCREEN -->
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
             <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Invita y Gana</h3>
             <p style="font-size:13px;color:var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos retiren.</p>
+            
             <div class="invite-highlight">
-                <h4>💎 +10% de comision</h4><p>por cada video que vean tus invitados</p>
+                <h4>💎 +10% de comisión</h4><p>por cada video que vean tus invitados</p>
                 <h4 style="margin-top:12px;">🌟 +0.02 USDT</h4><p>cuando tu amigo haga su primer retiro</p>
-                <div class="earn-tag">💰 Ingresos pasivos!</div>
+                <div class="earn-tag">💰 ¡Ingresos pasivos!</div>
             </div>
+            
             <div class="invite-stats">
-                <div class="stat-box"><div class="stat-number" id="totalInvitados">0</div><div class="stat-label">Invitados</div></div>
-                <div class="stat-box"><div class="stat-number" id="totalGanadoRef">0 ⭐</div><div class="stat-label">Ganado por referidos</div></div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalInvitados">0</div>
+                    <div class="stat-label">Invitados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalGanadoRef">0 ⭐</div>
+                    <div class="stat-label">Ganado por referidos</div>
+                </div>
             </div>
-            <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir enlace de invitacion</button>
-            <p style="font-size:11px;color:var(--text-soft);margin-top:10px;text-align:center;"><i class="fas fa-check-circle"></i> El bono se acredita al primer retiro de tu invitado</p>
+            
+            <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn">
+                <i class="fas fa-share-alt"></i> Compartir enlace de invitación
+            </button>
+            <p style="font-size:11px;color:var(--text-soft);margin-top:10px;text-align:center;">
+                <i class="fas fa-check-circle"></i> El bono se acredita al primer retiro de tu invitado
+            </p>
         </div>
     </div>
 
-    <!-- WITHDRAW SCREEN -->
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-wallet" style="font-size:36px;background:linear-gradient(135deg,var(--success),#4A8C74);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
             <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Retirar con CCWallet</h3>
-            <div class="balance-available"><small>Balance disponible</small><div class="coins" id="withdraw-balance-coins">0 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div>
-            <div class="ccwallet-info"><i class="fas fa-info-circle"></i> No tienes CCWallet? <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aqui</button><br><small>Retiro via @cctip_bot</small></div>
-            <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet (8 dígitos)"></textarea>
-            <div class="warning-text"><i class="fas fa-exclamation-triangle"></i> Solo se aceptan 8 dígitos numéricos. Si ingresas otro ID, perderás tu dinero.</div>
+            <div class="balance-available">
+                <small>Balance disponible</small>
+                <div class="coins" id="withdraw-balance-coins">0 ⭐</div>
+                <div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div>
+            </div>
+            <div class="ccwallet-info">
+                <i class="fas fa-info-circle"></i> ¿No tienes CCWallet? 
+                <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aquí</button>
+                <br><small>Retiro vía @cctip_bot</small>
+            </div>
+            <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet"></textarea>
             <button class="btn-game btn-success" style="width:100%;padding:16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
-            <p style="margin-top:10px;font-size:11px;color:var(--text-soft);">Minimo 200 ⭐ (0.02 USDT)</p>
+            <p style="margin-top:10px;font-size:11px;color:var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p>
             <div class="history-title">Historial</div>
             <div id="history-list" style="max-height:150px;overflow-y:auto;"></div>
         </div>
     </div>
 
-    <!-- REDEEM SCREEN -->
     <div id="redeem-screen" class="screen">
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-ticket-alt" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
-            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Canjear Codigo</h3>
-            <div class="channel-join"><i class="fab fa-telegram"></i> Unete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div>
-            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Codigo"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
+            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Canjear Código</h3>
+            <div class="channel-join"><i class="fab fa-telegram"></i> Únete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div>
+            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
             <div id="redeem-message" style="margin-top:14px;font-size:13px;text-align:center;"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // ==================== CONFIGURACION ====================
+    // ==================== CONFIGURACIÓN ====================
     const firebaseConfig = {
         apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU",
         authDomain: "usdt-8b129.firebaseapp.com",
@@ -620,16 +566,25 @@
     const BONO_REFERIDOR = 200;
     const UNLOCK_HOURS = 24;
 
-    // ==================== NUEVO: ADSGRAM ====================
-    const ADSGRAM_REWARDS = [5, 5, 5, 5];
-    const TOTAL_ADSGRAM = 4;
-    const ADSGRAM_BLOCK_ID = 'task-28364';
-    let agTimers = [];
-
-    // ==================== SISTEMA HIBRIDO ====================
+    // ==================== SISTEMA HÍBRIDO LOCALSTORAGE + FIREBASE ====================
     const STORAGE_KEY = 'usdtgiftk_userdata';
-    function saveToLocal(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); document.getElementById('syncStatus').innerHTML = '💾 Local'; } catch (e) {} }
-    function loadFromLocal() { try { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : null; } catch (e) { return null; } }
+    
+    function saveToLocal(data) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            document.getElementById('syncStatus').innerHTML = '💾 Local';
+        } catch (e) {}
+    }
+    
+    function loadFromLocal() {
+        try {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+    
     async function syncToFirebase(data) {
         if (!userId) return false;
         try {
@@ -639,201 +594,492 @@
             setTimeout(() => document.getElementById('syncStatus').style.opacity = '0', 2000);
             document.getElementById('syncStatus').style.opacity = '1';
             return true;
-        } catch (e) { document.getElementById('syncStatus').innerHTML = '⚠️ Sin conexion'; return false; }
+        } catch (e) {
+            document.getElementById('syncStatus').innerHTML = '⚠️ Sin conexión';
+            return false;
+        }
     }
+
     function enviarNotificacion(titulo, mensaje) {
-        fetch('https://api.pushbullet.com/v2/pushes', { method:'POST', headers:{'Access-Token':PUSHBULLET_TOKEN,'Content-Type':'application/json'}, body:JSON.stringify({type:'note',title:titulo,body:mensaje}) }).catch(e=>console.error);
+        fetch('https://api.pushbullet.com/v2/pushes', {
+            method: 'POST',
+            headers: { 'Access-Token': PUSHBULLET_TOKEN, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'note', title: titulo, body: mensaje })
+        }).catch(e => console.error('Error Pushbullet:', e));
     }
 
     const tg = window.Telegram.WebApp;
-    tg.ready(); tg.expand();
-    let userId, userName, userUsername;
-    if (!tg.initDataUnsafe?.user) {
-        console.warn('⚠️ MODO PRUEBA');
-        userId = 'test_' + Date.now(); userName = 'Test User'; userUsername = 'testuser';
-    } else {
-        userId = tg.initDataUnsafe?.user?.id?.toString();
-        userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
-        userUsername = tg.initDataUnsafe?.user?.username || '';
-    }
+    tg.ready();
+    tg.expand();
+    
+    const userId = tg.initDataUnsafe?.user?.id?.toString();
+    const userName = tg.initDataUnsafe?.user?.first_name || 'Usuario';
+    const userUsername = tg.initDataUnsafe?.user?.username || '';
     
     let userData = null;
     let isProcessing = false;
     let isAdPlaying = false;
     let unlockTimers = [];
-    let gameApuesta = 5, gameRacha = 0, gameRecord = 0, gameHistorial = [];
 
-    // ==================== DETECCIÓN DE MULTICUENTAS / VPN ====================
-    function generateDeviceFingerprint() { /* ... igual que antes ... */ const screen = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`; const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; const language = navigator.language; const platform = navigator.platform; const vendor = navigator.vendor || 'unknown'; const str = `${screen}|${timezone}|${language}|${platform}|${vendor}|${userId}`; let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; } return hash.toString(); }
-    async function fetchIPData() { try { const res = await fetch('https://ipapi.co/json/'); if (!res.ok) return null; const data = await res.json(); return { ip: data.ip, country: data.country_code, timezone: data.timezone, org: data.org }; } catch (e) { return null; } }
-    function isSuspiciousVPN(ipData) { if (!ipData) return false; const org = (ipData.org || '').toLowerCase(); const suspicious = ['vpn', 'hosting', 'proxy', 'data center', 'cloud', 'm247', 'digitalocean', 'aws', 'google cloud']; return suspicious.some(kw => org.includes(kw)); }
-    async function checkMultiAccountAndVPN() { /* ... igual ... */ return true; }
-
-    // ==================== INICIALIZACIÓN (MODIFICADA SOLO PARA ADSGRAM) ====================
     async function initUser() {
         if (!userId) return;
+        
         const ref = db.collection("usuarios").doc(userId);
         const doc = await ref.get();
         const start = tg.initDataUnsafe?.start_param;
+        
         if (!doc.exists) {
             const inv = (start && start !== userId) ? start : null;
-            const fingerprint = generateDeviceFingerprint();
-            const ipData = await fetchIPData();
             const initialData = {
-                nombre: userName, username: userUsername, balance: 0, invitado_por: inv, referidos: 0,
-                videoUnlockTimes: {}, hasWithdrawn: false, ccwallet_id: '', withdrawHistory: [], redeemedCodes: [],
-                lastReferidoWithdraw: 0, createdAt: Date.now(), gameRecord: 0, gameHistorial: [],
-                fingerprint, ip: ipData?.ip || 'unknown', country: ipData?.country || 'unknown', vpnDetected: isSuspiciousVPN(ipData),
-                adGramUnlockTimes: {}   // <-- NUEVO CAMPO
+                nombre: userName,
+                username: userUsername,
+                balance: 0,
+                invitado_por: inv,
+                referidos: 0,
+                videoUnlockTimes: {},
+                hasWithdrawn: false,
+                ccwallet_id: '',
+                withdrawHistory: [],
+                redeemedCodes: [],
+                lastReferidoWithdraw: 0
             };
             await ref.set(initialData);
             userData = initialData;
             saveToLocal(initialData);
-            if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
-            enviarNotificacion('🆕 NUEVO USUARIO', `👤 ${userName} (@${userUsername||'n/a'})\n🆔 ${userId}\n🔗 Invitado por: ${inv||'nadie'}`);
+            if (inv) {
+                const invRef = db.collection("usuarios").doc(inv);
+                await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) });
+            }
+            enviarNotificacion('🆕 NUEVO USUARIO', `👤 ${userName} (@${userUsername || 'n/a'})\n🆔 ${userId}\n🔗 Invitado por: ${inv || 'nadie'}`);
         } else {
             const firebaseData = doc.data();
             const localData = loadFromLocal();
+            
+            // Combinar datos: Firebase es la fuente principal, pero respetamos unlocks locales más recientes
             if (localData && localData.userId === userId) {
                 userData = { ...firebaseData };
-                if (localData.videoUnlockTimes) { /* merge unlocks... */ }
-                if (localData.pendingBalance) { userData.balance = (userData.balance||0) + localData.pendingBalance; if (localData.pendingBalance > 0) syncToFirebase({ balance: userData.balance }); }
-            } else { userData = firebaseData; }
+                // Mantener los unlockTimes más recientes
+                if (localData.videoUnlockTimes) {
+                    for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+                        const localTime = localData.videoUnlockTimes[i];
+                        const firebaseTime = firebaseData.videoUnlockTimes?.[i];
+                        if (localTime && (!firebaseTime || localTime > firebaseTime)) {
+                            if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {};
+                            userData.videoUnlockTimes[i] = localTime;
+                        }
+                    }
+                }
+                // Sincronizar el balance combinado
+                if (localData.pendingBalance) {
+                    userData.balance = (userData.balance || 0) + localData.pendingBalance;
+                    // Intentar sincronizar el balance pendiente
+                    if (localData.pendingBalance > 0) {
+                        syncToFirebase({ balance: userData.balance });
+                    }
+                }
+            } else {
+                userData = firebaseData;
+            }
+            
             if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {};
-            if (!userData.createdAt) { userData.createdAt = Date.now(); syncToFirebase({ createdAt: userData.createdAt }); }
-            gameRecord = userData.gameRecord || 0; gameHistorial = userData.gameHistorial || [];
-            if (!userData.adGramUnlockTimes) userData.adGramUnlockTimes = {}; // <-- NUEVO
             saveToLocal({ ...userData, userId });
         }
-        const allowed = await checkMultiAccountAndVPN(); if (!allowed) return;
+        
         await updateUI();
-        updateGameUI();
         startUnlockTimers();
-        startAdsGramTimers();  // <-- NUEVO
         document.getElementById('loading-screen').classList.add('hidden');
     }
 
-    // ==================== FUNCIONES ORIGINALES (NO SE TOCAN) ====================
-    function isVideoLocked(videoNum) { const unlockTime = userData.videoUnlockTimes?.[videoNum]; return unlockTime ? Date.now() < unlockTime : false; }
-    function getUnlockTimeString(videoNum) { const unlockTime = userData.videoUnlockTimes?.[videoNum]; if (!unlockTime) return ''; const remaining = unlockTime - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60 * 60 * 1000)); const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)); return `🔒 ${h}h ${m}m`; }
-    function startUnlockTimers() { unlockTimers.forEach(t=>clearInterval(t)); unlockTimers=[]; for(let i=1;i<=TOTAL_VIDEOS;i++){ const timer=setInterval(()=>{ const unlockSpan=document.getElementById(`video${i}Unlock`); const btn=document.getElementById(`video${i}Btn`); if(unlockSpan&&btn){ const timeStr=getUnlockTimeString(i); unlockSpan.textContent=timeStr; const locked=isVideoLocked(i); btn.disabled=locked||isProcessing; if(locked)btn.innerHTML='🔒'; else if(!(userData.videoUnlockTimes?.[i]&&Date.now()<userData.videoUnlockTimes[i]))btn.innerHTML='Ver'; } },1000); unlockTimers.push(timer); } }
+    function isVideoLocked(videoNum) {
+        const unlockTime = userData.videoUnlockTimes?.[videoNum];
+        if (!unlockTime) return false;
+        return Date.now() < unlockTime;
+    }
+
+    function getUnlockTimeString(videoNum) {
+        const unlockTime = userData.videoUnlockTimes?.[videoNum];
+        if (!unlockTime) return '';
+        const remaining = unlockTime - Date.now();
+        if (remaining <= 0) return '';
+        const h = Math.floor(remaining / (60 * 60 * 1000));
+        const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+        return `🔒 ${h}h ${m}m`;
+    }
+
+    function startUnlockTimers() {
+        unlockTimers.forEach(t => clearInterval(t));
+        unlockTimers = [];
+        
+        for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+            const timer = setInterval(() => {
+                const unlockSpan = document.getElementById(`video${i}Unlock`);
+                const btn = document.getElementById(`video${i}Btn`);
+                if (unlockSpan && btn) {
+                    const timeStr = getUnlockTimeString(i);
+                    unlockSpan.textContent = timeStr;
+                    
+                    const locked = isVideoLocked(i);
+                    btn.disabled = locked || isProcessing;
+                    if (locked) {
+                        btn.innerHTML = '🔒';
+                    } else if (!(userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i])) {
+                        btn.innerHTML = 'Ver';
+                    }
+                }
+            }, 1000);
+            unlockTimers.push(timer);
+        }
+    }
+
     async function updateUI() {
         if (!userData) return;
         document.getElementById('user-balance').innerText = Math.floor(userData.balance || 0);
-        document.getElementById('game-balance').innerText = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('totalInvitados').innerText = userData.referidos || 0;
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + ((userData.balance || 0) / COINS_PER_USDT).toFixed(4) + ' USDT';
+        
         let watchedCount = 0;
-        for (let i = 1; i <= TOTAL_VIDEOS; i++) if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) watchedCount++;
-        document.getElementById('videosWatchedCount').innerText = watchedCount;
-        document.querySelectorAll('#videoDots .dot').forEach((d, i) => { const videoNum = i + 1; const hasUnlock = userData.videoUnlockTimes?.[videoNum] && Date.now() < userData.videoUnlockTimes[videoNum]; d.classList.toggle('completed', hasUnlock); });
         for (let i = 1; i <= TOTAL_VIDEOS; i++) {
-            const btn = document.getElementById(`video${i}Btn`); const card = document.getElementById(`video${i}Card`); const unlockSpan = document.getElementById(`video${i}Unlock`);
-            if (btn) { const locked = isVideoLocked(i); btn.disabled = locked || isProcessing; if (locked) { btn.innerHTML = '🔒'; card?.classList.add('completed'); } else { btn.innerHTML = 'Ver'; card?.classList.remove('completed'); } }
-            if (unlockSpan) unlockSpan.textContent = getUnlockTimeString(i);
+            if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) {
+                watchedCount++;
+            }
         }
+        document.getElementById('videosWatchedCount').innerText = watchedCount;
+        
+        document.querySelectorAll('.dot').forEach((d, i) => {
+            const videoNum = i + 1;
+            const hasUnlock = userData.videoUnlockTimes?.[videoNum] && Date.now() < userData.videoUnlockTimes[videoNum];
+            d.classList.toggle('completed', hasUnlock);
+        });
+        
+        for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+            const btn = document.getElementById(`video${i}Btn`);
+            const card = document.getElementById(`video${i}Card`);
+            const unlockSpan = document.getElementById(`video${i}Unlock`);
+            
+            if (btn) {
+                const locked = isVideoLocked(i);
+                btn.disabled = locked || isProcessing;
+                
+                if (locked) {
+                    btn.innerHTML = '🔒';
+                    card?.classList.add('completed');
+                } else {
+                    btn.innerHTML = 'Ver';
+                    card?.classList.remove('completed');
+                }
+            }
+            
+            if (unlockSpan) {
+                unlockSpan.textContent = getUnlockTimeString(i);
+            }
+        }
+        
         loadHistory();
+        
         if (userId) {
-            const refSnap = await db.collection("usuarios").where("invitado_por", "==", userId).where("hasWithdrawn", "==", true).get();
-            const ganado = refSnap.size * BONO_REFERIDOR; document.getElementById('totalGanadoRef').innerText = ganado + ' ⭐';
+            const refSnap = await db.collection("usuarios")
+                .where("invitado_por", "==", userId)
+                .where("hasWithdrawn", "==", true)
+                .get();
+            const ganado = refSnap.size * BONO_REFERIDOR;
+            const el = document.getElementById('totalGanadoRef');
+            if (el) el.innerText = ganado + ' ⭐';
         }
-        updateAdsGramUI(); // <-- NUEVO
     }
-    function updateGameUI() { document.getElementById('game-apuesta-actual').innerText = gameApuesta; document.getElementById('game-ganancia').innerText = `Ganas ${gameApuesta * 2} ⭐`; document.getElementById('game-racha').innerText = gameRacha; document.getElementById('game-record').innerText = gameRecord; const historialEl = document.getElementById('game-historial'); historialEl.innerHTML = gameHistorial.slice(-6).map(r => `<div class="historial-item ${r === 'win' ? 'win' : 'lose'}">${r === 'win' ? '✓' : '✗'}</div>`).join(''); }
-    function setMinimo() { gameApuesta = 5; updateGameUI(); }
-    function doblarApuesta() { gameApuesta = Math.min(gameApuesta * 2, userData.balance || 0); if (gameApuesta < 5) gameApuesta = 5; updateGameUI(); }
-    function setMaximo() { gameApuesta = userData.balance || 5; if (gameApuesta < 5) gameApuesta = 5; updateGameUI(); }
-    async function jugarDobleONada() { /* ... igual ... */ }
+
     function showAdLoader() { document.getElementById('adLoader').style.display = 'flex'; }
     function hideAdLoader() { document.getElementById('adLoader').style.display = 'none'; }
-    function showMonetagAd() { try { if (typeof window.show_10853207 === 'function') window.show_10853207(); } catch (e) {} return Promise.resolve(true); }
-    async function watchVideo(n) { /* ... igual ... */ }
-    async function handleWithdraw() { /* ... igual ... */ }
-    function loadHistory() { /* ... igual ... */ }
-    async function handleRedeem() { /* ... igual ... */ }
-    function showAlert(t, m, i = 'bell') { document.getElementById('alertTitle').innerText = t; document.getElementById('alertMessage').innerText = m; document.querySelector('.alert-icon i').className = `fas fa-${i}`; document.getElementById('alertModal').style.display = 'flex'; }
+
+    async function showMonetagAd() {
+        return new Promise((resolve, reject) => {
+            if (typeof show_10853207 !== 'function') { reject(new Error('SDK no disponible')); return; }
+            let adShown = false;
+            const timeout = setTimeout(() => { if (!adShown) { hideAdLoader(); reject(new Error('Timeout')); } }, 8000);
+            show_10853207()
+                .then(() => { adShown = true; clearTimeout(timeout); hideAdLoader(); resolve(true); })
+                .catch((err) => { clearTimeout(timeout); hideAdLoader(); reject(err); });
+        });
+    }
+
+    async function watchVideo(n) {
+        if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
+        if (isVideoLocked(n)) {
+            showAlert('Video bloqueado', `El video #${n} estará disponible en ${getUnlockTimeString(n)}`, 'clock');
+            return;
+        }
+        
+        isProcessing = true;
+        isAdPlaying = true;
+        updateUI();
+        showAdLoader();
+        
+        try {
+            await showMonetagAd();
+            
+            const reward = VIDEO_REWARDS[n - 1];
+            const unlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
+            
+            // Actualizar datos locales
+            const newUnlockTimes = { ...(userData.videoUnlockTimes || {}) };
+            newUnlockTimes[n] = unlockTime;
+            userData.videoUnlockTimes = newUnlockTimes;
+            userData.balance += reward;
+            
+            // Guardar en localStorage PRIMERO (instantáneo)
+            saveToLocal({ ...userData, userId, pendingBalance: 0 });
+            
+            // Actualizar UI inmediatamente
+            updateUI();
+            showAlert('🎉 ¡Recompensa!', `+${reward} ⭐`, 'check-circle');
+            
+            // Sincronizar con Firebase en segundo plano
+            syncToFirebase({
+                balance: firebase.firestore.FieldValue.increment(reward),
+                videoUnlockTimes: newUnlockTimes
+            });
+            
+        } catch (e) {
+            showAlert('Aviso', 'No se pudo mostrar el anuncio', 'exclamation-triangle');
+        } finally {
+            hideAdLoader();
+            isProcessing = false;
+            isAdPlaying = false;
+            updateUI();
+        }
+    }
+
+    async function handleWithdraw() {
+        if (isProcessing) return;
+        const cc = document.getElementById('ccwallet-id').value.trim();
+        if (cc.length < 3) { showAlert('ID inválido', 'Ingresa CCWallet', 'times-circle'); return; }
+        if ((userData.balance || 0) < 200) { showAlert('Saldo insuficiente', 'Mínimo 200 ⭐', 'coins'); return; }
+        
+        isProcessing = true;
+        showAdLoader();
+        
+        try {
+            await showMonetagAd();
+            
+            const ref = db.collection("usuarios").doc(userId);
+            const bal = userData.balance;
+            const firstWithdraw = !userData.hasWithdrawn;
+            
+            await ref.update({
+                balance: 0,
+                hasWithdrawn: true,
+                ccwallet_id: cc,
+                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                    amount: Math.floor(bal),
+                    date: new Date().toLocaleDateString(),
+                    status: '✅ Completado',
+                    ccwallet: cc
+                })
+            });
+            
+            if (firstWithdraw && userData.invitado_por) {
+                const invRef = db.collection("usuarios").doc(userData.invitado_por);
+                await invRef.update({ balance: firebase.firestore.FieldValue.increment(BONO_REFERIDOR) });
+                await invRef.update({ lastReferidoWithdraw: Date.now() });
+                enviarNotificacion('🎁 BONO REFERIDO', `👤 ${userName} hizo su primer retiro\n💰 +200 ⭐ para ${userData.invitado_por}`);
+            }
+            
+            userData.balance = 0;
+            userData.hasWithdrawn = true;
+            if (!userData.withdrawHistory) userData.withdrawHistory = [];
+            userData.withdrawHistory.push({ amount: Math.floor(bal), date: new Date().toLocaleDateString(), status: '✅ Completado' });
+            
+            saveToLocal({ ...userData, userId });
+            await updateUI();
+            
+            enviarNotificacion('🦊 RETIRO', `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n🆔 ${userId}\n💰 ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}`);
+            showAlert('✅ ¡Retiro exitoso!', `${Math.floor(bal)} ⭐ retiradas`, 'check-circle');
+            tg.openTelegramLink('https://t.me/cctip_bot');
+        } catch (e) {
+            showAlert('Error', 'No se pudo completar', 'times-circle');
+        } finally {
+            hideAdLoader();
+            isProcessing = false;
+        }
+    }
+
+    function loadHistory() {
+        const el = document.getElementById('history-list');
+        const h = userData?.withdrawHistory || [];
+        el.innerHTML = h.length ? h.reverse().map(i => 
+            `<div class="history-item"><span>${i.date}</span><span>${i.amount} ⭐</span><span class="status-badge">${i.status}</span></div>`
+        ).join('') : '<p style="text-align:center;">Sin retiros</p>';
+    }
+
+    async function handleRedeem() {
+        const input = document.getElementById('redeem-code');
+        const code = input.value.trim().toUpperCase();
+        const msg = document.getElementById('redeem-message');
+        
+        if (!code) { msg.innerHTML = '<span style="color:var(--terracotta);">Ingresa un código</span>'; return; }
+        
+        const redeemed = userData.redeemedCodes || [];
+        if (redeemed.includes(code)) {
+            msg.innerHTML = '<span style="color:var(--terracotta);">Ya usaste este código</span>';
+            return;
+        }
+        
+        isProcessing = true;
+        try {
+            await showMonetagAd();
+            
+            const codeRef = db.collection("giftCodes").doc(code);
+            const codeDoc = await codeRef.get();
+            
+            if (!codeDoc.exists) throw new Error('Código inválido');
+            
+            const codeData = codeDoc.data();
+            if (codeData.usedCount >= codeData.maxUses) throw new Error('Código agotado');
+            
+            await db.runTransaction(async (transaction) => {
+                const userRef = db.collection("usuarios").doc(userId);
+                transaction.update(userRef, { 
+                    balance: firebase.firestore.FieldValue.increment(codeData.amount),
+                    redeemedCodes: firebase.firestore.FieldValue.arrayUnion(code)
+                });
+                transaction.update(codeRef, { usedCount: firebase.firestore.FieldValue.increment(1) });
+            });
+            
+            userData.balance += codeData.amount;
+            if (!userData.redeemedCodes) userData.redeemedCodes = [];
+            userData.redeemedCodes.push(code);
+            
+            saveToLocal({ ...userData, userId });
+            await updateUI();
+            msg.innerHTML = `<span style="color:var(--success);">🎉 +${codeData.amount} ⭐</span>`;
+            input.value = '';
+            showAlert('🎁 ¡Código canjeado!', `+${codeData.amount} ⭐`, 'gift');
+        } catch (e) {
+            msg.innerHTML = `<span style="color:var(--terracotta);">❌ ${e.message}</span>`;
+        } finally {
+            isProcessing = false;
+        }
+    }
+
+    function showAlert(t, m, i = 'bell') {
+        document.getElementById('alertTitle').innerText = t;
+        document.getElementById('alertMessage').innerText = m;
+        document.querySelector('.alert-icon i').className = `fas fa-${i}`;
+        document.getElementById('alertModal').style.display = 'flex';
+    }
     function closeAlertModal() { document.getElementById('alertModal').style.display = 'none'; }
-    function showToast(m) { const t = document.getElementById('toast-element'); t.innerHTML = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000); }
-    function navigate(s) { document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if (s === 'withdraw-screen') loadHistory(); if (s === 'game-screen') updateGameUI(); }
-    function copyRefLink() { tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana 10%% de comision + 0.02 USDT cuando retiren!`); }
+    function showToast(m) {
+        const t = document.getElementById('toast-element');
+        t.innerHTML = m;
+        t.style.opacity = '1';
+        setTimeout(() => t.style.opacity = '0', 2000);
+    }
+    function navigate(s) {
+        document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active'));
+        document.getElementById(s).classList.add('active');
+        if (s === 'withdraw-screen') loadHistory();
+    }
+    function copyRefLink() {
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. ¡Invita amigos y gana 10%% de comisión + 0.02 USDT cuando retiren!`);
+    }
     function openCCWallet() { tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel() { tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ==================== NUEVAS FUNCIONES PARA ADSGRAM ====================
-    function isAdGramLocked(adNum) { const unlockTime = userData?.adGramUnlockTimes?.[adNum]; return unlockTime ? Date.now() < unlockTime : false; }
-    function getAdGramUnlockTimeString(adNum) { const unlockTime = userData?.adGramUnlockTimes?.[adNum]; if (!unlockTime) return ''; const remaining = unlockTime - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60 * 60 * 1000)); const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)); return `🔒 ${h}h ${m}m`; }
-    function updateAdsGramUI() {
-        if (!userData) return;
-        const adUnlocks = userData.adGramUnlockTimes || {};
-        let watched = 0;
-        for (let i = 1; i <= TOTAL_ADSGRAM; i++) if (adUnlocks[i] && Date.now() < adUnlocks[i]) watched++;
-        document.getElementById('adsGramWatchedCount').innerText = watched;
-        const dots = document.querySelectorAll('#adsGramDots .dot');
-        dots.forEach((dot, idx) => { const adNum = idx + 1; dot.classList.toggle('completed', !!(adUnlocks[adNum] && Date.now() < adUnlocks[adNum])); });
-        for (let i = 1; i <= TOTAL_ADSGRAM; i++) {
-            const btn = document.getElementById(`agAd${i}Btn`); const card = document.getElementById(`agAd${i}Card`); const unlockSpan = document.getElementById(`agAd${i}Unlock`);
-            if (btn) { const locked = isAdGramLocked(i); btn.disabled = locked || isProcessing; if (locked) { btn.innerHTML = '🔒'; card?.classList.add('completed'); } else { btn.innerHTML = (i === 2 || i === 4) ? 'Ver' : 'Ver'; card?.classList.remove('completed'); } }
-            if (unlockSpan) unlockSpan.textContent = getAdGramUnlockTimeString(i);
-        }
-    }
-    function startAdsGramTimers() {
-        agTimers.forEach(t => clearInterval(t)); agTimers = [];
-        for (let i = 1; i <= TOTAL_ADSGRAM; i++) {
-            const timer = setInterval(() => {
-                const unlockSpan = document.getElementById(`agAd${i}Unlock`); const btn = document.getElementById(`agAd${i}Btn`);
-                if (unlockSpan && btn) { unlockSpan.textContent = getAdGramUnlockTimeString(i); const locked = isAdGramLocked(i); btn.disabled = locked || isProcessing; if (locked) btn.innerHTML = '🔒'; else if (!(userData?.adGramUnlockTimes?.[i] && Date.now() < userData.adGramUnlockTimes[i])) btn.innerHTML = (i === 2 || i === 4) ? 'Ver' : 'Ver'; }
-            }, 1000);
-            agTimers.push(timer);
-        }
-    }
-    async function watchAdGram(n) {
-        if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
-        if (isAdGramLocked(n)) { showAlert('Anuncio bloqueado', `Disponible en ${getAdGramUnlockTimeString(n)}`, 'clock'); return; }
-        if (!userData) return;
-        isProcessing = true; isAdPlaying = true; updateUI(); updateAdsGramUI(); showAdLoader();
-        try {
-            const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
-            await AdController.show();
-            const reward = ADSGRAM_REWARDS[n - 1];
-            const unlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
-            const newUnlocks = { ...(userData.adGramUnlockTimes || {}) }; newUnlocks[n] = unlockTime;
-            userData.adGramUnlockTimes = newUnlocks; userData.balance += reward;
-            saveToLocal({ ...userData, userId }); await updateUI(); updateAdsGramUI(); updateGameUI();
-            let message = `+${reward} ⭐`; if (n===1) message = "🎉 ¡PRIMER ANUNCIO! +5⭐. ¡SIGUE ASÍ!"; else if (n===2) message = "🔥 ¡SEGUNDO ANUNCIO! +5⭐. ¡VAS POR LA MITAD!"; else if (n===3) message = "⚡ ¡TERCER ANUNCIO! +5⭐. ¡SOLO UNO MÁS!"; else if (n===4) message = "🏆 ¡BONO COMPLETO! +5⭐. ¡MÁXIMO ALCANZADO!";
-            showAlert('🎁 ¡Recompensa!', message, 'check-circle');
-            syncToFirebase({ balance: firebase.firestore.FieldValue.increment(reward), adGramUnlockTimes: newUnlocks });
-        } catch (error) { console.error('Error AdsGram:', error); showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle'); }
-        finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI(); }
+    // ==================== ADMIN ====================
+    function initAdmin() {
+        const card = document.querySelector('.balance-card');
+        let t;
+        card.addEventListener('mousedown', () => t = setTimeout(() => document.getElementById('adminModal').style.display = 'flex', 8000));
+        card.addEventListener('mouseup', () => clearTimeout(t));
+        card.addEventListener('touchstart', () => t = setTimeout(() => document.getElementById('adminModal').style.display = 'flex', 8000));
+        card.addEventListener('touchend', () => clearTimeout(t));
+        
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+                document.getElementById(`tab-${tab.dataset.tab}`).style.display = 'block';
+                if (tab.dataset.tab === 'stats') loadRefStats();
+                if (tab.dataset.tab === 'codigos') loadGiftCodes();
+            });
+        });
+        
+        document.getElementById('adminAddBalanceBtn').onclick = async () => {
+            const pwd = document.getElementById('adminPassword').value;
+            const targetId = document.getElementById('adminUserId').value.trim();
+            const amt = parseInt(document.getElementById('adminAmount').value);
+            if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
+            if (!targetId || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
+            try {
+                await db.collection("usuarios").doc(targetId).update({ balance: firebase.firestore.FieldValue.increment(amt) });
+                showAlert('Saldo añadido', `+${amt} ⭐ a ${targetId}`, 'crown');
+                document.getElementById('adminUserId').value = '';
+                document.getElementById('adminAmount').value = '';
+            } catch (e) { showAlert('Error', 'Usuario no encontrado', 'times-circle'); }
+        };
+        
+        document.getElementById('createGiftCodeBtn').onclick = async () => {
+            const pwd = document.getElementById('adminPassword').value;
+            const code = document.getElementById('giftCode').value.trim().toUpperCase();
+            const amt = parseInt(document.getElementById('giftAmount').value);
+            const max = parseInt(document.getElementById('giftMaxUses').value) || 1;
+            if (pwd !== ADMIN_SECRET) { showAlert('Clave incorrecta', '', 'lock'); return; }
+            if (!code || amt <= 0) { showAlert('Datos inválidos', '', 'times-circle'); return; }
+            try {
+                await db.collection("giftCodes").doc(code).set({ amount: amt, maxUses: max, usedCount: 0, createdAt: Date.now() });
+                showAlert('Código creado', `${code} por ${amt} ⭐ (${max} usos)`, 'gift');
+                document.getElementById('giftCode').value = '';
+                document.getElementById('giftAmount').value = '';
+                document.getElementById('giftMaxUses').value = '';
+                loadGiftCodes();
+            } catch (e) { showAlert('Error', 'No se pudo crear', 'times-circle'); }
+        };
+        
+        document.getElementById('adminCancelBtn').onclick = () => document.getElementById('adminModal').style.display = 'none';
     }
 
-    // ==================== ADMIN Y OTROS (SIN CAMBIOS) ====================
-    function initAdmin() { /* ... */ }
-    async function loadGiftCodes() { /* ... */ }
-    async function loadRefStats() { /* ... */ }
+    async function loadGiftCodes() {
+        const el = document.getElementById('giftCodesList');
+        el.innerHTML = '<p style="text-align:center;">Cargando...</p>';
+        try {
+            const snap = await db.collection("giftCodes").get();
+            if (snap.empty) { el.innerHTML = '<p style="text-align:center;">No hay códigos</p>'; return; }
+            let html = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                html += `<div class="code-item">
+                    <span><strong>${doc.id}</strong><br><small>${d.amount} ⭐ | ${d.usedCount}/${d.maxUses} usos</small></span>
+                    <span style="color:${d.usedCount >= d.maxUses ? 'var(--terracotta)' : 'var(--success)'};">${d.usedCount >= d.maxUses ? 'Agotado' : 'Activo'}</span>
+                </div>`;
+            });
+            el.innerHTML = html;
+        } catch (e) { el.innerHTML = '<p style="text-align:center;">Error al cargar</p>'; }
+    }
+
+    async function loadRefStats() {
+        try {
+            const snap = await db.collection("usuarios").where("hasWithdrawn", "==", true).get();
+            let totalPagado = 0;
+            snap.forEach(doc => { if (doc.data().invitado_por) totalPagado += BONO_REFERIDOR; });
+            document.getElementById('totalRefGanancias').innerText = totalPagado + ' ⭐';
+            document.getElementById('totalRefUSDT').innerText = (totalPagado / COINS_PER_USDT).toFixed(4);
+        } catch (e) { console.error('Error cargando stats:', e); }
+    }
 
     // ==================== EVENT LISTENERS ====================
-    for (let i = 1; i <= TOTAL_VIDEOS; i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
-    document.getElementById('gameNavBtn').onclick = () => navigate('game-screen');
+    for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+        document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
+    }
     document.getElementById('inviteNavBtn').onclick = () => navigate('invite-screen');
     document.getElementById('withdrawNavBtn').onclick = () => navigate('withdraw-screen');
     document.getElementById('redeemNavBtn').onclick = () => navigate('redeem-screen');
-    document.getElementById('backHomeGame').onclick = () => navigate('home-screen');
     document.getElementById('backHomeInvite').onclick = () => navigate('home-screen');
     document.getElementById('backHomeWithdraw').onclick = () => navigate('home-screen');
     document.getElementById('backHomeRedeem').onclick = () => navigate('home-screen');
-    document.getElementById('game-minimo').onclick = setMinimo;
-    document.getElementById('game-doblar').onclick = doblarApuesta;
-    document.getElementById('game-maximo').onclick = setMaximo;
-    document.getElementById('game-jugar').onclick = jugarDobleONada;
     document.getElementById('shareRefBtn').onclick = copyRefLink;
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
-    // NUEVOS LISTENERS
-    document.getElementById('agAd1Btn').onclick = () => watchAdGram(1);
-    document.getElementById('agAd2Btn').onclick = () => watchAdGram(2);
-    document.getElementById('agAd3Btn').onclick = () => watchAdGram(3);
-    document.getElementById('agAd4Btn').onclick = () => watchAdGram(4);
 
     initUser();
     initAdmin();
