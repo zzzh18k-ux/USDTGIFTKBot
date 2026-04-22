@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== TODOS LOS ESTILOS ORIGINALES (SIN CAMBIOS) ========== */
+        /* ========== TODOS LOS ESTILOS ORIGINALES ========== */
         :root { --gold: #D4AF37; --cream: #FFFDF7; --terracotta: #D68B7C; --text-dark: #3A2C27; --text-soft: #6B4E44; --success: #6BAF92; --danger: #E86A6A; --shadow-soft: 0 8px 20px rgba(0,0,0,0.04); }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Outfit', sans-serif; background: var(--cream); height: 100vh; overflow: hidden; display: flex; justify-content: center; }
@@ -206,6 +206,14 @@
     </div>
 </div>
 
+<!-- COMPONENTE ADSGRAM TASK -->
+<adsgram-task 
+    id="adsgramTask"
+    data-block-id="task-28364"
+    data-debug="true"
+    style="display: none;">
+</adsgram-task>
+
 <div id="app-container">
     <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
@@ -254,7 +262,7 @@
         </div>
     </div>
 
-    <!-- OTRAS PANTALLAS (COMPLETAS) -->
+    <!-- OTRAS PANTALLAS -->
     <div id="game-screen" class="screen">
         <div class="back-circle" id="backHomeGame"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card" style="padding: 16px;">
@@ -315,27 +323,6 @@
 </div>
 
 <script>
-    // ==================== ESPERAR A QUE ADSGRAM CARGUE ====================
-    function waitForAdsGram() {
-        return new Promise((resolve) => {
-            if (typeof window.Adsgram !== 'undefined') {
-                resolve();
-            } else {
-                const checkInterval = setInterval(() => {
-                    if (typeof window.Adsgram !== 'undefined') {
-                        clearInterval(checkInterval);
-                        resolve();
-                    }
-                }, 100);
-                // Timeout de seguridad: después de 5 segundos, seguir de todas formas
-                setTimeout(() => {
-                    clearInterval(checkInterval);
-                    resolve();
-                }, 5000);
-            }
-        });
-    }
-
     // ==================== CONFIGURACION ====================
     const firebaseConfig = { apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU", authDomain: "usdt-8b129.firebaseapp.com", projectId: "usdt-8b129", storageBucket: "usdt-8b129.firebasestorage.app", messagingSenderId: "816855613636", appId: "1:816855613636:web:7891ba3996acef2c91c991" };
     firebase.initializeApp(firebaseConfig);
@@ -351,7 +338,6 @@
     // ==================== ADSGRAM ====================
     const ADSGRAM_REWARDS = [5, 5, 5, 5];
     const TOTAL_ADSGRAM = 4;
-    const ADSGRAM_BLOCK_ID = 'task-28364';
     let agTimer = null;
 
     // ==================== SISTEMA HIBRIDO ====================
@@ -434,7 +420,7 @@
     function openCCWallet(){ tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ==================== FUNCIONES ADSGRAM ====================
+    // ==================== FUNCIONES ADSGRAM (COMPONENTE WEB) ====================
     function isAdsGramLocked() { return userData?.adGramUnlockTime && Date.now() < userData.adGramUnlockTime; }
     function getAdsGramUnlockTimeString() { const ut = userData?.adGramUnlockTime; if (!ut) return ''; const remaining = ut - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60*60*1000)); const m = Math.floor((remaining % (60*60*1000)) / (60*1000)); return `🔒 ${h}h ${m}m`; }
     function updateAdsGramUI() {
@@ -451,30 +437,54 @@
         if (unlockSpan) unlockSpan.textContent = getAdsGramUnlockTimeString();
     }
     function startAdsGramTimer() { if (agTimer) clearInterval(agTimer); agTimer = setInterval(() => { updateAdsGramUI(); }, 1000); }
+    
     async function watchAdGram() {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if (isAdsGramLocked()) { showAlert('Bono bloqueado', `Disponible en ${getAdsGramUnlockTimeString()}`, 'clock'); return; }
         if (!userData) return;
         const count = userData.adGramCount || 0;
         if (count >= TOTAL_ADSGRAM) { showAlert('Bono completado', 'Ya has visto los 4 anuncios diarios.', 'check-circle'); return; }
+        
         const nextAd = count + 1;
         isProcessing = true; isAdPlaying = true; updateUI(); updateAdsGramUI(); showAdLoader();
-        try {
-            const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
-            await AdController.show();
+        
+        const taskElement = document.getElementById('adsgramTask');
+        
+        const onReward = async (event) => {
+            cleanup();
             const reward = ADSGRAM_REWARDS[nextAd - 1];
             userData.adGramCount = nextAd;
             userData.balance += reward;
+            
             let message = '';
             if (nextAd === 1) message = "🎉 ¡PRIMER ANUNCIO! +5⭐. ¡SIGUE ASÍ!";
             else if (nextAd === 2) message = "🔥 ¡SEGUNDO ANUNCIO! +5⭐. ¡VAS POR LA MITAD!";
             else if (nextAd === 3) message = "⚡ ¡TERCER ANUNCIO! +5⭐. ¡SOLO UNO MÁS!";
             else if (nextAd === 4) { message = "🏆 ¡BONO COMPLETO! +5⭐. ¡MÁXIMO ALCANZADO!"; userData.adGramUnlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000); }
+            
             saveToLocal({ ...userData, userId }); await updateUI(); updateAdsGramUI(); updateGameUI();
             showAlert('🎁 ¡Recompensa!', message, 'check-circle');
             syncToFirebase({ balance: userData.balance, adGramCount: userData.adGramCount, adGramUnlockTime: userData.adGramUnlockTime });
-        } catch (error) { console.error('Error AdsGram:', error); showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle'); }
-        finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI(); }
+            
+            hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI();
+        };
+        
+        const onError = (event) => {
+            cleanup();
+            console.error('Error AdsGram:', event.detail);
+            showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle');
+            hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI();
+        };
+        
+        const cleanup = () => {
+            taskElement.removeEventListener('reward', onReward);
+            taskElement.removeEventListener('onError', onError);
+            taskElement.style.display = 'none';
+        };
+        
+        taskElement.addEventListener('reward', onReward);
+        taskElement.addEventListener('onError', onError);
+        taskElement.style.display = 'block';
     }
 
     // ==================== ADMIN Y OTROS ====================
@@ -501,11 +511,8 @@
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
     document.getElementById('agBonusBtn').onclick = watchAdGram;
 
-    // ==================== INICIAR CUANDO ADSGRAM ESTÉ LISTO ====================
-    waitForAdsGram().then(() => {
-        initUser();
-        initAdmin();
-    });
+    initUser();
+    initAdmin();
 </script>
 </body>
-  </html>
+</html>
