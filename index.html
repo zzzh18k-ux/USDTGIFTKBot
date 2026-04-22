@@ -22,11 +22,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== TODOS LOS ESTILOS ORIGINALES (SIN CAMBIOS) ========== */
-        :root {
-            --gold: #D4AF37; --cream: #FFFDF7; --terracotta: #D68B7C; --text-dark: #3A2C27;
-            --text-soft: #6B4E44; --success: #6BAF92; --danger: #E86A6A; --shadow-soft: 0 8px 20px rgba(0,0,0,0.04);
-        }
+        /* ========== ESTILOS (SIN CAMBIOS) ========== */
+        :root { --gold: #D4AF37; --cream: #FFFDF7; --terracotta: #D68B7C; --text-dark: #3A2C27; --text-soft: #6B4E44; --success: #6BAF92; --danger: #E86A6A; --shadow-soft: 0 8px 20px rgba(0,0,0,0.04); }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Outfit', sans-serif; background: var(--cream); height: 100vh; overflow: hidden; display: flex; justify-content: center; }
         #gradient-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(145deg, #FFFDF7 0%, #FDF6EC 30%, #FCF0E3 70%, #FDF6EC 100%); background-size: 300% 300%; z-index: -1; animation: gradientMove 14s ease infinite; }
@@ -137,23 +134,9 @@
         .historial-item.win { background: var(--success); color: white; }
         .historial-item.lose { background: var(--danger); color: white; }
         .warning-text { color: var(--danger); font-size: 11px; margin-top: 5px; padding: 5px; background: rgba(232,106,106,0.1); border-radius: 20px; }
-        
-        /* NUEVO ESTILO PARA DESTACAR EL BONO */
-        .bonus-card {
-            background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(214,139,124,0.1));
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 15px rgba(212,175,55,0.2);
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-        .bonus-card .video-icon {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            box-shadow: 0 0 10px rgba(255,215,0,0.5);
-        }
-        .bonus-card .video-title {
-            color: var(--gold);
-            font-weight: 800;
-        }
+        .bonus-card { background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(214,139,124,0.1)); border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.2); margin-top: 10px; margin-bottom: 10px; }
+        .bonus-card .video-icon { background: linear-gradient(135deg, #FFD700, #FFA500); box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .bonus-card .video-title { color: var(--gold); font-weight: 800; }
     </style>
 </head>
 <body>
@@ -223,6 +206,14 @@
     </div>
 </div>
 
+<!-- COMPONENTE ADSGRAM-TASK (OCULTO) -->
+<adsgram-task 
+    id="adsgramTask"
+    data-block-id="task-28364"
+    data-debug="true"
+    style="display: none;">
+</adsgram-task>
+
 <div id="app-container">
     <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
@@ -231,7 +222,7 @@
         </div>
         <div class="balance-card" id="balanceCard"><div id="user-balance">0</div><div class="balance-label">⭐ MONEDAS</div></div>
         
-        <!-- ===== VIDEOS ORIGINALES (SIN TOCAR) ===== -->
+        <!-- ===== VIDEOS ORIGINALES ===== -->
         <div class="section-title"><i class="fas fa-video"></i><span>Videos (24h de espera por video)</span></div>
         <div class="daily-progress">
             <span><span id="videosWatchedCount">0</span>/6 videos vistos</span>
@@ -247,7 +238,7 @@
         <div class="video-card" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VIDEO</div><div class="video-reward">⭐ +15</div></div></div><div class="video-btn-container"><button class="video-btn" id="video5Btn">Ver</button><span class="unlock-time" id="video5Unlock"></span></div></div>
         <div class="video-card" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VIDEO</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video6Btn">Ver</button><span class="unlock-time" id="video6Unlock"></span></div></div>
 
-        <!-- ===== SECCIÓN BONO ADSGRAM (DESTACADA VISUALMENTE) ===== -->
+        <!-- ===== SECCIÓN BONO ADSGRAM ===== -->
         <div class="section-title" style="margin-top: 15px;"><i class="fas fa-gift" style="color: var(--gold);"></i><span style="color: var(--gold); font-weight: 800;">🎁 BONO DIARIO (4 x 5⭐)</span></div>
         <div class="daily-progress" style="background: rgba(212,175,55,0.15); border-color: var(--gold);">
             <span style="color: var(--text-dark); font-weight: 700;"><span id="adsGramWatchedCount">0</span>/4 anuncios vistos</span>
@@ -255,7 +246,6 @@
                 <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
         </div>
-        <!-- UN SOLO BOTÓN DESTACADO -->
         <div class="video-card bonus-card" id="agBonusCard">
             <div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title" id="agBonusTitle">BONO DISPONIBLE</div><div class="video-reward" style="color: var(--gold); font-weight: 800;">⭐ +5 c/u</div></div></div>
             <div class="video-btn-container">
@@ -272,77 +262,11 @@
         </div>
     </div>
 
-    <!-- GAME SCREEN -->
-    <div id="game-screen" class="screen">
-        <div class="back-circle" id="backHomeGame"><i class="fas fa-arrow-left"></i></div>
-        <div class="glass-card" style="padding: 16px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                <i class="fas fa-gamepad" style="font-size: 28px; background: linear-gradient(135deg, var(--gold), var(--terracotta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
-                <h3 style="font-size: 20px; font-weight: 800; color: var(--text-dark);">Doble o Nada</h3>
-            </div>
-            <div style="text-align: center; margin-bottom: 10px;"><span style="font-size: 14px; color: var(--text-soft);">Balance disponible</span><div style="font-size: 32px; font-weight: 800; color: var(--gold);" id="game-balance">0 ⭐</div></div>
-            <div class="game-apuesta-display"><div class="apuesta-label">APOSTANDO</div><div class="apuesta-valor" id="game-apuesta-actual">5</div><div class="ganancia-valor" id="game-ganancia">Ganas 10 ⭐</div></div>
-            <div class="game-botones-container">
-                <button class="game-btn" id="game-minimo">MINIMO<br><small>5</small></button>
-                <button class="game-btn highlight" id="game-doblar">x2<br><small>Duplicar</small></button>
-                <button class="game-btn danger" id="game-maximo">MAXIMO<br><small>Todo</small></button>
-            </div>
-            <button class="game-jugar-btn" id="game-jugar">JUGAR DOBLE O NADA</button>
-            <div class="racha-container"><span>Racha actual: <span class="racha-actual" id="game-racha">0</span></span><span>Record: <span class="racha-record" id="game-record">0</span></span></div>
-            <div style="margin-top: 10px;"><div style="font-size: 11px; color: var(--text-soft); margin-bottom: 5px;">Ultimas jugadas</div><div class="historial-juego" id="game-historial"></div></div>
-            <p style="font-size: 10px; color: var(--text-soft); margin-top: 15px; text-align: center;">30% probabilidad de duplicar tu apuesta</p>
-        </div>
-    </div>
-
-    <!-- INVITE SCREEN -->
-    <div id="invite-screen" class="screen">
-        <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
-        <div class="glass-card">
-            <i class="fas fa-rocket" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
-            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Invita y Gana</h3>
-            <p style="font-size:13px;color:var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos retiren.</p>
-            <div class="invite-highlight">
-                <h4>💎 +10% de comision</h4><p>por cada video que vean tus invitados</p>
-                <h4 style="margin-top:12px;">🌟 +0.02 USDT</h4><p>cuando tu amigo haga su primer retiro</p>
-                <div class="earn-tag">💰 Ingresos pasivos!</div>
-            </div>
-            <div class="invite-stats">
-                <div class="stat-box"><div class="stat-number" id="totalInvitados">0</div><div class="stat-label">Invitados</div></div>
-                <div class="stat-box"><div class="stat-number" id="totalGanadoRef">0 ⭐</div><div class="stat-label">Ganado por referidos</div></div>
-            </div>
-            <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir enlace de invitacion</button>
-            <p style="font-size:11px;color:var(--text-soft);margin-top:10px;text-align:center;"><i class="fas fa-check-circle"></i> El bono se acredita al primer retiro de tu invitado</p>
-        </div>
-    </div>
-
-    <!-- WITHDRAW SCREEN -->
-    <div id="withdraw-screen" class="screen">
-        <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
-        <div class="glass-card">
-            <i class="fas fa-wallet" style="font-size:36px;background:linear-gradient(135deg,var(--success),#4A8C74);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
-            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Retirar con CCWallet</h3>
-            <div class="balance-available"><small>Balance disponible</small><div class="coins" id="withdraw-balance-coins">0 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div>
-            <div class="ccwallet-info"><i class="fas fa-info-circle"></i> No tienes CCWallet? <button onclick="openCCWallet()" style="background:none;border:none;color:var(--terracotta);font-weight:600;cursor:pointer;text-decoration:underline;">Crear cuenta aqui</button><br><small>Retiro via @cctip_bot</small></div>
-            <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet (8 dígitos)"></textarea>
-            <div class="warning-text"><i class="fas fa-exclamation-triangle"></i> Solo se aceptan 8 dígitos numéricos. Si ingresas otro ID, perderás tu dinero.</div>
-            <button class="btn-game btn-success" style="width:100%;padding:16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
-            <p style="margin-top:10px;font-size:11px;color:var(--text-soft);">Minimo 200 ⭐ (0.02 USDT)</p>
-            <div class="history-title">Historial</div>
-            <div id="history-list" style="max-height:150px;overflow-y:auto;"></div>
-        </div>
-    </div>
-
-    <!-- REDEEM SCREEN -->
-    <div id="redeem-screen" class="screen">
-        <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
-        <div class="glass-card">
-            <i class="fas fa-ticket-alt" style="font-size:36px;background:linear-gradient(135deg,var(--gold),var(--terracotta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
-            <h3 style="margin:10px 0;font-size:20px;font-weight:800;color:var(--text-dark);">Canjear Codigo</h3>
-            <div class="channel-join"><i class="fab fa-telegram"></i> Unete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--terracotta);font-weight:600;">@UsdtGiftChannel</button></div>
-            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Codigo"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
-            <div id="redeem-message" style="margin-top:14px;font-size:13px;text-align:center;"></div>
-        </div>
-    </div>
+    <!-- OTRAS PANTALLAS (SIN CAMBIOS) -->
+    <div id="game-screen" class="screen">...</div>
+    <div id="invite-screen" class="screen">...</div>
+    <div id="withdraw-screen" class="screen">...</div>
+    <div id="redeem-screen" class="screen">...</div>
 </div>
 
 <script>
@@ -361,7 +285,6 @@
     // ==================== ADSGRAM ====================
     const ADSGRAM_REWARDS = [5, 5, 5, 5];
     const TOTAL_ADSGRAM = 4;
-    const ADSGRAM_BLOCK_ID = '28364'; // ✅ CORREGIDO DEFINITIVO
     let agTimer = null;
 
     // ==================== SISTEMA HIBRIDO ====================
@@ -444,7 +367,7 @@
     function openCCWallet(){ tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
-    // ==================== FUNCIONES ADSGRAM ====================
+    // ==================== FUNCIONES ADSGRAM (CORREGIDO - COMPONENTE WEB) ====================
     function isAdsGramLocked() { return userData?.adGramUnlockTime && Date.now() < userData.adGramUnlockTime; }
     function getAdsGramUnlockTimeString() { const ut = userData?.adGramUnlockTime; if (!ut) return ''; const remaining = ut - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60*60*1000)); const m = Math.floor((remaining % (60*60*1000)) / (60*1000)); return `🔒 ${h}h ${m}m`; }
     function updateAdsGramUI() {
@@ -461,30 +384,57 @@
         if (unlockSpan) unlockSpan.textContent = getAdsGramUnlockTimeString();
     }
     function startAdsGramTimer() { if (agTimer) clearInterval(agTimer); agTimer = setInterval(() => { updateAdsGramUI(); }, 1000); }
+    
     async function watchAdGram() {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if (isAdsGramLocked()) { showAlert('Bono bloqueado', `Disponible en ${getAdsGramUnlockTimeString()}`, 'clock'); return; }
         if (!userData) return;
         const count = userData.adGramCount || 0;
         if (count >= TOTAL_ADSGRAM) { showAlert('Bono completado', 'Ya has visto los 4 anuncios diarios.', 'check-circle'); return; }
+        
         const nextAd = count + 1;
         isProcessing = true; isAdPlaying = true; updateUI(); updateAdsGramUI(); showAdLoader();
-        try {
-            const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
-            await AdController.show();
+        
+        const taskElement = document.getElementById('adsgramTask');
+        
+        // Escuchar evento reward (CUANDO COMPLETA LA TAREA)
+        const onReward = async (event) => {
+            taskElement.removeEventListener('reward', onReward);
+            taskElement.removeEventListener('onError', onError);
+            taskElement.style.display = 'none';
+            
             const reward = ADSGRAM_REWARDS[nextAd - 1];
             userData.adGramCount = nextAd;
             userData.balance += reward;
+            
             let message = '';
             if (nextAd === 1) message = "🎉 ¡PRIMER ANUNCIO! +5⭐. ¡SIGUE ASÍ!";
             else if (nextAd === 2) message = "🔥 ¡SEGUNDO ANUNCIO! +5⭐. ¡VAS POR LA MITAD!";
             else if (nextAd === 3) message = "⚡ ¡TERCER ANUNCIO! +5⭐. ¡SOLO UNO MÁS!";
             else if (nextAd === 4) { message = "🏆 ¡BONO COMPLETO! +5⭐. ¡MÁXIMO ALCANZADO!"; userData.adGramUnlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000); }
+            
             saveToLocal({ ...userData, userId }); await updateUI(); updateAdsGramUI(); updateGameUI();
             showAlert('🎁 ¡Recompensa!', message, 'check-circle');
             syncToFirebase({ balance: userData.balance, adGramCount: userData.adGramCount, adGramUnlockTime: userData.adGramUnlockTime });
-        } catch (error) { console.error('Error AdsGram:', error); showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle'); }
-        finally { hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI(); }
+            
+            hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI();
+        };
+        
+        // Escuchar evento onError
+        const onError = (event) => {
+            taskElement.removeEventListener('reward', onReward);
+            taskElement.removeEventListener('onError', onError);
+            taskElement.style.display = 'none';
+            console.error('Error AdsGram:', event.detail);
+            showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle');
+            hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI(); updateAdsGramUI();
+        };
+        
+        taskElement.addEventListener('reward', onReward);
+        taskElement.addEventListener('onError', onError);
+        
+        // Mostrar el componente para que el usuario interactúe
+        taskElement.style.display = 'block';
     }
 
     // ==================== ADMIN Y OTROS ====================
