@@ -1000,22 +1000,20 @@
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
     let gameApuesta = 5, gameRacha = 0, gameRecord = 0, gameHistorial = [];
 
-    // ==================== PASO 2: TATUAJE DEL TELÉFONO (mejorado con modal profesional) ====================
+    // ==================== PASO 2: TATUAJE DEL TELÉFONO (con mensaje claro y directo) ====================
     async function initUser() {
         if (!userId) return;
 
         // Marcado de dispositivo (localStorage)
         const marca = localStorage.getItem('mi_marca_secreta');
         if (marca && marca !== userId) {
-            // Mostrar modal elegante y luego bloquear la interfaz
-            showAlert('Acceso Denegado', 'Esta cuenta ya está vinculada a otro dispositivo. No se permiten múltiples cuentas.', 'exclamation-triangle');
-            // Ocultar la app y mostrar un mensaje de bloqueo permanente
+            // Bloquear permanentemente la interfaz con mensaje claro y contundente
             document.getElementById('app-container').style.display = 'none';
             document.getElementById('loading-screen').style.display = 'none';
             const bloqueoDiv = document.createElement('div');
             bloqueoDiv.id = 'bloqueo-multicuenta';
             bloqueoDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:Outfit; text-align:center; padding:20px; z-index:100000;';
-            bloqueoDiv.innerHTML = '<i class="fas fa-shield-alt" style="font-size:64px; color:#6C63FF; margin-bottom:20px;"></i><h2 style="color:#2D3436;">Acceso restringido</h2><p style="color:#636E72; margin-top:10px;">No se puede iniciar sesión desde este dispositivo.</p><button onclick="location.reload()" style="margin-top:20px; background:#6C63FF; border:none; padding:12px 24px; border-radius:50px; color:white; font-weight:600;">Intentar de nuevo</button>';
+            bloqueoDiv.innerHTML = '<i class="fas fa-ban" style="font-size:64px; color:#FF4757; margin-bottom:20px;"></i><h2 style="color:#2D3436;">CUENTA BLOQUEADA</h2><p style="color:#636E72; margin-top:10px;">Has sido bloqueado por usar múltiples cuentas en este dispositivo.<br>No se permiten multicuentas. Cada usuario solo puede tener una cuenta.</p><button onclick="window.Telegram.WebApp.close()" style="margin-top:20px; background:#FF4757; border:none; padding:12px 24px; border-radius:50px; color:white; font-weight:600;">Aceptar</button>';
             document.body.appendChild(bloqueoDiv);
             return;
         }
