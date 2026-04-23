@@ -203,7 +203,7 @@
             width: 100%;
             max-width: 450px;
             height: 100vh;
-            padding: 12px 16px;
+            padding: 8px 12px;
             display: flex;
             flex-direction: column;
             z-index: 1;
@@ -227,11 +227,11 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         .channel-bubble {
             background: var(--violet);
-            padding: 6px 14px;
+            padding: 4px 12px;
             border-radius: 50px;
             box-shadow: var(--shadow-soft);
             display: flex;
@@ -239,7 +239,7 @@
             gap: 6px;
             color: white;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -248,8 +248,8 @@
         }
         .balance-card {
             text-align: center;
-            margin: 0 0 8px 0;
-            padding: 12px 16px;
+            margin: 0 0 4px 0;
+            padding: 6px 12px;
             background: var(--white);
             border-radius: 60px;
             box-shadow: var(--shadow-soft);
@@ -260,20 +260,20 @@
             transform: scale(0.99);
         }
         #user-balance {
-            font-size: 44px;
+            font-size: 32px;
             font-weight: 800;
             color: var(--violet);
         }
         .balance-label {
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: 2px;
             color: var(--coral);
             font-weight: 600;
         }
         .section-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -285,22 +285,22 @@
         .daily-progress {
             background: var(--pastel-lavender);
             border-radius: 50px;
-            padding: 8px 16px;
-            margin: 4px 0 8px;
+            padding: 4px 12px;
+            margin: 2px 0 4px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-dark);
         }
         .progress-dots {
             display: flex;
-            gap: 6px;
+            gap: 4px;
         }
         .dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: #D0D0D0;
             transition: all 0.2s;
@@ -311,8 +311,8 @@
         .video-card {
             background: var(--white);
             border-radius: 50px;
-            padding: 6px 16px 6px 12px;
-            margin-bottom: 8px;
+            padding: 4px 12px 4px 8px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -326,18 +326,18 @@
         .video-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
         .video-icon {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 30px;
             background: var(--pastel-lavender);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--violet);
-            font-size: 18px;
+            font-size: 14px;
         }
         .completed .video-icon {
             background: var(--pastel-mint);
@@ -345,11 +345,11 @@
         }
         .video-title {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-dark);
         }
         .video-reward {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--coral);
         }
@@ -357,26 +357,26 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 4px;
+            gap: 2px;
         }
         .video-btn {
-            padding: 8px 20px;
+            padding: 5px 12px;
             border-radius: 50px;
             border: none;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 11px;
             cursor: pointer;
             background: var(--violet);
             color: white;
             box-shadow: 0 2px 6px rgba(108,99,255,0.3);
             transition: all 0.15s ease;
-            min-width: 80px;
+            min-width: 65px;
             text-align: center;
         }
         .video-btn.small-btn {
-            padding: 6px 16px;
-            font-size: 12px;
-            min-width: 70px;
+            padding: 4px 10px;
+            font-size: 10px;
+            min-width: 60px;
         }
         .video-btn:active {
             transform: scale(0.96);
@@ -390,7 +390,7 @@
             transform: none;
         }
         .unlock-time {
-            font-size: 9px;
+            font-size: 8px;
             color: var(--text-soft);
             white-space: nowrap;
         }
@@ -408,15 +408,15 @@
         .menu-grid {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 4px;
+            margin-top: 4px;
         }
         .btn-game {
             background: var(--white);
             border: none;
-            padding: 14px 18px;
+            padding: 8px 16px;
             border-radius: 60px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -777,55 +777,10 @@
             background: var(--danger);
             color: white;
         }
+        /* compactación adicional para home sin scroll */
         #home-screen {
             padding-bottom: 0;
             justify-content: flex-start;
-        }
-        #home-screen .balance-card {
-            margin: 0 0 6px !important;
-            padding: 8px 12px !important;
-        }
-        #home-screen #user-balance {
-            font-size: 36px !important;
-        }
-        #home-screen .balance-label {
-            font-size: 9px !important;
-        }
-        #home-screen .section-title {
-            font-size: 11px !important;
-            margin-bottom: 4px !important;
-        }
-        #home-screen .daily-progress {
-            padding: 5px 12px !important;
-            margin: 2px 0 6px !important;
-        }
-        #home-screen .video-card {
-            padding: 4px 12px 4px 8px !important;
-            margin-bottom: 6px !important;
-        }
-        #home-screen .video-icon {
-            width: 34px !important;
-            height: 34px !important;
-            font-size: 14px !important;
-        }
-        #home-screen .video-title {
-            font-size: 12px !important;
-        }
-        #home-screen .video-reward {
-            font-size: 10px !important;
-        }
-        #home-screen .video-btn {
-            padding: 6px 14px !important;
-            font-size: 11px !important;
-            min-width: 70px !important;
-        }
-        #home-screen .menu-grid {
-            gap: 6px !important;
-            margin-top: 8px !important;
-        }
-        #home-screen .btn-game {
-            padding: 10px 16px !important;
-            font-size: 12px !important;
         }
         .sync-status {
             position: fixed;
@@ -929,7 +884,7 @@
         <div class="video-card" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title">#5 VIDEO</div><div class="video-reward">⭐ +15</div></div></div><div class="video-btn-container"><button class="video-btn" id="video5Btn">Ver</button><span class="unlock-time" id="video5Unlock"></span></div></div>
         <div class="video-card" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 VIDEO</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video6Btn">Ver</button><span class="unlock-time" id="video6Unlock"></span></div></div>
 
-        <div class="section-title" style="margin-top: 12px;"><i class="fas fa-gift" style="color: var(--coral);"></i><span style="font-weight: 800;">🎁 BONO DIARIO (4 x 5⭐)</span></div>
+        <div class="section-title" style="margin-top: 6px;"><i class="fas fa-gift" style="color: var(--coral);"></i><span style="font-weight: 800;">🎁 BONO DIARIO (4 x 5⭐)</span></div>
         <div class="daily-progress" style="background: var(--pastel-peach);">
             <span><span id="adsGramWatchedCount">0</span>/4 anuncios vistos</span>
             <div class="progress-dots" id="adsGramDots">
@@ -1045,15 +1000,23 @@
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
     let gameApuesta = 5, gameRacha = 0, gameRecord = 0, gameHistorial = [];
 
-    // ==================== PASO 2: TATUAJE DEL TELÉFONO ====================
+    // ==================== PASO 2: TATUAJE DEL TELÉFONO (mejorado con modal profesional) ====================
     async function initUser() {
         if (!userId) return;
 
         // Marcado de dispositivo (localStorage)
         const marca = localStorage.getItem('mi_marca_secreta');
         if (marca && marca !== userId) {
-            alert("Lo siento, en este teléfono ya hay una cuenta registrada. No se permiten multicuentas.");
-            document.body.innerHTML = ""; // Borra la app
+            // Mostrar modal elegante y luego bloquear la interfaz
+            showAlert('Acceso Denegado', 'Esta cuenta ya está vinculada a otro dispositivo. No se permiten múltiples cuentas.', 'exclamation-triangle');
+            // Ocultar la app y mostrar un mensaje de bloqueo permanente
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'none';
+            const bloqueoDiv = document.createElement('div');
+            bloqueoDiv.id = 'bloqueo-multicuenta';
+            bloqueoDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:Outfit; text-align:center; padding:20px; z-index:100000;';
+            bloqueoDiv.innerHTML = '<i class="fas fa-shield-alt" style="font-size:64px; color:#6C63FF; margin-bottom:20px;"></i><h2 style="color:#2D3436;">Acceso restringido</h2><p style="color:#636E72; margin-top:10px;">No se puede iniciar sesión desde este dispositivo.</p><button onclick="location.reload()" style="margin-top:20px; background:#6C63FF; border:none; padding:12px 24px; border-radius:50px; color:white; font-weight:600;">Intentar de nuevo</button>';
+            document.body.appendChild(bloqueoDiv);
             return;
         }
         if (!marca) {
