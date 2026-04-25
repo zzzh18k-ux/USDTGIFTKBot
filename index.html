@@ -1170,27 +1170,81 @@
 
     function isAdsGramLocked() { return userData?.adGramUnlockTime && Date.now() < userData.adGramUnlockTime; }
     function getAdsGramUnlockTimeString() { const ut = userData?.adGramUnlockTime; if (!ut) return ''; const remaining = ut - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60*60*1000)); const m = Math.floor((remaining % (60*60*1000)) / (60*1000)); return `🔒 ${h}h ${m}m`; }
+    
+    // ==================== ADSGRAM UI CON RESETEO AUTOMÁTICO ====================
     function updateAdsGramUI() {
-        const count = userData?.adGramCount || 0;
+        if (!userData) return;
+        
+        let count = userData.adGramCount || 0;
+        const unlockTime = userData.adGramUnlockTime;
+        
+        // RESETEO AUTOMÁTICO: si pasaron las 24h y el contador está en 4 o más, reiniciamos
+        if (unlockTime && Date.now() > unlockTime && count >= TOTAL_ADSGRAM) {
+            count = 0;
+            userData.adGramCount = 0;
+            userData.adGramUnlockTime = null;
+            syncToFirebase({ adGramCount: 0, adGramUnlockTime: null });
+            saveToLocal({ ...userData, userId });
+        }
+        
         document.getElementById('adsGramWatchedCount').innerText = count;
         const dots = document.querySelectorAll('#adsGramDots .dot');
         dots.forEach((dot, idx) => dot.classList.toggle('completed', idx < count));
-        const btn = document.getElementById('agBonusBtn'); const card = document.getElementById('agBonusCard');
-        const unlockSpan = document.getElementById('agBonusUnlock'); const titleEl = document.getElementById('agBonusTitle');
-        const locked = isAdsGramLocked();
+        
+        const btn = document.getElementById('agBonusBtn');
+        const card = document.getElementById('agBonusCard');
+        const unlockSpan = document.getElementById('agBonusUnlock');
+        const titleEl = document.getElementById('agBonusTitle');
+        
+        const locked = unlockTime && Date.now() < unlockTime;
         btn.disabled = locked || isProcessing;
-        if (locked) { btn.innerHTML = '🔒'; titleEl.innerText = 'BONO BLOQUEADO'; card?.classList.add('completed'); }
-        else { const next = (userData?.adGramCount || 0) + 1; if (next <= TOTAL_ADSGRAM) { btn.innerHTML = `Ver Anuncio #${next}`; titleEl.innerText = `ANUNCIO #${next} DISPONIBLE`; card?.classList.remove('completed'); } else { btn.innerHTML = '🔒'; titleEl.innerText = '¡BONO COMPLETO!'; card?.classList.add('completed'); } }
-        if (unlockSpan) unlockSpan.textContent = getAdsGramUnlockTimeString();
+        
+        if (locked) {
+            btn.innerHTML = '🔒';
+            titleEl.innerText = 'BONO BLOQUEADO';
+            card?.classList.add('completed');
+            const remaining = unlockTime - Date.now();
+            const h = Math.floor(remaining / (60*60*1000));
+            const m = Math.floor((remaining % (60*60*1000)) / (60*1000));
+            if (unlockSpan) unlockSpan.textContent = `🔒 ${h}h ${m}m`;
+        } else if (count >= TOTAL_ADSGRAM) {
+            btn.innerHTML = '🔒';
+            titleEl.innerText = 'BONO COMPLETO (espera 24h)';
+            card?.classList.add('completed');
+            if (unlockSpan) unlockSpan.textContent = '';
+        } else {
+            const next = count + 1;
+            btn.innerHTML = `Ver Anuncio #${next}`;
+            titleEl.innerText = `ANUNCIO #${next} DISPONIBLE`;
+            card?.classList.remove('completed');
+            if (unlockSpan) unlockSpan.textContent = '';
+        }
     }
+    
     function startAdsGramTimer() { if (agTimer) clearInterval(agTimer); agTimer = setInterval(() => { updateAdsGramUI(); }, 1000); }
     
     async function watchAdGram() {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
-        if (isAdsGramLocked()) { showAlert('Bono bloqueado', `Disponible en ${getAdsGramUnlockTimeString()}`, 'clock'); return; }
+        if (isAdsGramLocked()) { 
+            showAlert('Bono bloqueado', `Disponible en ${getAdsGramUnlockTimeString()}`, 'clock'); 
+            return; 
+        }
         if (!userData) return;
-        const count = userData.adGramCount || 0;
-        if (count >= TOTAL_ADSGRAM) { showAlert('Bono completado', 'Ya has visto los 4 anuncios diarios.', 'check-circle'); return; }
+        let count = userData.adGramCount || 0;
+        // Si después del reset automático aún hay error, prevenimos
+        if (count >= TOTAL_ADSGRAM) {
+            // Forzamos reset si el tiempo ya pasó
+            if (userData.adGramUnlockTime && Date.now() > userData.adGramUnlockTime) {
+                userData.adGramCount = 0;
+                userData.adGramUnlockTime = null;
+                syncToFirebase({ adGramCount: 0, adGramUnlockTime: null });
+                saveToLocal({ ...userData, userId });
+                count = 0;
+            } else {
+                showAlert('Bono completado', 'Ya has visto los 4 anuncios diarios. Vuelve mañana.', 'check-circle');
+                return;
+            }
+        }
         
         const nextAd = count + 1;
         isProcessing = true; isAdPlaying = true; updateUI(); updateAdsGramUI(); showAdLoader();
@@ -1205,8 +1259,14 @@
             if (nextAd === 1) message = "🎉 ¡PRIMER ANUNCIO! +5⭐. ¡SIGUE ASÍ!";
             else if (nextAd === 2) message = "🔥 ¡SEGUNDO ANUNCIO! +5⭐. ¡VAS POR LA MITAD!";
             else if (nextAd === 3) message = "⚡ ¡TERCER ANUNCIO! +5⭐. ¡SOLO UNO MÁS!";
-            else if (nextAd === 4) { message = "🏆 ¡BONO COMPLETO! +5⭐. ¡MÁXIMO ALCANZADO!"; userData.adGramUnlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000); }
-            saveToLocal({ ...userData, userId }); await updateUI(); updateAdsGramUI(); updateGameUI();
+            else if (nextAd === 4) { 
+                message = "🏆 ¡BONO COMPLETO! +5⭐. ¡MÁXIMO ALCANZADO!"; 
+                userData.adGramUnlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
+            }
+            saveToLocal({ ...userData, userId }); 
+            await updateUI(); 
+            updateAdsGramUI(); 
+            updateGameUI();
             showAlert('🎁 ¡Recompensa!', message, 'check-circle');
             syncToFirebase({ balance: userData.balance, adGramCount: userData.adGramCount, adGramUnlockTime: userData.adGramUnlockTime });
         } catch (error) {
