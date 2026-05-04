@@ -1001,7 +1001,7 @@
         </div>
     </div>
 
-    <!-- INVITE SCREEN - NUEVO SISTEMA DE TAREAS -->
+    <!-- INVITE SCREEN - NUEVO SISTEMA DE TAREAS CON HISTÓRICOS -->
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -1009,11 +1009,23 @@
             <h3 style="margin: 12px 0; font-size: 22px; font-weight: 800;">Invita y Gana</h3>
             <p style="font-size: 14px; color: var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos vean los 10 videos.</p>
             
-            <!-- Estadísticas de referidos -->
+            <!-- Estadísticas de referidos del día -->
             <div class="invite-stats">
                 <div class="stat-box"><div class="stat-number" id="totalInvitadosHoy">0</div><div class="stat-label">Referidos hoy</div></div>
                 <div class="stat-box"><div class="stat-number" id="totalActivosHoy">0</div><div class="stat-label">Activos (v.10 videos)</div></div>
                 <div class="stat-box"><div class="stat-number" id="saldoPendienteRef">0 ⭐</div><div class="stat-label">Saldo pendiente</div></div>
+            </div>
+            
+            <!-- ESTADÍSTICAS HISTÓRICAS (lo que pediste) -->
+            <div style="background: var(--pastel-lavender); border-radius: 30px; padding: 10px; margin: 10px 0; text-align: center;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span><i class="fas fa-users"></i> <strong>Total referidos (histórico):</strong></span>
+                    <span id="totalReferidosHistoricos" style="font-weight: 800; color: var(--violet);">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span><i class="fas fa-coins"></i> <strong>Total ganado por referidos:</strong></span>
+                    <span id="totalGanadoReferidos" style="font-weight: 800; color: var(--coral);">0 ⭐</span>
+                </div>
             </div>
             
             <!-- Tareas Diarias (Metas) -->
@@ -1131,9 +1143,10 @@
                 redeemedCodes: [], createdAt: Date.now(), gameRecord: 0, gameHistorial: [], 
                 fingerprint, ip: ipData?.ip || 'unknown', country: ipData?.country || 'unknown', 
                 vpnDetected: isSuspiciousVPN(ipData), adGramUnlockTime: null, adGramCount: 0,
-                saldoPendiente: 0, ultimaReclamacionSemanal: null, // Para control semanal
-                tasksReclamadas: { 20: false, 50: false, 100: false, 200: false }, // Metas reclamadas hoy
-                tasksPendientes: {} // Almacena las metas pendientes que no les tocó aún
+                saldoPendiente: 0, ultimaReclamacionSemanal: null,
+                tasksReclamadas: { 20: false, 50: false, 100: false, 200: false },
+                tasksPendientes: {},
+                totalGanadoReferidos: 0 // NUEVO: total histórico ganado por referidos
             };
             await ref.set(initialData); userData = initialData; saveToLocal(initialData);
             if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
@@ -1151,6 +1164,7 @@
             if (userData.referidosActivos === undefined) userData.referidosActivos = 0;
             if (userData.referidosHoy === undefined) userData.referidosHoy = 0;
             if (userData.activosHoy === undefined) userData.activosHoy = 0;
+            if (userData.totalGanadoReferidos === undefined) userData.totalGanadoReferidos = 0;
             saveToLocal({ ...userData, userId });
         }
         
@@ -1191,6 +1205,10 @@
         document.getElementById('totalInvitadosHoy').innerText = userData.referidosHoy || 0;
         document.getElementById('totalActivosHoy').innerText = userData.activosHoy || 0;
         document.getElementById('saldoPendienteRef').innerHTML = (userData.saldoPendiente || 0) + ' ⭐';
+        
+        // Actualizar históricos
+        document.getElementById('totalReferidosHistoricos').innerText = userData.referidos || 0;
+        document.getElementById('totalGanadoReferidos').innerHTML = (userData.totalGanadoReferidos || 0) + ' ⭐';
         
         let watchedCount = 0; for (let i=1; i<=TOTAL_VIDEOS; i++) if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) watchedCount++;
         document.getElementById('videosWatchedCount').innerText = watchedCount;
@@ -1317,17 +1335,18 @@
         }
         isProcessing = true;
         try {
-            // Añadir la recompensa al saldo principal (se puede retirar de inmediato)
-            // O mejor: añadir al saldo pendiente semanal? El usuario dijo "saldo pendiente y semanal"
-            // Voy a guardarlo en saldoPendiente y el recolector semanal lo mueve a balance
+            // Añadir la recompensa al saldo pendiente
             userData.saldoPendiente = (userData.saldoPendiente || 0) + task.rewardStars;
+            // Sumar al total histórico ganado
+            userData.totalGanadoReferidos = (userData.totalGanadoReferidos || 0) + task.rewardStars;
             if (!userData.tasksReclamadas) userData.tasksReclamadas = {};
             userData.tasksReclamadas[threshold] = true;
             if (userData.tasksPendientes) delete userData.tasksPendientes[threshold];
             await syncToFirebase({ 
                 saldoPendiente: userData.saldoPendiente,
                 tasksReclamadas: userData.tasksReclamadas,
-                tasksPendientes: userData.tasksPendientes
+                tasksPendientes: userData.tasksPendientes,
+                totalGanadoReferidos: userData.totalGanadoReferidos
             });
             saveToLocal({ ...userData, userId });
             showAlert('🎉 Recompensa añadida', `+${task.rewardStars} ⭐ se han añadido a tu saldo pendiente. Reclámalo semanalmente.`, 'check-circle');
@@ -1550,4 +1569,4 @@
     initAdmin();
 </script>
 </body>
-</html>
+ </html>
