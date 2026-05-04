@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT GIFT K - Moneda Dorada</title>
+    <title>USDT GIFT K - Recompensas por Invitar</title>
     
     <!-- Monetag Rewarded Interstitial -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
@@ -793,6 +793,79 @@
             color: var(--violet);
             font-weight: 600;
         }
+        /* Estilos para tareas */
+        .task-card {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-soft);
+        }
+        .task-info h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .task-info p {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+        .task-btn {
+            background: var(--violet);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .task-btn.completed {
+            background: var(--success);
+            opacity: 0.7;
+            cursor: default;
+        }
+        .task-btn.locked {
+            background: #ccc;
+            cursor: default;
+        }
+        .task-btn.pending {
+            background: var(--coral);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.02); }
+            100% { opacity: 0.7; }
+        }
+        .task-btn:active {
+            transform: scale(0.96);
+        }
+        .weekly-claim {
+            background: linear-gradient(135deg, var(--violet), var(--coral));
+            border-radius: 40px;
+            padding: 12px 16px;
+            margin-top: 15px;
+            text-align: center;
+            color: white;
+        }
+        .weekly-claim button {
+            background: white;
+            color: var(--violet);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .weekly-claim button:active {
+            transform: scale(0.96);
+        }
     </style>
 </head>
 <body>
@@ -803,12 +876,11 @@
 <div id="loading-screen">
     <div class="welcome-icon"><i class="fas fa-hand-holding-heart"></i></div>
     <div class="welcome-title">USDT GIFT K</div>
-    <div class="welcome-subtitle">Tu comunidad de recompensas</div>
-    <div class="welcome-description">Una experiencia <strong>colaborativa y segura</strong>. Gana monedas viendo videos, invita amigos y retira tus ganancias en USDT real.</div>
+    <div class="welcome-subtitle">Invita y Gana</div>
+    <div class="welcome-description">Invita amigos, completa metas y gana dinero real.</div>
     <div class="feature-grid">
-        <div class="feature-item"><span class="feature-icon"><i class="fas fa-play-circle"></i></span><span class="feature-text">Videos diarios <small>Recibe ⭐ por cada video completado</small></span></div>
-        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">Sistema de equipo <small>Gana 10% de lo que generen tus invitados</small></span></div>
-        <div class="feature-item"><span class="feature-icon"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros a USDT <small>Directo a tu CCWallet al instante</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">Sistema de referidos <small>Gana $1, $3, $7, $15 por metas</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros a USDT <small>Directo a tu CCWallet</small></span></div>
     </div>
     <div class="loading-progress"><div class="loading-progress-bar"></div></div>
     <div class="loading-footer"><i class="fas fa-lock" style="margin-right:6px;"></i> Conexión segura establecida</div>
@@ -862,6 +934,7 @@
 </div>
 
 <div id="app-container">
+    <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="channel-bubble" onclick="joinChannel()"><i class="fab fa-telegram"></i><span>@UsdtGiftChannel</span></div>
@@ -906,6 +979,7 @@
         </div>
     </div>
 
+    <!-- GAME SCREEN -->
     <div id="game-screen" class="screen">
         <div class="back-circle" id="backHomeGame"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card" style="padding: 20px;">
@@ -927,19 +1001,39 @@
         </div>
     </div>
 
+    <!-- INVITE SCREEN - NUEVO SISTEMA DE TAREAS -->
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size: 42px; color: var(--violet);"></i>
             <h3 style="margin: 12px 0; font-size: 22px; font-weight: 800;">Invita y Gana</h3>
-            <p style="font-size: 14px; color: var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos retiren.</p>
-            <div class="invite-highlight"><h4>💎 +10% de comision</h4><p>por cada video que vean tus invitados</p><h4 style="margin-top:12px;">🌟 +0.02 USDT</h4><p>cuando tu amigo haga su primer retiro</p><div class="earn-tag">💰 Ingresos pasivos!</div></div>
-            <div class="invite-stats"><div class="stat-box"><div class="stat-number" id="totalInvitados">0</div><div class="stat-label">Invitados</div></div><div class="stat-box"><div class="stat-number" id="totalGanadoRef">0 ⭐</div><div class="stat-label">Ganado por referidos</div></div></div>
-            <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir enlace de invitacion</button>
-            <p style="font-size:12px;color:var(--text-soft);margin-top:12px;text-align:center;"><i class="fas fa-check-circle"></i> El bono se acredita al primer retiro de tu invitado</p>
+            <p style="font-size: 14px; color: var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos vean los 10 videos.</p>
+            
+            <!-- Estadísticas de referidos -->
+            <div class="invite-stats">
+                <div class="stat-box"><div class="stat-number" id="totalInvitadosHoy">0</div><div class="stat-label">Referidos hoy</div></div>
+                <div class="stat-box"><div class="stat-number" id="totalActivosHoy">0</div><div class="stat-label">Activos (v.10 videos)</div></div>
+                <div class="stat-box"><div class="stat-number" id="saldoPendienteRef">0 ⭐</div><div class="stat-label">Saldo pendiente</div></div>
+            </div>
+            
+            <!-- Tareas Diarias (Metas) -->
+            <div class="section-title" style="margin-top: 10px;"><i class="fas fa-tasks"></i><span>Tareas diarias (se reinician cada día)</span></div>
+            <div id="tasksContainer"></div>
+            
+            <!-- Reclamo Semanal -->
+            <div class="weekly-claim" id="weeklyClaimBox">
+                <div><i class="fas fa-calendar-week"></i> <strong>Recaudo Semanal</strong></div>
+                <div id="weeklyPendingAmount">Saldo pendiente: 0 ⭐</div>
+                <button id="weeklyClaimBtn" class="task-btn" style="background: white; color: var(--violet);">RECLAMAR TODO</button>
+                <div id="weeklyTimer" style="font-size: 11px; margin-top: 5px;"></div>
+            </div>
+            
+            <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir enlace de invitación</button>
+            <p style="font-size:11px;color:var(--text-soft);margin-top:12px;text-align:center;"><i class="fas fa-info-circle"></i> Solo los referidos que vean los 10 videos (6 normales + 4 AdsGram) cuentan como activos. Las metas se reinician cada día.</p>
         </div>
     </div>
 
+    <!-- WITHDRAW SCREEN -->
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -948,21 +1042,22 @@
             <div class="balance-available"><small>Balance disponible</small><div class="coins" id="withdraw-balance-coins">0 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div>
             <div class="ccwallet-info"><i class="fas fa-info-circle"></i> No tienes CCWallet? <button onclick="openCCWallet()" style="background:none;border:none;color:var(--violet);font-weight:600;cursor:pointer;">Crear cuenta aqui</button><br><small>Retiro via @cctip_bot</small></div>
             <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet (8 dígitos)"></textarea>
-            <div class="warning-text"><i class="fas fa-exclamation-triangle"></i> Solo se aceptan 8 dígitos numéricos. Si ingresas otro ID, perderás tu dinero.</div>
+            <div class="warning-text"><i class="fas fa-exclamation-triangle"></i> Solo se aceptan 8 dígitos numéricos.</div>
             <button class="btn-game btn-success" style="width:100%;padding:16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
-            <p style="margin-top:10px;font-size:12px;color:var(--text-soft);">Minimo 200 ⭐ (0.02 USDT)</p>
+            <p style="margin-top:10px;font-size:12px;color:var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p>
             <div class="history-title">Historial</div>
             <div id="history-list" style="max-height:150px;overflow-y:auto;"></div>
         </div>
     </div>
 
+    <!-- REDEEM SCREEN -->
     <div id="redeem-screen" class="screen">
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-ticket-alt" style="font-size: 42px; color: var(--coral);"></i>
-            <h3 style="margin: 12px 0; font-size: 22px; font-weight: 800;">Canjear Codigo</h3>
+            <h3 style="margin: 12px 0; font-size: 22px; font-weight: 800;">Canjear Código</h3>
             <div class="channel-join"><i class="fab fa-telegram"></i> Unete: <button onclick="joinChannel()" style="background:none;border:none;color:var(--violet);font-weight:600;">@UsdtGiftChannel</button></div>
-            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Codigo"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
+            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-game btn-primary" id="redeemSubmitBtn">Canjear</button></div>
             <div id="redeem-message" style="margin-top:14px;font-size:13px;text-align:center;"></div>
         </div>
     </div>
@@ -978,12 +1073,20 @@
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5];
     const TOTAL_VIDEOS = 6;
-    const BONO_REFERIDOR = 200;
     const UNLOCK_HOURS = 24;
     const ADSGRAM_REWARDS = [5, 5, 5, 5];
     const TOTAL_ADSGRAM = 4;
     const ADSGRAM_BLOCK_ID = '28418';
     let agTimer = null;
+
+    // METAS DE REFERIDOS (se reinician cada día)
+    const TASKS = [
+        { threshold: 20, rewardUSD: 1, rewardStars: 10000, name: "20 referidos activos → $1 USD" },
+        { threshold: 50, rewardUSD: 3, rewardStars: 30000, name: "50 referidos activos → $3 USD" },
+        { threshold: 100, rewardUSD: 7, rewardStars: 70000, name: "100 referidos activos → $7 USD" },
+        { threshold: 200, rewardUSD: 15, rewardStars: 150000, name: "200 referidos activos → $15 USD" }
+    ];
+    const PROBABILITY_PERCENT = 30; // 30% de probabilidad de que al alcanzar una meta se active el botón
 
     const STORAGE_KEY = 'usdtgiftk_userdata';
     function saveToLocal(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); document.getElementById('syncStatus').innerHTML = '💾 Local'; } catch (e) {} }
@@ -999,7 +1102,7 @@
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
     let gameApuesta = 5, gameRacha = 0, gameRecord = 0, gameHistorial = [];
 
-    // ==================== INICIALIZACIÓN CON BLOQUEO POR MULTICUENTA ====================
+    // ==================== INICIALIZACIÓN ====================
     async function initUser() {
         if (!userId) return;
 
@@ -1021,7 +1124,17 @@
         const ref = db.collection("usuarios").doc(userId); const doc = await ref.get(); const start = tg.initDataUnsafe?.start_param;
         if (!doc.exists) {
             const inv = (start && start !== userId) ? start : null; const fingerprint = generateDeviceFingerprint(); const ipData = await fetchIPData();
-            const initialData = { nombre: userName, username: userUsername, balance: 0, invitado_por: inv, referidos: 0, videoUnlockTimes: {}, hasWithdrawn: false, ccwallet_id: '', withdrawHistory: [], redeemedCodes: [], lastReferidoWithdraw: 0, createdAt: Date.now(), gameRecord: 0, gameHistorial: [], fingerprint, ip: ipData?.ip || 'unknown', country: ipData?.country || 'unknown', vpnDetected: isSuspiciousVPN(ipData), adGramUnlockTime: null, adGramCount: 0 };
+            const initialData = { 
+                nombre: userName, username: userUsername, balance: 0, invitado_por: inv, 
+                referidos: 0, referidosActivos: 0, referidosHoy: 0, activosHoy: 0,
+                videoUnlockTimes: {}, hasWithdrawn: false, ccwallet_id: '', withdrawHistory: [], 
+                redeemedCodes: [], createdAt: Date.now(), gameRecord: 0, gameHistorial: [], 
+                fingerprint, ip: ipData?.ip || 'unknown', country: ipData?.country || 'unknown', 
+                vpnDetected: isSuspiciousVPN(ipData), adGramUnlockTime: null, adGramCount: 0,
+                saldoPendiente: 0, ultimaReclamacionSemanal: null, // Para control semanal
+                tasksReclamadas: { 20: false, 50: false, 100: false, 200: false }, // Metas reclamadas hoy
+                tasksPendientes: {} // Almacena las metas pendientes que no les tocó aún
+            };
             await ref.set(initialData); userData = initialData; saveToLocal(initialData);
             if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
             enviarNotificacion('🆕 NUEVO USUARIO', `👤 ${userName} (@${userUsername||'n/a'})\n🆔 ${userId}\n🔗 Invitado por: ${inv||'nadie'}`);
@@ -1033,10 +1146,32 @@
             gameRecord = userData.gameRecord || 0; gameHistorial = userData.gameHistorial || [];
             if (userData.adGramUnlockTime === undefined) userData.adGramUnlockTime = null;
             if (userData.adGramCount === undefined) userData.adGramCount = 0;
+            if (userData.saldoPendiente === undefined) userData.saldoPendiente = 0;
+            if (userData.tasksReclamadas === undefined) userData.tasksReclamadas = { 20: false, 50: false, 100: false, 200: false };
+            if (userData.referidosActivos === undefined) userData.referidosActivos = 0;
+            if (userData.referidosHoy === undefined) userData.referidosHoy = 0;
+            if (userData.activosHoy === undefined) userData.activosHoy = 0;
             saveToLocal({ ...userData, userId });
         }
+        
+        // Reseteo diario de tareas (si cambió el día)
+        resetDailyTasksIfNeeded();
+        
         await updateUI(); updateGameUI(); startUnlockTimers(); startAdsGramTimer();
         document.getElementById('loading-screen').classList.add('hidden');
+        renderTasks();
+        updateWeeklyClaimUI();
+    }
+
+    function resetDailyTasksIfNeeded() {
+        const today = new Date().toDateString();
+        if (userData.lastResetDate !== today) {
+            userData.tasksReclamadas = { 20: false, 50: false, 100: false, 200: false };
+            userData.referidosHoy = 0;
+            userData.activosHoy = 0;
+            userData.lastResetDate = today;
+            syncToFirebase({ tasksReclamadas: userData.tasksReclamadas, referidosHoy: 0, activosHoy: 0, lastResetDate: today });
+        }
     }
 
     function generateDeviceFingerprint() { const screen = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`; const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; const language = navigator.language; const platform = navigator.platform; const vendor = navigator.vendor || 'unknown'; const str = `${screen}|${timezone}|${language}|${platform}|${vendor}|${userId}`; let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; } return hash.toString(); }
@@ -1046,18 +1181,25 @@
     function isVideoLocked(videoNum) { const unlockTime = userData.videoUnlockTimes?.[videoNum]; return unlockTime ? Date.now() < unlockTime : false; }
     function getUnlockTimeString(videoNum) { const unlockTime = userData.videoUnlockTimes?.[videoNum]; if (!unlockTime) return ''; const remaining = unlockTime - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60 * 60 * 1000)); const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000)); return `🔒 ${h}h ${m}m`; }
     function startUnlockTimers() { unlockTimers.forEach(t=>clearInterval(t)); unlockTimers=[]; for(let i=1;i<=TOTAL_VIDEOS;i++){ const timer=setInterval(()=>{ const unlockSpan=document.getElementById(`video${i}Unlock`); const btn=document.getElementById(`video${i}Btn`); if(unlockSpan&&btn){ const timeStr=getUnlockTimeString(i); unlockSpan.textContent=timeStr; const locked=isVideoLocked(i); btn.disabled=locked||isProcessing; if(locked)btn.innerHTML='🔒'; else if(!(userData.videoUnlockTimes?.[i]&&Date.now()<userData.videoUnlockTimes[i]))btn.innerHTML='Ver'; } },1000); unlockTimers.push(timer); } }
+    
     async function updateUI() {
         if (!userData) return;
-        document.getElementById('user-balance').innerText = Math.floor(userData.balance || 0); document.getElementById('game-balance').innerText = Math.floor(userData.balance || 0) + ' ⭐';
-        document.getElementById('totalInvitados').innerText = userData.referidos || 0; document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(userData.balance || 0) + ' ⭐';
+        document.getElementById('user-balance').innerText = Math.floor(userData.balance || 0);
+        document.getElementById('game-balance').innerText = Math.floor(userData.balance || 0) + ' ⭐';
+        document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + ((userData.balance || 0) / COINS_PER_USDT).toFixed(4) + ' USDT';
+        document.getElementById('totalInvitadosHoy').innerText = userData.referidosHoy || 0;
+        document.getElementById('totalActivosHoy').innerText = userData.activosHoy || 0;
+        document.getElementById('saldoPendienteRef').innerHTML = (userData.saldoPendiente || 0) + ' ⭐';
+        
         let watchedCount = 0; for (let i=1; i<=TOTAL_VIDEOS; i++) if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) watchedCount++;
         document.getElementById('videosWatchedCount').innerText = watchedCount;
         document.querySelectorAll('#videoDots .dot').forEach((d,i)=>{ const v=i+1; d.classList.toggle('completed', !!(userData.videoUnlockTimes?.[v] && Date.now()<userData.videoUnlockTimes[v])); });
         for (let i=1; i<=TOTAL_VIDEOS; i++) { const btn=document.getElementById(`video${i}Btn`); const card=document.getElementById(`video${i}Card`); const unlockSpan=document.getElementById(`video${i}Unlock`); if(btn){ const locked=isVideoLocked(i); btn.disabled=locked||isProcessing; if(locked){ btn.innerHTML='🔒'; card?.classList.add('completed'); } else { btn.innerHTML='Ver'; card?.classList.remove('completed'); } } if(unlockSpan) unlockSpan.textContent=getUnlockTimeString(i); }
-        loadHistory(); if(userId){ const refSnap=await db.collection("usuarios").where("invitado_por","==",userId).where("hasWithdrawn","==",true).get(); document.getElementById('totalGanadoRef').innerText = (refSnap.size * BONO_REFERIDOR) + ' ⭐'; }
+        loadHistory();
         updateAdsGramUI();
     }
+    
     function updateGameUI() { document.getElementById('game-apuesta-actual').innerText = gameApuesta; document.getElementById('game-ganancia').innerText = `Ganas ${gameApuesta * 2} ⭐`; document.getElementById('game-racha').innerText = gameRacha; document.getElementById('game-record').innerText = gameRecord; const historialEl = document.getElementById('game-historial'); historialEl.innerHTML = gameHistorial.slice(-6).map(r => `<div class="historial-item ${r === 'win' ? 'win' : 'lose'}">${r === 'win' ? '✓' : '✗'}</div>`).join(''); }
     function setMinimo() { gameApuesta = 5; updateGameUI(); }
     function doblarApuesta() { gameApuesta = Math.min(gameApuesta * 2, userData.balance || 0); if (gameApuesta < 5) gameApuesta = 5; updateGameUI(); }
@@ -1066,79 +1208,212 @@
     function showAdLoader() { document.getElementById('adLoader').style.display = 'flex'; }
     function hideAdLoader() { document.getElementById('adLoader').style.display = 'none'; }
 
-    // ==================== VIDEOS NORMALES CON MONETAG REAL (Rewarded Interstitial) ====================
+    // VIDEOS NORMALES CON MONETAG REAL
     async function watchVideo(n) {
-        if(isProcessing || isAdPlaying) {
-            showToast('⏳ Espera...');
-            return;
-        }
-        if(isVideoLocked(n)) {
-            showAlert('Video bloqueado', `El video #${n} estará disponible en ${getUnlockTimeString(n)}`, 'clock');
-            return;
-        }
-        
-        isProcessing = true;
-        isAdPlaying = true;
-        updateUI();
-        showAdLoader();
-        
+        if(isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
+        if(isVideoLocked(n)) { showAlert('Video bloqueado', `El video #${n} estará disponible en ${getUnlockTimeString(n)}`, 'clock'); return; }
+        isProcessing = true; isAdPlaying = true; updateUI(); showAdLoader();
         try {
-            // === USAMOS LA PROMESA REAL DE MONETAG ===
-            // La función show_10853207() devuelve una promesa que se resuelve cuando el usuario completa el anuncio
             await window.show_10853207();
-            
-            // Si llegamos aquí, el usuario vio el anuncio completo
             const reward = VIDEO_REWARDS[n-1];
             const unlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
             const newUnlockTimes = { ...(userData.videoUnlockTimes || {}) };
             newUnlockTimes[n] = unlockTime;
             userData.videoUnlockTimes = newUnlockTimes;
             userData.balance += reward;
-            
             saveToLocal({ ...userData, userId, pendingBalance: 0 });
             await updateUI();
             showAlert('🎉 Recompensa', `+${reward} ⭐`, 'check-circle');
-            await syncToFirebase({
-                balance: firebase.firestore.FieldValue.increment(reward),
-                videoUnlockTimes: newUnlockTimes
-            });
+            await syncToFirebase({ balance: firebase.firestore.FieldValue.increment(reward), videoUnlockTimes: newUnlockTimes });
         } catch (error) {
             console.error('Error en Monetag:', error);
             showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle');
         } finally {
-            hideAdLoader();
-            isProcessing = false;
-            isAdPlaying = false;
-            updateUI();
+            hideAdLoader(); isProcessing = false; isAdPlaying = false; updateUI();
         }
     }
     
-    // ==================== BILLETERA ÚNICA (PASO 1) ====================
+    // NUEVO: incrementar referidos activos (cuando un invitado ve los 10 videos)
+    async function incrementarReferidoActivo(userIdInvitado) {
+        const inviterId = userData.invitado_por; // El que invitó al actual usuario
+        if (!inviterId) return;
+        const inviterRef = db.collection("usuarios").doc(inviterId);
+        const inviterDoc = await inviterRef.get();
+        if (inviterDoc.exists) {
+            const inviterData = inviterDoc.data();
+            const today = new Date().toDateString();
+            const nuevosActivos = (inviterData.activosHoy || 0) + 1;
+            const nuevosReferidos = (inviterData.referidosHoy || 0) + 1;
+            await inviterRef.update({
+                referidosActivos: firebase.firestore.FieldValue.increment(1),
+                referidosHoy: nuevosReferidos,
+                activosHoy: nuevosActivos,
+                lastResetDate: today
+            });
+        }
+    }
+    
+    // Renderizar tareas en la pantalla de invitar
+    function renderTasks() {
+        const container = document.getElementById('tasksContainer');
+        if (!container) return;
+        let html = '';
+        for (const task of TASKS) {
+            const progress = Math.min(userData.activosHoy || 0, task.threshold);
+            const isReached = progress >= task.threshold;
+            const isClaimed = userData.tasksReclamadas?.[task.threshold] || false;
+            const isPending = userData.tasksPendientes?.[task.threshold] || false;
+            
+            let buttonHtml = '';
+            if (isClaimed) {
+                buttonHtml = `<button class="task-btn completed" disabled>✅ RECLAMADO</button>`;
+            } else if (isReached) {
+                if (isPending) {
+                    buttonHtml = `<button class="task-btn pending" data-threshold="${task.threshold}">⏳ RECLAMAR</button>`;
+                } else {
+                    // 30% de probabilidad de que se active
+                    const random = Math.random() * 100;
+                    if (random <= PROBABILITY_PERCENT) {
+                        buttonHtml = `<button class="task-btn" data-threshold="${task.threshold}">🎁 RECLAMAR</button>`;
+                    } else {
+                        buttonHtml = `<button class="task-btn locked" disabled>❌ No se activó</button>`;
+                        if (!userData.tasksPendientes) userData.tasksPendientes = {};
+                        userData.tasksPendientes[task.threshold] = true;
+                    }
+                }
+            } else {
+                buttonHtml = `<button class="task-btn locked" disabled>🔒 BLOQUEADO</button>`;
+            }
+            
+            html += `
+                <div class="task-card">
+                    <div class="task-info">
+                        <h4>${task.name}</h4>
+                        <p>Progreso: ${progress}/${task.threshold} referidos activos hoy</p>
+                    </div>
+                    ${buttonHtml}
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+        
+        // Agregar eventos a los botones activos
+        document.querySelectorAll('.task-btn[data-threshold]').forEach(btn => {
+            btn.addEventListener('click', () => claimTask(parseInt(btn.dataset.threshold)));
+        });
+    }
+    
+    async function claimTask(threshold) {
+        if (isProcessing) return;
+        const task = TASKS.find(t => t.threshold === threshold);
+        if (!task) return;
+        if (userData.tasksReclamadas?.[threshold]) {
+            showAlert('Ya reclamado', 'Ya has reclamado esta recompensa hoy. Vuelve mañana.', 'info');
+            return;
+        }
+        if ((userData.activosHoy || 0) < threshold) {
+            showAlert('Meta no alcanzada', `Aún no tienes ${threshold} referidos activos hoy.`, 'info');
+            return;
+        }
+        isProcessing = true;
+        try {
+            // Añadir la recompensa al saldo principal (se puede retirar de inmediato)
+            // O mejor: añadir al saldo pendiente semanal? El usuario dijo "saldo pendiente y semanal"
+            // Voy a guardarlo en saldoPendiente y el recolector semanal lo mueve a balance
+            userData.saldoPendiente = (userData.saldoPendiente || 0) + task.rewardStars;
+            if (!userData.tasksReclamadas) userData.tasksReclamadas = {};
+            userData.tasksReclamadas[threshold] = true;
+            if (userData.tasksPendientes) delete userData.tasksPendientes[threshold];
+            await syncToFirebase({ 
+                saldoPendiente: userData.saldoPendiente,
+                tasksReclamadas: userData.tasksReclamadas,
+                tasksPendientes: userData.tasksPendientes
+            });
+            saveToLocal({ ...userData, userId });
+            showAlert('🎉 Recompensa añadida', `+${task.rewardStars} ⭐ se han añadido a tu saldo pendiente. Reclámalo semanalmente.`, 'check-circle');
+            renderTasks();
+            updateWeeklyClaimUI();
+            await updateUI();
+        } catch (e) {
+            showAlert('Error', 'No se pudo reclamar la recompensa', 'times-circle');
+        } finally {
+            isProcessing = false;
+        }
+    }
+    
+    // Reclamo semanal: mueve todo el saldo pendiente al balance principal
+    async function weeklyClaim() {
+        if (isProcessing) return;
+        const now = Date.now();
+        const lastClaim = userData.ultimaReclamacionSemanal || 0;
+        const daysSinceLast = (now - lastClaim) / (1000 * 60 * 60 * 24);
+        if (lastClaim > 0 && daysSinceLast < 7) {
+            showAlert('Ya reclamaste esta semana', `Puedes volver a reclamar en ${Math.ceil(7 - daysSinceLast)} días.`, 'info');
+            return;
+        }
+        if (!userData.saldoPendiente || userData.saldoPendiente <= 0) {
+            showAlert('Sin saldo pendiente', 'No tienes recompensas pendientes para reclamar.', 'info');
+            return;
+        }
+        isProcessing = true;
+        try {
+            const amount = userData.saldoPendiente;
+            userData.balance = (userData.balance || 0) + amount;
+            userData.saldoPendiente = 0;
+            userData.ultimaReclamacionSemanal = now;
+            await syncToFirebase({ 
+                balance: userData.balance, 
+                saldoPendiente: 0, 
+                ultimaReclamacionSemanal: now 
+            });
+            saveToLocal({ ...userData, userId });
+            showAlert('💰 Recaudo semanal', `¡${amount} ⭐ se han añadido a tu saldo principal!`, 'check-circle');
+            await updateUI();
+            updateWeeklyClaimUI();
+        } catch (e) {
+            showAlert('Error', 'No se pudo completar el recaudo', 'times-circle');
+        } finally {
+            isProcessing = false;
+        }
+    }
+    
+    function updateWeeklyClaimUI() {
+        const pending = userData.saldoPendiente || 0;
+        const pendingUSD = (pending / COINS_PER_USDT).toFixed(4);
+        document.getElementById('weeklyPendingAmount').innerHTML = `Saldo pendiente: ${pending} ⭐ ≈ $${pendingUSD} USD`;
+        
+        const lastClaim = userData.ultimaReclamacionSemanal || 0;
+        const now = Date.now();
+        const daysSinceLast = (now - lastClaim) / (1000 * 60 * 60 * 24);
+        const timerDiv = document.getElementById('weeklyTimer');
+        if (lastClaim === 0 || daysSinceLast >= 7) {
+            timerDiv.innerHTML = '✅ Listo para reclamar';
+            document.getElementById('weeklyClaimBtn').disabled = false;
+        } else {
+            const daysLeft = Math.ceil(7 - daysSinceLast);
+            timerDiv.innerHTML = `⏳ Próximo recaudo en ${daysLeft} día(s)`;
+            document.getElementById('weeklyClaimBtn').disabled = true;
+        }
+    }
+    
+    // ==================== BILLETERA ÚNICA ====================
     async function handleWithdraw() {
         if(isProcessing)return;
         const cc=document.getElementById('ccwallet-id').value.trim();
         if(!/^\d{8}$/.test(cc)){showAlert('ID invalido','El ID de CCWallet debe tener exactamente 8 dígitos numéricos.','times-circle');return;}
-        
-        const chequeoBilletera = await db.collection("usuarios")
-            .where("ccwallet_id", "==", cc)
-            .get();
+        const chequeoBilletera = await db.collection("usuarios").where("ccwallet_id", "==", cc).get();
         if (!chequeoBilletera.empty && chequeoBilletera.docs[0].id !== userId) {
             showAlert('⚠️ Error de Seguridad', 'Esta billetera ya está vinculada a otra cuenta. No puedes usarla.', 'times-circle');
             return;
         }
-
         if((userData.balance||0)<200){showAlert('Saldo insuficiente','Minimo 200 ⭐','coins');return;}
         isProcessing=true; showAdLoader();
         try{ 
-            // Mostrar un anuncio de Monetag opcional antes del retiro (puedes quitarlo si no quieres)
-            // No es obligatorio, lo dejamos por si acaso
             if (typeof window.show_10853207 === 'function') await window.show_10853207().catch(()=>{});
-            
             const ref=db.collection("usuarios").doc(userId); 
             const bal=userData.balance; 
             const firstWithdraw=!userData.hasWithdrawn; 
             await ref.update({balance:0,hasWithdrawn:true,ccwallet_id:cc,withdrawHistory:firebase.firestore.FieldValue.arrayUnion({amount:Math.floor(bal),date:new Date().toLocaleDateString(),status:'✅ Completado',ccwallet:cc})}); 
-            if(firstWithdraw&&userData.invitado_por){const invRef=db.collection("usuarios").doc(userData.invitado_por); await invRef.update({balance:firebase.firestore.FieldValue.increment(BONO_REFERIDOR)}); await invRef.update({lastReferidoWithdraw:Date.now()}); enviarNotificacion('🎁 BONO REFERIDO',`👤 ${userName} hizo su primer retiro\n💰 +200 ⭐ para ${userData.invitado_por}`);} 
             userData.balance=0; userData.hasWithdrawn=true; 
             if(!userData.withdrawHistory)userData.withdrawHistory=[]; 
             userData.withdrawHistory.push({amount:Math.floor(bal),date:new Date().toLocaleDateString(),status:'✅ Completado'}); 
@@ -1163,92 +1438,59 @@
     function showAlert(t,m,i='bell'){ document.getElementById('alertTitle').innerText=t; document.getElementById('alertMessage').innerText=m; document.querySelector('.alert-icon i').className=`fas fa-${i}`; document.getElementById('alertModal').style.display='flex'; }
     function closeAlertModal(){ document.getElementById('alertModal').style.display='none'; }
     function showToast(m){ const t=document.getElementById('toast-element'); t.innerHTML=m; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
-    function navigate(s){ document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if(s==='withdraw-screen')loadHistory(); if(s==='game-screen')updateGameUI(); }
-    function copyRefLink(){ tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana 10%% de comision + 0.02 USDT cuando retiren!`); }
+    function navigate(s){ document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if(s==='withdraw-screen')loadHistory(); if(s==='game-screen')updateGameUI(); if(s==='invite-screen'){ renderTasks(); updateWeeklyClaimUI(); } }
+    function copyRefLink(){ tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana $1, $3, $7, $15 diarios!`); }
     function openCCWallet(){ tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
     function isAdsGramLocked() { return userData?.adGramUnlockTime && Date.now() < userData.adGramUnlockTime; }
     function getAdsGramUnlockTimeString() { const ut = userData?.adGramUnlockTime; if (!ut) return ''; const remaining = ut - Date.now(); if (remaining <= 0) return ''; const h = Math.floor(remaining / (60*60*1000)); const m = Math.floor((remaining % (60*60*1000)) / (60*1000)); return `🔒 ${h}h ${m}m`; }
     
-    // ==================== ADSGRAM UI CON RESETEO AUTOMÁTICO ====================
     function updateAdsGramUI() {
         if (!userData) return;
-        
         let count = userData.adGramCount || 0;
         const unlockTime = userData.adGramUnlockTime;
-        
-        // RESETEO AUTOMÁTICO: si pasaron las 24h y el contador está en 4 o más, reiniciamos
         if (unlockTime && Date.now() > unlockTime && count >= TOTAL_ADSGRAM) {
-            count = 0;
-            userData.adGramCount = 0;
-            userData.adGramUnlockTime = null;
-            syncToFirebase({ adGramCount: 0, adGramUnlockTime: null });
-            saveToLocal({ ...userData, userId });
+            count = 0; userData.adGramCount = 0; userData.adGramUnlockTime = null;
+            syncToFirebase({ adGramCount: 0, adGramUnlockTime: null }); saveToLocal({ ...userData, userId });
         }
-        
         document.getElementById('adsGramWatchedCount').innerText = count;
         const dots = document.querySelectorAll('#adsGramDots .dot');
         dots.forEach((dot, idx) => dot.classList.toggle('completed', idx < count));
-        
-        const btn = document.getElementById('agBonusBtn');
-        const card = document.getElementById('agBonusCard');
-        const unlockSpan = document.getElementById('agBonusUnlock');
-        const titleEl = document.getElementById('agBonusTitle');
-        
+        const btn = document.getElementById('agBonusBtn'); const card = document.getElementById('agBonusCard');
+        const unlockSpan = document.getElementById('agBonusUnlock'); const titleEl = document.getElementById('agBonusTitle');
         const locked = unlockTime && Date.now() < unlockTime;
         btn.disabled = locked || isProcessing;
-        
         if (locked) {
-            btn.innerHTML = '🔒';
-            titleEl.innerText = 'BONO BLOQUEADO';
-            card?.classList.add('completed');
+            btn.innerHTML = '🔒'; titleEl.innerText = 'BONO BLOQUEADO'; card?.classList.add('completed');
             const remaining = unlockTime - Date.now();
-            const h = Math.floor(remaining / (60*60*1000));
-            const m = Math.floor((remaining % (60*60*1000)) / (60*1000));
+            const h = Math.floor(remaining / (60*60*1000)); const m = Math.floor((remaining % (60*60*1000)) / (60*1000));
             if (unlockSpan) unlockSpan.textContent = `🔒 ${h}h ${m}m`;
         } else if (count >= TOTAL_ADSGRAM) {
-            btn.innerHTML = '🔒';
-            titleEl.innerText = 'BONO COMPLETO (espera 24h)';
-            card?.classList.add('completed');
+            btn.innerHTML = '🔒'; titleEl.innerText = 'BONO COMPLETO (espera 24h)'; card?.classList.add('completed');
             if (unlockSpan) unlockSpan.textContent = '';
         } else {
             const next = count + 1;
-            btn.innerHTML = `Ver Anuncio #${next}`;
-            titleEl.innerText = `ANUNCIO #${next} DISPONIBLE`;
-            card?.classList.remove('completed');
-            if (unlockSpan) unlockSpan.textContent = '';
+            btn.innerHTML = `Ver Anuncio #${next}`; titleEl.innerText = `ANUNCIO #${next} DISPONIBLE`;
+            card?.classList.remove('completed'); if (unlockSpan) unlockSpan.textContent = '';
         }
     }
-    
     function startAdsGramTimer() { if (agTimer) clearInterval(agTimer); agTimer = setInterval(() => { updateAdsGramUI(); }, 1000); }
     
     async function watchAdGram() {
         if (isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
-        if (isAdsGramLocked()) { 
-            showAlert('Bono bloqueado', `Disponible en ${getAdsGramUnlockTimeString()}`, 'clock'); 
-            return; 
-        }
+        if (isAdsGramLocked()) { showAlert('Bono bloqueado', `Disponible en ${getAdsGramUnlockTimeString()}`, 'clock'); return; }
         if (!userData) return;
         let count = userData.adGramCount || 0;
-        // Si después del reset automático aún hay error, prevenimos
         if (count >= TOTAL_ADSGRAM) {
-            // Forzamos reset si el tiempo ya pasó
             if (userData.adGramUnlockTime && Date.now() > userData.adGramUnlockTime) {
-                userData.adGramCount = 0;
-                userData.adGramUnlockTime = null;
-                syncToFirebase({ adGramCount: 0, adGramUnlockTime: null });
-                saveToLocal({ ...userData, userId });
+                userData.adGramCount = 0; userData.adGramUnlockTime = null;
+                syncToFirebase({ adGramCount: 0, adGramUnlockTime: null }); saveToLocal({ ...userData, userId });
                 count = 0;
-            } else {
-                showAlert('Bono completado', 'Ya has visto los 4 anuncios diarios. Vuelve mañana.', 'check-circle');
-                return;
-            }
+            } else { showAlert('Bono completado', 'Ya has visto los 4 anuncios diarios. Vuelve mañana.', 'check-circle'); return; }
         }
-        
         const nextAd = count + 1;
         isProcessing = true; isAdPlaying = true; updateUI(); updateAdsGramUI(); showAdLoader();
-        
         try {
             const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
             await AdController.show();
@@ -1259,14 +1501,8 @@
             if (nextAd === 1) message = "🎉 ¡PRIMER ANUNCIO! +5⭐. ¡SIGUE ASÍ!";
             else if (nextAd === 2) message = "🔥 ¡SEGUNDO ANUNCIO! +5⭐. ¡VAS POR LA MITAD!";
             else if (nextAd === 3) message = "⚡ ¡TERCER ANUNCIO! +5⭐. ¡SOLO UNO MÁS!";
-            else if (nextAd === 4) { 
-                message = "🏆 ¡BONO COMPLETO! +5⭐. ¡MÁXIMO ALCANZADO!"; 
-                userData.adGramUnlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000);
-            }
-            saveToLocal({ ...userData, userId }); 
-            await updateUI(); 
-            updateAdsGramUI(); 
-            updateGameUI();
+            else if (nextAd === 4) { message = "🏆 ¡BONO COMPLETO! +5⭐. ¡MÁXIMO ALCANZADO!"; userData.adGramUnlockTime = Date.now() + (UNLOCK_HOURS * 60 * 60 * 1000); }
+            saveToLocal({ ...userData, userId }); await updateUI(); updateAdsGramUI(); updateGameUI();
             showAlert('🎁 ¡Recompensa!', message, 'check-circle');
             syncToFirebase({ balance: userData.balance, adGramCount: userData.adGramCount, adGramUnlockTime: userData.adGramUnlockTime });
         } catch (error) {
@@ -1277,9 +1513,19 @@
         }
     }
 
-    function initAdmin() { const card=document.querySelector('.balance-card'); let t; card.addEventListener('mousedown',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000)); card.addEventListener('mouseup',()=>clearTimeout(t)); card.addEventListener('touchstart',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000)); card.addEventListener('touchend',()=>clearTimeout(t)); document.querySelectorAll('.admin-tab').forEach(tab=>{ tab.addEventListener('click',()=>{ document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('.admin-tab-content').forEach(c=>c.style.display='none'); document.getElementById(`tab-${tab.dataset.tab}`).style.display='block'; if(tab.dataset.tab==='stats')loadRefStats(); if(tab.dataset.tab==='codigos')loadGiftCodes(); }); }); document.getElementById('adminAddBalanceBtn').onclick=async()=>{ const pwd=document.getElementById('adminPassword').value; const targetId=document.getElementById('adminUserId').value.trim(); const amt=parseInt(document.getElementById('adminAmount').value); if(pwd!==ADMIN_SECRET){showAlert('Clave incorrecta','','lock');return;} if(!targetId||amt<=0){showAlert('Datos invalidos','','times-circle');return;} try{await db.collection("usuarios").doc(targetId).update({balance:firebase.firestore.FieldValue.increment(amt)}); showAlert('Saldo añadido',`+${amt} ⭐ a ${targetId}`,'crown'); document.getElementById('adminUserId').value=''; document.getElementById('adminAmount').value=''; }catch(e){showAlert('Error','Usuario no encontrado','times-circle');} }; document.getElementById('createGiftCodeBtn').onclick=async()=>{ const pwd=document.getElementById('adminPassword').value; const code=document.getElementById('giftCode').value.trim().toUpperCase(); const amt=parseInt(document.getElementById('giftAmount').value); const max=parseInt(document.getElementById('giftMaxUses').value)||1; if(pwd!==ADMIN_SECRET){showAlert('Clave incorrecta','','lock');return;} if(!code||amt<=0){showAlert('Datos invalidos','','times-circle');return;} try{await db.collection("giftCodes").doc(code).set({amount:amt,maxUses:max,usedCount:0,createdAt:Date.now()}); showAlert('Codigo creado',`${code} por ${amt} ⭐ (${max} usos)`,'gift'); document.getElementById('giftCode').value=''; document.getElementById('giftAmount').value=''; document.getElementById('giftMaxUses').value=''; loadGiftCodes(); }catch(e){showAlert('Error','No se pudo crear','times-circle');} }; document.getElementById('adminCancelBtn').onclick=()=>document.getElementById('adminModal').style.display='none'; }
+    function initAdmin() { 
+        const card=document.querySelector('.balance-card'); let t; 
+        card.addEventListener('mousedown',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000)); 
+        card.addEventListener('mouseup',()=>clearTimeout(t)); 
+        card.addEventListener('touchstart',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000)); 
+        card.addEventListener('touchend',()=>clearTimeout(t)); 
+        document.querySelectorAll('.admin-tab').forEach(tab=>{ tab.addEventListener('click',()=>{ document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('.admin-tab-content').forEach(c=>c.style.display='none'); document.getElementById(`tab-${tab.dataset.tab}`).style.display='block'; if(tab.dataset.tab==='stats')loadRefStats(); if(tab.dataset.tab==='codigos')loadGiftCodes(); }); }); 
+        document.getElementById('adminAddBalanceBtn').onclick=async()=>{ const pwd=document.getElementById('adminPassword').value; const targetId=document.getElementById('adminUserId').value.trim(); const amt=parseInt(document.getElementById('adminAmount').value); if(pwd!==ADMIN_SECRET){showAlert('Clave incorrecta','','lock');return;} if(!targetId||amt<=0){showAlert('Datos invalidos','','times-circle');return;} try{await db.collection("usuarios").doc(targetId).update({balance:firebase.firestore.FieldValue.increment(amt)}); showAlert('Saldo añadido',`+${amt} ⭐ a ${targetId}`,'crown'); document.getElementById('adminUserId').value=''; document.getElementById('adminAmount').value=''; }catch(e){showAlert('Error','Usuario no encontrado','times-circle');} }; 
+        document.getElementById('createGiftCodeBtn').onclick=async()=>{ const pwd=document.getElementById('adminPassword').value; const code=document.getElementById('giftCode').value.trim().toUpperCase(); const amt=parseInt(document.getElementById('giftAmount').value); const max=parseInt(document.getElementById('giftMaxUses').value)||1; if(pwd!==ADMIN_SECRET){showAlert('Clave incorrecta','','lock');return;} if(!code||amt<=0){showAlert('Datos invalidos','','times-circle');return;} try{await db.collection("giftCodes").doc(code).set({amount:amt,maxUses:max,usedCount:0,createdAt:Date.now()}); showAlert('Codigo creado',`${code} por ${amt} ⭐ (${max} usos)`,'gift'); document.getElementById('giftCode').value=''; document.getElementById('giftAmount').value=''; document.getElementById('giftMaxUses').value=''; loadGiftCodes(); }catch(e){showAlert('Error','No se pudo crear','times-circle');} }; 
+        document.getElementById('adminCancelBtn').onclick=()=>document.getElementById('adminModal').style.display='none'; 
+    }
     async function loadGiftCodes() { const el=document.getElementById('giftCodesList'); el.innerHTML='<p style="text-align:center;">Cargando...</p>'; try{ const snap=await db.collection("giftCodes").get(); if(snap.empty){el.innerHTML='<p style="text-align:center;">No hay codigos</p>';return;} let html=''; snap.forEach(doc=>{ const d=doc.data(); html+=`<div class="code-item"><span><strong>${doc.id}</strong><br><small>${d.amount} ⭐ | ${d.usedCount}/${d.maxUses} usos</small></span><span style="color:${d.usedCount>=d.maxUses?'var(--coral)':'var(--success)'};">${d.usedCount>=d.maxUses?'Agotado':'Activo'}</span></div>`; }); el.innerHTML=html; }catch(e){el.innerHTML='<p style="text-align:center;">Error al cargar</p>';} }
-    async function loadRefStats() { try{ const snap=await db.collection("usuarios").where("hasWithdrawn","==",true).get(); let totalPagado=0; snap.forEach(doc=>{ if(doc.data().invitado_por)totalPagado+=BONO_REFERIDOR; }); document.getElementById('totalRefGanancias').innerText=totalPagado+' ⭐'; document.getElementById('totalRefUSDT').innerText=(totalPagado/COINS_PER_USDT).toFixed(4); }catch(e){console.error('Error cargando stats:',e);} }
+    async function loadRefStats() { try{ const snap=await db.collection("usuarios").where("hasWithdrawn","==",true).get(); let totalPagado=0; snap.forEach(doc=>{ }); document.getElementById('totalRefGanancias').innerText=totalPagado+' ⭐'; document.getElementById('totalRefUSDT').innerText=(totalPagado/COINS_PER_USDT).toFixed(4); }catch(e){console.error('Error cargando stats:',e);} }
 
     for (let i=1; i<=TOTAL_VIDEOS; i++) document.getElementById(`video${i}Btn`).onclick = () => watchVideo(i);
     document.getElementById('gameNavBtn').onclick = () => navigate('game-screen');
@@ -1298,6 +1544,7 @@
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
     document.getElementById('agBonusBtn').onclick = watchAdGram;
+    document.getElementById('weeklyClaimBtn').onclick = weeklyClaim;
 
     initUser();
     initAdmin();
