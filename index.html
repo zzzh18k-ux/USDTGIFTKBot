@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT GIFT K - Recompensas por Invitar</title>
+    <title>USDT GIFT K - Gana por Referidos</title>
     
     <!-- Monetag Rewarded Interstitial -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
@@ -22,7 +22,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ========== ESTILO VIBRANT FINTECH ========== */
         :root {
             --white: #FFFFFF;
             --violet: #6C63FF;
@@ -51,9 +50,7 @@
             display: flex;
             justify-content: center;
         }
-        #gradient-bg {
-            display: none;
-        }
+        #gradient-bg { display: none; }
         #loading-screen {
             position: fixed;
             top: 0;
@@ -70,96 +67,21 @@
             padding: 20px;
             text-align: center;
         }
-        #loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .welcome-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            color: var(--violet);
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%,100%{transform: translateY(0);}
-            50%{transform: translateY(-8px);}
-        }
-        .welcome-title {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--violet);
-            margin-bottom: 16px;
-        }
-        .welcome-subtitle {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 24px;
-        }
-        .welcome-description {
-            font-size: 15px;
-            color: var(--text-soft);
-            margin-bottom: 32px;
-            line-height: 1.5;
-            max-width: 320px;
-        }
-        .feature-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 32px;
-            width: 100%;
-            max-width: 300px;
-        }
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-align: left;
-        }
-        .feature-icon {
-            font-size: 24px;
-            width: 40px;
-            text-align: center;
-            color: var(--violet);
-        }
-        .feature-text {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-dark);
-        }
-        .feature-text small {
-            display: block;
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--text-soft);
-            margin-top: 2px;
-        }
-        .loading-progress {
-            width: 200px;
-            height: 4px;
-            background: #E0E0E0;
-            border-radius: 10px;
-            margin-top: 16px;
-            overflow: hidden;
-        }
-        .loading-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--violet);
-            border-radius: 10px;
-            animation: progress 3s ease-out forwards;
-        }
-        @keyframes progress {
-            0%{width:0%;}
-            100%{width:100%;}
-        }
-        .loading-footer {
-            margin-top: 20px;
-            font-size: 13px;
-            color: var(--coral);
-            font-weight: 500;
-        }
+        #loading-screen.hidden { opacity: 0; pointer-events: none; }
+        .welcome-icon { font-size: 64px; margin-bottom: 16px; color: var(--violet); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform: translateY(0);} 50%{transform: translateY(-8px);} }
+        .welcome-title { font-size: 36px; font-weight: 800; color: var(--violet); margin-bottom: 16px; }
+        .welcome-subtitle { font-size: 18px; font-weight: 600; color: var(--text-dark); margin-bottom: 24px; }
+        .welcome-description { font-size: 15px; color: var(--text-soft); margin-bottom: 32px; line-height: 1.5; max-width: 320px; }
+        .feature-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; width: 100%; max-width: 300px; }
+        .feature-item { display: flex; align-items: center; gap: 12px; text-align: left; }
+        .feature-icon { font-size: 24px; width: 40px; text-align: center; color: var(--violet); }
+        .feature-text { font-size: 14px; font-weight: 500; color: var(--text-dark); }
+        .feature-text small { display: block; font-size: 12px; font-weight: 400; color: var(--text-soft); margin-top: 2px; }
+        .loading-progress { width: 200px; height: 4px; background: #E0E0E0; border-radius: 10px; margin-top: 16px; overflow: hidden; }
+        .loading-progress-bar { height: 100%; width: 0%; background: var(--violet); border-radius: 10px; animation: progress 3s ease-out forwards; }
+        @keyframes progress { 0%{width:0%;} 100%{width:100%;} }
+        .loading-footer { margin-top: 20px; font-size: 13px; color: var(--coral); font-weight: 500; }
         .ad-loader-overlay {
             position: fixed;
             top: 0;
@@ -184,21 +106,9 @@
             align-items: center;
             box-shadow: var(--shadow-soft);
         }
-        .ad-loader i {
-            font-size: 28px;
-            color: var(--violet);
-            animation: spin 1.5s linear infinite;
-        }
-        .ad-loader span {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--coral);
-            margin-top: 4px;
-        }
-        @keyframes spin {
-            0%{transform:rotate(0deg);}
-            100%{transform:rotate(360deg);}
-        }
+        .ad-loader i { font-size: 28px; color: var(--violet); animation: spin 1.5s linear infinite; }
+        .ad-loader span { font-size: 11px; font-weight: 600; color: var(--coral); margin-top: 4px; }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
         #app-container {
             width: 100%;
             max-width: 450px;
@@ -217,18 +127,9 @@
             overflow-y: auto;
             padding-bottom: 8px;
         }
-        .screen.active {
-            display: flex;
-        }
-        .screen::-webkit-scrollbar {
-            display: none;
-        }
-        .top-nav {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 4px;
-        }
+        .screen.active { display: flex; }
+        .screen::-webkit-scrollbar { display: none; }
+        .top-nav { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 4px; }
         .channel-bubble {
             background: var(--violet);
             padding: 4px 12px;
@@ -243,9 +144,7 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .channel-bubble:active {
-            transform: scale(0.97);
-        }
+        .channel-bubble:active { transform: scale(0.97); }
         .balance-card {
             text-align: center;
             margin: 0 0 4px 0;
@@ -256,32 +155,11 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .balance-card:active {
-            transform: scale(0.99);
-        }
-        #user-balance {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--violet);
-        }
-        .balance-label {
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: var(--coral);
-            font-weight: 600;
-        }
-        .section-title {
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-dark);
-        }
-        .section-title i {
-            color: var(--violet);
-        }
+        .balance-card:active { transform: scale(0.99); }
+        #user-balance { font-size: 32px; font-weight: 800; color: var(--violet); }
+        .balance-label { font-size: 10px; letter-spacing: 2px; color: var(--coral); font-weight: 600; }
+        .section-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; color: var(--text-dark); }
+        .section-title i { color: var(--violet); }
         .daily-progress {
             background: var(--pastel-lavender);
             border-radius: 50px;
@@ -294,20 +172,9 @@
             font-size: 11px;
             color: var(--text-dark);
         }
-        .progress-dots {
-            display: flex;
-            gap: 4px;
-        }
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #D0D0D0;
-            transition: all 0.2s;
-        }
-        .dot.completed {
-            background: var(--violet);
-        }
+        .progress-dots { display: flex; gap: 4px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #D0D0D0; transition: all 0.2s; }
+        .dot.completed { background: var(--violet); }
         .video-card {
             background: var(--white);
             border-radius: 50px;
@@ -319,15 +186,8 @@
             box-shadow: var(--shadow-soft);
             transition: all 0.2s;
         }
-        .video-card.completed {
-            background: var(--pastel-mint);
-            border-left: 4px solid var(--success);
-        }
-        .video-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .video-card.completed { background: var(--pastel-mint); border-left: 4px solid var(--success); }
+        .video-info { display: flex; align-items: center; gap: 8px; }
         .video-icon {
             width: 32px;
             height: 32px;
@@ -339,26 +199,10 @@
             color: var(--violet);
             font-size: 14px;
         }
-        .completed .video-icon {
-            background: var(--pastel-mint);
-            color: var(--success);
-        }
-        .video-title {
-            font-weight: 700;
-            font-size: 12px;
-            color: var(--text-dark);
-        }
-        .video-reward {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--coral);
-        }
-        .video-btn-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
-        }
+        .completed .video-icon { background: var(--pastel-mint); color: var(--success); }
+        .video-title { font-weight: 700; font-size: 12px; color: var(--text-dark); }
+        .video-reward { font-size: 10px; font-weight: 600; color: var(--coral); }
+        .video-btn-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
         .video-btn {
             padding: 5px 12px;
             border-radius: 50px;
@@ -373,44 +217,15 @@
             min-width: 65px;
             text-align: center;
         }
-        .video-btn.small-btn {
-            padding: 4px 10px;
-            font-size: 10px;
-            min-width: 60px;
-        }
-        .video-btn:active {
-            transform: scale(0.96);
-        }
-        .video-btn.completed-btn {
-            background: var(--success);
-        }
-        .video-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .unlock-time {
-            font-size: 8px;
-            color: var(--text-soft);
-            white-space: nowrap;
-        }
-        .bonus-card {
-            background: linear-gradient(145deg, #FFF8F0, #FFF0E6);
-            border: 1px solid var(--coral);
-        }
-        .bonus-card .video-icon {
-            background: var(--pastel-peach);
-            color: var(--coral);
-        }
-        .bonus-card .video-title {
-            color: var(--coral);
-        }
-        .menu-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-top: 4px;
-        }
+        .video-btn.small-btn { padding: 4px 10px; font-size: 10px; min-width: 60px; }
+        .video-btn:active { transform: scale(0.96); }
+        .video-btn.completed-btn { background: var(--success); }
+        .video-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .unlock-time { font-size: 8px; color: var(--text-soft); white-space: nowrap; }
+        .bonus-card { background: linear-gradient(145deg, #FFF8F0, #FFF0E6); border: 1px solid var(--coral); }
+        .bonus-card .video-icon { background: var(--pastel-peach); color: var(--coral); }
+        .bonus-card .video-title { color: var(--coral); }
+        .menu-grid { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
         .btn-game {
             background: var(--white);
             border: none;
@@ -426,21 +241,9 @@
             box-shadow: var(--shadow-soft);
             transition: all 0.2s;
         }
-        .btn-game:active {
-            transform: scale(0.98);
-            box-shadow: var(--shadow-hover);
-        }
-        .btn-game i:first-child {
-            color: var(--violet);
-            margin-right: 10px;
-        }
-        .glass-card {
-            background: var(--white);
-            border-radius: 40px;
-            padding: 24px;
-            margin-top: 8px;
-            box-shadow: var(--shadow-soft);
-        }
+        .btn-game:active { transform: scale(0.98); box-shadow: var(--shadow-hover); }
+        .btn-game i:first-child { color: var(--violet); margin-right: 10px; }
+        .glass-card { background: var(--white); border-radius: 40px; padding: 24px; margin-top: 8px; box-shadow: var(--shadow-soft); }
         .back-circle {
             width: 44px;
             height: 44px;
@@ -455,9 +258,7 @@
             font-size: 20px;
             transition: all 0.2s;
         }
-        .back-circle:active {
-            transform: scale(0.94);
-        }
+        .back-circle:active { transform: scale(0.94); }
         .alert-modal {
             position: fixed;
             top: 0;
@@ -480,37 +281,11 @@
             text-align: center;
             box-shadow: var(--shadow-hover);
         }
-        .alert-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--violet);
-        }
-        .alert-title {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: var(--text-dark);
-        }
-        .alert-message {
-            font-size: 15px;
-            color: var(--text-soft);
-            margin-bottom: 24px;
-        }
-        .alert-btn {
-            background: var(--coral);
-            border: none;
-            padding: 14px 30px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 16px;
-            color: white;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s;
-        }
-        .alert-btn:active {
-            transform: scale(0.97);
-        }
+        .alert-icon { font-size: 48px; margin-bottom: 16px; color: var(--violet); }
+        .alert-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--text-dark); }
+        .alert-message { font-size: 15px; color: var(--text-soft); margin-bottom: 24px; }
+        .alert-btn { background: var(--coral); border: none; padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 16px; color: white; cursor: pointer; width: 100%; transition: all 0.2s; }
+        .alert-btn:active { transform: scale(0.97); }
         .toast-premium {
             position: fixed;
             bottom: 20px;
@@ -538,65 +313,16 @@
             color: var(--text-dark);
             font-family: inherit;
         }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--violet);
-        }
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            border-bottom: 1px solid #F0F0F0;
-            font-size: 13px;
-            color: var(--text-soft);
-        }
-        .history-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin: 20px 0 12px;
-            color: var(--text-dark);
-        }
-        .ccwallet-info {
-            background: var(--pastel-lavender);
-            border-radius: 30px;
-            padding: 14px;
-            margin: 12px 0;
-            font-size: 13px;
-            color: var(--text-dark);
-        }
-        .balance-available {
-            background: var(--pastel-mint);
-            border-radius: 40px;
-            padding: 20px;
-            margin: 14px 0;
-            text-align: center;
-        }
-        .balance-available .coins {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--success);
-        }
-        .balance-available .usdt {
-            font-size: 14px;
-            color: var(--text-soft);
-        }
-        .btn-primary {
-            background: var(--violet);
-            color: white;
-        }
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-        .status-badge {
-            background: var(--success);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 700;
-        }
+        input:focus, textarea:focus { outline: none; border-color: var(--violet); }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #F0F0F0; font-size: 13px; color: var(--text-soft); }
+        .history-title { font-size: 16px; font-weight: 700; margin: 20px 0 12px; color: var(--text-dark); }
+        .ccwallet-info { background: var(--pastel-lavender); border-radius: 30px; padding: 14px; margin: 12px 0; font-size: 13px; color: var(--text-dark); }
+        .balance-available { background: var(--pastel-mint); border-radius: 40px; padding: 20px; margin: 14px 0; text-align: center; }
+        .balance-available .coins { font-size: 36px; font-weight: 800; color: var(--success); }
+        .balance-available .usdt { font-size: 14px; color: var(--text-soft); }
+        .btn-primary { background: var(--violet); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .status-badge { background: var(--success); color: white; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; }
         .admin-modal {
             position: fixed;
             top: 0;
@@ -619,252 +345,58 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        .admin-tab {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .admin-tab.active {
-            background: var(--violet);
-            color: white;
-        }
-        .admin-tab:not(.active) {
-            background: #F0F0F0;
-            color: var(--text-dark);
-        }
-        .invite-highlight {
-            background: var(--pastel-lavender);
-            border-radius: 40px;
-            padding: 20px;
-            margin: 16px 0;
-            text-align: center;
-        }
-        .invite-highlight h4 {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            color: var(--violet);
-        }
-        .earn-tag {
-            display: inline-block;
-            background: var(--pastel-peach);
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--coral);
-            margin-top: 10px;
-        }
-        .invite-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-        }
-        .stat-box {
-            text-align: center;
-            background: #F9F9F9;
-            padding: 12px;
+        .admin-tab { flex: 1; padding: 10px; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .admin-tab.active { background: var(--violet); color: white; }
+        .admin-tab:not(.active) { background: #F0F0F0; color: var(--text-dark); }
+        .invite-highlight { background: var(--pastel-lavender); border-radius: 40px; padding: 20px; margin: 16px 0; text-align: center; }
+        .invite-highlight h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--violet); }
+        .earn-tag { display: inline-block; background: var(--pastel-peach); padding: 6px 16px; border-radius: 40px; font-weight: 700; font-size: 14px; color: var(--coral); margin-top: 10px; }
+        .invite-stats { display: flex; justify-content: space-around; margin: 20px 0; }
+        .stat-box { text-align: center; background: #F9F9F9; padding: 12px; border-radius: 30px; flex: 1; margin: 0 5px; }
+        .stat-number { font-size: 26px; font-weight: 800; color: var(--violet); }
+        .code-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #EEE; font-size: 13px; }
+        .game-apuesta-display { background: var(--violet); border-radius: 60px; padding: 24px; margin: 15px 0; text-align: center; color: white; }
+        .game-apuesta-display .apuesta-valor { font-size: 52px; font-weight: 800; }
+        .game-botones-container { display: flex; gap: 10px; margin: 15px 0; }
+        .game-btn { flex: 1; padding: 14px 0; border: none; border-radius: 60px; font-weight: 700; font-size: 13px; cursor: pointer; background: var(--white); box-shadow: var(--shadow-soft); color: var(--text-dark); transition: all 0.2s; }
+        .game-btn:active { transform: scale(0.96); }
+        .game-btn.highlight { background: var(--coral); color: white; }
+        .game-btn.danger { background: var(--danger); color: white; }
+        .game-jugar-btn { width: 100%; padding: 16px; border: none; border-radius: 60px; font-weight: 800; font-size: 18px; cursor: pointer; background: var(--success); color: white; transition: all 0.2s; margin: 12px 0; }
+        .game-jugar-btn:active { transform: scale(0.97); }
+        .racha-container { display: flex; justify-content: space-between; margin: 12px 0; padding: 12px; background: #F8F8F8; border-radius: 40px; font-weight: 600; }
+        .racha-actual { color: var(--violet); }
+        .historial-juego { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .historial-item { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; background: #F0F0F0; }
+        .historial-item.win { background: var(--success); color: white; }
+        .historial-item.lose { background: var(--danger); color: white; }
+        #home-screen { padding-bottom: 0; justify-content: flex-start; }
+        .sync-status { position: fixed; bottom: 8px; right: 12px; font-size: 10px; background: var(--pastel-lavender); padding: 4px 12px; border-radius: 50px; z-index: 1000; color: var(--violet); font-weight: 600; }
+        .referido-card {
+            background: var(--pastel-mint);
             border-radius: 30px;
-            flex: 1;
-            margin: 0 5px;
-        }
-        .stat-number {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--violet);
-        }
-        .code-item {
-            display: flex;
-            justify-content: space-between;
             padding: 12px;
-            border-bottom: 1px solid #EEE;
-            font-size: 13px;
-        }
-        .game-apuesta-display {
-            background: var(--violet);
-            border-radius: 60px;
-            padding: 24px;
-            margin: 15px 0;
-            text-align: center;
-            color: white;
-        }
-        .game-apuesta-display .apuesta-valor {
-            font-size: 52px;
-            font-weight: 800;
-        }
-        .game-botones-container {
+            margin-bottom: 12px;
             display: flex;
-            gap: 10px;
-            margin: 15px 0;
+            align-items: center;
+            justify-content: space-between;
         }
-        .game-btn {
-            flex: 1;
-            padding: 14px 0;
-            border: none;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            background: var(--white);
-            box-shadow: var(--shadow-soft);
-            color: var(--text-dark);
-            transition: all 0.2s;
-        }
-        .game-btn:active {
-            transform: scale(0.96);
-        }
-        .game-btn.highlight {
-            background: var(--coral);
-            color: white;
-        }
-        .game-btn.danger {
-            background: var(--danger);
-            color: white;
-        }
-        .game-jugar-btn {
-            width: 100%;
+        .bonus-unico {
+            background: linear-gradient(135deg, var(--coral), var(--violet));
+            border-radius: 30px;
             padding: 16px;
-            border: none;
-            border-radius: 60px;
-            font-weight: 800;
-            font-size: 18px;
-            cursor: pointer;
-            background: var(--success);
-            color: white;
-            transition: all 0.2s;
-            margin: 12px 0;
-        }
-        .game-jugar-btn:active {
-            transform: scale(0.97);
-        }
-        .racha-container {
-            display: flex;
-            justify-content: space-between;
-            margin: 12px 0;
-            padding: 12px;
-            background: #F8F8F8;
-            border-radius: 40px;
-            font-weight: 600;
-        }
-        .racha-actual {
-            color: var(--violet);
-        }
-        .historial-juego {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
             margin-top: 10px;
-        }
-        .historial-item {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            background: #F0F0F0;
-        }
-        .historial-item.win {
-            background: var(--success);
             color: white;
         }
-        .historial-item.lose {
-            background: var(--danger);
-            color: white;
-        }
-        #home-screen {
-            padding-bottom: 0;
-            justify-content: flex-start;
-        }
-        .sync-status {
-            position: fixed;
-            bottom: 8px;
-            right: 12px;
-            font-size: 10px;
-            background: var(--pastel-lavender);
-            padding: 4px 12px;
-            border-radius: 50px;
-            z-index: 1000;
-            color: var(--violet);
-            font-weight: 600;
-        }
-        /* Estilos para tareas */
-        .task-card {
-            background: var(--white);
-            border-radius: 30px;
-            padding: 12px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--shadow-soft);
-        }
-        .task-info h4 {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-        .task-info p {
-            font-size: 11px;
-            color: var(--text-soft);
-        }
-        .task-btn {
-            background: var(--violet);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: white;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .task-btn.completed {
-            background: var(--success);
-            opacity: 0.7;
-            cursor: default;
-        }
-        .task-btn.locked {
-            background: #ccc;
-            cursor: default;
-        }
-        .task-btn.pending {
-            background: var(--coral);
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; transform: scale(1.02); }
-            100% { opacity: 0.7; }
-        }
-        .task-btn:active {
-            transform: scale(0.96);
-        }
-        .weekly-claim {
-            background: linear-gradient(135deg, var(--violet), var(--coral));
-            border-radius: 40px;
-            padding: 12px 16px;
-            margin-top: 15px;
-            text-align: center;
-            color: white;
-        }
-        .weekly-claim button {
+        .bonus-unico button {
             background: white;
-            color: var(--violet);
             border: none;
             padding: 8px 20px;
-            border-radius: 30px;
+            border-radius: 50px;
             font-weight: bold;
+            color: var(--violet);
             margin-top: 8px;
             cursor: pointer;
-        }
-        .weekly-claim button:active {
-            transform: scale(0.96);
         }
     </style>
 </head>
@@ -877,9 +409,10 @@
     <div class="welcome-icon"><i class="fas fa-hand-holding-heart"></i></div>
     <div class="welcome-title">USDT GIFT K</div>
     <div class="welcome-subtitle">Invita y Gana</div>
-    <div class="welcome-description">Invita amigos, completa metas y gana dinero real.</div>
+    <div class="welcome-description">Invita amigos, ellos ven videos y tú ganas dinero real.</div>
     <div class="feature-grid">
-        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">Sistema de referidos <small>Gana $1, $3, $7, $15 por metas</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">0.01 USD por referido activo <small>Cuando ven los 10 videos</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-gift"></i></span><span class="feature-text">Bono único de 1 USD <small>Al llegar a 20 referidos activos</small></span></div>
         <div class="feature-item"><span class="feature-icon"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros a USDT <small>Directo a tu CCWallet</small></span></div>
     </div>
     <div class="loading-progress"><div class="loading-progress-bar"></div></div>
@@ -1001,47 +534,29 @@
         </div>
     </div>
 
-    <!-- INVITE SCREEN - NUEVO SISTEMA DE TAREAS CON HISTÓRICOS -->
+    <!-- INVITE SCREEN - SISTEMA SIMPLE -->
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size: 42px; color: var(--violet);"></i>
             <h3 style="margin: 12px 0; font-size: 22px; font-weight: 800;">Invita y Gana</h3>
-            <p style="font-size: 14px; color: var(--text-soft);">Comparte tu enlace y gana recompensas cuando tus amigos vean los 10 videos.</p>
+            <p style="font-size: 14px; color: var(--text-soft);">Cada amigo que vea los 10 videos te da <strong>0.01 USD (100⭐)</strong>.</p>
             
-            <!-- Estadísticas de referidos del día -->
+            <!-- Estadísticas -->
             <div class="invite-stats">
-                <div class="stat-box"><div class="stat-number" id="totalInvitadosHoy">0</div><div class="stat-label">Referidos hoy</div></div>
-                <div class="stat-box"><div class="stat-number" id="totalActivosHoy">0</div><div class="stat-label">Activos (v.10 videos)</div></div>
-                <div class="stat-box"><div class="stat-number" id="saldoPendienteRef">0 ⭐</div><div class="stat-label">Saldo pendiente</div></div>
+                <div class="stat-box"><div class="stat-number" id="totalReferidos">0</div><div class="stat-label">Referidos activos</div></div>
+                <div class="stat-box"><div class="stat-number" id="totalGanado">0 ⭐</div><div class="stat-label">Ganado por referidos</div></div>
             </div>
             
-            <!-- ESTADÍSTICAS HISTÓRICAS (lo que pediste) -->
-            <div style="background: var(--pastel-lavender); border-radius: 30px; padding: 10px; margin: 10px 0; text-align: center;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span><i class="fas fa-users"></i> <strong>Total referidos (histórico):</strong></span>
-                    <span id="totalReferidosHistoricos" style="font-weight: 800; color: var(--violet);">0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                    <span><i class="fas fa-coins"></i> <strong>Total ganado por referidos:</strong></span>
-                    <span id="totalGanadoReferidos" style="font-weight: 800; color: var(--coral);">0 ⭐</span>
-                </div>
-            </div>
+            <!-- Lista de referidos pendientes de reclamo -->
+            <div class="section-title" style="margin-top: 10px;"><i class="fas fa-list"></i><span>Referidos activos para reclamar</span></div>
+            <div id="referidosPendientesList"></div>
             
-            <!-- Tareas Diarias (Metas) -->
-            <div class="section-title" style="margin-top: 10px;"><i class="fas fa-tasks"></i><span>Tareas diarias (se reinician cada día)</span></div>
-            <div id="tasksContainer"></div>
-            
-            <!-- Reclamo Semanal -->
-            <div class="weekly-claim" id="weeklyClaimBox">
-                <div><i class="fas fa-calendar-week"></i> <strong>Recaudo Semanal</strong></div>
-                <div id="weeklyPendingAmount">Saldo pendiente: 0 ⭐</div>
-                <button id="weeklyClaimBtn" class="task-btn" style="background: white; color: var(--violet);">RECLAMAR TODO</button>
-                <div id="weeklyTimer" style="font-size: 11px; margin-top: 5px;"></div>
-            </div>
+            <!-- Bono único de 20 referidos -->
+            <div id="bonos20Container"></div>
             
             <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir enlace de invitación</button>
-            <p style="font-size:11px;color:var(--text-soft);margin-top:12px;text-align:center;"><i class="fas fa-info-circle"></i> Solo los referidos que vean los 10 videos (6 normales + 4 AdsGram) cuentan como activos. Las metas se reinician cada día.</p>
+            <p style="font-size:11px;color:var(--text-soft);margin-top:12px;text-align:center;"><i class="fas fa-info-circle"></i> Un referido es "activo" cuando ve los 10 videos (6 normales + 4 AdsGram). Cada uno te da 100⭐ automáticamente al reclamar.</p>
         </div>
     </div>
 
@@ -1091,14 +606,9 @@
     const ADSGRAM_BLOCK_ID = '28418';
     let agTimer = null;
 
-    // METAS DE REFERIDOS (se reinician cada día)
-    const TASKS = [
-        { threshold: 20, rewardUSD: 1, rewardStars: 10000, name: "20 referidos activos → $1 USD" },
-        { threshold: 50, rewardUSD: 3, rewardStars: 30000, name: "50 referidos activos → $3 USD" },
-        { threshold: 100, rewardUSD: 7, rewardStars: 70000, name: "100 referidos activos → $7 USD" },
-        { threshold: 200, rewardUSD: 15, rewardStars: 150000, name: "200 referidos activos → $15 USD" }
-    ];
-    const PROBABILITY_PERCENT = 30; // 30% de probabilidad de que al alcanzar una meta se active el botón
+    // Recompensas
+    const REWARD_POR_REFERIDO = 100; // 100⭐ = 0.01 USD
+    const BONO_20_REFERIDOS = 10000; // 10000⭐ = 1 USD
 
     const STORAGE_KEY = 'usdtgiftk_userdata';
     function saveToLocal(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); document.getElementById('syncStatus').innerHTML = '💾 Local'; } catch (e) {} }
@@ -1138,54 +648,39 @@
             const inv = (start && start !== userId) ? start : null; const fingerprint = generateDeviceFingerprint(); const ipData = await fetchIPData();
             const initialData = { 
                 nombre: userName, username: userUsername, balance: 0, invitado_por: inv, 
-                referidos: 0, referidosActivos: 0, referidosHoy: 0, activosHoy: 0,
+                referidosActivos: 0, referidosPendientes: [], // lista de IDs de referidos que aún no han reclamado su recompensa
+                referidosReclamados: [], // IDs ya reclamados
                 videoUnlockTimes: {}, hasWithdrawn: false, ccwallet_id: '', withdrawHistory: [], 
                 redeemedCodes: [], createdAt: Date.now(), gameRecord: 0, gameHistorial: [], 
                 fingerprint, ip: ipData?.ip || 'unknown', country: ipData?.country || 'unknown', 
                 vpnDetected: isSuspiciousVPN(ipData), adGramUnlockTime: null, adGramCount: 0,
-                saldoPendiente: 0, ultimaReclamacionSemanal: null,
-                tasksReclamadas: { 20: false, 50: false, 100: false, 200: false },
-                tasksPendientes: {},
-                totalGanadoReferidos: 0 // NUEVO: total histórico ganado por referidos
+                bono20Reclamado: false, // bono único de 20 referidos
+                totalGanadoReferidos: 0
             };
             await ref.set(initialData); userData = initialData; saveToLocal(initialData);
-            if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
+            if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidosActivos: firebase.firestore.FieldValue.increment(1) }); }
             enviarNotificacion('🆕 NUEVO USUARIO', `👤 ${userName} (@${userUsername||'n/a'})\n🆔 ${userId}\n🔗 Invitado por: ${inv||'nadie'}`);
         } else {
             const firebaseData = doc.data(); const localData = loadFromLocal();
             if (localData && localData.userId === userId) { userData = { ...firebaseData }; if (localData.videoUnlockTimes) { for (let i=1; i<=TOTAL_VIDEOS; i++) { const localTime = localData.videoUnlockTimes[i]; const firebaseTime = firebaseData.videoUnlockTimes?.[i]; if (localTime && (!firebaseTime || localTime > firebaseTime)) { if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {}; userData.videoUnlockTimes[i] = localTime; } } } if (localData.pendingBalance) { userData.balance = (userData.balance||0) + localData.pendingBalance; if (localData.pendingBalance > 0) syncToFirebase({ balance: userData.balance }); } }
             else { userData = firebaseData; }
-            if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {}; if (!userData.createdAt) { userData.createdAt = Date.now(); syncToFirebase({ createdAt: userData.createdAt }); }
+            if (!userData.videoUnlockTimes) userData.videoUnlockTimes = {};
+            if (!userData.createdAt) { userData.createdAt = Date.now(); syncToFirebase({ createdAt: userData.createdAt }); }
             gameRecord = userData.gameRecord || 0; gameHistorial = userData.gameHistorial || [];
             if (userData.adGramUnlockTime === undefined) userData.adGramUnlockTime = null;
             if (userData.adGramCount === undefined) userData.adGramCount = 0;
-            if (userData.saldoPendiente === undefined) userData.saldoPendiente = 0;
-            if (userData.tasksReclamadas === undefined) userData.tasksReclamadas = { 20: false, 50: false, 100: false, 200: false };
             if (userData.referidosActivos === undefined) userData.referidosActivos = 0;
-            if (userData.referidosHoy === undefined) userData.referidosHoy = 0;
-            if (userData.activosHoy === undefined) userData.activosHoy = 0;
+            if (userData.referidosPendientes === undefined) userData.referidosPendientes = [];
+            if (userData.referidosReclamados === undefined) userData.referidosReclamados = [];
+            if (userData.bono20Reclamado === undefined) userData.bono20Reclamado = false;
             if (userData.totalGanadoReferidos === undefined) userData.totalGanadoReferidos = 0;
             saveToLocal({ ...userData, userId });
         }
         
-        // Reseteo diario de tareas (si cambió el día)
-        resetDailyTasksIfNeeded();
-        
         await updateUI(); updateGameUI(); startUnlockTimers(); startAdsGramTimer();
         document.getElementById('loading-screen').classList.add('hidden');
-        renderTasks();
-        updateWeeklyClaimUI();
-    }
-
-    function resetDailyTasksIfNeeded() {
-        const today = new Date().toDateString();
-        if (userData.lastResetDate !== today) {
-            userData.tasksReclamadas = { 20: false, 50: false, 100: false, 200: false };
-            userData.referidosHoy = 0;
-            userData.activosHoy = 0;
-            userData.lastResetDate = today;
-            syncToFirebase({ tasksReclamadas: userData.tasksReclamadas, referidosHoy: 0, activosHoy: 0, lastResetDate: today });
-        }
+        renderReferidosPendientes();
+        renderBono20();
     }
 
     function generateDeviceFingerprint() { const screen = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`; const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; const language = navigator.language; const platform = navigator.platform; const vendor = navigator.vendor || 'unknown'; const str = `${screen}|${timezone}|${language}|${platform}|${vendor}|${userId}`; let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; } return hash.toString(); }
@@ -1202,13 +697,8 @@
         document.getElementById('game-balance').innerText = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-coins').innerHTML = Math.floor(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + ((userData.balance || 0) / COINS_PER_USDT).toFixed(4) + ' USDT';
-        document.getElementById('totalInvitadosHoy').innerText = userData.referidosHoy || 0;
-        document.getElementById('totalActivosHoy').innerText = userData.activosHoy || 0;
-        document.getElementById('saldoPendienteRef').innerHTML = (userData.saldoPendiente || 0) + ' ⭐';
-        
-        // Actualizar históricos
-        document.getElementById('totalReferidosHistoricos').innerText = userData.referidos || 0;
-        document.getElementById('totalGanadoReferidos').innerHTML = (userData.totalGanadoReferidos || 0) + ' ⭐';
+        document.getElementById('totalReferidos').innerText = userData.referidosActivos || 0;
+        document.getElementById('totalGanado').innerHTML = (userData.totalGanadoReferidos || 0) + ' ⭐';
         
         let watchedCount = 0; for (let i=1; i<=TOTAL_VIDEOS; i++) if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) watchedCount++;
         document.getElementById('videosWatchedCount').innerText = watchedCount;
@@ -1226,7 +716,7 @@
     function showAdLoader() { document.getElementById('adLoader').style.display = 'flex'; }
     function hideAdLoader() { document.getElementById('adLoader').style.display = 'none'; }
 
-    // VIDEOS NORMALES CON MONETAG REAL
+    // ==================== VIDEOS NORMALES ====================
     async function watchVideo(n) {
         if(isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if(isVideoLocked(n)) { showAlert('Video bloqueado', `El video #${n} estará disponible en ${getUnlockTimeString(n)}`, 'clock'); return; }
@@ -1251,108 +741,85 @@
         }
     }
     
-    // NUEVO: incrementar referidos activos (cuando un invitado ve los 10 videos)
-    async function incrementarReferidoActivo(userIdInvitado) {
-        const inviterId = userData.invitado_por; // El que invitó al actual usuario
+    // ==================== REFERIDOS ====================
+    // Cuando un invitado se vuelve activo (ve los 10 videos)
+    async function marcarReferidoActivo(invitadoId, nombreInvitado) {
+        const inviterId = userData.invitado_por;
         if (!inviterId) return;
+        
         const inviterRef = db.collection("usuarios").doc(inviterId);
         const inviterDoc = await inviterRef.get();
         if (inviterDoc.exists) {
             const inviterData = inviterDoc.data();
-            const today = new Date().toDateString();
-            const nuevosActivos = (inviterData.activosHoy || 0) + 1;
-            const nuevosReferidos = (inviterData.referidosHoy || 0) + 1;
-            await inviterRef.update({
-                referidosActivos: firebase.firestore.FieldValue.increment(1),
-                referidosHoy: nuevosReferidos,
-                activosHoy: nuevosActivos,
-                lastResetDate: today
-            });
+            const pendientes = inviterData.referidosPendientes || [];
+            // Evitar duplicados
+            if (!pendientes.includes(invitadoId) && !(inviterData.referidosReclamados || []).includes(invitadoId)) {
+                pendientes.push({ id: invitadoId, nombre: nombreInvitado, timestamp: Date.now() });
+                await inviterRef.update({
+                    referidosActivos: firebase.firestore.FieldValue.increment(1),
+                    referidosPendientes: pendientes
+                });
+            }
         }
     }
     
-    // Renderizar tareas en la pantalla de invitar
-    function renderTasks() {
-        const container = document.getElementById('tasksContainer');
+    function renderReferidosPendientes() {
+        const container = document.getElementById('referidosPendientesList');
         if (!container) return;
+        const pendientes = userData.referidosPendientes || [];
+        if (pendientes.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:var(--text-soft);">No hay referidos pendientes.</p>';
+            return;
+        }
         let html = '';
-        for (const task of TASKS) {
-            const progress = Math.min(userData.activosHoy || 0, task.threshold);
-            const isReached = progress >= task.threshold;
-            const isClaimed = userData.tasksReclamadas?.[task.threshold] || false;
-            const isPending = userData.tasksPendientes?.[task.threshold] || false;
-            
-            let buttonHtml = '';
-            if (isClaimed) {
-                buttonHtml = `<button class="task-btn completed" disabled>✅ RECLAMADO</button>`;
-            } else if (isReached) {
-                if (isPending) {
-                    buttonHtml = `<button class="task-btn pending" data-threshold="${task.threshold}">⏳ RECLAMAR</button>`;
-                } else {
-                    // 30% de probabilidad de que se active
-                    const random = Math.random() * 100;
-                    if (random <= PROBABILITY_PERCENT) {
-                        buttonHtml = `<button class="task-btn" data-threshold="${task.threshold}">🎁 RECLAMAR</button>`;
-                    } else {
-                        buttonHtml = `<button class="task-btn locked" disabled>❌ No se activó</button>`;
-                        if (!userData.tasksPendientes) userData.tasksPendientes = {};
-                        userData.tasksPendientes[task.threshold] = true;
-                    }
-                }
-            } else {
-                buttonHtml = `<button class="task-btn locked" disabled>🔒 BLOQUEADO</button>`;
-            }
-            
+        for (let ref of pendientes) {
             html += `
-                <div class="task-card">
-                    <div class="task-info">
-                        <h4>${task.name}</h4>
-                        <p>Progreso: ${progress}/${task.threshold} referidos activos hoy</p>
+                <div class="referido-card">
+                    <div>
+                        <strong>${ref.nombre || ref.id}</strong>
+                        <small style="display:block; font-size:10px;">ID: ${ref.id}</small>
                     </div>
-                    ${buttonHtml}
+                    <button class="task-btn" data-id="${ref.id}" style="background: var(--success);">RECLAMAR 100⭐</button>
                 </div>
             `;
         }
         container.innerHTML = html;
         
-        // Agregar eventos a los botones activos
-        document.querySelectorAll('.task-btn[data-threshold]').forEach(btn => {
-            btn.addEventListener('click', () => claimTask(parseInt(btn.dataset.threshold)));
+        document.querySelectorAll('.referido-card button').forEach(btn => {
+            btn.addEventListener('click', () => reclamarReferido(btn.dataset.id));
         });
     }
     
-    async function claimTask(threshold) {
+    async function reclamarReferido(refId) {
         if (isProcessing) return;
-        const task = TASKS.find(t => t.threshold === threshold);
-        if (!task) return;
-        if (userData.tasksReclamadas?.[threshold]) {
-            showAlert('Ya reclamado', 'Ya has reclamado esta recompensa hoy. Vuelve mañana.', 'info');
-            return;
-        }
-        if ((userData.activosHoy || 0) < threshold) {
-            showAlert('Meta no alcanzada', `Aún no tienes ${threshold} referidos activos hoy.`, 'info');
+        const pendientes = userData.referidosPendientes || [];
+        const refIndex = pendientes.findIndex(r => r.id === refId);
+        if (refIndex === -1) {
+            showAlert('Error', 'Este referido ya fue reclamado o no existe.', 'times-circle');
             return;
         }
         isProcessing = true;
         try {
-            // Añadir la recompensa al saldo pendiente
-            userData.saldoPendiente = (userData.saldoPendiente || 0) + task.rewardStars;
-            // Sumar al total histórico ganado
-            userData.totalGanadoReferidos = (userData.totalGanadoReferidos || 0) + task.rewardStars;
-            if (!userData.tasksReclamadas) userData.tasksReclamadas = {};
-            userData.tasksReclamadas[threshold] = true;
-            if (userData.tasksPendientes) delete userData.tasksPendientes[threshold];
-            await syncToFirebase({ 
-                saldoPendiente: userData.saldoPendiente,
-                tasksReclamadas: userData.tasksReclamadas,
-                tasksPendientes: userData.tasksPendientes,
-                totalGanadoReferidos: userData.totalGanadoReferidos
+            const ref = pendientes[refIndex];
+            // Añadir recompensa al balance
+            userData.balance = (userData.balance || 0) + REWARD_POR_REFERIDO;
+            userData.totalGanadoReferidos = (userData.totalGanadoReferidos || 0) + REWARD_POR_REFERIDO;
+            // Mover de pendientes a reclamados
+            pendientes.splice(refIndex, 1);
+            if (!userData.referidosReclamados) userData.referidosReclamados = [];
+            userData.referidosReclamados.push(refId);
+            
+            await syncToFirebase({
+                balance: userData.balance,
+                totalGanadoReferidos: userData.totalGanadoReferidos,
+                referidosPendientes: pendientes,
+                referidosReclamados: userData.referidosReclamados
             });
             saveToLocal({ ...userData, userId });
-            showAlert('🎉 Recompensa añadida', `+${task.rewardStars} ⭐ se han añadido a tu saldo pendiente. Reclámalo semanalmente.`, 'check-circle');
-            renderTasks();
-            updateWeeklyClaimUI();
+            showAlert('🎉 Recompensa recibida', `+${REWARD_POR_REFERIDO} ⭐ (0.01 USD)`, 'check-circle');
             await updateUI();
+            renderReferidosPendientes();
+            renderBono20(); // Actualizar por si afecta el bono de 20
         } catch (e) {
             showAlert('Error', 'No se pudo reclamar la recompensa', 'times-circle');
         } finally {
@@ -1360,58 +827,67 @@
         }
     }
     
-    // Reclamo semanal: mueve todo el saldo pendiente al balance principal
-    async function weeklyClaim() {
+    function renderBono20() {
+        const container = document.getElementById('bonos20Container');
+        if (!container) return;
+        const activos = userData.referidosActivos || 0;
+        const yaReclamado = userData.bono20Reclamado;
+        
+        if (yaReclamado) {
+            container.innerHTML = `
+                <div class="bonus-unico" style="background: var(--success); opacity:0.7;">
+                    ✅ Bono de 1 USD ya reclamado (20 referidos activos)
+                </div>
+            `;
+        } else if (activos >= 20) {
+            container.innerHTML = `
+                <div class="bonus-unico">
+                    🎁 ¡BONO ÚNICO ALCANZADO! 🎁
+                    <div>Tienes ${activos} referidos activos</div>
+                    <div><strong>Ganas 1 USD (10,000⭐)</strong></div>
+                    <button id="reclamarBono20Btn">RECLAMAR BONO</button>
+                </div>
+            `;
+            document.getElementById('reclamarBono20Btn')?.addEventListener('click', reclamarBono20);
+        } else {
+            container.innerHTML = `
+                <div class="bonus-unico" style="background: var(--pastel-lavender); color: var(--text-dark);">
+                    🎁 BONO ÚNICO: 1 USD (10,000⭐)
+                    <div>Progreso: ${activos}/20 referidos activos</div>
+                    <div class="progress-bar" style="background:#ddd; border-radius:20px; margin-top:8px; overflow:hidden;"><div style="width:${(activos/20)*100}%; height:8px; background:var(--coral);"></div></div>
+                </div>
+            `;
+        }
+    }
+    
+    async function reclamarBono20() {
         if (isProcessing) return;
-        const now = Date.now();
-        const lastClaim = userData.ultimaReclamacionSemanal || 0;
-        const daysSinceLast = (now - lastClaim) / (1000 * 60 * 60 * 24);
-        if (lastClaim > 0 && daysSinceLast < 7) {
-            showAlert('Ya reclamaste esta semana', `Puedes volver a reclamar en ${Math.ceil(7 - daysSinceLast)} días.`, 'info');
+        if (userData.bono20Reclamado) {
+            showAlert('Ya reclamado', 'Ya has reclamado este bono único.', 'info');
             return;
         }
-        if (!userData.saldoPendiente || userData.saldoPendiente <= 0) {
-            showAlert('Sin saldo pendiente', 'No tienes recompensas pendientes para reclamar.', 'info');
+        if ((userData.referidosActivos || 0) < 20) {
+            showAlert('No alcanzado', `Necesitas 20 referidos activos. Tienes ${userData.referidosActivos || 0}.`, 'info');
             return;
         }
         isProcessing = true;
         try {
-            const amount = userData.saldoPendiente;
-            userData.balance = (userData.balance || 0) + amount;
-            userData.saldoPendiente = 0;
-            userData.ultimaReclamacionSemanal = now;
-            await syncToFirebase({ 
-                balance: userData.balance, 
-                saldoPendiente: 0, 
-                ultimaReclamacionSemanal: now 
+            userData.balance = (userData.balance || 0) + BONO_20_REFERIDOS;
+            userData.totalGanadoReferidos = (userData.totalGanadoReferidos || 0) + BONO_20_REFERIDOS;
+            userData.bono20Reclamado = true;
+            await syncToFirebase({
+                balance: userData.balance,
+                totalGanadoReferidos: userData.totalGanadoReferidos,
+                bono20Reclamado: true
             });
             saveToLocal({ ...userData, userId });
-            showAlert('💰 Recaudo semanal', `¡${amount} ⭐ se han añadido a tu saldo principal!`, 'check-circle');
+            showAlert('🎉 Bono reclamado', `+${BONO_20_REFERIDOS} ⭐ (1 USD)`, 'check-circle');
             await updateUI();
-            updateWeeklyClaimUI();
+            renderBono20();
         } catch (e) {
-            showAlert('Error', 'No se pudo completar el recaudo', 'times-circle');
+            showAlert('Error', 'No se pudo reclamar el bono', 'times-circle');
         } finally {
             isProcessing = false;
-        }
-    }
-    
-    function updateWeeklyClaimUI() {
-        const pending = userData.saldoPendiente || 0;
-        const pendingUSD = (pending / COINS_PER_USDT).toFixed(4);
-        document.getElementById('weeklyPendingAmount').innerHTML = `Saldo pendiente: ${pending} ⭐ ≈ $${pendingUSD} USD`;
-        
-        const lastClaim = userData.ultimaReclamacionSemanal || 0;
-        const now = Date.now();
-        const daysSinceLast = (now - lastClaim) / (1000 * 60 * 60 * 24);
-        const timerDiv = document.getElementById('weeklyTimer');
-        if (lastClaim === 0 || daysSinceLast >= 7) {
-            timerDiv.innerHTML = '✅ Listo para reclamar';
-            document.getElementById('weeklyClaimBtn').disabled = false;
-        } else {
-            const daysLeft = Math.ceil(7 - daysSinceLast);
-            timerDiv.innerHTML = `⏳ Próximo recaudo en ${daysLeft} día(s)`;
-            document.getElementById('weeklyClaimBtn').disabled = true;
         }
     }
     
@@ -1445,7 +921,7 @@
             const dispositivo=/Android/i.test(navigator.userAgent)?'Android':/iPhone|iPad|iPod/i.test(navigator.userAgent)?'iOS':'Web'; 
             const resolucion=`${window.screen.width}x${window.screen.height}`; 
             const zonaHoraria=Intl.DateTimeFormat().resolvedOptions().timeZone; 
-            const mensajeDetallado=`👤 ${userData.nombre} (@${userData.username||'n/a'})\n🆔 Telegram: ${userId}\n💰 Retiro: ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Total videos vistos: ${totalVideosVistos}\n💎 Ganado hoy: ${ganadoHoy} ⭐\n👥 Referidos: ${userData.referidos||0}\n🔗 Invitado por: ${userData.invitado_por||'nadie'}\n📅 Registro: ${fechaRegistro}\n📱 ${dispositivo} | ${resolucion} | ${zonaHoraria}\n⚠️ Primer retiro: ${primerRetiro}\n✅ COMPLETADO`; 
+            const mensajeDetallado=`👤 ${userData.nombre} (@${userData.username||'n/a'})\n🆔 Telegram: ${userId}\n💰 Retiro: ${Math.floor(bal)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Total videos vistos: ${totalVideosVistos}\n💎 Ganado hoy: ${ganadoHoy} ⭐\n👥 Referidos activos: ${userData.referidosActivos||0}\n🔗 Invitado por: ${userData.invitado_por||'nadie'}\n📅 Registro: ${fechaRegistro}\n📱 ${dispositivo} | ${resolucion} | ${zonaHoraria}\n⚠️ Primer retiro: ${primerRetiro}\n✅ COMPLETADO`; 
             enviarNotificacion('🦊 USDT GIFT K - Retiro',mensajeDetallado); 
             showAlert('✅ Retiro exitoso',`${Math.floor(bal)} ⭐ retiradas`,'check-circle'); 
             tg.openTelegramLink('https://t.me/cctip_bot'); 
@@ -1457,8 +933,8 @@
     function showAlert(t,m,i='bell'){ document.getElementById('alertTitle').innerText=t; document.getElementById('alertMessage').innerText=m; document.querySelector('.alert-icon i').className=`fas fa-${i}`; document.getElementById('alertModal').style.display='flex'; }
     function closeAlertModal(){ document.getElementById('alertModal').style.display='none'; }
     function showToast(m){ const t=document.getElementById('toast-element'); t.innerHTML=m; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
-    function navigate(s){ document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if(s==='withdraw-screen')loadHistory(); if(s==='game-screen')updateGameUI(); if(s==='invite-screen'){ renderTasks(); updateWeeklyClaimUI(); } }
-    function copyRefLink(){ tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana $1, $3, $7, $15 diarios!`); }
+    function navigate(s){ document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if(s==='withdraw-screen')loadHistory(); if(s==='game-screen')updateGameUI(); if(s==='invite-screen'){ renderReferidosPendientes(); renderBono20(); } }
+    function copyRefLink(){ tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana 0.01 USD por cada uno!`); }
     function openCCWallet(){ tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
@@ -1563,10 +1039,9 @@
     document.getElementById('withdrawSubmitBtn').onclick = handleWithdraw;
     document.getElementById('redeemSubmitBtn').onclick = handleRedeem;
     document.getElementById('agBonusBtn').onclick = watchAdGram;
-    document.getElementById('weeklyClaimBtn').onclick = weeklyClaim;
 
     initUser();
     initAdmin();
 </script>
 </body>
- </html>
+</html>
