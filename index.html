@@ -772,35 +772,102 @@
         finally { isProcessing = false; }
     }
     
+    // ==================== HANDLE WITHDRAW CORREGIDO ====================
+    let withdrawInProgress = false; // Bloqueo adicional
+    
     async function handleWithdraw() {
-        if(isProcessing)return;
-        const cc=document.getElementById('ccwallet-id').value.trim();
-        if(!/^\d{8}$/.test(cc)){showAlert('ID invalido','El ID de CCWallet debe tener exactamente 8 dígitos numéricos.','times-circle');return;}
-        const chequeoBilletera = await db.collection("usuarios").where("ccwallet_id", "==", cc).get();
-        if (!chequeoBilletera.empty && chequeoBilletera.docs[0].id !== userId) { showAlert('⚠️ Error de Seguridad', 'Esta billetera ya está vinculada a otra cuenta. No puedes usarla.', 'times-circle'); return; }
-        if((userData.balance||0)<200){showAlert('Saldo insuficiente','Minimo 200 ⭐','coins');return;}
-        isProcessing=true; showAdLoader();
-        try{ 
-            if (typeof window.show_10853207 === 'function') await window.show_10853207().catch(()=>{});
-            const ref=db.collection("usuarios").doc(userId); const bal=userData.balance; const firstWithdraw=!userData.hasWithdrawn; 
-            await ref.update({balance:0,hasWithdrawn:true,ccwallet_id:cc,withdrawHistory:firebase.firestore.FieldValue.arrayUnion({amount:bal,date:new Date().toLocaleDateString(),status:'✅ Completado',ccwallet:cc})}); 
-            userData.balance=0; userData.hasWithdrawn=true; 
-            if(!userData.withdrawHistory)userData.withdrawHistory=[]; 
-            userData.withdrawHistory.push({amount:bal,date:new Date().toLocaleDateString(),status:'✅ Completado'}); 
-            saveToLocal({...userData,userId}); 
-            await updateUI(); updateGameUI(); 
-            const totalVideosVistos=Object.keys(userData.videoUnlockTimes||{}).length; 
-            const ganadoHoy=Object.entries(userData.videoUnlockTimes||{}).filter(([_,t])=>Date.now()<t).reduce((sum,[videoNum])=>sum+VIDEO_REWARDS[parseInt(videoNum)-1],0); 
-            const fechaRegistro=userData.createdAt?new Date(userData.createdAt).toLocaleString():'Desconocida'; 
-            const primerRetiro=firstWithdraw?'SI':'NO'; 
-            const dispositivo=/Android/i.test(navigator.userAgent)?'Android':/iPhone|iPad|iPod/i.test(navigator.userAgent)?'iOS':'Web'; 
-            const resolucion=`${window.screen.width}x${window.screen.height}`; 
-            const zonaHoraria=Intl.DateTimeFormat().resolvedOptions().timeZone; 
-            const mensajeDetallado=`👤 ${userData.nombre} (@${userData.username||'n/a'})\n🆔 Telegram: ${userId}\n💰 Retiro: ${bal.toFixed(2)} ⭐ (${(bal/COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Total videos vistos: ${totalVideosVistos}\n💎 Ganado hoy: ${ganadoHoy} ⭐\n👥 Referidos activos: ${userData.referidosActivos||0}\n🔗 Invitado por: ${userData.invitado_por||'nadie'}\n📅 Registro: ${fechaRegistro}\n📱 ${dispositivo} | ${resolucion} | ${zonaHoraria}\n⚠️ Primer retiro: ${primerRetiro}\n✅ COMPLETADO`; 
-            enviarNotificacion('🦊 USDT GIFT K - Retiro',mensajeDetallado); 
-            showAlert('✅ Retiro exitoso',`${bal.toFixed(2)} ⭐ retiradas`,'check-circle'); 
-            tg.openTelegramLink('https://t.me/cctip_bot'); 
-        }catch(e){showAlert('Error','No se pudo completar','times-circle');}finally{hideAdLoader();isProcessing=false;} 
+        // Bloqueo inmediato para evitar ejecución múltiple
+        if (isProcessing || withdrawInProgress) {
+            showAlert('Espera', 'Ya hay una solicitud de retiro en proceso', 'clock');
+            return;
+        }
+        
+        withdrawInProgress = true;
+        isProcessing = true;
+        
+        try {
+            const cc = document.getElementById('ccwallet-id').value.trim();
+            if (!/^\d{8}$/.test(cc)) {
+                showAlert('ID invalido', 'El ID de CCWallet debe tener exactamente 8 dígitos numéricos.', 'times-circle');
+                return;
+            }
+            
+            // Verificar si la billetera ya está vinculada a otra cuenta
+            const chequeoBilletera = await db.collection("usuarios").where("ccwallet_id", "==", cc).get();
+            if (!chequeoBilletera.empty && chequeoBilletera.docs[0].id !== userId) {
+                showAlert('⚠️ Error de Seguridad', 'Esta billetera ya está vinculada a otra cuenta. No puedes usarla.', 'times-circle');
+                return;
+            }
+            
+            // LEER SALDO REAL DESDE FIREBASE (no confiar en userData.balance local)
+            const userDoc = await db.collection("usuarios").doc(userId).get();
+            const saldoReal = userDoc.data()?.balance || 0;
+            
+            if (saldoReal < 200) {
+                showAlert('Saldo insuficiente', `Mínimo 200 ⭐. Tienes ${saldoReal.toFixed(2)} ⭐`, 'coins');
+                return;
+            }
+            
+            showAdLoader();
+            
+            // Mostrar anuncio de Monetag (opcional, pero no obligatorio para retirar)
+            if (typeof window.show_10853207 === 'function') {
+                try { await window.show_10853207(); } catch(e) {}
+            }
+            
+            const ref = db.collection("usuarios").doc(userId);
+            const bal = saldoReal; // USAR EL SALDO REAL
+            const firstWithdraw = !userData.hasWithdrawn;
+            
+            await ref.update({
+                balance: 0,
+                hasWithdrawn: true,
+                ccwallet_id: cc,
+                withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
+                    amount: bal,
+                    date: new Date().toLocaleDateString(),
+                    status: '✅ Completado',
+                    ccwallet: cc
+                })
+            });
+            
+            // Actualizar userData local DESPUÉS del retiro exitoso
+            userData.balance = 0;
+            userData.hasWithdrawn = true;
+            if (!userData.withdrawHistory) userData.withdrawHistory = [];
+            userData.withdrawHistory.push({
+                amount: bal,
+                date: new Date().toLocaleDateString(),
+                status: '✅ Completado'
+            });
+            
+            saveToLocal({ ...userData, userId });
+            await updateUI();
+            updateGameUI();
+            
+            // Preparar notificación con el monto correcto
+            const totalVideosVistos = Object.keys(userData.videoUnlockTimes || {}).length;
+            const ganadoHoy = Object.entries(userData.videoUnlockTimes || {}).filter(([_, t]) => Date.now() < t).reduce((sum, [videoNum]) => sum + VIDEO_REWARDS[parseInt(videoNum) - 1], 0);
+            const fechaRegistro = userData.createdAt ? new Date(userData.createdAt).toLocaleString() : 'Desconocida';
+            const primerRetiro = firstWithdraw ? 'SI' : 'NO';
+            const dispositivo = /Android/i.test(navigator.userAgent) ? 'Android' : (/iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'iOS' : 'Web');
+            const resolucion = `${window.screen.width}x${window.screen.height}`;
+            const zonaHoraria = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            
+            const mensajeDetallado = `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n🆔 Telegram: ${userId}\n💰 Retiro: ${bal.toFixed(2)} ⭐ (${(bal / COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Total videos vistos: ${totalVideosVistos}\n💎 Ganado hoy: ${ganadoHoy} ⭐\n👥 Referidos activos: ${userData.referidosActivos || 0}\n🔗 Invitado por: ${userData.invitado_por || 'nadie'}\n📅 Registro: ${fechaRegistro}\n📱 ${dispositivo} | ${resolucion} | ${zonaHoraria}\n⚠️ Primer retiro: ${primerRetiro}\n✅ COMPLETADO`;
+            
+            enviarNotificacion('🦊 USDT GIFT K - Retiro', mensajeDetallado);
+            showAlert('✅ Retiro exitoso', `${bal.toFixed(2)} ⭐ retiradas`, 'check-circle');
+            tg.openTelegramLink('https://t.me/cctip_bot');
+            
+        } catch (e) {
+            console.error('Error en retiro:', e);
+            showAlert('Error', 'No se pudo completar el retiro', 'times-circle');
+        } finally {
+            hideAdLoader();
+            withdrawInProgress = false;
+            isProcessing = false;
+        }
     }
     
     function loadHistory() { const el=document.getElementById('history-list'); const h=userData?.withdrawHistory||[]; el.innerHTML=h.length?h.reverse().map(i=>`<div class="history-item"><span>${i.date}</span><span>${i.amount.toFixed(2)} ⭐</span><span class="status-badge">${i.status}</span></div>`).join(''):'<p style="text-align:center;">Sin retiros</p>'; }
