@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT GIFT K - Minas Frutales</title>
+    <title>USDT GIFT K - Minas Frutales Casino</title>
     
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -29,37 +29,10 @@
             --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
             --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.08);
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--white);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Outfit', sans-serif; background: var(--white); height: 100vh; overflow: hidden; display: flex; justify-content: center; }
         #gradient-bg { display: none; }
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--white);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999;
-            transition: opacity 0.5s ease;
-            padding: 20px;
-            text-align: center;
-        }
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; transition: opacity 0.5s ease; padding: 20px; text-align: center; }
         #loading-screen.hidden { opacity: 0; pointer-events: none; }
         .welcome-icon { font-size: 64px; margin-bottom: 16px; color: var(--violet); animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%,100%{transform: translateY(0);} 50%{transform: translateY(-8px);} }
@@ -75,141 +48,37 @@
         .loading-progress-bar { height: 100%; width: 0%; background: var(--violet); border-radius: 10px; animation: progress 3s ease-out forwards; }
         @keyframes progress { 0%{width:0%;} 100%{width:100%;} }
         .loading-footer { margin-top: 20px; font-size: 13px; color: var(--coral); font-weight: 500; }
-        .ad-loader-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(8px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 99998;
-        }
-        .ad-loader {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: var(--white);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: var(--shadow-soft);
-        }
+        .ad-loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 99998; }
+        .ad-loader { width: 70px; height: 70px; border-radius: 50%; background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: var(--shadow-soft); }
         .ad-loader i { font-size: 28px; color: var(--violet); animation: spin 1.5s linear infinite; }
         .ad-loader span { font-size: 11px; font-weight: 600; color: var(--coral); margin-top: 4px; }
         @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-        #app-container {
-            width: 100%;
-            max-width: 450px;
-            height: 100vh;
-            padding: 8px 12px;
-            display: flex;
-            flex-direction: column;
-            z-index: 1;
-            overflow: hidden;
-        }
-        .screen {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            padding-bottom: 8px;
-        }
+        #app-container { width: 100%; max-width: 450px; height: 100vh; padding: 8px 12px; display: flex; flex-direction: column; z-index: 1; overflow: hidden; }
+        .screen { display: none; flex-direction: column; width: 100%; height: 100%; overflow-y: auto; padding-bottom: 8px; }
         .screen.active { display: flex; }
         .screen::-webkit-scrollbar { display: none; }
         .top-nav { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 4px; }
-        .channel-bubble {
-            background: var(--violet);
-            padding: 4px 12px;
-            border-radius: 50px;
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: white;
-            font-weight: 600;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .channel-bubble { background: var(--violet); padding: 4px 12px; border-radius: 50px; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 6px; color: white; font-weight: 600; font-size: 11px; cursor: pointer; transition: all 0.2s; }
         .channel-bubble:active { transform: scale(0.97); }
-        .balance-card {
-            text-align: center;
-            margin: 0 0 4px 0;
-            padding: 6px 12px;
-            background: var(--white);
-            border-radius: 60px;
-            box-shadow: var(--shadow-soft);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .balance-card { text-align: center; margin: 0 0 4px 0; padding: 6px 12px; background: var(--white); border-radius: 60px; box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; }
         .balance-card:active { transform: scale(0.99); }
         #user-balance { font-size: 32px; font-weight: 800; color: var(--violet); }
         .balance-label { font-size: 10px; letter-spacing: 2px; color: var(--coral); font-weight: 600; }
         .section-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; color: var(--text-dark); }
         .section-title i { color: var(--violet); }
-        .daily-progress {
-            background: var(--pastel-lavender);
-            border-radius: 50px;
-            padding: 4px 12px;
-            margin: 2px 0 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 600;
-            font-size: 11px;
-            color: var(--text-dark);
-        }
+        .daily-progress { background: var(--pastel-lavender); border-radius: 50px; padding: 4px 12px; margin: 2px 0 4px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 11px; color: var(--text-dark); }
         .progress-dots { display: flex; gap: 4px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #D0D0D0; transition: all 0.2s; }
         .dot.completed { background: var(--violet); }
-        .video-card {
-            background: var(--white);
-            border-radius: 50px;
-            padding: 4px 12px 4px 8px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--shadow-soft);
-            transition: all 0.2s;
-        }
+        .video-card { background: var(--white); border-radius: 50px; padding: 4px 12px 4px 8px; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-soft); transition: all 0.2s; }
         .video-card.completed { background: var(--pastel-mint); border-left: 4px solid var(--success); }
         .video-info { display: flex; align-items: center; gap: 8px; }
-        .video-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 30px;
-            background: var(--pastel-lavender);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--violet);
-            font-size: 14px;
-        }
+        .video-icon { width: 32px; height: 32px; border-radius: 30px; background: var(--pastel-lavender); display: flex; align-items: center; justify-content: center; color: var(--violet); font-size: 14px; }
         .completed .video-icon { background: var(--pastel-mint); color: var(--success); }
         .video-title { font-weight: 700; font-size: 12px; color: var(--text-dark); }
         .video-reward { font-size: 10px; font-weight: 600; color: var(--coral); }
         .video-btn-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-        .video-btn {
-            padding: 5px 12px;
-            border-radius: 50px;
-            border: none;
-            font-weight: 700;
-            font-size: 11px;
-            cursor: pointer;
-            background: var(--violet);
-            color: white;
-            box-shadow: 0 2px 6px rgba(108,99,255,0.3);
-            transition: all 0.15s ease;
-            min-width: 65px;
-            text-align: center;
-        }
+        .video-btn { padding: 5px 12px; border-radius: 50px; border: none; font-weight: 700; font-size: 11px; cursor: pointer; background: var(--violet); color: white; box-shadow: 0 2px 6px rgba(108,99,255,0.3); transition: all 0.15s ease; min-width: 65px; text-align: center; }
         .video-btn.small-btn { padding: 4px 10px; font-size: 10px; min-width: 60px; }
         .video-btn:active { transform: scale(0.96); }
         .video-btn.completed-btn { background: var(--success); }
@@ -219,93 +88,21 @@
         .bonus-card .video-icon { background: var(--pastel-peach); color: var(--coral); }
         .bonus-card .video-title { color: var(--coral); }
         .menu-grid { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
-        .btn-game {
-            background: var(--white);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 60px;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            color: var(--text-dark);
-            box-shadow: var(--shadow-soft);
-            transition: all 0.2s;
-        }
+        .btn-game { background: var(--white); border: none; padding: 8px 16px; border-radius: 60px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: var(--text-dark); box-shadow: var(--shadow-soft); transition: all 0.2s; }
         .btn-game:active { transform: scale(0.98); box-shadow: var(--shadow-hover); }
         .btn-game i:first-child { color: var(--violet); margin-right: 10px; }
         .glass-card { background: var(--white); border-radius: 40px; padding: 24px; margin-top: 8px; box-shadow: var(--shadow-soft); }
-        .back-circle {
-            width: 44px;
-            height: 44px;
-            background: var(--pastel-lavender);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            margin-bottom: 12px;
-            color: var(--violet);
-            font-size: 20px;
-            transition: all 0.2s;
-        }
+        .back-circle { width: 44px; height: 44px; background: var(--pastel-lavender); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 12px; color: var(--violet); font-size: 20px; transition: all 0.2s; }
         .back-circle:active { transform: scale(0.94); }
-        .alert-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(6px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10001;
-        }
-        .alert-content {
-            background: var(--white);
-            border-radius: 50px;
-            padding: 32px 24px;
-            width: 85%;
-            max-width: 340px;
-            text-align: center;
-            box-shadow: var(--shadow-hover);
-        }
+        .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 10001; }
+        .alert-content { background: var(--white); border-radius: 50px; padding: 32px 24px; width: 85%; max-width: 340px; text-align: center; box-shadow: var(--shadow-hover); }
         .alert-icon { font-size: 48px; margin-bottom: 16px; color: var(--violet); }
         .alert-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--text-dark); }
         .alert-message { font-size: 15px; color: var(--text-soft); margin-bottom: 24px; }
         .alert-btn { background: var(--coral); border: none; padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 16px; color: white; cursor: pointer; width: 100%; transition: all 0.2s; }
         .alert-btn:active { transform: scale(0.97); }
-        .toast-premium {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--text-dark);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 13px;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 14px 18px;
-            border-radius: 60px;
-            border: 1px solid #E0E0E0;
-            margin: 8px 0;
-            background: var(--white);
-            font-size: 14px;
-            color: var(--text-dark);
-            font-family: inherit;
-        }
+        .toast-premium { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text-dark); color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+        input, textarea { width: 100%; padding: 14px 18px; border-radius: 60px; border: 1px solid #E0E0E0; margin: 8px 0; background: var(--white); font-size: 14px; color: var(--text-dark); font-family: inherit; }
         input:focus, textarea:focus { outline: none; border-color: var(--violet); }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #F0F0F0; font-size: 13px; color: var(--text-soft); }
         .history-title { font-size: 16px; font-weight: 700; margin: 20px 0 12px; color: var(--text-dark); }
@@ -316,28 +113,8 @@
         .btn-primary { background: var(--violet); color: white; }
         .btn-success { background: var(--success); color: white; }
         .status-badge { background: var(--success); color: white; padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; }
-        .admin-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(6px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-        .admin-modal-content {
-            background: var(--white);
-            border-radius: 48px;
-            padding: 24px;
-            width: 90%;
-            max-width: 360px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
+        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        .admin-modal-content { background: var(--white); border-radius: 48px; padding: 24px; width: 90%; max-width: 360px; max-height: 80vh; overflow-y: auto; }
         .admin-tab { flex: 1; padding: 10px; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .admin-tab.active { background: var(--violet); color: white; }
         .admin-tab:not(.active) { background: #F0F0F0; color: var(--text-dark); }
@@ -349,81 +126,22 @@
         .stat-number { font-size: 26px; font-weight: 800; color: var(--violet); }
         .code-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #EEE; font-size: 13px; }
         
-        .fruit-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-        .fruit-cell {
-            aspect-ratio: 1 / 1;
-            background: var(--violet);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow-soft);
-            color: white;
-            font-weight: bold;
-        }
-        .fruit-cell.revealed {
-            background: var(--pastel-peach);
-            cursor: default;
-            color: var(--text-dark);
-        }
-        .fruit-cell.bomb {
-            background: var(--danger);
-            color: white;
-        }
+        .fruit-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
+        .fruit-cell { aspect-ratio: 1 / 1; background: var(--violet); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-soft); color: white; font-weight: bold; }
+        .fruit-cell.revealed { background: var(--pastel-peach); cursor: default; color: var(--text-dark); }
+        .fruit-cell.bomb { background: var(--danger); color: white; }
         .fruit-cell:active { transform: scale(0.95); }
-        .fruit-cell.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .game-botones-container {
-            display: flex;
-            gap: 8px;
-            margin: 15px 0;
-        }
-        .game-btn {
-            flex: 1;
-            padding: 12px 0;
-            border: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            background: var(--white);
-            box-shadow: var(--shadow-soft);
-            color: var(--text-dark);
-            transition: all 0.2s;
-        }
+        .fruit-cell.disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .game-botones-container { display: flex; gap: 8px; margin: 15px 0; }
+        .game-btn { flex: 1; padding: 12px 0; border: none; border-radius: 50px; font-weight: 700; font-size: 13px; cursor: pointer; background: var(--white); box-shadow: var(--shadow-soft); color: var(--text-dark); transition: all 0.2s; }
         .game-btn:active { transform: scale(0.96); }
         .game-btn.highlight { background: var(--coral); color: white; }
         .game-btn.danger { background: var(--danger); color: white; }
         .game-btn.success { background: var(--success); color: white; }
-        .game-apuesta-display {
-            background: var(--violet);
-            border-radius: 50px;
-            padding: 16px;
-            margin: 15px 0;
-            text-align: center;
-            color: white;
-        }
+        .game-apuesta-display { background: var(--violet); border-radius: 50px; padding: 16px; margin: 15px 0; text-align: center; color: white; }
         .game-apuesta-display .apuesta-valor { font-size: 40px; font-weight: 800; }
-        .ganancia-actual {
-            background: var(--pastel-mint);
-            border-radius: 40px;
-            padding: 10px;
-            margin: 10px 0;
-            text-align: center;
-            font-weight: bold;
-            color: var(--success);
-        }
+        .multiplicador-actual { background: var(--pastel-peach); border-radius: 40px; padding: 8px; margin: 10px 0; text-align: center; font-weight: bold; color: var(--coral); font-size: 18px; }
+        .ganancia-actual { background: var(--pastel-mint); border-radius: 40px; padding: 10px; margin: 10px 0; text-align: center; font-weight: bold; color: var(--success); }
         .racha-container { display: flex; justify-content: space-between; margin: 12px 0; padding: 10px; background: #F8F8F8; border-radius: 40px; font-weight: 600; }
         .racha-actual { color: var(--violet); }
         .historial-juego { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
@@ -504,7 +222,6 @@
 </div>
 
 <div id="app-container">
-    <!-- HOME SCREEN -->
     <div id="home-screen" class="screen active">
         <div class="top-nav">
             <div class="channel-bubble" onclick="joinChannel()"><i class="fab fa-telegram"></i><span>@UsdtGiftChannel</span></div>
@@ -549,7 +266,6 @@
         </div>
     </div>
 
-    <!-- JUEGO MINAS FRUTALES -->
     <div id="game-screen" class="screen">
         <div class="back-circle" id="backHomeGame"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card" style="padding: 20px;">
@@ -564,7 +280,7 @@
             <div class="game-apuesta-display">
                 <div class="apuesta-label">🍀 APUESTA</div>
                 <div class="apuesta-valor" id="game-apuesta-actual">0.01</div>
-                <div class="ganancia-valor" id="game-ganancia">🍬 Por fruta +0.01 ⭐</div>
+                <div class="ganancia-valor" id="game-ganancia">🎲 Multiplicador 1.00x</div>
             </div>
             <div class="game-botones-container">
                 <button class="game-btn" id="game-minimo">🍬 MÍNIMO<br><small>0.01</small></button>
@@ -574,7 +290,8 @@
             
             <div class="fruit-board" id="fruit-board"></div>
             
-            <div class="ganancia-actual" id="ganancia-actual">💰 Ganancia acumulada: 0.00 ⭐</div>
+            <div class="multiplicador-actual" id="multiplicador-actual">🎲 Multiplicador actual: 1.00x</div>
+            <div class="ganancia-actual" id="ganancia-actual">💰 Ganancia potencial: 0.00 ⭐</div>
             
             <div class="game-botones-container">
                 <button class="game-btn success" id="retirarse-btn">🏆 RETIRARSE (Cobrar)</button>
@@ -588,35 +305,29 @@
                 <div style="font-size: 12px; color: var(--text-soft); margin-bottom: 8px;">Últimas cosechas</div>
                 <div class="historial-juego" id="game-historial"></div>
             </div>
-            <p style="font-size: 11px; color: var(--text-soft); margin-top: 16px; text-align: center;">🌸 Cada fruta = +50% de tu apuesta. Si encuentras una bomba, pierdes todo. Puedes retirarte cuando quieras.</p>
+            <p style="font-size: 11px; color: var(--text-soft); margin-top: 16px; text-align: center;">🌸 Cada fruta multiplica tu ganancia por 1.5x. Si encuentras una bomba, pierdes todo. ¡Puedes retirarte cuando quieras!</p>
         </div>
     </div>
 
-    <!-- INVITE SCREEN -->
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size: 42px; color: var(--violet);"></i>
             <h3 style="margin: 12px 0; font-size: 22px; font-weight: 800;">Invita y Gana</h3>
             <p style="font-size: 14px; color: var(--text-soft);">Cada amigo que vea los 10 videos te da <strong>0.01 USD (100⭐)</strong>.</p>
-            
             <div class="invite-stats">
                 <div class="stat-box"><div class="stat-number" id="totalInvitadosHistoricos">0</div><div class="stat-label">Total invitados</div></div>
                 <div class="stat-box"><div class="stat-number" id="totalReferidosActivos">0</div><div class="stat-label">Referidos activos</div></div>
                 <div class="stat-box"><div class="stat-number" id="totalGanadoReferidos">0 ⭐</div><div class="stat-label">Ganado por referidos</div></div>
             </div>
-            
             <div class="section-title" style="margin-top: 10px;"><i class="fas fa-list"></i><span>Referidos activos para reclamar</span></div>
             <div id="referidosPendientesList"></div>
-            
             <div id="bonos20Container"></div>
-            
             <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir enlace de invitación</button>
             <p style="font-size:11px;color:var(--text-soft);margin-top:12px;text-align:center;"><i class="fas fa-info-circle"></i> Un referido es "activo" cuando ve los 10 videos (6 normales + 4 AdsGram). Cada uno te da 100⭐ automáticamente al reclamar.</p>
         </div>
     </div>
 
-    <!-- WITHDRAW SCREEN -->
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -633,7 +344,6 @@
         </div>
     </div>
 
-    <!-- REDEEM SCREEN -->
     <div id="redeem-screen" class="screen">
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
@@ -667,6 +377,7 @@
     const MIN_APUESTA = 0.01;
     const TOTAL_CASILLAS = 9;
     const BOMBAS = 3;
+    const MULTIPLICADOR_POR_FRUTA = 1.5;
     
     let gameApuesta = MIN_APUESTA;
     let gameRacha = 0;
@@ -676,7 +387,7 @@
     let tableroActual = [];
     let celdasReveladas = [];
     let juegoTerminado = false;
-    let gananciaActual = 0;
+    let frutasEncontradas = 0;
     let apuestaActual = 0;
 
     const STORAGE_KEY = 'usdtgiftk_userdata';
@@ -757,6 +468,14 @@
     
     function formatBalance(balance) { return balance.toFixed(2); }
     
+    function getMultiplicador(frutas) {
+        return Math.pow(MULTIPLICADOR_POR_FRUTA, frutas);
+    }
+    
+    function getGananciaPotencial(apuesta, frutas) {
+        return apuesta * getMultiplicador(frutas);
+    }
+    
     async function updateUI() {
         if (!userData) return;
         document.getElementById('user-balance').innerText = formatBalance(userData.balance || 0);
@@ -784,11 +503,19 @@
         tableroActual = posiciones;
         celdasReveladas = Array(TOTAL_CASILLAS).fill(false);
         juegoTerminado = false;
-        gananciaActual = 0;
+        frutasEncontradas = 0;
         apuestaActual = gameApuesta;
         actualizarTableroUI();
-        document.getElementById('ganancia-actual').innerHTML = `💰 Ganancia acumulada: 0.00 ⭐`;
+        actualizarInfoJuego();
         document.getElementById('retirarse-btn').disabled = false;
+    }
+    
+    function actualizarInfoJuego() {
+        const mult = getMultiplicador(frutasEncontradas);
+        const ganancia = getGananciaPotencial(apuestaActual, frutasEncontradas);
+        document.getElementById('multiplicador-actual').innerHTML = `🎲 Multiplicador actual: ${mult.toFixed(2)}x`;
+        document.getElementById('ganancia-actual').innerHTML = `💰 Ganancia potencial: ${ganancia.toFixed(2)} ⭐`;
+        document.getElementById('game-ganancia').innerHTML = `🎲 Multiplicador ${mult.toFixed(2)}x`;
     }
     
     const frutasIconos = ['🍎', '🍓', '🍇', '🍊', '🍒', '🍉', '🥝', '🥭', '🍑'];
@@ -820,7 +547,8 @@
     async function revelarCelda(index) {
         if (isProcessing || juegoTerminado || celdasReveladas[index]) return;
         isProcessing = true;
-        if (gananciaActual === 0 && apuestaActual === 0) {
+        
+        if (frutasEncontradas === 0 && apuestaActual === 0) {
             apuestaActual = gameApuesta;
             if (apuestaActual > (userData.balance || 0)) {
                 showAlert('Saldo insuficiente', `No tienes suficientes ⭐ para apostar ${apuestaActual.toFixed(2)}`, 'coins');
@@ -831,7 +559,9 @@
             await syncToFirebase({ balance: userData.balance });
             await updateUI();
         }
+        
         celdasReveladas[index] = true;
+        
         if (tableroActual[index] === 'bomb') {
             juegoTerminado = true;
             actualizarTableroUI();
@@ -840,20 +570,22 @@
             if (gameHistorial.length > 20) gameHistorial.shift();
             userData.gameHistorial = gameHistorial;
             await syncToFirebase({ gameHistorial: gameHistorial });
-            showAlert('💣 ¡BOOM! 💣', `Encontraste una bomba. Perdiste ${apuestaActual.toFixed(2)} ⭐.`, 'bomb');
+            showAlert('💣 ¡BOOM! 💣', `Encontraste una bomba. Perdiste ${getGananciaPotencial(apuestaActual, frutasEncontradas).toFixed(2)} ⭐.`, 'bomb');
             updateGameUI();
             iniciarNuevoJuego();
         } else {
-            gananciaActual += apuestaActual * 0.5;
+            frutasEncontradas++;
             actualizarTableroUI();
-            document.getElementById('ganancia-actual').innerHTML = `💰 Ganancia acumulada: ${gananciaActual.toFixed(2)} ⭐`;
+            actualizarInfoJuego();
+            
             let frutasRestantes = 0;
             for (let i = 0; i < TOTAL_CASILLAS; i++) {
                 if (!celdasReveladas[i] && tableroActual[i] === 'fruit') frutasRestantes++;
             }
             if (frutasRestantes === 0) {
                 juegoTerminado = true;
-                userData.balance += gananciaActual;
+                const ganancia = getGananciaPotencial(apuestaActual, frutasEncontradas);
+                userData.balance += ganancia;
                 gameRacha++;
                 if (gameRacha > gameRecord) {
                     gameRecord = gameRacha;
@@ -863,7 +595,7 @@
                 if (gameHistorial.length > 20) gameHistorial.shift();
                 userData.gameHistorial = gameHistorial;
                 await syncToFirebase({ balance: userData.balance, gameRecord: gameRecord, gameHistorial: gameHistorial });
-                showAlert('🍎 ¡COSECHA COMPLETA! 🍎', `Ganaste ${gananciaActual.toFixed(2)} ⭐`, 'apple-alt');
+                showAlert('🍎 ¡COSECHA COMPLETA! 🍎', `Ganaste ${ganancia.toFixed(2)} ⭐ (${getMultiplicador(frutasEncontradas).toFixed(2)}x)`, 'apple-alt');
                 updateGameUI();
                 await updateUI();
                 iniciarNuevoJuego();
@@ -876,12 +608,13 @@
     }
     
     async function retirarse() {
-        if (isProcessing || juegoTerminado || gananciaActual === 0) {
-            if (gananciaActual === 0) showAlert('Sin ganancia', 'No has descubierto ninguna fruta aún.', 'info');
+        if (isProcessing || juegoTerminado || frutasEncontradas === 0) {
+            if (frutasEncontradas === 0) showAlert('Sin ganancia', 'No has descubierto ninguna fruta aún.', 'info');
             return;
         }
         isProcessing = true;
-        userData.balance += gananciaActual;
+        const ganancia = getGananciaPotencial(apuestaActual, frutasEncontradas);
+        userData.balance += ganancia;
         gameRacha++;
         if (gameRacha > gameRecord) {
             gameRecord = gameRacha;
@@ -891,7 +624,7 @@
         if (gameHistorial.length > 20) gameHistorial.shift();
         userData.gameHistorial = gameHistorial;
         await syncToFirebase({ balance: userData.balance, gameRecord: gameRecord, gameHistorial: gameHistorial });
-        showAlert('🏆 RETIRADO', `Cobraste ${gananciaActual.toFixed(2)} ⭐`, 'check-circle');
+        showAlert('🏆 RETIRADO', `Cobraste ${ganancia.toFixed(2)} ⭐ (${getMultiplicador(frutasEncontradas).toFixed(2)}x)`, 'check-circle');
         await updateUI();
         updateGameUI();
         iniciarNuevoJuego();
@@ -900,7 +633,6 @@
     
     function updateGameUI() { 
         document.getElementById('game-apuesta-actual').innerText = gameApuesta.toFixed(2); 
-        document.getElementById('game-ganancia').innerHTML = `🍬 Por fruta +${(gameApuesta * 0.5).toFixed(2)} ⭐`; 
         document.getElementById('game-racha').innerText = gameRacha; 
         document.getElementById('game-record').innerText = gameRecord; 
         const historialEl = document.getElementById('game-historial'); 
