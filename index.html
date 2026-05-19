@@ -5,17 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>USDT GIFT K - Minas Frutales</title>
     
-    <!-- Monetag Rewarded Interstitial -->
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
-    
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
-    <!-- Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- AdsGram SDK -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -356,7 +349,6 @@
         .stat-number { font-size: 26px; font-weight: 800; color: var(--violet); }
         .code-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #EEE; font-size: 13px; }
         
-        /* Estilos juego Minas Frutales */
         .fruit-board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -557,7 +549,7 @@
         </div>
     </div>
 
-    <!-- JUEGO MINAS FRUTALES (BUSCAMINAS) -->
+    <!-- JUEGO MINAS FRUTALES -->
     <div id="game-screen" class="screen">
         <div class="back-circle" id="backHomeGame"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card" style="padding: 20px;">
@@ -572,7 +564,7 @@
             <div class="game-apuesta-display">
                 <div class="apuesta-label">🍀 APUESTA</div>
                 <div class="apuesta-valor" id="game-apuesta-actual">0.01</div>
-                <div class="ganancia-valor" id="game-ganancia">🍬 Ganas 0.02 ⭐</div>
+                <div class="ganancia-valor" id="game-ganancia">🍬 Por fruta +0.01 ⭐</div>
             </div>
             <div class="game-botones-container">
                 <button class="game-btn" id="game-minimo">🍬 MÍNIMO<br><small>0.01</small></button>
@@ -580,10 +572,9 @@
                 <button class="game-btn danger" id="game-maximo">🍍 MÁXIMO<br><small>Todo</small></button>
             </div>
             
-            <!-- Tablero de minas (3x3) -->
             <div class="fruit-board" id="fruit-board"></div>
             
-            <div class="ganancia-actual" id="ganancia-actual">💰 Ganancia actual: 0.00 ⭐</div>
+            <div class="ganancia-actual" id="ganancia-actual">💰 Ganancia acumulada: 0.00 ⭐</div>
             
             <div class="game-botones-container">
                 <button class="game-btn success" id="retirarse-btn">🏆 RETIRARSE (Cobrar)</button>
@@ -597,7 +588,7 @@
                 <div style="font-size: 12px; color: var(--text-soft); margin-bottom: 8px;">Últimas cosechas</div>
                 <div class="historial-juego" id="game-historial"></div>
             </div>
-            <p style="font-size: 11px; color: var(--text-soft); margin-top: 16px; text-align: center;">🌸 Descubre frutas (🍎🍓🍇) para multiplicar tu apuesta. Si encuentras una bomba (💣), pierdes. Puedes retirarte cuando quieras.</p>
+            <p style="font-size: 11px; color: var(--text-soft); margin-top: 16px; text-align: center;">🌸 Cada fruta = +50% de tu apuesta. Si encuentras una bomba, pierdes todo. Puedes retirarte cuando quieras.</p>
         </div>
     </div>
 
@@ -656,7 +647,6 @@
 </div>
 
 <script>
-    // ==================== CONFIGURACION ====================
     const firebaseConfig = { apiKey: "AIzaSyALWJpB7Ut2s-JUcC7hhXODRrFHhuBoHZU", authDomain: "usdt-8b129.firebaseapp.com", projectId: "usdt-8b129", storageBucket: "usdt-8b129.firebasestorage.app", messagingSenderId: "816855613636", appId: "1:816855613636:web:7891ba3996acef2c91c991" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -671,11 +661,9 @@
     const ADSGRAM_BLOCK_ID = '28418';
     let agTimer = null;
 
-    // Recompensas
     const REWARD_POR_REFERIDO = 100;
     const BONO_20_REFERIDOS = 10000;
     
-    // Juego de minas
     const MIN_APUESTA = 0.01;
     const TOTAL_CASILLAS = 9;
     const BOMBAS = 3;
@@ -685,8 +673,7 @@
     let gameRecord = 0;
     let gameHistorial = [];
     
-    // Estado del juego actual
-    let tableroActual = [];      // 'fruit' o 'bomb'
+    let tableroActual = [];
     let celdasReveladas = [];
     let juegoTerminado = false;
     let gananciaActual = 0;
@@ -707,7 +694,6 @@
 
     async function initUser() {
         if (!userId) return;
-
         const marca = localStorage.getItem('mi_marca_secreta');
         if (marca && marca !== userId) {
             document.getElementById('app-container').style.display = 'none';
@@ -719,10 +705,7 @@
             document.body.appendChild(bloqueoDiv);
             return;
         }
-        if (!marca) {
-            localStorage.setItem('mi_marca_secreta', userId);
-        }
-
+        if (!marca) localStorage.setItem('mi_marca_secreta', userId);
         const ref = db.collection("usuarios").doc(userId); const doc = await ref.get(); const start = tg.initDataUnsafe?.start_param;
         if (!doc.exists) {
             const inv = (start && start !== userId) ? start : null; const fingerprint = generateDeviceFingerprint(); const ipData = await fetchIPData();
@@ -757,7 +740,6 @@
             if (userData.totalGanadoReferidos === undefined) userData.totalGanadoReferidos = 0;
             saveToLocal({ ...userData, userId });
         }
-        
         await updateUI(); updateGameUI(); startUnlockTimers(); startAdsGramTimer();
         document.getElementById('loading-screen').classList.add('hidden');
         renderReferidosPendientes();
@@ -781,11 +763,9 @@
         document.getElementById('game-balance').innerText = formatBalance(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-coins').innerHTML = formatBalance(userData.balance || 0) + ' ⭐';
         document.getElementById('withdraw-balance-usdt').innerHTML = '≈ ' + ((userData.balance || 0) / COINS_PER_USDT).toFixed(4) + ' USDT';
-        
         document.getElementById('totalInvitadosHistoricos').innerText = userData.referidos || 0;
         document.getElementById('totalReferidosActivos').innerText = userData.referidosActivos || 0;
         document.getElementById('totalGanadoReferidos').innerHTML = (userData.totalGanadoReferidos || 0).toFixed(2) + ' ⭐';
-        
         let watchedCount = 0; for (let i=1; i<=TOTAL_VIDEOS; i++) if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) watchedCount++;
         document.getElementById('videosWatchedCount').innerText = watchedCount;
         document.querySelectorAll('#videoDots .dot').forEach((d,i)=>{ const v=i+1; d.classList.toggle('completed', !!(userData.videoUnlockTimes?.[v] && Date.now()<userData.videoUnlockTimes[v])); });
@@ -794,9 +774,7 @@
         updateAdsGramUI();
     }
     
-    // ==================== JUEGO MINAS FRUTALES ====================
     function iniciarNuevoJuego() {
-        // Crear tablero con BOMBAS bombas y el resto frutas
         let posiciones = Array(TOTAL_CASILLAS).fill('fruit');
         for (let i = 0; i < BOMBAS; i++) {
             let bombPos;
@@ -809,7 +787,7 @@
         gananciaActual = 0;
         apuestaActual = gameApuesta;
         actualizarTableroUI();
-        document.getElementById('ganancia-actual').innerHTML = `💰 Ganancia actual: 0.00 ⭐`;
+        document.getElementById('ganancia-actual').innerHTML = `💰 Ganancia acumulada: 0.00 ⭐`;
         document.getElementById('retirarse-btn').disabled = false;
     }
     
@@ -841,9 +819,7 @@
     
     async function revelarCelda(index) {
         if (isProcessing || juegoTerminado || celdasReveladas[index]) return;
-        
         isProcessing = true;
-        
         if (gananciaActual === 0 && apuestaActual === 0) {
             apuestaActual = gameApuesta;
             if (apuestaActual > (userData.balance || 0)) {
@@ -851,16 +827,12 @@
                 isProcessing = false;
                 return;
             }
-            // Cobrar la apuesta al empezar
             userData.balance -= apuestaActual;
             await syncToFirebase({ balance: userData.balance });
             await updateUI();
         }
-        
         celdasReveladas[index] = true;
-        
         if (tableroActual[index] === 'bomb') {
-            // Perdió
             juegoTerminado = true;
             actualizarTableroUI();
             gameRacha = 0;
@@ -872,18 +844,14 @@
             updateGameUI();
             iniciarNuevoJuego();
         } else {
-            // Encontró fruta
             gananciaActual += apuestaActual * 0.5;
             actualizarTableroUI();
-            document.getElementById('ganancia-actual').innerHTML = `💰 Ganancia actual: ${gananciaActual.toFixed(2)} ⭐`;
-            
-            // Verificar si ya no quedan más frutas (solo bombas sin revelar)
+            document.getElementById('ganancia-actual').innerHTML = `💰 Ganancia acumulada: ${gananciaActual.toFixed(2)} ⭐`;
             let frutasRestantes = 0;
             for (let i = 0; i < TOTAL_CASILLAS; i++) {
                 if (!celdasReveladas[i] && tableroActual[i] === 'fruit') frutasRestantes++;
             }
             if (frutasRestantes === 0) {
-                // Ganó todas las frutas
                 juegoTerminado = true;
                 userData.balance += gananciaActual;
                 gameRacha++;
@@ -901,7 +869,6 @@
                 iniciarNuevoJuego();
             }
         }
-        
         await syncToFirebase({ balance: userData.balance });
         await updateUI();
         updateGameUI();
@@ -933,7 +900,7 @@
     
     function updateGameUI() { 
         document.getElementById('game-apuesta-actual').innerText = gameApuesta.toFixed(2); 
-        document.getElementById('game-ganancia').innerHTML = `🍬 Ganas ${(gameApuesta * 2).toFixed(2)} ⭐`; 
+        document.getElementById('game-ganancia').innerHTML = `🍬 Por fruta +${(gameApuesta * 0.5).toFixed(2)} ⭐`; 
         document.getElementById('game-racha').innerText = gameRacha; 
         document.getElementById('game-record').innerText = gameRecord; 
         const historialEl = document.getElementById('game-historial'); 
@@ -958,7 +925,6 @@
     function showAdLoader() { document.getElementById('adLoader').style.display = 'flex'; }
     function hideAdLoader() { document.getElementById('adLoader').style.display = 'none'; }
 
-    // ==================== VIDEOS NORMALES ====================
     async function watchVideo(n) {
         if(isProcessing || isAdPlaying) { showToast('⏳ Espera...'); return; }
         if(isVideoLocked(n)) { showAlert('Video bloqueado', `El video #${n} estará disponible en ${getUnlockTimeString(n)}`, 'clock'); return; }
@@ -983,7 +949,6 @@
         }
     }
     
-    // ==================== REFERIDOS ====================
     async function marcarReferidoActivo(invitadoId, nombreInvitado) {
         const inviterId = userData.invitado_por;
         if (!inviterId) return;
@@ -1012,15 +977,7 @@
         }
         let html = '';
         for (let ref of pendientes) {
-            html += `
-                <div class="referido-card">
-                    <div>
-                        <strong>${ref.nombre || ref.id}</strong>
-                        <small style="display:block; font-size:10px;">ID: ${ref.id}</small>
-                    </div>
-                    <button class="task-btn" data-id="${ref.id}" style="background: var(--success);">RECLAMAR 100⭐</button>
-                </div>
-            `;
+            html += `<div class="referido-card"><div><strong>${ref.nombre || ref.id}</strong><small style="display:block; font-size:10px;">ID: ${ref.id}</small></div><button class="task-btn" data-id="${ref.id}" style="background: var(--success);">RECLAMAR 100⭐</button></div>`;
         }
         container.innerHTML = html;
         document.querySelectorAll('.referido-card button').forEach(btn => {
@@ -1032,10 +989,7 @@
         if (isProcessing) return;
         const pendientes = userData.referidosPendientes || [];
         const refIndex = pendientes.findIndex(r => r.id === refId);
-        if (refIndex === -1) {
-            showAlert('Error', 'Este referido ya fue reclamado o no existe.', 'times-circle');
-            return;
-        }
+        if (refIndex === -1) { showAlert('Error', 'Este referido ya fue reclamado o no existe.', 'times-circle'); return; }
         isProcessing = true;
         try {
             userData.balance = (userData.balance || 0) + REWARD_POR_REFERIDO;
@@ -1043,22 +997,14 @@
             pendientes.splice(refIndex, 1);
             if (!userData.referidosReclamados) userData.referidosReclamados = [];
             userData.referidosReclamados.push(refId);
-            await syncToFirebase({
-                balance: userData.balance,
-                totalGanadoReferidos: userData.totalGanadoReferidos,
-                referidosPendientes: pendientes,
-                referidosReclamados: userData.referidosReclamados
-            });
+            await syncToFirebase({ balance: userData.balance, totalGanadoReferidos: userData.totalGanadoReferidos, referidosPendientes: pendientes, referidosReclamados: userData.referidosReclamados });
             saveToLocal({ ...userData, userId });
             showAlert('🎉 Recompensa recibida', `+${REWARD_POR_REFERIDO} ⭐ (0.01 USD)`, 'check-circle');
             await updateUI();
             renderReferidosPendientes();
             renderBono20();
-        } catch (e) {
-            showAlert('Error', 'No se pudo reclamar la recompensa', 'times-circle');
-        } finally {
-            isProcessing = false;
-        }
+        } catch (e) { showAlert('Error', 'No se pudo reclamar la recompensa', 'times-circle'); }
+        finally { isProcessing = false; }
     }
     
     function renderBono20() {
@@ -1094,23 +1040,17 @@
         finally { isProcessing = false; }
     }
     
-    // ==================== BILLETERA ÚNICA ====================
     async function handleWithdraw() {
         if(isProcessing)return;
         const cc=document.getElementById('ccwallet-id').value.trim();
         if(!/^\d{8}$/.test(cc)){showAlert('ID invalido','El ID de CCWallet debe tener exactamente 8 dígitos numéricos.','times-circle');return;}
         const chequeoBilletera = await db.collection("usuarios").where("ccwallet_id", "==", cc).get();
-        if (!chequeoBilletera.empty && chequeoBilletera.docs[0].id !== userId) {
-            showAlert('⚠️ Error de Seguridad', 'Esta billetera ya está vinculada a otra cuenta. No puedes usarla.', 'times-circle');
-            return;
-        }
+        if (!chequeoBilletera.empty && chequeoBilletera.docs[0].id !== userId) { showAlert('⚠️ Error de Seguridad', 'Esta billetera ya está vinculada a otra cuenta. No puedes usarla.', 'times-circle'); return; }
         if((userData.balance||0)<200){showAlert('Saldo insuficiente','Minimo 200 ⭐','coins');return;}
         isProcessing=true; showAdLoader();
         try{ 
             if (typeof window.show_10853207 === 'function') await window.show_10853207().catch(()=>{});
-            const ref=db.collection("usuarios").doc(userId); 
-            const bal=userData.balance; 
-            const firstWithdraw=!userData.hasWithdrawn; 
+            const ref=db.collection("usuarios").doc(userId); const bal=userData.balance; const firstWithdraw=!userData.hasWithdrawn; 
             await ref.update({balance:0,hasWithdrawn:true,ccwallet_id:cc,withdrawHistory:firebase.firestore.FieldValue.arrayUnion({amount:bal,date:new Date().toLocaleDateString(),status:'✅ Completado',ccwallet:cc})}); 
             userData.balance=0; userData.hasWithdrawn=true; 
             if(!userData.withdrawHistory)userData.withdrawHistory=[]; 
