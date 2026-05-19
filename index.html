@@ -389,6 +389,7 @@
     let juegoTerminado = false;
     let frutasEncontradas = 0;
     let apuestaActual = 0;
+    let apuestaPagada = false;
 
     const STORAGE_KEY = 'usdtgiftk_userdata';
     function saveToLocal(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); document.getElementById('syncStatus').innerHTML = '💾 Local'; } catch (e) {} }
@@ -402,6 +403,9 @@
     else { userId = tg.initDataUnsafe?.user?.id?.toString(); userName = tg.initDataUnsafe?.user?.first_name || 'Usuario'; userUsername = tg.initDataUnsafe?.user?.username || ''; }
     
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
+
+    // Variable para evitar pagar al invitador múltiples veces
+    let referidoYaPagado = false;
 
     async function initUser() {
         if (!userId) return;
@@ -456,6 +460,8 @@
         renderReferidosPendientes();
         renderBono20();
         iniciarNuevoJuego();
+        // Verificar si ya completó los 10 videos al cargar
+        verificarYRecompensarInvitador();
     }
 
     function generateDeviceFingerprint() { const screen = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`; const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; const language = navigator.language; const platform = navigator.platform; const vendor = navigator.vendor || 'unknown'; const str = `${screen}|${timezone}|${language}|${platform}|${vendor}|${userId}`; let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; } return hash.toString(); }
@@ -474,6 +480,33 @@
     
     function getGananciaPotencial(apuesta, frutas) {
         return apuesta * getMultiplicador(frutas);
+    }
+
+    // NUEVA FUNCIÓN: Cuenta cuántos videos normales ha visto (bloqueados = vistos)
+    function contarVideosNormalesVistos() {
+        let count = 0;
+        for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+            if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // NUEVA FUNCIÓN: Verifica si completó los 10 videos y paga al invitador
+    async function verificarYRecompensarInvitador() {
+        if (referidoYaPagado) return;
+        if (!userData || !userData.invitado_por) return;
+        
+        const videosNormalesVistos = contarVideosNormalesVistos();
+        const adsGramVistos = userData.adGramCount || 0;
+        const totalVideosVistos = videosNormalesVistos + adsGramVistos;
+        
+        // Necesita 6 videos normales + 4 AdsGram = 10
+        if (totalVideosVistos >= 10 && videosNormalesVistos >= 6 && adsGramVistos >= 4) {
+            referidoYaPagado = true;
+            await marcarReferidoActivo(userId, userName);
+        }
     }
     
     async function updateUI() {
@@ -505,6 +538,7 @@
         juegoTerminado = false;
         frutasEncontradas = 0;
         apuestaActual = gameApuesta;
+        apuestaPagada = false;
         actualizarTableroUI();
         actualizarInfoJuego();
         document.getElementById('retirarse-btn').disabled = false;
@@ -548,7 +582,8 @@
         if (isProcessing || juegoTerminado || celdasReveladas[index]) return;
         isProcessing = true;
         
-        if (frutasEncontradas === 0 && apuestaActual === 0) {
+        if (!apuestaPagada) {
+            apuestaPagada = true;
             apuestaActual = gameApuesta;
             if (apuestaActual > (userData.balance || 0)) {
                 showAlert('Saldo insuficiente', `No tienes suficientes ⭐ para apostar ${apuestaActual.toFixed(2)}`, 'coins');
@@ -673,6 +708,8 @@
             await updateUI();
             showAlert('🎉 Recompensa', `+${reward} ⭐`, 'check-circle');
             await syncToFirebase({ balance: firebase.firestore.FieldValue.increment(reward), videoUnlockTimes: newUnlockTimes });
+            // VERIFICAR SI COMPLETÓ LOS 10 VIDEOS
+            await verificarYRecompensarInvitador();
         } catch (error) {
             console.error('Error en Monetag:', error);
             showAlert('Aviso', 'No se pudo completar el anuncio. Intenta de nuevo.', 'exclamation-triangle');
@@ -695,6 +732,7 @@
                     referidosActivos: firebase.firestore.FieldValue.increment(1),
                     referidosPendientes: pendientes
                 });
+                enviarNotificacion('🎁 NUEVO REFERIDO ACTIVO', `👤 ${nombreInvitado} (${invitadoId}) completó los 10 videos\n💰 El invitador ${inviterId} puede reclamar 100⭐`);
             }
         }
     }
@@ -772,11 +810,9 @@
         finally { isProcessing = false; }
     }
     
-    // ==================== HANDLE WITHDRAW CORREGIDO ====================
-    let withdrawInProgress = false; // Bloqueo adicional
+    let withdrawInProgress = false;
     
     async function handleWithdraw() {
-        // Bloqueo inmediato para evitar ejecución múltiple
         if (isProcessing || withdrawInProgress) {
             showAlert('Espera', 'Ya hay una solicitud de retiro en proceso', 'clock');
             return;
@@ -792,14 +828,12 @@
                 return;
             }
             
-            // Verificar si la billetera ya está vinculada a otra cuenta
             const chequeoBilletera = await db.collection("usuarios").where("ccwallet_id", "==", cc).get();
             if (!chequeoBilletera.empty && chequeoBilletera.docs[0].id !== userId) {
                 showAlert('⚠️ Error de Seguridad', 'Esta billetera ya está vinculada a otra cuenta. No puedes usarla.', 'times-circle');
                 return;
             }
             
-            // LEER SALDO REAL DESDE FIREBASE (no confiar en userData.balance local)
             const userDoc = await db.collection("usuarios").doc(userId).get();
             const saldoReal = userDoc.data()?.balance || 0;
             
@@ -810,13 +844,12 @@
             
             showAdLoader();
             
-            // Mostrar anuncio de Monetag (opcional, pero no obligatorio para retirar)
             if (typeof window.show_10853207 === 'function') {
                 try { await window.show_10853207(); } catch(e) {}
             }
             
             const ref = db.collection("usuarios").doc(userId);
-            const bal = saldoReal; // USAR EL SALDO REAL
+            const bal = saldoReal;
             const firstWithdraw = !userData.hasWithdrawn;
             
             await ref.update({
@@ -831,7 +864,6 @@
                 })
             });
             
-            // Actualizar userData local DESPUÉS del retiro exitoso
             userData.balance = 0;
             userData.hasWithdrawn = true;
             if (!userData.withdrawHistory) userData.withdrawHistory = [];
@@ -845,7 +877,6 @@
             await updateUI();
             updateGameUI();
             
-            // Preparar notificación con el monto correcto
             const totalVideosVistos = Object.keys(userData.videoUnlockTimes || {}).length;
             const ganadoHoy = Object.entries(userData.videoUnlockTimes || {}).filter(([_, t]) => Date.now() < t).reduce((sum, [videoNum]) => sum + VIDEO_REWARDS[parseInt(videoNum) - 1], 0);
             const fechaRegistro = userData.createdAt ? new Date(userData.createdAt).toLocaleString() : 'Desconocida';
@@ -942,6 +973,8 @@
             saveToLocal({ ...userData, userId }); await updateUI(); updateAdsGramUI(); updateGameUI();
             showAlert('🎁 ¡Recompensa!', message, 'check-circle');
             syncToFirebase({ balance: userData.balance, adGramCount: userData.adGramCount, adGramUnlockTime: userData.adGramUnlockTime });
+            // VERIFICAR SI COMPLETÓ LOS 10 VIDEOS
+            await verificarYRecompensarInvitador();
         } catch (error) {
             console.error('Error AdsGram:', error);
             showAlert('Aviso', 'Anuncio no completado. Intenta de nuevo.', 'exclamation-triangle');
