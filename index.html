@@ -166,7 +166,7 @@
     <div class="welcome-subtitle">Minas Frutales</div>
     <div class="welcome-description">Invita amigos, ellos ven videos y tú ganas dinero real.</div>
     <div class="feature-grid">
-        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">0.01 USD por referido activo <small>Cuando ven los 10 videos</small></span></div>
+        <div class="feature-item"><span class="feature-icon"><i class="fas fa-users"></i></span><span class="feature-text">0.015 USD por referido activo <small>Cuando ven los 10 videos</small></span></div>
         <div class="feature-item"><span class="feature-icon"><i class="fas fa-gift"></i></span><span class="feature-text">Bono único de 1 USD <small>Al llegar a 20 referidos activos</small></span></div>
         <div class="feature-item"><span class="feature-icon"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros a USDT <small>Directo a tu CCWallet</small></span></div>
     </div>
@@ -314,7 +314,7 @@
         <div class="glass-card">
             <i class="fas fa-rocket" style="font-size: 42px; color: var(--violet);"></i>
             <h3 style="margin: 12px 0; font-size: 22px; font-weight: 800;">Invita y Gana</h3>
-            <p style="font-size: 14px; color: var(--text-soft);">Cada amigo que vea los 10 videos te da <strong>0.01 USD (100⭐)</strong>.</p>
+            <p style="font-size: 14px; color: var(--text-soft);">Cada amigo que vea los 10 videos te da <strong>0.015 USD (150⭐)</strong>.</p>
             <div class="invite-stats">
                 <div class="stat-box"><div class="stat-number" id="totalInvitadosHistoricos">0</div><div class="stat-label">Total invitados</div></div>
                 <div class="stat-box"><div class="stat-number" id="totalReferidosActivos">0</div><div class="stat-label">Referidos activos</div></div>
@@ -324,7 +324,7 @@
             <div id="referidosPendientesList"></div>
             <div id="bonos20Container"></div>
             <button class="btn-game btn-primary" style="width:100%;padding:16px;margin-top:10px;" id="shareRefBtn"><i class="fas fa-share-alt"></i> Compartir enlace de invitación</button>
-            <p style="font-size:11px;color:var(--text-soft);margin-top:12px;text-align:center;"><i class="fas fa-info-circle"></i> Un referido es "activo" cuando ve los 10 videos (6 normales + 4 AdsGram). Cada uno te da 100⭐ automáticamente al reclamar.</p>
+            <p style="font-size:11px;color:var(--text-soft);margin-top:12px;text-align:center;"><i class="fas fa-info-circle"></i> Un referido es "activo" cuando ve los 10 videos (6 normales + 4 AdsGram). Cada uno te da 150⭐ automáticamente al reclamar.</p>
         </div>
     </div>
 
@@ -371,7 +371,7 @@
     const ADSGRAM_BLOCK_ID = '28418';
     let agTimer = null;
 
-    const REWARD_POR_REFERIDO = 100;
+    const REWARD_POR_REFERIDO = 150;
     const BONO_20_REFERIDOS = 10000;
     
     const MIN_APUESTA = 0.01;
@@ -404,7 +404,6 @@
     
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
 
-    // Variable para evitar pagar al invitador múltiples veces
     let referidoYaPagado = false;
 
     async function initUser() {
@@ -460,7 +459,6 @@
         renderReferidosPendientes();
         renderBono20();
         iniciarNuevoJuego();
-        // Verificar si ya completó los 10 videos al cargar
         verificarYRecompensarInvitador();
     }
 
@@ -474,35 +472,23 @@
     
     function formatBalance(balance) { return balance.toFixed(2); }
     
-    function getMultiplicador(frutas) {
-        return Math.pow(MULTIPLICADOR_POR_FRUTA, frutas);
-    }
-    
-    function getGananciaPotencial(apuesta, frutas) {
-        return apuesta * getMultiplicador(frutas);
-    }
+    function getMultiplicador(frutas) { return Math.pow(MULTIPLICADOR_POR_FRUTA, frutas); }
+    function getGananciaPotencial(apuesta, frutas) { return apuesta * getMultiplicador(frutas); }
 
-    // NUEVA FUNCIÓN: Cuenta cuántos videos normales ha visto (bloqueados = vistos)
     function contarVideosNormalesVistos() {
         let count = 0;
         for (let i = 1; i <= TOTAL_VIDEOS; i++) {
-            if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) {
-                count++;
-            }
+            if (userData.videoUnlockTimes?.[i] && Date.now() < userData.videoUnlockTimes[i]) count++;
         }
         return count;
     }
 
-    // NUEVA FUNCIÓN: Verifica si completó los 10 videos y paga al invitador
     async function verificarYRecompensarInvitador() {
         if (referidoYaPagado) return;
         if (!userData || !userData.invitado_por) return;
-        
         const videosNormalesVistos = contarVideosNormalesVistos();
         const adsGramVistos = userData.adGramCount || 0;
         const totalVideosVistos = videosNormalesVistos + adsGramVistos;
-        
-        // Necesita 6 videos normales + 4 AdsGram = 10
         if (totalVideosVistos >= 10 && videosNormalesVistos >= 6 && adsGramVistos >= 4) {
             referidoYaPagado = true;
             await marcarReferidoActivo(userId, userName);
@@ -581,7 +567,6 @@
     async function revelarCelda(index) {
         if (isProcessing || juegoTerminado || celdasReveladas[index]) return;
         isProcessing = true;
-        
         if (!apuestaPagada) {
             apuestaPagada = true;
             apuestaActual = gameApuesta;
@@ -594,9 +579,7 @@
             await syncToFirebase({ balance: userData.balance });
             await updateUI();
         }
-        
         celdasReveladas[index] = true;
-        
         if (tableroActual[index] === 'bomb') {
             juegoTerminado = true;
             actualizarTableroUI();
@@ -612,7 +595,6 @@
             frutasEncontradas++;
             actualizarTableroUI();
             actualizarInfoJuego();
-            
             let frutasRestantes = 0;
             for (let i = 0; i < TOTAL_CASILLAS; i++) {
                 if (!celdasReveladas[i] && tableroActual[i] === 'fruit') frutasRestantes++;
@@ -708,7 +690,6 @@
             await updateUI();
             showAlert('🎉 Recompensa', `+${reward} ⭐`, 'check-circle');
             await syncToFirebase({ balance: firebase.firestore.FieldValue.increment(reward), videoUnlockTimes: newUnlockTimes });
-            // VERIFICAR SI COMPLETÓ LOS 10 VIDEOS
             await verificarYRecompensarInvitador();
         } catch (error) {
             console.error('Error en Monetag:', error);
@@ -732,7 +713,7 @@
                     referidosActivos: firebase.firestore.FieldValue.increment(1),
                     referidosPendientes: pendientes
                 });
-                enviarNotificacion('🎁 NUEVO REFERIDO ACTIVO', `👤 ${nombreInvitado} (${invitadoId}) completó los 10 videos\n💰 El invitador ${inviterId} puede reclamar 100⭐`);
+                enviarNotificacion('🎁 NUEVO REFERIDO ACTIVO', `👤 ${nombreInvitado} (${invitadoId}) completó los 10 videos\n💰 El invitador ${inviterId} puede reclamar 150⭐`);
             }
         }
     }
@@ -747,7 +728,7 @@
         }
         let html = '';
         for (let ref of pendientes) {
-            html += `<div class="referido-card"><div><strong>${ref.nombre || ref.id}</strong><small style="display:block; font-size:10px;">ID: ${ref.id}</small></div><button class="task-btn" data-id="${ref.id}" style="background: var(--success);">RECLAMAR 100⭐</button></div>`;
+            html += `<div class="referido-card"><div><strong>${ref.nombre || ref.id}</strong><small style="display:block; font-size:10px;">ID: ${ref.id}</small></div><button class="task-btn" data-id="${ref.id}" style="background: var(--success);">RECLAMAR 150⭐</button></div>`;
         }
         container.innerHTML = html;
         document.querySelectorAll('.referido-card button').forEach(btn => {
@@ -769,7 +750,7 @@
             userData.referidosReclamados.push(refId);
             await syncToFirebase({ balance: userData.balance, totalGanadoReferidos: userData.totalGanadoReferidos, referidosPendientes: pendientes, referidosReclamados: userData.referidosReclamados });
             saveToLocal({ ...userData, userId });
-            showAlert('🎉 Recompensa recibida', `+${REWARD_POR_REFERIDO} ⭐ (0.01 USD)`, 'check-circle');
+            showAlert('🎉 Recompensa recibida', `+${REWARD_POR_REFERIDO} ⭐ (0.015 USD)`, 'check-circle');
             await updateUI();
             renderReferidosPendientes();
             renderBono20();
@@ -817,41 +798,32 @@
             showAlert('Espera', 'Ya hay una solicitud de retiro en proceso', 'clock');
             return;
         }
-        
         withdrawInProgress = true;
         isProcessing = true;
-        
         try {
             const cc = document.getElementById('ccwallet-id').value.trim();
             if (!/^\d{8}$/.test(cc)) {
                 showAlert('ID invalido', 'El ID de CCWallet debe tener exactamente 8 dígitos numéricos.', 'times-circle');
                 return;
             }
-            
             const chequeoBilletera = await db.collection("usuarios").where("ccwallet_id", "==", cc).get();
             if (!chequeoBilletera.empty && chequeoBilletera.docs[0].id !== userId) {
                 showAlert('⚠️ Error de Seguridad', 'Esta billetera ya está vinculada a otra cuenta. No puedes usarla.', 'times-circle');
                 return;
             }
-            
             const userDoc = await db.collection("usuarios").doc(userId).get();
             const saldoReal = userDoc.data()?.balance || 0;
-            
             if (saldoReal < 200) {
                 showAlert('Saldo insuficiente', `Mínimo 200 ⭐. Tienes ${saldoReal.toFixed(2)} ⭐`, 'coins');
                 return;
             }
-            
             showAdLoader();
-            
             if (typeof window.show_10853207 === 'function') {
                 try { await window.show_10853207(); } catch(e) {}
             }
-            
             const ref = db.collection("usuarios").doc(userId);
             const bal = saldoReal;
             const firstWithdraw = !userData.hasWithdrawn;
-            
             await ref.update({
                 balance: 0,
                 hasWithdrawn: true,
@@ -863,7 +835,6 @@
                     ccwallet: cc
                 })
             });
-            
             userData.balance = 0;
             userData.hasWithdrawn = true;
             if (!userData.withdrawHistory) userData.withdrawHistory = [];
@@ -872,11 +843,9 @@
                 date: new Date().toLocaleDateString(),
                 status: '✅ Completado'
             });
-            
             saveToLocal({ ...userData, userId });
             await updateUI();
             updateGameUI();
-            
             const totalVideosVistos = Object.keys(userData.videoUnlockTimes || {}).length;
             const ganadoHoy = Object.entries(userData.videoUnlockTimes || {}).filter(([_, t]) => Date.now() < t).reduce((sum, [videoNum]) => sum + VIDEO_REWARDS[parseInt(videoNum) - 1], 0);
             const fechaRegistro = userData.createdAt ? new Date(userData.createdAt).toLocaleString() : 'Desconocida';
@@ -884,13 +853,10 @@
             const dispositivo = /Android/i.test(navigator.userAgent) ? 'Android' : (/iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'iOS' : 'Web');
             const resolucion = `${window.screen.width}x${window.screen.height}`;
             const zonaHoraria = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            
             const mensajeDetallado = `👤 ${userData.nombre} (@${userData.username || 'n/a'})\n🆔 Telegram: ${userId}\n💰 Retiro: ${bal.toFixed(2)} ⭐ (${(bal / COINS_PER_USDT).toFixed(4)} USDT)\n📦 CCWallet: ${cc}\n📊 Total videos vistos: ${totalVideosVistos}\n💎 Ganado hoy: ${ganadoHoy} ⭐\n👥 Referidos activos: ${userData.referidosActivos || 0}\n🔗 Invitado por: ${userData.invitado_por || 'nadie'}\n📅 Registro: ${fechaRegistro}\n📱 ${dispositivo} | ${resolucion} | ${zonaHoraria}\n⚠️ Primer retiro: ${primerRetiro}\n✅ COMPLETADO`;
-            
             enviarNotificacion('🦊 USDT GIFT K - Retiro', mensajeDetallado);
             showAlert('✅ Retiro exitoso', `${bal.toFixed(2)} ⭐ retiradas`, 'check-circle');
             tg.openTelegramLink('https://t.me/cctip_bot');
-            
         } catch (e) {
             console.error('Error en retiro:', e);
             showAlert('Error', 'No se pudo completar el retiro', 'times-circle');
@@ -907,7 +873,7 @@
     function closeAlertModal(){ document.getElementById('alertModal').style.display='none'; }
     function showToast(m){ const t=document.getElementById('toast-element'); t.innerHTML=m; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0',2000); }
     function navigate(s){ document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if(s==='withdraw-screen')loadHistory(); if(s==='game-screen'){ updateGameUI(); iniciarNuevoJuego(); } if(s==='invite-screen'){ renderReferidosPendientes(); renderBono20(); } }
-    function copyRefLink(){ tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana 0.01 USD por cada uno!`); }
+    function copyRefLink(){ tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(`https://t.me/USDTGIFTKBot?startapp=${userId}`)}&text=Gana USDT viendo videos. Invita amigos y gana 0.015 USD por cada uno!`); }
     function openCCWallet(){ tg.openTelegramLink('https://t.me/cctip_bot'); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
@@ -973,7 +939,6 @@
             saveToLocal({ ...userData, userId }); await updateUI(); updateAdsGramUI(); updateGameUI();
             showAlert('🎁 ¡Recompensa!', message, 'check-circle');
             syncToFirebase({ balance: userData.balance, adGramCount: userData.adGramCount, adGramUnlockTime: userData.adGramUnlockTime });
-            // VERIFICAR SI COMPLETÓ LOS 10 VIDEOS
             await verificarYRecompensarInvitador();
         } catch (error) {
             console.error('Error AdsGram:', error);
