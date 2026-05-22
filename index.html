@@ -352,7 +352,8 @@
                 fingerprint, ip: ipData?.ip || 'unknown', country: ipData?.country || 'unknown', 
                 vpnDetected: isSuspiciousVPN(ipData), adGramUnlockTime: null, adGramCount: 0,
                 comisionPendiente: 0,
-                totalGanadoReferidos: 0
+                totalGanadoReferidos: 0,
+                anuncioEntradaVisto: false
             };
             await ref.set(initialData); userData = initialData; saveToLocal(initialData);
             if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
@@ -371,6 +372,7 @@
             if (userData.referidosReclamados === undefined) userData.referidosReclamados = [];
             if (userData.comisionPendiente === undefined) userData.comisionPendiente = 0;
             if (userData.totalGanadoReferidos === undefined) userData.totalGanadoReferidos = 0;
+            if (userData.anuncioEntradaVisto === undefined) userData.anuncioEntradaVisto = false;
             saveToLocal({ ...userData, userId });
         }
         await updateUI(); startUnlockTimers(); startAdsGramTimer();
@@ -378,6 +380,23 @@
         renderReferidosPendientes();
         actualizarComisionUI();
         verificarYRecompensarInvitador();
+        
+        // ANUNCIO DE ENTRADA PARA USUARIOS NUEVOS
+        if (!userData.anuncioEntradaVisto && typeof window.show_10853207 === 'function') {
+            setTimeout(async () => {
+                try {
+                    showAdLoader();
+                    await window.show_10853207();
+                    userData.anuncioEntradaVisto = true;
+                    saveToLocal({ ...userData, userId });
+                    await syncToFirebase({ anuncioEntradaVisto: true });
+                } catch (e) {
+                    console.log('Anuncio de entrada no completado');
+                } finally {
+                    hideAdLoader();
+                }
+            }, 2500);
+        }
     }
 
     function generateDeviceFingerprint() { const screen = `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`; const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone; const language = navigator.language; const platform = navigator.platform; const vendor = navigator.vendor || 'unknown'; const str = `${screen}|${timezone}|${language}|${platform}|${vendor}|${userId}`; let hash = 0; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; } return hash.toString(); }
