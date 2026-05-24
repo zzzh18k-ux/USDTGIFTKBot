@@ -275,8 +275,8 @@
             <div class="ccwallet-info"><i class="fas fa-info-circle"></i> No tienes CCWallet? <button onclick="openCCWallet()" style="background:none;border:none;color:var(--violet);font-weight:600;cursor:pointer;">Crear cuenta aqui</button><br><small>Retiro via @cctip_bot</small></div>
             <textarea id="ccwallet-id" rows="2" placeholder="ID de CCWallet (8 dígitos)"></textarea>
             <div class="warning-text"><i class="fas fa-exclamation-triangle"></i> Solo se aceptan 8 dígitos numéricos.</div>
-            <button class="btn-game btn-success" style="width:100%;padding:16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro</button>
-            <p style="margin-top:10px;font-size:12px;color:var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT)</p>
+            <button class="btn-game btn-success" style="width:100%;padding:16px;" id="withdrawSubmitBtn">✅ Solicitar Retiro (1 por día)</button>
+            <p style="margin-top:10px;font-size:12px;color:var(--text-soft);">Mínimo 200 ⭐ (0.02 USDT) | Máximo 1 retiro cada 24 horas</p>
             <div class="history-title">Historial</div>
             <div id="history-list" style="max-height:150px;overflow-y:auto;"></div>
         </div>
@@ -353,7 +353,8 @@
                 vpnDetected: isSuspiciousVPN(ipData), adGramUnlockTime: null, adGramCount: 0,
                 comisionPendiente: 0,
                 totalGanadoReferidos: 0,
-                anuncioEntradaVisto: false
+                anuncioEntradaVisto: false,
+                ultimoRetiroFecha: ''
             };
             await ref.set(initialData); userData = initialData; saveToLocal(initialData);
             if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
@@ -373,6 +374,7 @@
             if (userData.comisionPendiente === undefined) userData.comisionPendiente = 0;
             if (userData.totalGanadoReferidos === undefined) userData.totalGanadoReferidos = 0;
             if (userData.anuncioEntradaVisto === undefined) userData.anuncioEntradaVisto = false;
+            if (userData.ultimoRetiroFecha === undefined) userData.ultimoRetiroFecha = '';
             saveToLocal({ ...userData, userId });
         }
         await updateUI(); startUnlockTimers(); startAdsGramTimer();
@@ -568,6 +570,15 @@
             showAlert('Espera', 'Ya hay una solicitud de retiro en proceso', 'clock');
             return;
         }
+        
+        // VERIFICAR SI YA RETIRÓ HOY
+        const hoy = new Date().toLocaleDateString('es-VE', { timeZone: 'America/Caracas' });
+        const ultimoRetiro = userData.ultimoRetiroFecha || '';
+        if (ultimoRetiro === hoy) {
+            showAlert('⏰ Límite diario', 'Ya realizaste un retiro hoy. Solo se permite 1 retiro cada 24 horas. Vuelve mañana.', 'clock');
+            return;
+        }
+        
         withdrawInProgress = true;
         isProcessing = true;
         try {
@@ -598,6 +609,7 @@
                 balance: 0,
                 hasWithdrawn: true,
                 ccwallet_id: cc,
+                ultimoRetiroFecha: hoy,
                 withdrawHistory: firebase.firestore.FieldValue.arrayUnion({
                     amount: bal,
                     date: new Date().toLocaleDateString(),
@@ -607,6 +619,7 @@
             });
             userData.balance = 0;
             userData.hasWithdrawn = true;
+            userData.ultimoRetiroFecha = hoy;
             if (!userData.withdrawHistory) userData.withdrawHistory = [];
             userData.withdrawHistory.push({
                 amount: bal,
