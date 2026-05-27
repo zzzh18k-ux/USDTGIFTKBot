@@ -324,7 +324,6 @@
     else { userId = tg.initDataUnsafe?.user?.id?.toString(); userName = tg.initDataUnsafe?.user?.first_name || 'Usuario'; userUsername = tg.initDataUnsafe?.user?.username || ''; }
     
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
-    let referidoYaPagado = false;
 
     async function initUser() {
         if (!userId) return;
@@ -354,7 +353,8 @@
                 comisionPendiente: 0,
                 totalGanadoReferidos: 0,
                 anuncioEntradaVisto: false,
-                ultimoRetiroFecha: ''
+                ultimoRetiroFecha: '',
+                referidoActivoMarcado: false
             };
             await ref.set(initialData); userData = initialData; saveToLocal(initialData);
             if (inv) { const invRef = db.collection("usuarios").doc(inv); await invRef.update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
@@ -375,6 +375,7 @@
             if (userData.totalGanadoReferidos === undefined) userData.totalGanadoReferidos = 0;
             if (userData.anuncioEntradaVisto === undefined) userData.anuncioEntradaVisto = false;
             if (userData.ultimoRetiroFecha === undefined) userData.ultimoRetiroFecha = '';
+            if (userData.referidoActivoMarcado === undefined) userData.referidoActivoMarcado = false;
             saveToLocal({ ...userData, userId });
         }
         await updateUI(); startUnlockTimers(); startAdsGramTimer();
@@ -383,7 +384,6 @@
         actualizarComisionUI();
         verificarYRecompensarInvitador();
         
-        // ANUNCIO DE ENTRADA PARA USUARIOS NUEVOS
         if (!userData.anuncioEntradaVisto && typeof window.show_10853207 === 'function') {
             setTimeout(async () => {
                 try {
@@ -420,14 +420,27 @@
     }
 
     async function verificarYRecompensarInvitador() {
-        if (referidoYaPagado) return;
         if (!userData || !userData.invitado_por) return;
+        if (userData.referidoActivoMarcado) return;
+        
         const videosNormalesVistos = contarVideosNormalesVistos();
         const adsGramVistos = userData.adGramCount || 0;
         const totalVideosVistos = videosNormalesVistos + adsGramVistos;
+        
         if (totalVideosVistos >= 10 && videosNormalesVistos >= 6 && adsGramVistos >= 4) {
-            referidoYaPagado = true;
-            await marcarReferidoActivo(userId, userName);
+            const inviterRef = db.collection("usuarios").doc(userData.invitado_por);
+            const inviterDoc = await inviterRef.get();
+            if (inviterDoc.exists) {
+                const inviterData = inviterDoc.data();
+                const pendientes = inviterData.referidosPendientes || [];
+                const reclamados = inviterData.referidosReclamados || [];
+                if (!pendientes.some(r => r.id === userId) && !reclamados.includes(userId)) {
+                    await marcarReferidoActivo(userId, userName);
+                }
+            }
+            userData.referidoActivoMarcado = true;
+            saveToLocal({ ...userData, userId });
+            await syncToFirebase({ referidoActivoMarcado: true });
         }
     }
     
@@ -571,7 +584,6 @@
             return;
         }
         
-        // VERIFICAR SI YA RETIRÓ HOY
         const hoy = new Date().toLocaleDateString('es-VE', { timeZone: 'America/Caracas' });
         const ultimoRetiro = userData.ultimoRetiroFecha || '';
         if (ultimoRetiro === hoy) {
