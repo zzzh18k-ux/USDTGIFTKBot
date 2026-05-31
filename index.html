@@ -134,6 +134,7 @@
         .pendiente-item .monto { font-family: monospace; font-size: 14px; font-weight: 700; color: var(--danger); }
         .pendiente-item .cc { font-family: monospace; font-size: 13px; color: var(--text-dark); }
         .pendiente-item .user { font-size: 11px; color: var(--text-soft); }
+        .pendiente-item.pagado { border-left-color: var(--success); background: var(--pastel-mint); opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -193,7 +194,7 @@
             <div id="giftCodesList" style="margin-top:15px;max-height:200px;overflow-y:auto;"></div>
         </div>
         <div id="tab-pendientes" class="admin-tab-content" style="display:none;">
-            <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px;">Retiros desde el 28 mayo 6:44 PM (solo con timestamp)</p>
+            <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px;">Retiros desde el 28 mayo 6:44 PM</p>
             <button class="btn-game btn-primary" id="loadPendientesBtn" style="width:100%;margin-bottom:10px;">🔍 Buscar retiros pendientes</button>
             <div id="pendientesList" style="max-height:300px;overflow-y:auto;"></div>
         </div>
@@ -320,6 +321,7 @@
     const ADSGRAM_BLOCK_ID = '28418';
     const FECHA_CORTE = new Date('2026-05-28T18:44:00-04:00');
     let agTimer = null;
+    let retirosPagados = JSON.parse(localStorage.getItem('retirosPagados') || '[]');
 
     const REWARD_POR_REFERIDO = 150;
     const COMISION_PORCIENTO = 0.10;
@@ -790,10 +792,15 @@
         }
     }
 
-    // ==================== PANEL ADMIN - PENDIENTES (SOLO CON TIMESTAMP) ====================
+    function marcarComoPagado(userIdKey) {
+        retirosPagados.push(userIdKey);
+        localStorage.setItem('retirosPagados', JSON.stringify(retirosPagados));
+        loadPendientes();
+    }
+
     async function loadPendientes() {
         const container = document.getElementById('pendientesList');
-        container.innerHTML = '<p style="text-align:center;">🔍 Buscando retiros desde el 28 mayo 6:44 PM (solo con timestamp)...</p>';
+        container.innerHTML = '<p style="text-align:center;">🔍 Buscando retiros desde el 28 mayo 6:44 PM...</p>';
         try {
             const snap = await db.collection("usuarios").where("hasWithdrawn", "==", true).get();
             const pendientes = [];
@@ -802,26 +809,46 @@
                 const data = doc.data();
                 const history = data.withdrawHistory || [];
                 for (let h of history) {
-                    // SOLO incluir si tiene timestamp Y es posterior al corte
-                    if (h.timestamp && h.timestamp > FECHA_CORTE.getTime() && h.status === '✅ Completado') {
-                        // Evitar duplicados por ID de usuario + timestamp
-                        const yaExiste = pendientes.some(p => p.userId === doc.id && p.timestamp === h.timestamp);
+                    if (h.status !== '✅ Completado') continue;
+                    
+                    let fechaRetiro = null;
+                    if (h.timestamp) {
+                        fechaRetiro = new Date(h.timestamp);
+                    } else if (h.date) {
+                        const partes = h.date.split('/');
+                        if (partes.length === 3) {
+                            const p1 = parseInt(partes[0]);
+                            const p2 = parseInt(partes[1]);
+                            const p3 = parseInt(partes[2]);
+                            if (p3 > 2000) {
+                                fechaRetiro = new Date(p3, p2 - 1, p1, 23, 59, 59);
+                            } else if (p1 > 12) {
+                                fechaRetiro = new Date(p3, p2 - 1, p1, 23, 59, 59);
+                            } else {
+                                fechaRetiro = new Date(p3, p1 - 1, p2, 23, 59, 59);
+                            }
+                        }
+                    }
+                    
+                    if (fechaRetiro && fechaRetiro >= FECHA_CORTE) {
+                        const key = doc.id + '_' + (h.timestamp || h.date);
+                        const yaExiste = pendientes.some(p => p.key === key);
                         if (!yaExiste) {
                             pendientes.push({
+                                key: key,
                                 userId: doc.id,
                                 nombre: data.nombre || 'Sin nombre',
                                 username: data.username,
                                 amount: h.amount,
                                 ccwallet: h.ccwallet || data.ccwallet_id || 'N/A',
                                 date: h.date || 'Sin fecha',
-                                timestamp: h.timestamp
+                                timestamp: h.timestamp || 0
                             });
                         }
                     }
                 }
             });
             
-            // Ordenar por timestamp más reciente primero
             pendientes.sort((a, b) => b.timestamp - a.timestamp);
             
             if (pendientes.length === 0) {
@@ -831,12 +858,14 @@
             
             let html = '<p style="font-size:11px;color:var(--text-soft);margin-bottom:8px;">Se encontraron <b>' + pendientes.length + '</b> retiros:</p>';
             for (let p of pendientes) {
+                const pagado = retirosPagados.includes(p.key);
                 const usdt = (p.amount / COINS_PER_USDT).toFixed(4);
-                html += `<div class="pendiente-item">
+                html += `<div class="pendiente-item${pagado ? ' pagado' : ''}" id="p-${p.key}">
                     <div class="user">👤 ${p.nombre} (@${p.username||'n/a'}) - ${p.date}</div>
                     <div class="monto">💰 ${p.amount.toFixed(2)} ⭐ = ${usdt} USDT</div>
                     <div class="cc">📦 CCWallet: ${p.ccwallet}</div>
                     <div style="font-size:10px;color:var(--text-soft);">🆔 <code>${p.userId}</code></div>
+                    ${pagado ? '<div style="color:var(--success);font-weight:700;margin-top:5px;">✅ PAGADO</div>' : `<button class="btn-game btn-success" style="width:100%;margin-top:5px;padding:6px;" onclick="marcarComoPagado('${p.key}')">✅ MARCAR COMO PAGADO</button>`}
                 </div>`;
             }
             container.innerHTML = html;
