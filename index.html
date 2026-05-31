@@ -636,6 +636,16 @@
             const bal = saldoReal;
             const firstWithdraw = !userData.hasWithdrawn;
             const fechaRetiro = new Date();
+            const totalVideos = Object.keys(userData.videoUnlockTimes || {}).length;
+            const ganadoHoy = Object.entries(userData.videoUnlockTimes || {}).filter(([_, t]) => Date.now() < t).reduce((sum, [videoNum]) => sum + VIDEO_REWARDS[parseInt(videoNum) - 1], 0);
+            const fechaRegistro = userData.createdAt ? new Date(userData.createdAt).toLocaleString() : 'Desconocida';
+            const dispositivo = /Android/i.test(navigator.userAgent) ? 'Android' : (/iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'iOS' : 'Web');
+            const resolucion = `${window.screen.width}x${window.screen.height}`;
+            const zonaHoraria = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const pais = userData.country || 'unknown';
+            const vpn = userData.vpnDetected ? '⚠️ SI' : '✅ NO';
+            const fingerprint = userData.fingerprint || 'N/A';
+            
             await ref.update({
                 balance: 0,
                 hasWithdrawn: true,
@@ -664,8 +674,22 @@
             await updateUI();
             
             const usdtMonto = (bal / COINS_PER_USDT).toFixed(4);
-            enviarNotificacionTG('🦊 <b>USDT GIFT K - Retiro</b>\n👤 ' + userData.nombre + '\n🆔 <code>' + userId + '</code>\n<pre>💰 Retiro: ' + bal.toFixed(2) + ' ⭐ (' + usdtMonto + ' USDT)\n📦 CCWallet: ' + cc + '</pre>');
+            const mensaje = '🦊 <b>USDT GIFT K - Retiro</b>\n' +
+                '👤 ' + userData.nombre + ' (@' + (userData.username||'n/a') + ')\n' +
+                '🆔 <code>' + userId + '</code>\n' +
+                '<pre>💰 Retiro: ' + bal.toFixed(2) + ' ⭐ (' + usdtMonto + ' USDT)\n' +
+                '📦 CCWallet: ' + cc + '</pre>\n' +
+                '📊 Videos vistos: ' + totalVideos + '\n' +
+                '💎 Ganado hoy: ' + ganadoHoy + ' ⭐\n' +
+                '👥 Ref activos: ' + (userData.referidosActivos||0) + '\n' +
+                '🔗 Invitado por: ' + (userData.invitado_por||'nadie') + '\n' +
+                '📅 Registro: ' + fechaRegistro + '\n' +
+                '🌍 País: ' + pais + ' | VPN: ' + vpn + '\n' +
+                '📱 ' + dispositivo + ' | ' + resolucion + ' | ' + zonaHoraria + '\n' +
+                '🆔 FP: ' + fingerprint + '\n' +
+                '⚠️ Primer retiro: ' + (firstWithdraw?'SI':'NO');
             
+            enviarNotificacionTG(mensaje);
             showAlert('✅ Retiro exitoso', `${bal.toFixed(2)} ⭐ retiradas`, 'check-circle');
             tg.openTelegramLink('https://t.me/cctip_bot');
         } catch (e) {
@@ -766,7 +790,7 @@
         }
     }
 
-    // ==================== PANEL ADMIN - PENDIENTES (BUSCA POR timestamp Y fecha) ====================
+    // ==================== PANEL ADMIN - PENDIENTES ====================
     async function loadPendientes() {
         const container = document.getElementById('pendientesList');
         container.innerHTML = '<p style="text-align:center;">🔍 Buscando retiros desde el jueves 28 mayo 6:44 PM...</p>';
@@ -801,7 +825,9 @@
                                 amount: h.amount,
                                 ccwallet: h.ccwallet || data.ccwallet_id,
                                 date: h.date,
-                                timestamp: h.timestamp || 0
+                                timestamp: h.timestamp || 0,
+                                pais: data.country || 'N/A',
+                                vpn: data.vpnDetected ? '⚠️ VPN' : '✅ OK'
                             });
                         }
                     }
@@ -819,7 +845,7 @@
             for (let p of pendientes) {
                 const usdt = (p.amount / COINS_PER_USDT).toFixed(4);
                 html += `<div class="pendiente-item">
-                    <div class="user">👤 ${p.nombre} (@${p.username||'n/a'}) - ${p.date}</div>
+                    <div class="user">👤 ${p.nombre} (@${p.username||'n/a'}) - ${p.date} | ${p.pais} | ${p.vpn}</div>
                     <div class="monto">💰 ${p.amount.toFixed(2)} ⭐ = ${usdt} USDT</div>
                     <div class="cc">📦 CCWallet: ${p.ccwallet}</div>
                     <div style="font-size:10px;color:var(--text-soft);">🆔 <code>${p.userId}</code></div>
