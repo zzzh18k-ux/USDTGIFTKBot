@@ -193,7 +193,7 @@
             <div id="giftCodesList" style="margin-top:15px;max-height:200px;overflow-y:auto;"></div>
         </div>
         <div id="tab-pendientes" class="admin-tab-content" style="display:none;">
-            <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px;">Retiros desde el jueves (fallo de notificaciones)</p>
+            <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px;">Retiros desde el jueves 28 mayo 6:44 PM</p>
             <button class="btn-game btn-primary" id="loadPendientesBtn" style="width:100%;margin-bottom:10px;">🔍 Buscar retiros pendientes</button>
             <div id="pendientesList" style="max-height:300px;overflow-y:auto;"></div>
         </div>
@@ -309,7 +309,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const TELEGRAM_BOT_TOKEN = '8786796917:AAEJPHbFpN7KbPg4AGWEblb1yVVL3TDNL_8';
-    const TELEGRAM_CHAT_ID = '8786796917';
+    const TELEGRAM_CHAT_ID = '5177703836';
     const ADMIN_SECRET = '231606';
     const COINS_PER_USDT = 10000;
     const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5];
@@ -766,34 +766,52 @@
         }
     }
 
-    // ==================== PANEL ADMIN - PENDIENTES ====================
+    // ==================== PANEL ADMIN - PENDIENTES (BUSCA POR timestamp Y fecha) ====================
     async function loadPendientes() {
         const container = document.getElementById('pendientesList');
-        container.innerHTML = '<p style="text-align:center;">🔍 Buscando retiros desde el jueves...</p>';
+        container.innerHTML = '<p style="text-align:center;">🔍 Buscando retiros desde el jueves 28 mayo 6:44 PM...</p>';
         try {
             const snap = await db.collection("usuarios").where("hasWithdrawn", "==", true).get();
-            const pendientes = [];
+            const pendientesMap = new Map();
             snap.forEach(doc => {
                 const data = doc.data();
                 const history = data.withdrawHistory || [];
                 for (let h of history) {
-                    if (h.timestamp && h.timestamp >= FECHA_CORTE.getTime() && h.status === '✅ Completado') {
-                        pendientes.push({
-                            userId: doc.id,
-                            nombre: data.nombre,
-                            username: data.username,
-                            amount: h.amount,
-                            ccwallet: h.ccwallet || data.ccwallet_id,
-                            date: h.date,
-                            timestamp: h.timestamp
-                        });
+                    if (h.status !== '✅ Completado') continue;
+                    let esPosterior = false;
+                    if (h.timestamp && h.timestamp >= FECHA_CORTE.getTime()) {
+                        esPosterior = true;
+                    } else if (h.date) {
+                        const partes = h.date.split('/');
+                        if (partes.length === 3) {
+                            const fechaRetiro = new Date(partes[2], partes[1] - 1, partes[0]);
+                            fechaRetiro.setHours(23, 59, 59);
+                            if (fechaRetiro.getTime() >= FECHA_CORTE.getTime()) {
+                                esPosterior = true;
+                            }
+                        }
+                    }
+                    if (esPosterior) {
+                        const key = doc.id + '_' + (h.timestamp || h.date);
+                        if (!pendientesMap.has(key)) {
+                            pendientesMap.set(key, {
+                                userId: doc.id,
+                                nombre: data.nombre,
+                                username: data.username,
+                                amount: h.amount,
+                                ccwallet: h.ccwallet || data.ccwallet_id,
+                                date: h.date,
+                                timestamp: h.timestamp || 0
+                            });
+                        }
                     }
                 }
             });
+            const pendientes = Array.from(pendientesMap.values());
             pendientes.sort((a, b) => b.timestamp - a.timestamp);
             
             if (pendientes.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:var(--success);">✅ No hay retiros pendientes desde el jueves.</p>';
+                container.innerHTML = '<p style="text-align:center;color:var(--success);">✅ No hay retiros pendientes desde el jueves 28 mayo 6:44 PM.</p>';
                 return;
             }
             
