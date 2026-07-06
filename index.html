@@ -279,7 +279,7 @@
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="Pega tu dirección de Polygon (0x...)"></textarea>
             <div class="warning-text"><i class="fas fa-check-circle"></i> Dirección de red Polygon (empieza con 0x)</div>
-            <button class="btn-game btn-success" style="width:100%; padding:14px;" id="withdrawSubmitBtn"><span><i class="fas fa-circle-check"></i> Solicitar Retiro (1 por día)</span></button>
+            <button class="btn-game btn-success" style="width:100%; padding:14px;" id="withdrawSubmitBtn"><span><i class="fas fa-circle-check"></i> Solicitar Retiro</span></button>
             <div style="text-align:center; margin-top:8px; font-size:11px; color:var(--text-soft-cocoa); font-weight:600;">Mínimo de retiro: 200 ⭐ (0.02 USDT)</div>
             <div class="history-title"><i class="fas fa-list-check"></i> Historial de transacciones</div>
             <div id="history-list" style="max-height:150px; overflow-y:auto; background:var(--bg-cream); border-radius:18px; border:2px solid var(--border-cocoa);"></div>
@@ -395,7 +395,7 @@
                 referidos: 0, referidosActivos: 0, referidosPendientes: [], referidosReclamados: [],
                 videoUnlockTimes: {}, hasWithdrawn: false, withdrawHistory: [], 
                 redeemedCodes: [], createdAt: Date.now(), comisionPendiente: 0,
-                totalGanadoReferidos: 0, ultimoRetiroFecha: '', referidoActivoMarcado: false
+                totalGanadoReferidos: 0, referidoActivoMarcado: false
             };
             await ref.set(initialData); userData = initialData; saveToLocal({...initialData, userId});
             if (inv) { await db.collection("usuarios").doc(inv).update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
@@ -459,8 +459,6 @@
     
     async function handleWithdraw() {
         if(isProcessing||withdrawInProgress){ showAlert('Espera','Proceso en curso','clock'); return; }
-        const hoy=new Date().toLocaleDateString('es-VE',{timeZone:'America/Caracas'});
-        if(userData.ultimoRetiroFecha===hoy){ showAlert('Límite diario','1 retiro cada 24h','clock'); return; }
         withdrawInProgress=true; isProcessing=true;
         try {
             const cc=document.getElementById('ccwallet-id').value.trim();
@@ -479,13 +477,13 @@
             const fechaStr=new Date().toLocaleDateString();
             
             await db.collection("usuarios").doc(userId).update({
-                balance:0, hasWithdrawn:true, ultimoRetiroFecha:hoy,
+                balance:0, hasWithdrawn:true,
                 withdrawHistory:firebase.firestore.FieldValue.arrayUnion({
                     amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'
                 })
             });
             
-            userData.balance=0; userData.hasWithdrawn=true; userData.ultimoRetiroFecha=hoy;
+            userData.balance=0; userData.hasWithdrawn=true;
             if(!userData.withdrawHistory) userData.withdrawHistory=[];
             userData.withdrawHistory.push({amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'});
             
