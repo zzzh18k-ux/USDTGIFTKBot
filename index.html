@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>USDT GIFT K - Pagos Automáticos Polygon</title>
+    <title>USDT GIFT K - Minas Frutales Casino</title>
     
     <script src='//libtl.com/sdk.js' data-zone='10853207' data-sdk='show_10853207'></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -16,16 +16,29 @@
 
     <style>
         :root {
-            --bg-cream: #FFFDF6; --card-milk: #FFFFFF; --text-cocoa: #4E3629;
-            --text-soft-cocoa: #8D7365; --border-cocoa: #5D4037;
-            --pastel-pink: #FFD3DA; --pastel-green: #C5EBE1; --pastel-purple: #E2DBF5;
-            --pastel-coral: #FFCAB8; --pastel-yellow: #FFF0C2;
+            --bg-cream: #FFFDF6;
+            --card-milk: #FFFFFF;
+            --text-cocoa: #4E3629;
+            --text-soft-cocoa: #8D7365;
+            --border-cocoa: #5D4037;
+            --pastel-pink: #FFD3DA;
+            --pastel-pink-shadow: #E2ACB4;
+            --pastel-green: #C5EBE1;
+            --pastel-green-shadow: #A0CFC3;
+            --pastel-purple: #E2DBF5;
+            --pastel-purple-shadow: #BDB2D9;
+            --pastel-coral: #FFCAB8;
+            --pastel-coral-shadow: #E89E86;
+            --pastel-yellow: #FFF0C2;
+            --pastel-yellow-shadow: #E6D294;
+            --clay-shadow: 0 8px 0px rgba(78, 54, 41, 0.15), 0 15px 30px rgba(78, 54, 41, 0.05);
+            --inner-soft: inset 0 -4px 0px rgba(78, 54, 41, 0.08);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Fredoka', sans-serif; color: var(--text-cocoa); }
         body { background: var(--bg-cream); height: 100vh; overflow: hidden; display: flex; justify-content: center; background-image: radial-gradient(#F3EDE0 1.5px, transparent 1.5px), radial-gradient(#F3EDE0 1.5px, #FFFDF6 1.5px); background-size: 24px 24px; background-position: 0 0, 12px 12px; }
-        
-        /* PANTALLA DE CARGA MEJORADA - 8 SEGUNDOS */
-        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-cream); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; transition: opacity 0.8s ease; padding: 24px; text-align: center; }
+        #gradient-bg { display: none; }
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-cream); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; transition: opacity 0.5s ease; padding: 24px; text-align: center; }
         #loading-screen.hidden { opacity: 0; pointer-events: none; }
         .welcome-badge { background: var(--pastel-pink); border: 4px solid var(--border-cocoa); border-radius: 40px; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 0 var(--border-cocoa); animation: float 3s ease-in-out infinite; margin-bottom: 24px; }
         .welcome-badge i { font-size: 44px; color: var(--text-cocoa); }
@@ -39,13 +52,9 @@
         .feature-icon-wrapper i { font-size: 16px; color: var(--text-cocoa); }
         .feature-text { font-size: 13px; font-weight: 600; color: var(--text-cocoa); }
         .feature-text small { display: block; font-size: 11px; font-weight: 500; color: var(--text-soft-cocoa); margin-top: 1px; }
-        .loading-progress { width: 200px; height: 16px; background: #FFF; border: 3px solid var(--border-cocoa); border-radius: 20px; margin-top: 16px; overflow: hidden; position: relative; }
-        .loading-progress-bar { height: 100%; width: 0%; background: var(--pastel-pink); border-radius: 20px; animation: progress 8s ease-out forwards; }
-        @keyframes progress { 0%{width:0%;} 20%{width:15%;} 50%{width:40%;} 80%{width:75%;} 100%{width:100%;} }
+        .loading-progress { width: 180px; height: 14px; background: #FFF; border: 3px solid var(--border-cocoa); border-radius: 20px; margin-top: 16px; overflow: hidden; position: relative; }
+        .loading-progress-bar { height: 100%; width: 0%; background: var(--pastel-pink); border-radius: 20px; }
         .loading-footer { margin-top: 20px; font-size: 12px; color: var(--text-soft-cocoa); font-weight: 600; display: flex; align-items: center; gap: 6px; }
-        .loading-step { font-size: 11px; color: var(--text-soft-cocoa); margin-top: 8px; font-weight: 500; animation: fadeSteps 8s infinite; }
-        @keyframes fadeSteps { 0%,100%{opacity:0.6;} 50%{opacity:1;} }
-
         .ad-loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(78, 54, 41, 0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 99998; }
         .ad-loader { width: 120px; height: 120px; border-radius: 32px; background: var(--bg-cream); border: 4px solid var(--border-cocoa); display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 0 var(--border-cocoa); }
         .ad-loader i { font-size: 32px; color: var(--text-cocoa); animation: spin 1.2s linear infinite; }
@@ -71,7 +80,7 @@
         .dot { width: 12px; height: 12px; border-radius: 50%; background: #FFF; border: 2px solid var(--border-cocoa); transition: all 0.2s; }
         .dot.completed { background: var(--pastel-green); }
         .video-card { background: var(--card-milk); border-radius: 24px; padding: 12px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 3px solid var(--border-cocoa); box-shadow: 0 5px 0 var(--border-cocoa); transition: all 0.2s; }
-        .video-card.completed { background: #F4FAF7; }
+        .video-card.completed { background: #F4FAF7; border-color: var(--border-cocoa); }
         .video-info { display: flex; align-items: center; gap: 12px; }
         .video-icon { width: 38px; height: 38px; border-radius: 14px; background: var(--pastel-yellow); border: 2px solid var(--border-cocoa); display: flex; align-items: center; justify-content: center; }
         .video-icon i { font-size: 14px; color: var(--text-cocoa); }
@@ -90,62 +99,85 @@
         .btn-game { background: var(--card-milk); border: 3px solid var(--border-cocoa); padding: 14px 20px; border-radius: 24px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 5px 0 var(--border-cocoa); transition: all 0.15s ease; }
         .btn-game:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--border-cocoa); }
         .btn-game span { display: flex; align-items: center; gap: 10px; }
+        .btn-game i:first-child { font-size: 14px; }
+        .btn-game .chevron-icon { font-size: 12px; color: var(--text-soft-cocoa); }
         .glass-card { background: var(--card-milk); border-radius: 32px; padding: 24px; margin-top: 12px; border: 4px solid var(--border-cocoa); box-shadow: 0 8px 0 var(--border-cocoa); }
         .back-circle { width: 44px; height: 44px; background: var(--card-milk); border-radius: 18px; border: 3px solid var(--border-cocoa); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 12px; box-shadow: 0 4px 0 var(--border-cocoa); transition: all 0.1s; }
         .back-circle:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--border-cocoa); }
+        .back-circle i { font-size: 16px; color: var(--text-cocoa); }
         .alert-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(78, 54, 41, 0.4); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 10001; }
         .alert-content { background: var(--bg-cream); border-radius: 36px; padding: 32px 24px; width: 85%; max-width: 340px; text-align: center; border: 4px solid var(--border-cocoa); box-shadow: 0 12px 0 var(--border-cocoa); }
         .alert-icon { font-size: 40px; margin-bottom: 16px; color: var(--text-cocoa); }
-        .alert-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+        .alert-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--text-cocoa); }
         .alert-message { font-size: 14px; color: var(--text-soft-cocoa); margin-bottom: 24px; line-height: 1.4; }
-        .alert-btn { background: var(--pastel-coral); border: 3px solid var(--border-cocoa); padding: 12px 30px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; box-shadow: 0 4px 0 var(--border-cocoa); }
+        .alert-btn { background: var(--pastel-coral); border: 3px solid var(--border-cocoa); padding: 12px 30px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; box-shadow: 0 4px 0 var(--border-cocoa); transition: all 0.1s; }
         .alert-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--border-cocoa); }
         .toast-premium { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text-cocoa); color: #FFF; padding: 12px 24px; border-radius: 20px; font-size: 13px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-weight: 600; }
         .toast-premium * { color: #FFF; }
         input, textarea { width: 100%; padding: 14px 18px; border-radius: 20px; border: 3px solid var(--border-cocoa); margin: 8px 0; background: var(--card-milk); font-size: 13px; color: var(--text-cocoa); font-weight: 600; box-shadow: inset 0 2px 4px rgba(78, 54, 41, 0.05); outline: none; }
+        input:focus, textarea:focus { border-color: var(--border-cocoa); background: #FFFDF9; }
         .warning-text { font-size: 11px; color: var(--text-soft-cocoa); margin: 4px 0 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 2px dashed #E5DCD5; font-size: 12px; color: var(--text-soft-cocoa); font-weight: 600; }
-        .history-title { font-size: 14px; font-weight: 700; margin: 24px 0 12px; }
+        .history-title { font-size: 14px; font-weight: 700; margin: 24px 0 12px; color: var(--text-cocoa); }
         .balance-available { background: var(--pastel-green); border-radius: 24px; padding: 20px; margin: 14px 0; text-align: center; border: 3px solid var(--border-cocoa); box-shadow: 0 4px 0 var(--border-cocoa); }
-        .balance-available .coins { font-size: 32px; font-weight: 700; }
+        .balance-available .coins { font-size: 32px; font-weight: 700; color: var(--text-cocoa); }
         .balance-available .usdt { font-size: 12px; color: var(--text-soft-cocoa); font-weight: 600; margin-top: 4px; }
         .btn-primary { background: var(--pastel-pink) !important; }
         .btn-success { background: var(--pastel-green) !important; }
-        .status-badge { background: var(--pastel-green); border: 2px solid var(--border-cocoa); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; }
+        .status-badge { background: var(--pastel-green); border: 2px solid var(--border-cocoa); color: var(--text-cocoa); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; }
         .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(78, 54, 41, 0.4); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 10000; }
         .admin-modal-content { background: var(--bg-cream); border-radius: 36px; padding: 24px; width: 90%; max-width: 360px; max-height: 80vh; overflow-y: auto; border: 4px solid var(--border-cocoa); box-shadow: 0 12px 0 var(--border-cocoa); }
         .admin-tabs-container { display: flex; gap: 4px; margin-bottom: 15px; flex-wrap: wrap; }
         .admin-tab { flex: 1; padding: 8px; border: 2px solid var(--border-cocoa); border-radius: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 10px; text-align: center; }
         .admin-tab.active { background: var(--pastel-pink); box-shadow: 0 3px 0 var(--border-cocoa); transform: translateY(-2px); }
         .admin-tab:not(.active) { background: #FFF; box-shadow: 0 2px 0 var(--border-cocoa); }
+        .invite-highlight { background: var(--pastel-yellow); border-radius: 28px; padding: 20px; margin: 16px 0; text-align: center; border: 3px solid var(--border-cocoa); box-shadow: 0 4px 0 var(--border-cocoa); }
+        .invite-highlight h4 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .earn-tag { display: inline-block; background: var(--pastel-pink); padding: 6px 16px; border-radius: 18px; font-weight: 700; font-size: 12px; margin-top: 8px; border: 2px solid var(--border-cocoa); }
         .invite-stats { display: flex; justify-content: space-around; margin: 16px 0; gap: 6px; }
         .stat-box { text-align: center; background: var(--card-milk); padding: 10px; border-radius: 20px; flex: 1; border: 2px solid var(--border-cocoa); box-shadow: 0 3px 0 var(--border-cocoa); }
         .stat-number { font-size: 20px; font-weight: 700; }
         .stat-label { font-size: 9px; font-weight: 600; color: var(--text-soft-cocoa); margin-top: 2px; }
+        .code-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 2px dashed #E5DCD5; font-size: 12px; }
+        #home-screen { padding-bottom: 0; justify-content: flex-start; }
         .sync-status { position: fixed; bottom: 12px; right: 12px; font-size: 10px; background: var(--card-milk); padding: 6px 14px; border-radius: 14px; z-index: 1000; font-weight: 700; border: 2px solid var(--border-cocoa); box-shadow: 0 2px 0 var(--border-cocoa); display: flex; align-items: center; gap: 4px; }
         .referido-card { background: var(--card-milk); border-radius: 20px; padding: 12px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 2px solid var(--border-cocoa); box-shadow: 0 4px 0 var(--border-cocoa); }
+        .referido-card strong { font-size: 12px; }
+        .referido-card button { padding: 6px 12px; border-radius: 14px; border: 2px solid var(--border-cocoa); font-size: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 0 var(--border-cocoa); }
+        .referido-card button:active { transform: translateY(2px); box-shadow: none; }
         .comision-card { background: var(--pastel-coral); border-radius: 24px; padding: 16px; margin-top: 10px; border: 3px solid var(--border-cocoa); box-shadow: 0 4px 0 var(--border-cocoa); text-align: center; }
+        .comision-card button { background: var(--card-milk); border: 2px solid var(--border-cocoa); padding: 8px 20px; border-radius: 16px; font-weight: 700; margin-top: 8px; cursor: pointer; box-shadow: 0 3px 0 var(--border-cocoa); font-size: 11px; }
+        .comision-card button:active { transform: translateY(2px); box-shadow: none; }
         .pendiente-item { background: #FFF; border-radius: 20px; padding: 14px; margin-bottom: 8px; border: 3px solid var(--border-cocoa); font-size: 12px; box-shadow: 0 3px 0 var(--border-cocoa); }
+        .pendiente-item .monto { font-size: 14px; font-weight: 700; }
+        .pendiente-item .cc { font-size: 11px; margin-top: 2px; word-break: break-all; background: #FFFBF0; padding: 6px 10px; border-radius: 10px; border: 1px dashed var(--border-cocoa); }
+        .pendiente-item .user { font-size: 10px; color: var(--text-soft-cocoa); margin-bottom: 4px; }
         .pendiente-item.pagado { background: var(--pastel-green); opacity: 0.8; }
+        .channel-join { background: var(--pastel-yellow); border: 2px solid var(--border-cocoa); border-radius: 16px; padding: 8px 12px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+        .channel-join button { text-decoration: underline; font-weight: 700; border: none; background: none; cursor: pointer; }
+        .code-input-group { display: flex; gap: 6px; align-items: center; }
+        .code-input-group input { flex: 1; margin: 0; }
+        .code-input-group button { padding: 12px 20px; border-radius: 20px; border: 3px solid var(--border-cocoa); box-shadow: 0 4px 0 var(--border-cocoa); font-size: 12px; font-weight: 700; cursor: pointer; height: 48px; display: flex; align-items: center; justify-content: center; }
+        .code-input-group button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--border-cocoa); }
     </style>
 </head>
 <body>
 
+<div id="gradient-bg"></div>
 <div id="syncStatus" class="sync-status"><i class="fa-solid fa-cloud-arrow-up"></i> Sincronizado</div>
 
-<!-- PANTALLA DE CARGA - 8 SEGUNDOS -->
 <div id="loading-screen">
     <div class="welcome-badge"><i class="fas fa-cookie-bite"></i></div>
     <div class="welcome-title">USDT GIFT K</div>
-    <div class="welcome-subtitle">🍓 Pagos Automáticos Polygon</div>
-    <div class="welcome-description">
-        📺 <b>Ve videos</b> y gana estrellas ⭐<br>
-        🤖 <b>Retiros automáticos</b> a tu billetera Polygon<br>
-        💰 <b>Sin esperas</b> - El sistema paga por ti
+    <div class="welcome-subtitle">🍓 Recompensas Diarias</div>
+    <div class="welcome-description">Invita amigos de manera divertida, ellos ven videos sencillos y tú ganas recompensas de forma estable.</div>
+    <div class="feature-grid">
+        <div class="feature-item"><span class="feature-icon-wrapper"><i class="fas fa-heart"></i></span><span class="feature-text">0.015 USD por referido <small>Cuando ven los 10 videos</small></span></div>
+        <div class="feature-item"><span class="feature-icon-wrapper"><i class="fas fa-star"></i></span><span class="feature-text">Comisión del 10% <small>Por cada estrella que generen</small></span></div>
+        <div class="feature-item"><span class="feature-icon-wrapper"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros automáticos <small>Directo a tu billetera</small></span></div>
     </div>
-    <div class="loading-progress"><div class="loading-progress-bar"></div></div>
-    <div class="loading-step" id="loadingStep">🔄 Conectando con la blockchain...</div>
-    <div class="loading-footer"><i class="fas fa-shield-halved"></i> Pago automático activado</div>
+    <div class="loading-progress"><div class="loading-progress-bar" id="loadingBar"></div></div>
+    <div class="loading-footer" id="loadingFooter"><i class="fas fa-shield-halved"></i> Preparando todo para ti...</div>
 </div>
 
 <div id="adLoader" class="ad-loader-overlay">
@@ -165,12 +197,13 @@
 
 <div id="adminModal" class="admin-modal">
     <div class="admin-modal-content">
-        <h3 style="margin-bottom:12px;"><i class="fas fa-crown"></i> Panel Admin</h3>
-        <input type="password" id="adminPassword" placeholder="Clave secreta">
+        <h3 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;"><i class="fas fa-crown" style="color:var(--text-cocoa);"></i> Panel Admin</h3>
+        <input type="password" id="adminPassword" placeholder="Clave secreta" style="margin-bottom:15px;">
         <div class="admin-tabs-container">
             <button class="admin-tab active" data-tab="saldo">Saldo</button>
             <button class="admin-tab" data-tab="codigos">Códigos</button>
             <button class="admin-tab" data-tab="pendientes">Pendientes</button>
+            <button class="admin-tab" data-tab="stats">Stats</button>
         </div>
         <div id="tab-saldo" class="admin-tab-content">
             <input type="text" id="adminUserId" placeholder="ID de usuario">
@@ -178,15 +211,23 @@
             <button class="btn-game btn-primary" id="adminAddBalanceBtn" style="width:100%; margin-top:8px;">Agregar Saldo</button>
         </div>
         <div id="tab-codigos" class="admin-tab-content" style="display:none;">
-            <input type="text" id="giftCode" placeholder="Código">
+            <input type="text" id="giftCode" placeholder="Código (ej: COQUETO50)">
             <input type="number" id="giftAmount" placeholder="Monto en ⭐">
             <input type="number" id="giftMaxUses" placeholder="Límite de usos">
-            <button class="btn-game btn-primary" id="createGiftCodeBtn" style="width:100%;">Crear Código</button>
+            <button class="btn-game btn-primary" id="createGiftCodeBtn" style="width:100%; margin-top:8px;">Crear Código</button>
             <div id="giftCodesList" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
         </div>
         <div id="tab-pendientes" class="admin-tab-content" style="display:none;">
+            <p style="font-size:11px; color:var(--text-soft-cocoa); margin-bottom:10px;">Retiros procesados desde el corte</p>
             <button class="btn-game btn-primary" id="loadPendientesBtn" style="width:100%; margin-bottom:10px;">Buscar pendientes</button>
             <div id="pendientesList" style="max-height:250px; overflow-y:auto;"></div>
+        </div>
+        <div id="tab-stats" class="admin-tab-content" style="display:none;">
+            <div style="text-align:center; padding:10px 0;">
+                <p style="font-size:12px; color:var(--text-soft-cocoa);">Total pagado por referidos</p>
+                <h2 style="font-size:28px; font-weight:700; margin-top:4px;" id="totalRefGanancias">0 ⭐</h2>
+                <p style="font-size:11px; color:var(--text-soft-cocoa); margin-top:2px;">≈ <span id="totalRefUSDT">0.0000</span> USDT</p>
+            </div>
         </div>
         <button class="btn-game" id="adminCancelBtn" style="margin-top:15px; width:100%; background:#EAEAEA;">Cancelar</button>
     </div>
@@ -196,59 +237,62 @@
     <div id="home-screen" class="screen active">
         <div class="top-nav"><div class="channel-bubble" onclick="joinChannel()"><i class="fab fa-telegram"></i><span>@UsdtGiftChannel</span></div></div>
         <div class="balance-card" id="balanceCard"><div id="user-balance">0.00</div><div class="balance-label">⭐ ESTRELLAS</div></div>
-        <div class="section-title"><div class="section-title-icon"><i class="fas fa-video"></i></div><span>Videos de Cosecha (24h)</span></div>
-        <div class="daily-progress"><span><span id="videosWatchedCount">0</span>/6</span><div class="progress-dots" id="videoDots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="section-title"><div class="section-title-icon"><i class="fas fa-video"></i></div><span>Videos de Cosecha (24h de espera)</span></div>
+        <div class="daily-progress"><span><span id="videosWatchedCount">0</span>/6 completados</span><div class="progress-dots" id="videoDots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
         <div class="video-card" id="video1Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#1 Cultivo</div><div class="video-reward">⭐ +10</div></div></div><div class="video-btn-container"><button class="video-btn" id="video1Btn">Ver</button><span class="unlock-time" id="video1Unlock"></span></div></div>
         <div class="video-card" id="video2Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#2 Riego</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video2Btn">Ver</button><span class="unlock-time" id="video2Unlock"></span></div></div>
         <div class="video-card" id="video3Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#3 Abono</div><div class="video-reward">⭐ +15</div></div></div><div class="video-btn-container"><button class="video-btn" id="video3Btn">Ver</button><span class="unlock-time" id="video3Unlock"></span></div></div>
         <div class="video-card" id="video4Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#4 Poda</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video4Btn">Ver</button><span class="unlock-time" id="video4Unlock"></span></div></div>
-        <div class="video-card" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-star"></i></div><div><div class="video-title">#5 Premium</div><div class="video-reward">⭐ +15</div></div></div><div class="video-btn-container"><button class="video-btn" id="video5Btn">Ver</button><span class="unlock-time" id="video5Unlock"></span></div></div>
+        <div class="video-card" id="video5Card"><div class="video-info"><div class="video-icon"><i class="fas fa-star"></i></div><div><div class="video-title">#5 Cosecha Premium</div><div class="video-reward">⭐ +15</div></div></div><div class="video-btn-container"><button class="video-btn" id="video5Btn">Ver</button><span class="unlock-time" id="video5Unlock"></span></div></div>
         <div class="video-card" id="video6Card"><div class="video-info"><div class="video-icon"><i class="fas fa-play"></i></div><div><div class="video-title">#6 Fruto Final</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn small-btn" id="video6Btn">Ver</button><span class="unlock-time" id="video6Unlock"></span></div></div>
-        <div class="section-title"><div class="section-title-icon" style="background:var(--pastel-coral);"><i class="fas fa-gift"></i></div><span>Bono Diario (4 x 5⭐)</span></div>
-        <div class="daily-progress"><span><span id="adsGramWatchedCount">0</span>/4</span><div class="progress-dots" id="adsGramDots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
-        <div class="video-card bonus-card" id="agBonusCard"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title" id="agBonusTitle">Bono Disponible</div><div class="video-reward">⭐ +5</div></div></div><div class="video-btn-container"><button class="video-btn btn-primary" id="agBonusBtn">Ver Bono</button><span class="unlock-time" id="agBonusUnlock"></span></div></div>
+        <div class="section-title" style="margin-top: 12px;"><div class="section-title-icon" style="background:var(--pastel-coral);"><i class="fas fa-gift"></i></div><span>Bono Diario Sorpresa (4 x 5⭐)</span></div>
+        <div class="daily-progress" style="background: var(--bg-cream);"><span><span id="adsGramWatchedCount">0</span>/4 anuncios vistos</span><div class="progress-dots" id="adsGramDots"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+        <div class="video-card bonus-card" id="agBonusCard"><div class="video-info"><div class="video-icon"><i class="fas fa-gift"></i></div><div><div class="video-title" id="agBonusTitle">Bono Disponible</div><div class="video-reward">⭐ +5 por anuncio</div></div></div><div class="video-btn-container"><button class="video-btn btn-primary" id="agBonusBtn">Ver Bono</button><span class="unlock-time" id="agBonusUnlock"></span></div></div>
         <div class="menu-grid">
-            <button class="btn-game" id="gameNavBtn"><span><i class="fas fa-apple-whole"></i> Minas Frutales Casino</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-face-smile"></i> Invitar y Ganar</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-wallet"></i> Retirar a Polygon</span> <i class="fas fa-chevron-right"></i></button>
-            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket"></i> Canjear Cupón</span> <i class="fas fa-chevron-right"></i></button>
+            <button class="btn-game" id="gameNavBtn"><span><i class="fas fa-apple-whole" style="color:var(--text-cocoa);"></i> Minas Frutales Casino</span> <i class="fas fa-chevron-right chevron-icon"></i></button>
+            <button class="btn-game" id="inviteNavBtn"><span><i class="fas fa-face-smile" style="color:var(--text-cocoa);"></i> Invitar y Ganar</span> <i class="fas fa-chevron-right chevron-icon"></i></button>
+            <button class="btn-game" id="withdrawNavBtn"><span><i class="fas fa-wallet" style="color:var(--text-cocoa);"></i> Retirar Balance</span> <i class="fas fa-chevron-right chevron-icon"></i></button>
+            <button class="btn-game" id="redeemNavBtn"><span><i class="fas fa-ticket" style="color:var(--text-cocoa);"></i> Canjear Cupón</span> <i class="fas fa-chevron-right chevron-icon"></i></button>
         </div>
     </div>
 
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <div style="text-align:center;"><i class="fas fa-champagne-glasses" style="font-size:36px;"></i><h3>Invita & Multiplica</h3><p style="font-size:13px;color:var(--text-soft-cocoa);">150⭐ por amigo activo + 10% comisión</p></div>
-            <div class="invite-stats"><div class="stat-box"><div class="stat-number" id="totalInvitadosHistoricos">0</div><div class="stat-label">Invitados</div></div><div class="stat-box"><div class="stat-number" id="totalReferidosActivos">0</div><div class="stat-label">Activos</div></div><div class="stat-box"><div class="stat-number" id="totalGanadoReferidos">0 ⭐</div><div class="stat-label">Ganado</div></div></div>
+            <div style="text-align:center; margin-bottom:12px;"><i class="fas fa-champagne-glasses" style="font-size: 36px;"></i><h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Invita & Multiplica</h3><p style="font-size: 13px; color: var(--text-soft-cocoa); line-height: 1.4;">Obtén 0.015 USD (150⭐) por cada amigo activo, más el 10% de todo lo que ellos generen diariamente.</p></div>
+            <div class="invite-stats"><div class="stat-box"><div class="stat-number" id="totalInvitadosHistoricos">0</div><div class="stat-label">Invitados</div></div><div class="stat-box"><div class="stat-number" id="totalReferidosActivos">0</div><div class="stat-label">Activos</div></div><div class="stat-box"><div class="stat-number" id="totalGanadoReferidos">0 ⭐</div><div class="stat-label">Total ganado</div></div></div>
+            <div class="section-title"><div class="section-title-icon"><i class="fas fa-user-check"></i></div><span>Amigos listos para reclamar</span></div>
             <div id="referidosPendientesList"></div>
-            <div class="comision-card"><span id="comisionPendienteValor">0</span> ⭐<br><button id="reclamarComisionBtn">Recoger Comisiones</button></div>
-            <button class="btn-game btn-primary" style="width:100%;padding:14px;margin-top:12px;" id="shareRefBtn"><span><i class="fas fa-share-nodes"></i> Compartir enlace</span></button>
+            <div class="comision-card" id="comisionContainer"><div style="font-size:11px; font-weight:700;">Comisiones acumuladas</div><div style="font-size: 24px; font-weight: 700; margin-top:2px;"><span id="comisionPendienteValor">0</span> ⭐</div><button id="reclamarComisionBtn">Recoger Comisiones</button></div>
+            <button class="btn-game btn-primary" style="width:100%; padding:14px; margin-top:12px;" id="shareRefBtn"><span><i class="fas fa-share-nodes"></i> Compartir enlace de invitación</span></button>
+            <div style="background:var(--bg-cream); padding:10px; border-radius:14px; border:2px dashed var(--border-cocoa); margin-top:12px; font-size:10px; color:var(--text-soft-cocoa); line-height:1.4;"><i class="fas fa-circle-info"></i> Un amigo se considera "activo" cuando completa sus primeros 10 videos (6 normales y 4 de bono diario). Cada amigo te otorga 150⭐ inmediatamente tras ser verificado.</div>
         </div>
     </div>
 
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <div style="text-align:center;"><i class="fas fa-rocket" style="font-size:36px;"></i><h3>🚀 Retiro Automático Polygon</h3></div>
-            <div class="balance-available"><span style="font-size:11px;">Balance</span><div class="coins" id="withdraw-balance-coins">0.00 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div>
-            <div style="background:var(--pastel-pink);border-radius:20px;padding:14px;margin:12px 0;font-size:12px;border:3px solid var(--border-cocoa);text-align:center;">
-                🤖 <b>PAGO AUTOMÁTICO</b><br>Envío instantáneo a tu billetera Polygon (0x...)
+            <div style="text-align:center; margin-bottom:12px;"><i class="fas fa-piggy-bank" style="font-size: 36px; color: var(--text-cocoa);"></i><h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Retiro de USDT</h3></div>
+            <div class="balance-available"><span style="font-size:11px; font-weight:700; color:var(--text-soft-cocoa);">Balance actual</span><div class="coins" id="withdraw-balance-coins">0.00 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div>
+            <div style="background: var(--pastel-pink); border-radius: 20px; padding: 14px; margin: 12px 0; font-size: 12px; border: 3px solid var(--border-cocoa); text-align: center;">
+                🤖 <b>PAGO AUTOMÁTICO</b><br>Recibe tu USDT directamente en tu billetera
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="Pega tu dirección de Polygon (0x...)"></textarea>
-            <div class="warning-text">⚡ Solo direcciones de red Polygon (empiezan con 0x)</div>
-            <button class="btn-game btn-success" style="width:100%;padding:14px;" id="withdrawSubmitBtn"><span><i class="fas fa-rocket"></i> Retirar Automáticamente</span></button>
-            <div style="text-align:center;margin-top:8px;font-size:11px;">Mínimo: 200 ⭐ (0.02 USDT) | 1 retiro por día</div>
-            <div class="history-title">📋 Historial</div>
-            <div id="history-list" style="max-height:150px;overflow-y:auto;background:var(--bg-cream);border-radius:18px;border:2px solid var(--border-cocoa);"></div>
+            <div class="warning-text"><i class="fas fa-check-circle"></i> Dirección de red Polygon (empieza con 0x)</div>
+            <button class="btn-game btn-success" style="width:100%; padding:14px;" id="withdrawSubmitBtn"><span><i class="fas fa-circle-check"></i> Solicitar Retiro (1 por día)</span></button>
+            <div style="text-align:center; margin-top:8px; font-size:11px; color:var(--text-soft-cocoa); font-weight:600;">Mínimo de retiro: 200 ⭐ (0.02 USDT)</div>
+            <div class="history-title"><i class="fas fa-list-check"></i> Historial de transacciones</div>
+            <div id="history-list" style="max-height:150px; overflow-y:auto; background:var(--bg-cream); border-radius:18px; border:2px solid var(--border-cocoa);"></div>
         </div>
     </div>
 
     <div id="redeem-screen" class="screen">
         <div class="back-circle" id="backHomeRedeem"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <div style="text-align:center;"><i class="fas fa-gift" style="font-size:36px;"></i><h3>Canjea tu Cupón</h3></div>
-            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Código"><button class="btn-primary" id="redeemSubmitBtn">Canjear</button></div>
-            <div id="redeem-message" style="margin-top:14px;font-size:12px;text-align:center;font-weight:700;"></div>
+            <div style="text-align:center; margin-bottom:12px;"><i class="fas fa-gift" style="font-size: 36px;"></i><h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Canjea tu Cupón</h3></div>
+            <div class="channel-join"><i class="fab fa-telegram"></i> Síguenos en: <button onclick="joinChannel()">@UsdtGiftChannel</button></div>
+            <div class="code-input-group"><input type="text" id="redeem-code" placeholder="Introduce tu código aquí"><button class="btn-primary" id="redeemSubmitBtn">Canjear</button></div>
+            <div id="redeem-message" style="margin-top:14px; font-size:12px; text-align:center; font-weight:700;"></div>
         </div>
     </div>
 </div>
@@ -268,7 +312,9 @@
     const TOTAL_ADSGRAM = 4;
     const ADSGRAM_BLOCK_ID = '28418';
     const FECHA_CORTE = new Date('2026-05-28T18:44:00-04:00');
+    
     const PAGO_AUTOMATICO_URL = 'https://pagos-auto-mauve.vercel.app/api/pagar';
+    const PAGO_AUTOMATICO_ACTIVO = true;
     
     let agTimer = null;
     let retirosPagados = JSON.parse(localStorage.getItem('retirosPagados') || '[]');
@@ -276,36 +322,27 @@
     const COMISION_PORCIENTO = 0.10;
     const STORAGE_KEY = 'usdtgiftk_userdata';
 
-    // PASOS DE CARGA
-    const loadingSteps = [
-        '🔄 Conectando con la blockchain Polygon...',
-        '⚡ Verificando nodos de FaucetPay...',
-        '🔐 Estableciendo conexión segura...',
-        '🤖 Configurando pagos automáticos...',
-        '✅ ¡Todo listo! Pagos automáticos activados.'
+    // Animación de carga
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingFooter = document.getElementById('loadingFooter');
+    loadingBar.style.animation = 'progress 6s ease-out forwards';
+    
+    const mensajesCarga = [
+        '🍓 Preparando tus recompensas...',
+        '✨ Casi listo...',
+        '🎉 ¡Todo listo!'
     ];
-    let stepIndex = 0;
-    const stepInterval = setInterval(() => {
-        if (stepIndex < loadingSteps.length) {
-            document.getElementById('loadingStep').textContent = loadingSteps[stepIndex];
-            stepIndex++;
+    let idx = 0;
+    const intervalo = setInterval(() => {
+        if (idx < mensajesCarga.length) {
+            loadingFooter.innerHTML = '<i class="fas fa-shield-halved"></i> ' + mensajesCarga[idx];
+            idx++;
         }
-    }, 1600);
+    }, 2000);
 
     function saveToLocal(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {} }
     function loadFromLocal() { try { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : null; } catch (e) { return null; } }
-    
-    async function syncToFirebase(data) { 
-        if (!userId) return false; 
-        try { 
-            await db.collection("usuarios").doc(userId).update(data);
-            document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Sincronizado';
-            return true; 
-        } catch (e) { 
-            document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-wifi"></i> Sin conexión'; 
-            return false; 
-        } 
-    }
+    async function syncToFirebase(data) { if (!userId) return false; try { await db.collection("usuarios").doc(userId).update(data); return true; } catch (e) { return false; } }
     
     async function enviarNotificacionTG(mensaje) {
         try {
@@ -313,7 +350,7 @@
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: mensaje, parse_mode: 'HTML' })
             });
-        } catch (e) { console.error('Error TG:', e); }
+        } catch (e) {}
     }
 
     const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
@@ -323,20 +360,18 @@
     
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
 
-    // PAGO AUTOMÁTICO
     async function ejecutarPagoAutomatico(direccion, cantidadUSDT, userIdPago, nombreUsuario) {
+        if (!PAGO_AUTOMATICO_ACTIVO) return { success: false, mensaje: 'Desactivado' };
         try {
             const respuesta = await fetch(PAGO_AUTOMATICO_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ direccion, cantidad: cantidadUSDT, userId: userIdPago, nombre: nombreUsuario })
             });
             const resultado = await respuesta.json();
-            
             if (resultado.success) {
-                await enviarNotificacionTG('🤖 <b>PAGO EXITOSO</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n📦 <code>' + direccion + '</code>\n🔗 Polygon');
+                await enviarNotificacionTG('🤖 <b>PAGO EXITOSO</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n📦 <code>' + direccion + '</code>');
             } else {
-                await enviarNotificacionTG('⚠️ <b>PAGO FALLÓ</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n📦 <code>' + direccion + '</code>\n❌ ' + (resultado.mensaje || 'Error'));
+                await enviarNotificacionTG('⚠️ <b>PAGO FALLÓ</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n❌ ' + (resultado.mensaje || 'Error'));
             }
             return resultado;
         } catch (error) {
@@ -349,11 +384,10 @@
         if (!userId) return;
         const marca = localStorage.getItem('mi_marca_secreta');
         if (marca && marca !== userId) {
-            document.body.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-ban" style="font-size:64px;color:#FF4757;"></i><h2>CUENTA BLOQUEADA</h2><p>No se permiten multicuentas.</p></div>';
+            document.body.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-ban" style="font-size:64px;color:#FF4757;"></i><h2>CUENTA BLOQUEADA</h2></div>';
             return;
         }
         if (!marca) localStorage.setItem('mi_marca_secreta', userId);
-        
         const ref = db.collection("usuarios").doc(userId); const doc = await ref.get(); const start = tg.initDataUnsafe?.start_param;
         if (!doc.exists) {
             const inv = (start && start !== userId) ? start : null;
@@ -369,26 +403,23 @@
         } else {
             const firebaseData = doc.data(); const localData = loadFromLocal();
             userData = { ...firebaseData };
-            if (localData && localData.withdrawHistory) {
-                userData.withdrawHistory = localData.withdrawHistory;
-            }
+            if (localData && localData.withdrawHistory) { userData.withdrawHistory = localData.withdrawHistory; }
             saveToLocal({ ...userData, userId });
         }
-        
         await updateUI(); startUnlockTimers(); startAdsGramTimer();
         
-        // PANTALLA DE CARGA DE 8 SEGUNDOS
+        // Carga de 6 segundos
         setTimeout(() => {
-            clearInterval(stepInterval);
+            clearInterval(intervalo);
             document.getElementById('loading-screen').classList.add('hidden');
-        }, 8000);
+        }, 6000);
         
         renderReferidosPendientes(); actualizarComisionUI(); verificarYRecompensarInvitador();
     }
 
     function isVideoLocked(videoNum) { return userData?.videoUnlockTimes?.[videoNum] ? Date.now() < userData.videoUnlockTimes[videoNum] : false; }
-    function getUnlockTimeString(videoNum) { const t = userData?.videoUnlockTimes?.[videoNum]; if (!t) return ''; const r = t - Date.now(); if (r <= 0) return ''; const h = Math.floor(r/3600000); const m = Math.floor((r%3600000)/60000); return `🔒 ${h}h ${m}m`; }
-    function startUnlockTimers() { unlockTimers.forEach(t=>clearInterval(t)); unlockTimers=[]; for(let i=1;i<=TOTAL_VIDEOS;i++){ unlockTimers.push(setInterval(()=>{ const btn=document.getElementById(`video${i}Btn`); if(btn){ const locked=isVideoLocked(i); btn.disabled=locked||isProcessing; btn.innerHTML=locked?'🔒':'Ver'; } document.getElementById(`video${i}Unlock`).textContent=getUnlockTimeString(i); },1000)); } }
+    function getUnlockTimeString(videoNum) { const t = userData?.videoUnlockTimes?.[videoNum]; if (!t) return ''; const r = t - Date.now(); if (r <= 0) return ''; return `🔒 ${Math.floor(r/3600000)}h ${Math.floor((r%3600000)/60000)}m`; }
+    function startUnlockTimers() { unlockTimers.forEach(t=>clearInterval(t)); unlockTimers=[]; for(let i=1;i<=TOTAL_VIDEOS;i++){ unlockTimers.push(setInterval(()=>{ const btn=document.getElementById('video'+i+'Btn'); if(btn){ btn.disabled=isVideoLocked(i)||isProcessing; btn.innerHTML=isVideoLocked(i)?'🔒':'Ver'; } document.getElementById('video'+i+'Unlock').textContent=getUnlockTimeString(i); },1000)); } }
     function formatBalance(b) { return (b||0).toFixed(2); }
     function actualizarComisionUI() { const el=document.getElementById('comisionPendienteValor'); if(el) el.innerText=formatBalance(userData?.comisionPendiente||0); }
 
@@ -408,23 +439,18 @@
 
     async function watchVideo(n) {
         if(isProcessing||isAdPlaying) return;
-        if(isVideoLocked(n)) { showAlert('Bloqueado', 'Disponible en '+getUnlockTimeString(n), 'clock'); return; }
+        if(isVideoLocked(n)) { showAlert('Video bloqueado','Disponible en '+getUnlockTimeString(n),'clock'); return; }
         isProcessing=true; isAdPlaying=true; showAdLoader();
         try {
             await window.show_10853207();
             const reward=VIDEO_REWARDS[n-1];
-            const newTimes={...(userData.videoUnlockTimes||{})};
-            newTimes[n]=Date.now()+(UNLOCK_HOURS*3600000);
-            userData.videoUnlockTimes=newTimes;
+            userData.videoUnlockTimes=userData.videoUnlockTimes||{};
+            userData.videoUnlockTimes[n]=Date.now()+(UNLOCK_HOURS*3600000);
             userData.balance+=reward;
-            saveToLocal({...userData,userId});
-            await updateUI();
-            await syncToFirebase({balance:firebase.firestore.FieldValue.increment(reward),videoUnlockTimes:newTimes});
-            showAlert('🎉 +'+reward+' ⭐','Recompensa recibida','check-circle');
-            if(userData.invitado_por&&reward>0){
-                const com=Math.floor(reward*COMISION_PORCIENTO);
-                if(com>0) await db.collection("usuarios").doc(userData.invitado_por).update({comisionPendiente:firebase.firestore.FieldValue.increment(com)});
-            }
+            saveToLocal({...userData,userId}); await updateUI();
+            await syncToFirebase({balance:firebase.firestore.FieldValue.increment(reward),videoUnlockTimes:userData.videoUnlockTimes});
+            showAlert('🎉 Recompensa','+'+reward+' ⭐','check-circle');
+            if(userData.invitado_por){ await db.collection("usuarios").doc(userData.invitado_por).update({comisionPendiente:firebase.firestore.FieldValue.increment(Math.floor(reward*COMISION_PORCIENTO))}); }
         }catch(e){ showAlert('Error','Anuncio no completado','exclamation-triangle'); }
         finally{ hideAdLoader(); isProcessing=false; isAdPlaying=false; updateUI(); }
     }
@@ -442,7 +468,7 @@
             
             const userDoc=await db.collection("usuarios").doc(userId).get();
             const saldoReal=userDoc.data()?.balance||0;
-            if(saldoReal<200){ showAlert('Saldo insuficiente','Mínimo 200 ⭐. Tienes '+saldoReal.toFixed(2)+' ⭐','coins'); return; }
+            if(saldoReal<200){ showAlert('Saldo insuficiente','Mínimo 200 ⭐','coins'); return; }
             
             showAdLoader();
             if(typeof window.show_10853207==='function'){ try{await window.show_10853207();}catch(e){} }
@@ -451,52 +477,44 @@
             const usdtMonto=(bal/COINS_PER_USDT).toFixed(4);
             const fechaRetiro=new Date();
             
-            // Guardar en Firebase
             await db.collection("usuarios").doc(userId).update({
                 balance:0, hasWithdrawn:true, ultimoRetiroFecha:hoy,
                 withdrawHistory:firebase.firestore.FieldValue.arrayUnion({
-                    amount:bal, date:new Date().toLocaleDateString(),
-                    timestamp:fechaRetiro.getTime(), status:'✅ Completado', ccwallet:cc
+                    amount:bal, date:new Date().toLocaleDateString(), timestamp:fechaRetiro.getTime(), status:'✅ Completado'
                 })
             });
             
-            // Guardar en userData local
             userData.balance=0; userData.hasWithdrawn=true; userData.ultimoRetiroFecha=hoy;
             if(!userData.withdrawHistory) userData.withdrawHistory=[];
-            userData.withdrawHistory.push({
-                amount:bal, date:new Date().toLocaleDateString(),
-                timestamp:fechaRetiro.getTime(), status:'✅ Completado'
-            });
+            userData.withdrawHistory.push({amount:bal, date:new Date().toLocaleDateString(), timestamp:fechaRetiro.getTime(), status:'✅ Completado'});
             
-            // GUARDAR EN LOCALSTORAGE INMEDIATAMENTE
+            // Guardar en localStorage y respaldo
             saveToLocal({...userData, userId});
+            localStorage.setItem('ultimo_retiro_'+userId, JSON.stringify({amount:bal, date:new Date().toLocaleDateString(), status:'✅ Completado'}));
             await updateUI();
             
-            // PAGO AUTOMÁTICO
-            showAlert('🤖 Pagando...','Enviando '+usdtMonto+' USDT a tu billetera Polygon...','rocket');
-            
+            // Pago automático
+            showAlert('🤖 Procesando...','Enviando '+usdtMonto+' USDT a tu billetera','rocket');
             ejecutarPagoAutomatico(cc, parseFloat(usdtMonto), userId, userData.nombre||userName)
-                .then(r => {
-                    if(r.success) showAlert('✅ ¡Pago Exitoso!',usdtMonto+' USDT enviados','check-circle');
-                    else showAlert('⚠️ Procesando','El pago está en camino','clock');
-                });
+                .then(r => { if(r.success) showAlert('✅ ¡Listo!',usdtMonto+' USDT enviados','check-circle'); });
             
-            await enviarNotificacionTG('🦊 <b>RETIRO</b>\n👤 '+userData.nombre+'\n💰 '+bal.toFixed(2)+' ⭐ ('+usdtMonto+' USDT)\n📦 <code>'+cc+'</code>\n🤖 Pago automático ejecutado');
-            
-        }catch(e){ console.error(e); showAlert('Error','No se pudo completar','times-circle'); }
+            await enviarNotificacionTG('🦊 <b>RETIRO</b>\n👤 '+userData.nombre+'\n💰 '+bal.toFixed(2)+' ⭐ ('+usdtMonto+' USDT)\n📦 <code>'+cc+'</code>');
+        }catch(e){ showAlert('Error','No se pudo completar','times-circle'); }
         finally{ hideAdLoader(); withdrawInProgress=false; isProcessing=false; }
     }
     
     function loadHistory(){ 
         const el=document.getElementById('history-list');
-        const h=userData?.withdrawHistory||[];
-        el.innerHTML=h.length?h.reverse().map(i=>`<div class="history-item"><span>${i.date}</span><span>${i.amount.toFixed(2)} ⭐</span><span class="status-badge">${i.status}</span></div>`).join(''):'<p style="text-align:center;padding:12px;font-size:12px;">Sin retiros</p>';
+        let h=userData?.withdrawHistory||[];
+        const respaldo=localStorage.getItem('ultimo_retiro_'+userId);
+        if(respaldo){ const r=JSON.parse(respaldo); if(!h.some(i=>i.amount===r.amount&&i.date===r.date)) h.push(r); }
+        el.innerHTML=h.length?h.reverse().map(i=>`<div class="history-item"><span>${i.date}</span><span>${i.amount.toFixed(2)} ⭐</span><span class="status-badge">${i.status}</span></div>`).join(''):'<p style="text-align:center;padding:12px;">Sin retiros</p>';
     }
 
     function showAlert(t,m,i='bell'){ document.getElementById('alertTitle').innerText=t; document.getElementById('alertMessage').innerText=m; document.querySelector('.alert-icon i').className='fas fa-'+i; document.getElementById('alertModal').style.display='flex'; }
     function closeAlertModal(){ document.getElementById('alertModal').style.display='none'; }
-    function navigate(s){ document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if(s==='withdraw-screen')loadHistory(); }
-    function copyRefLink(){ tg.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent('https://t.me/USDTGIFTKBot?startapp='+userId)+'&text=Gana USDT viendo videos!'); }
+    function navigate(s){ document.querySelectorAll('.screen').forEach(sc=>sc.classList.remove('active')); document.getElementById(s).classList.add('active'); if(s==='withdraw-screen')loadHistory(); if(s==='invite-screen'){ renderReferidosPendientes(); actualizarComisionUI(); } }
+    function copyRefLink(){ tg.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent('https://t.me/USDTGIFTKBot?startapp='+userId)); }
     function joinChannel(){ tg.openTelegramLink('https://t.me/UsdtGiftChannel'); }
 
     function isAdsGramLocked(){ return userData?.adGramUnlockTime&&Date.now()<userData.adGramUnlockTime; }
@@ -506,11 +524,8 @@
         document.getElementById('adsGramWatchedCount').innerText=count;
         document.querySelectorAll('#adsGramDots .dot').forEach((d,i)=>d.classList.toggle('completed',i<count));
         const btn=document.getElementById('agBonusBtn');
-        const locked=isAdsGramLocked();
-        btn.disabled=locked||isProcessing||count>=TOTAL_ADSGRAM;
-        if(locked) btn.innerHTML='🔒';
-        else if(count>=TOTAL_ADSGRAM) btn.innerHTML='🔒';
-        else btn.innerHTML='Ver Bono';
+        btn.disabled=isAdsGramLocked()||isProcessing||count>=TOTAL_ADSGRAM;
+        btn.innerHTML=isAdsGramLocked()||count>=TOTAL_ADSGRAM?'🔒':'Ver Bono';
     }
     function startAdsGramTimer(){ if(agTimer)clearInterval(agTimer); agTimer=setInterval(updateAdsGramUI,1000); }
     
@@ -518,22 +533,54 @@
         if(isProcessing||isAdPlaying)return;
         if(isAdsGramLocked()){ showAlert('Bloqueado','Vuelve mañana','clock'); return; }
         let count=userData.adGramCount||0;
-        if(count>=TOTAL_ADSGRAM){ showAlert('Completado','4/4 anuncios vistos','check-circle'); return; }
+        if(count>=TOTAL_ADSGRAM){ showAlert('Completado','4/4','check-circle'); return; }
         isProcessing=true; isAdPlaying=true; showAdLoader();
         try {
-            const AdController=window.Adsgram.init({blockId:ADSGRAM_BLOCK_ID});
-            await AdController.show();
-            userData.adGramCount=count+1;
-            userData.balance+=5;
+            await window.Adsgram.init({blockId:ADSGRAM_BLOCK_ID}).show();
+            userData.adGramCount=count+1; userData.balance+=5;
             if(userData.adGramCount>=TOTAL_ADSGRAM) userData.adGramUnlockTime=Date.now()+(UNLOCK_HOURS*3600000);
             saveToLocal({...userData,userId}); await updateUI();
             syncToFirebase({balance:userData.balance,adGramCount:userData.adGramCount,adGramUnlockTime:userData.adGramUnlockTime});
-            showAlert('🎁 +5 ⭐','Bono recibido','check-circle');
-        }catch(e){ showAlert('Error','Anuncio no completado','exclamation-triangle'); }
+            showAlert('🎁 +5 ⭐','Bono','check-circle');
+        }catch(e){ showAlert('Error','No completado','exclamation-triangle'); }
         finally{ hideAdLoader(); isProcessing=false; isAdPlaying=false; updateUI(); }
     }
 
-    // EVENTOS
+    async function verificarYRecompensarInvitador() {
+        if(!userData||!userData.invitado_por||userData.referidoActivoMarcado)return;
+        let count=0; for(let i=1;i<=TOTAL_VIDEOS;i++) if(userData.videoUnlockTimes?.[i]&&Date.now()<userData.videoUnlockTimes[i]) count++;
+        if(count+(userData.adGramCount||0)>=10&&count>=6&&(userData.adGramCount||0)>=4){
+            const inv=await db.collection("usuarios").doc(userData.invitado_por).get();
+            if(inv.exists){
+                const d=inv.data();
+                if(!(d.referidosPendientes||[]).some(r=>r.id===userId)&&!(d.referidosReclamados||[]).includes(userId)){
+                    await db.collection("usuarios").doc(userData.invitado_por).update({
+                        referidosActivos:firebase.firestore.FieldValue.increment(1),
+                        referidosPendientes:firebase.firestore.FieldValue.arrayUnion({id:userId,nombre:userName,timestamp:Date.now()})
+                    });
+                }
+            }
+            userData.referidoActivoMarcado=true; saveToLocal({...userData,userId}); syncToFirebase({referidoActivoMarcado:true});
+        }
+    }
+
+    function renderReferidosPendientes(){
+        const c=document.getElementById('referidosPendientesList'); if(!c)return;
+        const p=userData.referidosPendientes||[];
+        c.innerHTML=p.length?p.map(r=>`<div class="referido-card"><div><strong>${r.nombre||r.id}</strong><small>ID: ${r.id}</small></div><button style="background:var(--pastel-green);padding:6px 12px;border-radius:14px;border:2px solid var(--border-cocoa);" onclick="reclamarReferido('${r.id}')">RECLAMAR 150⭐</button></div>`).join(''):'<p style="text-align:center;">Sin amigos pendientes</p>';
+    }
+
+    async function reclamarReferido(refId){
+        const p=userData.referidosPendientes||[]; const i=p.findIndex(r=>r.id===refId);
+        if(i===-1)return;
+        userData.balance+=REWARD_POR_REFERIDO; userData.totalGanadoReferidos=(userData.totalGanadoReferidos||0)+REWARD_POR_REFERIDO;
+        p.splice(i,1); userData.referidosReclamados=[...(userData.referidosReclamados||[]),refId];
+        saveToLocal({...userData,userId}); await updateUI(); renderReferidosPendientes();
+        syncToFirebase({balance:userData.balance,totalGanadoReferidos:userData.totalGanadoReferidos,referidosPendientes:p,referidosReclamados:userData.referidosReclamados});
+        showAlert('🎉 +150 ⭐','Recompensa','check-circle');
+    }
+
+    // Eventos
     for(let i=1;i<=TOTAL_VIDEOS;i++) document.getElementById('video'+i+'Btn').onclick=()=>watchVideo(i);
     document.getElementById('withdrawNavBtn').onclick=()=>navigate('withdraw-screen');
     document.getElementById('inviteNavBtn').onclick=()=>navigate('invite-screen');
@@ -545,16 +592,22 @@
     document.getElementById('agBonusBtn').onclick=watchAdGram;
     document.getElementById('shareRefBtn').onclick=copyRefLink;
     document.getElementById('reclamarComisionBtn').onclick=async()=>{
-        const c=userData.comisionPendiente||0;
-        if(c<=0){ showAlert('Sin comisión','No hay comisiones pendientes','info'); return; }
-        userData.balance+=c; userData.comisionPendiente=0;
+        const c=userData.comisionPendiente||0; if(c<=0)return;
+        userData.balance+=c; userData.comisionPendiente=0; saveToLocal({...userData,userId}); await updateUI();
+        syncToFirebase({balance:userData.balance,comisionPendiente:0}); showAlert('💰 +'+formatBalance(c)+' ⭐','Comisión','check-circle');
+    };
+    document.getElementById('redeemSubmitBtn').onclick=async()=>{
+        const input=document.getElementById('redeem-code'); const code=input.value.trim().toUpperCase();
+        if(!code||(userData.redeemedCodes||[]).includes(code))return;
+        const d=await db.collection("giftCodes").doc(code).get();
+        if(!d.exists||d.data().usedCount>=d.data().maxUses)return;
+        userData.balance+=d.data().amount; userData.redeemedCodes=[...(userData.redeemedCodes||[]),code];
         saveToLocal({...userData,userId}); await updateUI();
-        syncToFirebase({balance:userData.balance,comisionPendiente:0});
-        showAlert('💰 Comisión','+'+formatBalance(c)+' ⭐','check-circle');
+        syncToFirebase({balance:userData.balance,redeemedCodes:userData.redeemedCodes});
+        await db.collection("giftCodes").doc(code).update({usedCount:firebase.firestore.FieldValue.increment(1)});
+        showAlert('🎁 +'+d.data().amount+' ⭐','Código','gift'); input.value='';
     };
 
-    initUser();
-    
     // Admin
     const card=document.querySelector('.balance-card'); let t;
     card.addEventListener('mousedown',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000));
@@ -563,13 +616,11 @@
     card.addEventListener('touchend',()=>clearTimeout(t));
     document.getElementById('adminCancelBtn').onclick=()=>document.getElementById('adminModal').style.display='none';
     document.getElementById('adminAddBalanceBtn').onclick=async()=>{
-        const pwd=document.getElementById('adminPassword').value;
-        if(pwd!==ADMIN_SECRET)return;
-        const tid=document.getElementById('adminUserId').value.trim();
-        const amt=parseFloat(document.getElementById('adminAmount').value);
-        await db.collection("usuarios").doc(tid).update({balance:firebase.firestore.FieldValue.increment(amt)});
-        showAlert('Saldo','+'+amt+' ⭐','crown');
+        if(document.getElementById('adminPassword').value!==ADMIN_SECRET)return;
+        await db.collection("usuarios").doc(document.getElementById('adminUserId').value.trim()).update({balance:firebase.firestore.FieldValue.increment(parseFloat(document.getElementById('adminAmount').value))});
     };
+
+    initUser();
 </script>
 </body>
 </html>
