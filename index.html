@@ -322,7 +322,6 @@
     const COMISION_PORCIENTO = 0.10;
     const STORAGE_KEY = 'usdtgiftk_userdata';
 
-    // Animación de carga
     const loadingBar = document.getElementById('loadingBar');
     const loadingFooter = document.getElementById('loadingFooter');
     loadingBar.style.animation = 'progress 6s ease-out forwards';
@@ -403,12 +402,13 @@
         } else {
             const firebaseData = doc.data(); const localData = loadFromLocal();
             userData = { ...firebaseData };
-            if (localData && localData.withdrawHistory) { userData.withdrawHistory = localData.withdrawHistory; }
+            if (localData && localData.withdrawHistory && localData.withdrawHistory.length > (firebaseData.withdrawHistory||[]).length) {
+                userData.withdrawHistory = localData.withdrawHistory;
+            }
             saveToLocal({ ...userData, userId });
         }
         await updateUI(); startUnlockTimers(); startAdsGramTimer();
         
-        // Carga de 6 segundos
         setTimeout(() => {
             clearInterval(intervalo);
             document.getElementById('loading-screen').classList.add('hidden');
@@ -476,24 +476,22 @@
             const bal=saldoReal;
             const usdtMonto=(bal/COINS_PER_USDT).toFixed(4);
             const fechaRetiro=new Date();
+            const fechaStr=new Date().toLocaleDateString();
             
             await db.collection("usuarios").doc(userId).update({
                 balance:0, hasWithdrawn:true, ultimoRetiroFecha:hoy,
                 withdrawHistory:firebase.firestore.FieldValue.arrayUnion({
-                    amount:bal, date:new Date().toLocaleDateString(), timestamp:fechaRetiro.getTime(), status:'✅ Completado'
+                    amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'
                 })
             });
             
             userData.balance=0; userData.hasWithdrawn=true; userData.ultimoRetiroFecha=hoy;
             if(!userData.withdrawHistory) userData.withdrawHistory=[];
-            userData.withdrawHistory.push({amount:bal, date:new Date().toLocaleDateString(), timestamp:fechaRetiro.getTime(), status:'✅ Completado'});
+            userData.withdrawHistory.push({amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'});
             
-            // Guardar en localStorage y respaldo
             saveToLocal({...userData, userId});
-            localStorage.setItem('ultimo_retiro_'+userId, JSON.stringify({amount:bal, date:new Date().toLocaleDateString(), status:'✅ Completado'}));
             await updateUI();
             
-            // Pago automático
             showAlert('🤖 Procesando...','Enviando '+usdtMonto+' USDT a tu billetera','rocket');
             ejecutarPagoAutomatico(cc, parseFloat(usdtMonto), userId, userData.nombre||userName)
                 .then(r => { if(r.success) showAlert('✅ ¡Listo!',usdtMonto+' USDT enviados','check-circle'); });
@@ -504,11 +502,35 @@
     }
     
     function loadHistory(){ 
-        const el=document.getElementById('history-list');
-        let h=userData?.withdrawHistory||[];
-        const respaldo=localStorage.getItem('ultimo_retiro_'+userId);
-        if(respaldo){ const r=JSON.parse(respaldo); if(!h.some(i=>i.amount===r.amount&&i.date===r.date)) h.push(r); }
-        el.innerHTML=h.length?h.reverse().map(i=>`<div class="history-item"><span>${i.date}</span><span>${i.amount.toFixed(2)} ⭐</span><span class="status-badge">${i.status}</span></div>`).join(''):'<p style="text-align:center;padding:12px;">Sin retiros</p>';
+        var el=document.getElementById('history-list');
+        if(!el) return;
+        var h=[];
+        if(userData&&userData.withdrawHistory) h=userData.withdrawHistory.slice();
+        for(var i=0;i<localStorage.length;i++){
+            var key=localStorage.key(i);
+            if(key&&key.indexOf('ultimo_retiro_')===0){
+                try{
+                    var r=JSON.parse(localStorage.getItem(key));
+                    if(r&&r.amount){
+                        var duplicado=false;
+                        for(var j=0;j<h.length;j++){
+                            if(h[j].amount===r.amount&&h[j].date===r.date) duplicado=true;
+                        }
+                        if(!duplicado) h.push(r);
+                    }
+                }catch(e){}
+            }
+        }
+        if(userData&&h.length>(userData.withdrawHistory||[]).length){
+            userData.withdrawHistory=h;
+            saveToLocal(userData);
+        }
+        h.sort(function(a,b){ return (b.timestamp||0)-(a.timestamp||0); });
+        var html='';
+        for(var k=0;k<h.length;k++){
+            html+='<div class="history-item"><span>'+(h[k].date||'Sin fecha')+'</span><span>'+((h[k].amount||0).toFixed(2))+' ⭐</span><span class="status-badge">'+(h[k].status||'✅ Completado')+'</span></div>';
+        }
+        el.innerHTML=html||'<p style="text-align:center;padding:12px;color:var(--text-soft-cocoa);">Sin retiros registrados</p>';
     }
 
     function showAlert(t,m,i='bell'){ document.getElementById('alertTitle').innerText=t; document.getElementById('alertMessage').innerText=m; document.querySelector('.alert-icon i').className='fas fa-'+i; document.getElementById('alertModal').style.display='flex'; }
@@ -580,7 +602,6 @@
         showAlert('🎉 +150 ⭐','Recompensa','check-circle');
     }
 
-    // Eventos
     for(let i=1;i<=TOTAL_VIDEOS;i++) document.getElementById('video'+i+'Btn').onclick=()=>watchVideo(i);
     document.getElementById('withdrawNavBtn').onclick=()=>navigate('withdraw-screen');
     document.getElementById('inviteNavBtn').onclick=()=>navigate('invite-screen');
@@ -608,7 +629,6 @@
         showAlert('🎁 +'+d.data().amount+' ⭐','Código','gift'); input.value='';
     };
 
-    // Admin
     const card=document.querySelector('.balance-card'); let t;
     card.addEventListener('mousedown',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000));
     card.addEventListener('mouseup',()=>clearTimeout(t));
