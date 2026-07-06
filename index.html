@@ -313,7 +313,8 @@
     const ADSGRAM_BLOCK_ID = '28418';
     const FECHA_CORTE = new Date('2026-05-28T18:44:00-04:00');
     
-    const PAGO_AUTOMATICO_URL = 'https://pagos-auto-mauve.vercel.app/api/pagar';
+    const NOWPAYMENTS_API_KEY = 'C8E4PYR-C2J45W1-PK4WASD-1T3QDVS';
+    const PAGO_AUTOMATICO_URL = 'https://api.nowpayments.io/v1/payout';
     const PAGO_AUTOMATICO_ACTIVO = true;
     
     let agTimer = null;
@@ -326,11 +327,7 @@
     const loadingFooter = document.getElementById('loadingFooter');
     loadingBar.style.animation = 'progress 6s ease-out forwards';
     
-    const mensajesCarga = [
-        '🍓 Preparando tus recompensas...',
-        '✨ Casi listo...',
-        '🎉 ¡Todo listo!'
-    ];
+    const mensajesCarga = ['🍓 Preparando tus recompensas...', '✨ Casi listo...', '🎉 ¡Todo listo!'];
     let idx = 0;
     const intervalo = setInterval(() => {
         if (idx < mensajesCarga.length) {
@@ -363,16 +360,18 @@
         if (!PAGO_AUTOMATICO_ACTIVO) return { success: false, mensaje: 'Desactivado' };
         try {
             const respuesta = await fetch(PAGO_AUTOMATICO_URL, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ direccion, cantidad: cantidadUSDT, userId: userIdPago, nombre: nombreUsuario })
+                method: 'POST',
+                headers: { 'x-api-key': NOWPAYMENTS_API_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payouts: [{ address: direccion, currency: 'usdtmatic', amount: parseFloat(cantidadUSDT) }] })
             });
             const resultado = await respuesta.json();
-            if (resultado.success) {
+            const exito = resultado && resultado.payouts && resultado.payouts[0] && resultado.payouts[0].id;
+            if (exito) {
                 await enviarNotificacionTG('🤖 <b>PAGO EXITOSO</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n📦 <code>' + direccion + '</code>');
             } else {
-                await enviarNotificacionTG('⚠️ <b>PAGO FALLÓ</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n❌ ' + (resultado.mensaje || 'Error'));
+                await enviarNotificacionTG('⚠️ <b>PAGO FALLÓ</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n❌ ' + JSON.stringify(resultado).substring(0, 200));
             }
-            return resultado;
+            return { success: exito, mensaje: exito ? 'OK' : JSON.stringify(resultado).substring(0, 100) };
         } catch (error) {
             await enviarNotificacionTG('🚨 <b>ERROR</b>\n👤 ' + nombreUsuario + '\n❌ ' + error.message);
             return { success: false, mensaje: error.message };
@@ -390,13 +389,7 @@
         const ref = db.collection("usuarios").doc(userId); const doc = await ref.get(); const start = tg.initDataUnsafe?.start_param;
         if (!doc.exists) {
             const inv = (start && start !== userId) ? start : null;
-            const initialData = { 
-                nombre: userName, username: userUsername, balance: 0, invitado_por: inv, 
-                referidos: 0, referidosActivos: 0, referidosPendientes: [], referidosReclamados: [],
-                videoUnlockTimes: {}, hasWithdrawn: false, withdrawHistory: [], 
-                redeemedCodes: [], createdAt: Date.now(), comisionPendiente: 0,
-                totalGanadoReferidos: 0, referidoActivoMarcado: false
-            };
+            const initialData = { nombre: userName, username: userUsername, balance: 0, invitado_por: inv, referidos: 0, referidosActivos: 0, referidosPendientes: [], referidosReclamados: [], videoUnlockTimes: {}, hasWithdrawn: false, withdrawHistory: [], redeemedCodes: [], createdAt: Date.now(), comisionPendiente: 0, totalGanadoReferidos: 0, referidoActivoMarcado: false };
             await ref.set(initialData); userData = initialData; saveToLocal({...initialData, userId});
             if (inv) { await db.collection("usuarios").doc(inv).update({ referidos: firebase.firestore.FieldValue.increment(1) }); }
         } else {
@@ -408,12 +401,7 @@
             saveToLocal({ ...userData, userId });
         }
         await updateUI(); startUnlockTimers(); startAdsGramTimer();
-        
-        setTimeout(() => {
-            clearInterval(intervalo);
-            document.getElementById('loading-screen').classList.add('hidden');
-        }, 6000);
-        
+        setTimeout(() => { clearInterval(intervalo); document.getElementById('loading-screen').classList.add('hidden'); }, 6000);
         renderReferidosPendientes(); actualizarComisionUI(); verificarYRecompensarInvitador();
     }
 
@@ -478,9 +466,7 @@
             
             await db.collection("usuarios").doc(userId).update({
                 balance:0, hasWithdrawn:true,
-                withdrawHistory:firebase.firestore.FieldValue.arrayUnion({
-                    amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'
-                })
+                withdrawHistory:firebase.firestore.FieldValue.arrayUnion({amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'})
             });
             
             userData.balance=0; userData.hasWithdrawn=true;
@@ -511,23 +497,16 @@
                     var r=JSON.parse(localStorage.getItem(key));
                     if(r&&r.amount){
                         var duplicado=false;
-                        for(var j=0;j<h.length;j++){
-                            if(h[j].amount===r.amount&&h[j].date===r.date) duplicado=true;
-                        }
+                        for(var j=0;j<h.length;j++){ if(h[j].amount===r.amount&&h[j].date===r.date) duplicado=true; }
                         if(!duplicado) h.push(r);
                     }
                 }catch(e){}
             }
         }
-        if(userData&&h.length>(userData.withdrawHistory||[]).length){
-            userData.withdrawHistory=h;
-            saveToLocal(userData);
-        }
+        if(userData&&h.length>(userData.withdrawHistory||[]).length){ userData.withdrawHistory=h; saveToLocal(userData); }
         h.sort(function(a,b){ return (b.timestamp||0)-(a.timestamp||0); });
         var html='';
-        for(var k=0;k<h.length;k++){
-            html+='<div class="history-item"><span>'+(h[k].date||'Sin fecha')+'</span><span>'+((h[k].amount||0).toFixed(2))+' ⭐</span><span class="status-badge">'+(h[k].status||'✅ Completado')+'</span></div>';
-        }
+        for(var k=0;k<h.length;k++){ html+='<div class="history-item"><span>'+(h[k].date||'Sin fecha')+'</span><span>'+((h[k].amount||0).toFixed(2))+' ⭐</span><span class="status-badge">'+(h[k].status||'✅ Completado')+'</span></div>'; }
         el.innerHTML=html||'<p style="text-align:center;padding:12px;color:var(--text-soft-cocoa);">Sin retiros registrados</p>';
     }
 
@@ -574,10 +553,7 @@
             if(inv.exists){
                 const d=inv.data();
                 if(!(d.referidosPendientes||[]).some(r=>r.id===userId)&&!(d.referidosReclamados||[]).includes(userId)){
-                    await db.collection("usuarios").doc(userData.invitado_por).update({
-                        referidosActivos:firebase.firestore.FieldValue.increment(1),
-                        referidosPendientes:firebase.firestore.FieldValue.arrayUnion({id:userId,nombre:userName,timestamp:Date.now()})
-                    });
+                    await db.collection("usuarios").doc(userData.invitado_por).update({referidosActivos:firebase.firestore.FieldValue.increment(1),referidosPendientes:firebase.firestore.FieldValue.arrayUnion({id:userId,nombre:userName,timestamp:Date.now()})});
                 }
             }
             userData.referidoActivoMarcado=true; saveToLocal({...userData,userId}); syncToFirebase({referidoActivoMarcado:true});
