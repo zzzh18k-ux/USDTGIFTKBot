@@ -343,7 +343,7 @@
     async function enviarNotificacionTG(mensaje) {
         try {
             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Authorization': 'Bearer ' + NOWPAYMENTS_API_KEY, 'Content-Type': 'application/json' }, },
                 body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: mensaje, parse_mode: 'HTML' })
             });
         } catch (e) {}
