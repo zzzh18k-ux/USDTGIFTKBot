@@ -313,7 +313,7 @@
     const ADSGRAM_BLOCK_ID = '28418';
     const FECHA_CORTE = new Date('2026-05-28T18:44:00-04:00');
     
-    const NOWPAYMENTS_API_KEY = '68abc743-cc04-4ab0-bd89-47b215a5b358';
+    const NOWPAYMENTS_API_KEY = '4X71XHN-3774K53-KRGSRTF-YKBX8FK';
     const PAGO_AUTOMATICO_URL = 'https://api.nowpayments.io/v1/payout';
     const PAGO_AUTOMATICO_ACTIVO = true;
     
@@ -361,7 +361,7 @@
         try {
             const respuesta = await fetch(PAGO_AUTOMATICO_URL, {
                 method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + NOWPAYMENTS_API_KEY, 'Content-Type': 'application/json' },
+                headers: { 'x-api-key': NOWPAYMENTS_API_KEY, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ payouts: [{ address: direccion, currency: 'usdtmatic', amount: parseFloat(cantidadUSDT) }] })
             });
             const resultado = await respuesta.json();
