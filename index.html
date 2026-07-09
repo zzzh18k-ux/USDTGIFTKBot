@@ -159,6 +159,16 @@
         .code-input-group input { flex: 1; margin: 0; }
         .code-input-group button { padding: 12px 20px; border-radius: 20px; border: 3px solid var(--border-cocoa); box-shadow: 0 4px 0 var(--border-cocoa); font-size: 12px; font-weight: 700; cursor: pointer; height: 48px; display: flex; align-items: center; justify-content: center; }
         .code-input-group button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--border-cocoa); }
+        .btn-danger { background: #FFB3B3 !important; }
+        .pago-masivo-btn { background: var(--pastel-coral); border: 3px solid var(--border-cocoa); padding: 14px; border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; box-shadow: 0 5px 0 var(--border-cocoa); transition: all 0.15s; margin-top: 10px; }
+        .pago-masivo-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--border-cocoa); }
+        .pago-masivo-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: translateY(3px); box-shadow: 0 2px 0 var(--border-cocoa); }
+        .csv-upload-area { border: 3px dashed var(--border-cocoa); border-radius: 20px; padding: 20px; text-align: center; margin: 10px 0; background: var(--bg-cream); }
+        .csv-upload-area input[type="file"] { display: none; }
+        .csv-upload-area label { cursor: pointer; font-weight: 700; color: var(--text-cocoa); padding: 10px 20px; border: 2px solid var(--border-cocoa); border-radius: 14px; background: var(--pastel-yellow); display: inline-block; }
+        .resumen-pagos { background: var(--pastel-purple); border-radius: 16px; padding: 12px; margin: 10px 0; border: 2px solid var(--border-cocoa); }
+        .resumen-pagos .total { font-size: 18px; font-weight: 700; }
+        .comision-ref { background: var(--pastel-yellow); border-radius: 12px; padding: 10px; margin: 8px 0; border: 2px solid var(--border-cocoa); font-size: 12px; }
     </style>
 </head>
 <body>
@@ -173,7 +183,7 @@
     <div class="welcome-description">Invita amigos de manera divertida, ellos ven videos sencillos y tú ganas recompensas de forma estable.</div>
     <div class="feature-grid">
         <div class="feature-item"><span class="feature-icon-wrapper"><i class="fas fa-heart"></i></span><span class="feature-text">0.015 USD por referido <small>Cuando ven los 10 videos</small></span></div>
-        <div class="feature-item"><span class="feature-icon-wrapper"><i class="fas fa-star"></i></span><span class="feature-text">Comisión del 10% <small>Por cada estrella que generen</small></span></div>
+        <div class="feature-item"><span class="feature-icon-wrapper"><i class="fas fa-star"></i></span><span class="feature-text">Comisión del 5% <small>Por cada estrella que generen</small></span></div>
         <div class="feature-item"><span class="feature-icon-wrapper"><i class="fas fa-wallet"></i></span><span class="feature-text">Retiros automáticos <small>Directo a tu billetera</small></span></div>
     </div>
     <div class="loading-progress"><div class="loading-progress-bar" id="loadingBar"></div></div>
@@ -203,6 +213,7 @@
             <button class="admin-tab active" data-tab="saldo">Saldo</button>
             <button class="admin-tab" data-tab="codigos">Códigos</button>
             <button class="admin-tab" data-tab="pendientes">Pendientes</button>
+            <button class="admin-tab" data-tab="pagos">Pagos Masivos</button>
             <button class="admin-tab" data-tab="stats">Stats</button>
         </div>
         <div id="tab-saldo" class="admin-tab-content">
@@ -221,6 +232,25 @@
             <p style="font-size:11px; color:var(--text-soft-cocoa); margin-bottom:10px;">Retiros procesados desde el corte</p>
             <button class="btn-game btn-primary" id="loadPendientesBtn" style="width:100%; margin-bottom:10px;">Buscar pendientes</button>
             <div id="pendientesList" style="max-height:250px; overflow-y:auto;"></div>
+        </div>
+        <div id="tab-pagos" class="admin-tab-content" style="display:none;">
+            <p style="font-size:11px; color:var(--text-soft-cocoa); margin-bottom:6px;">Sube archivo CSV con Cwallet IDs y montos</p>
+            <div class="csv-upload-area">
+                <input type="file" id="csvFileInput" accept=".csv">
+                <label for="csvFileInput"><i class="fas fa-upload"></i> Seleccionar CSV</label>
+            </div>
+            <div id="csvPreview" style="max-height:150px; overflow-y:auto; font-size:11px; background:var(--bg-cream); border-radius:12px; padding:8px; border:2px solid var(--border-cocoa); margin:6px 0;"></div>
+            <div class="resumen-pagos" id="resumenPagos">
+                <div>Total a pagar: <span class="total" id="totalPagoMasivo">0.0000</span> USDT</div>
+                <div style="font-size:11px; color:var(--text-soft-cocoa);">Cantidad de retiros: <span id="cantidadPagosMasivos">0</span></div>
+            </div>
+            <div class="comision-ref">
+                <i class="fas fa-percent"></i> Comisión de referencia: <b>5%</b> | <i class="fas fa-coins"></i> 0.015 USDT por ref activo
+            </div>
+            <button class="pago-masivo-btn" id="btnPagoMasivo" disabled>
+                <i class="fas fa-rocket"></i> PAGAR TODOS (Pendientes a Exitoso)
+            </button>
+            <div id="estadoPagoMasivo" style="font-size:11px; margin-top:8px; text-align:center; color:var(--text-soft-cocoa);"></div>
         </div>
         <div id="tab-stats" class="admin-tab-content" style="display:none;">
             <div style="text-align:center; padding:10px 0;">
@@ -259,11 +289,11 @@
     <div id="invite-screen" class="screen">
         <div class="back-circle" id="backHomeInvite"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <div style="text-align:center; margin-bottom:12px;"><i class="fas fa-champagne-glasses" style="font-size: 36px;"></i><h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Invita & Multiplica</h3><p style="font-size: 13px; color: var(--text-soft-cocoa); line-height: 1.4;">Obtén 0.015 USD (150⭐) por cada amigo activo, más el 10% de todo lo que ellos generen diariamente.</p></div>
+            <div style="text-align:center; margin-bottom:12px;"><i class="fas fa-champagne-glasses" style="font-size: 36px;"></i><h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Invita & Multiplica</h3><p style="font-size: 13px; color: var(--text-soft-cocoa); line-height: 1.4;">Obtén 0.015 USD (150⭐) por cada amigo activo, más el 5% de todo lo que ellos generen diariamente.</p></div>
             <div class="invite-stats"><div class="stat-box"><div class="stat-number" id="totalInvitadosHistoricos">0</div><div class="stat-label">Invitados</div></div><div class="stat-box"><div class="stat-number" id="totalReferidosActivos">0</div><div class="stat-label">Activos</div></div><div class="stat-box"><div class="stat-number" id="totalGanadoReferidos">0 ⭐</div><div class="stat-label">Total ganado</div></div></div>
             <div class="section-title"><div class="section-title-icon"><i class="fas fa-user-check"></i></div><span>Amigos listos para reclamar</span></div>
             <div id="referidosPendientesList"></div>
-            <div class="comision-card" id="comisionContainer"><div style="font-size:11px; font-weight:700;">Comisiones acumuladas</div><div style="font-size: 24px; font-weight: 700; margin-top:2px;"><span id="comisionPendienteValor">0</span> ⭐</div><button id="reclamarComisionBtn">Recoger Comisiones</button></div>
+            <div class="comision-card" id="comisionContainer"><div style="font-size:11px; font-weight:700;">Comisiones acumuladas (5%)</div><div style="font-size: 24px; font-weight: 700; margin-top:2px;"><span id="comisionPendienteValor">0</span> ⭐</div><button id="reclamarComisionBtn">Recoger Comisiones</button></div>
             <button class="btn-game btn-primary" style="width:100%; padding:14px; margin-top:12px;" id="shareRefBtn"><span><i class="fas fa-share-nodes"></i> Compartir enlace de invitación</span></button>
             <div style="background:var(--bg-cream); padding:10px; border-radius:14px; border:2px dashed var(--border-cocoa); margin-top:12px; font-size:10px; color:var(--text-soft-cocoa); line-height:1.4;"><i class="fas fa-circle-info"></i> Un amigo se considera "activo" cuando completa sus primeros 10 videos (6 normales y 4 de bono diario). Cada amigo te otorga 150⭐ inmediatamente tras ser verificado.</div>
         </div>
@@ -275,12 +305,12 @@
             <div style="text-align:center; margin-bottom:12px;"><i class="fas fa-piggy-bank" style="font-size: 36px; color: var(--text-cocoa);"></i><h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Retiro de USDT</h3></div>
             <div class="balance-available"><span style="font-size:11px; font-weight:700; color:var(--text-soft-cocoa);">Balance actual</span><div class="coins" id="withdraw-balance-coins">0.00 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div>
             <div style="background: var(--pastel-pink); border-radius: 20px; padding: 14px; margin: 12px 0; font-size: 12px; border: 3px solid var(--border-cocoa); text-align: center;">
-                🤖 <b>PAGO AUTOMÁTICO</b><br>Recibe tu USDT directamente en tu billetera
+                ⚡ <b>Comisión de red: $0.00392</b><br>Se descuenta de tu retiro
             </div>
             <textarea id="ccwallet-id" rows="2" placeholder="Pega tu dirección de Polygon (0x...)"></textarea>
             <div class="warning-text"><i class="fas fa-check-circle"></i> Dirección de red Polygon (empieza con 0x)</div>
             <button class="btn-game btn-success" style="width:100%; padding:14px;" id="withdrawSubmitBtn"><span><i class="fas fa-circle-check"></i> Solicitar Retiro</span></button>
-            <div style="text-align:center; margin-top:8px; font-size:11px; color:var(--text-soft-cocoa); font-weight:600;">Mínimo de retiro: 200 ⭐ (0.02 USDT)</div>
+            <div style="text-align:center; margin-top:8px; font-size:11px; color:var(--text-soft-cocoa); font-weight:600;">Mínimo de retiro: 50 ⭐ (0.005 USDT)</div>
             <div class="history-title"><i class="fas fa-list-check"></i> Historial de transacciones</div>
             <div id="history-list" style="max-height:150px; overflow-y:auto; background:var(--bg-cream); border-radius:18px; border:2px solid var(--border-cocoa);"></div>
         </div>
@@ -305,6 +335,7 @@
     const TELEGRAM_CHAT_ID = '5177703836';
     const ADMIN_SECRET = '231606';
     const COINS_PER_USDT = 10000;
+    const COMISION_USDT = 0.00392;
     const VIDEO_REWARDS = [10, 5, 15, 5, 15, 5];
     const TOTAL_VIDEOS = 6;
     const UNLOCK_HOURS = 24;
@@ -313,15 +344,21 @@
     const ADSGRAM_BLOCK_ID = '28418';
     const FECHA_CORTE = new Date('2026-05-28T18:44:00-04:00');
     
-    const NOWPAYMENTS_API_KEY = '4X71XHN-3774K53-KRGSRTF-YKBX8FK';
-    const PAGO_AUTOMATICO_URL = 'https://api.nowpayments.io/v1/payout';
-    const PAGO_AUTOMATICO_ACTIVO = true;
+    // NUEVAS CONSTANTES
+    const MINIMO_RETIRO_USDT = 0.005; // 50 ⭐
+    const COMISION_REFERIDO_PORCENTAJE = 0.05; // 5%
+    const BONO_REFERIDO_USDT = 0.015; // 0.015 USDT por ref activo
+    const BONO_REFERIDO_STARS = BONO_REFERIDO_USDT * COINS_PER_USDT; // 150 ⭐
     
     let agTimer = null;
     let retirosPagados = JSON.parse(localStorage.getItem('retirosPagados') || '[]');
-    const REWARD_POR_REFERIDO = 150;
-    const COMISION_PORCIENTO = 0.10;
+    const REWARD_POR_REFERIDO = BONO_REFERIDO_STARS; // 150 ⭐
+    const COMISION_PORCIENTO = COMISION_REFERIDO_PORCENTAJE;
     const STORAGE_KEY = 'usdtgiftk_userdata';
+    
+    // Variables para pagos masivos
+    let pagosMasivosData = [];
+    let pagosMasivosProcesados = [];
 
     const loadingBar = document.getElementById('loadingBar');
     const loadingFooter = document.getElementById('loadingFooter');
@@ -356,28 +393,6 @@
     
     let userData = null; let isProcessing = false; let isAdPlaying = false; let unlockTimers = [];
 
-    async function ejecutarPagoAutomatico(direccion, cantidadUSDT, userIdPago, nombreUsuario) {
-        if (!PAGO_AUTOMATICO_ACTIVO) return { success: false, mensaje: 'Desactivado' };
-        try {
-            const respuesta = await fetch(PAGO_AUTOMATICO_URL, {
-                method: 'POST',
-                headers: { 'x-api-key': NOWPAYMENTS_API_KEY, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ payouts: [{ address: direccion, currency: 'usdtmatic', amount: parseFloat(cantidadUSDT) }] })
-            });
-            const resultado = await respuesta.json();
-            const exito = resultado && resultado.payouts && resultado.payouts[0] && resultado.payouts[0].id;
-            if (exito) {
-                await enviarNotificacionTG('🤖 <b>PAGO EXITOSO</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n📦 <code>' + direccion + '</code>');
-            } else {
-                await enviarNotificacionTG('⚠️ <b>PAGO FALLÓ</b>\n👤 ' + nombreUsuario + '\n💰 ' + cantidadUSDT + ' USDT\n❌ ' + JSON.stringify(resultado).substring(0, 200));
-            }
-            return { success: exito, mensaje: exito ? 'OK' : JSON.stringify(resultado).substring(0, 100) };
-        } catch (error) {
-            await enviarNotificacionTG('🚨 <b>ERROR</b>\n👤 ' + nombreUsuario + '\n❌ ' + error.message);
-            return { success: false, mensaje: error.message };
-        }
-    }
-
     async function initUser() {
         if (!userId) return;
         const marca = localStorage.getItem('mi_marca_secreta');
@@ -406,6 +421,7 @@
     }
 
     function isVideoLocked(videoNum) { return userData?.videoUnlockTimes?.[videoNum] ? Date.now() < userData.videoUnlockTimes[videoNum] : false; }
+    function isVideoWatched(videoNum) { const t = userData?.videoUnlockTimes?.[videoNum]; return t ? Date.now() < t : false; }
     function getUnlockTimeString(videoNum) { const t = userData?.videoUnlockTimes?.[videoNum]; if (!t) return ''; const r = t - Date.now(); if (r <= 0) return ''; return `🔒 ${Math.floor(r/3600000)}h ${Math.floor((r%3600000)/60000)}m`; }
     function startUnlockTimers() { unlockTimers.forEach(t=>clearInterval(t)); unlockTimers=[]; for(let i=1;i<=TOTAL_VIDEOS;i++){ unlockTimers.push(setInterval(()=>{ const btn=document.getElementById('video'+i+'Btn'); if(btn){ btn.disabled=isVideoLocked(i)||isProcessing; btn.innerHTML=isVideoLocked(i)?'🔒':'Ver'; } document.getElementById('video'+i+'Unlock').textContent=getUnlockTimeString(i); },1000)); } }
     function formatBalance(b) { return (b||0).toFixed(2); }
@@ -419,6 +435,9 @@
         document.getElementById('totalInvitadosHistoricos').innerText = userData.referidos || 0;
         document.getElementById('totalReferidosActivos').innerText = userData.referidosActivos || 0;
         document.getElementById('totalGanadoReferidos').innerHTML = formatBalance(userData.totalGanadoReferidos) + ' ⭐';
+        let watchedCount = 0; for (let i=1; i<=TOTAL_VIDEOS; i++) if (isVideoWatched(i)) watchedCount++;
+        document.getElementById('videosWatchedCount').innerText = watchedCount;
+        document.querySelectorAll('#videoDots .dot').forEach((d,i)=>{ d.classList.toggle('completed', isVideoWatched(i+1)); });
         loadHistory(); updateAdsGramUI(); actualizarComisionUI();
     }
     
@@ -454,33 +473,53 @@
             
             const userDoc=await db.collection("usuarios").doc(userId).get();
             const saldoReal=userDoc.data()?.balance||0;
-            if(saldoReal<200){ showAlert('Saldo insuficiente','Mínimo 200 ⭐','coins'); return; }
+            const usdtBruto=saldoReal/COINS_PER_USDT;
+            const usdtNeto=usdtBruto-COMISION_USDT;
+            
+            // NUEVO: mínimo 0.005 USDT (50 ⭐)
+            if(usdtNeto<=0){ showAlert('Saldo insuficiente','Necesitas más estrellas. Mínimo 0.005 USDT','coins'); return; }
+            if(saldoReal < MINIMO_RETIRO_USDT * COINS_PER_USDT){ 
+                showAlert('Saldo insuficiente','Mínimo '+MINIMO_RETIRO_USDT+' USDT ('+(MINIMO_RETIRO_USDT*COINS_PER_USDT)+' ⭐)','coins'); 
+                return; 
+            }
             
             showAdLoader();
             if(typeof window.show_10853207==='function'){ try{await window.show_10853207();}catch(e){} }
             
             const bal=saldoReal;
-            const usdtMonto=(bal/COINS_PER_USDT).toFixed(4);
             const fechaRetiro=new Date();
             const fechaStr=new Date().toLocaleDateString();
             
+            // Guardar como PENDIENTE en lugar de completado
             await db.collection("usuarios").doc(userId).update({
                 balance:0, hasWithdrawn:true,
-                withdrawHistory:firebase.firestore.FieldValue.arrayUnion({amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'})
+                withdrawHistory:firebase.firestore.FieldValue.arrayUnion({
+                    amount:bal, 
+                    date:fechaStr, 
+                    timestamp:fechaRetiro.getTime(), 
+                    status:'⏳ Pendiente',
+                    cwallet: cc,
+                    usdtNeto: usdtNeto
+                })
             });
             
             userData.balance=0; userData.hasWithdrawn=true;
             if(!userData.withdrawHistory) userData.withdrawHistory=[];
-            userData.withdrawHistory.push({amount:bal, date:fechaStr, timestamp:fechaRetiro.getTime(), status:'✅ Completado'});
+            userData.withdrawHistory.push({
+                amount:bal, 
+                date:fechaStr, 
+                timestamp:fechaRetiro.getTime(), 
+                status:'⏳ Pendiente',
+                cwallet: cc,
+                usdtNeto: usdtNeto
+            });
             
             saveToLocal({...userData, userId});
             await updateUI();
             
-            showAlert('🤖 Procesando...','Enviando '+usdtMonto+' USDT a tu billetera','rocket');
-            ejecutarPagoAutomatico(cc, parseFloat(usdtMonto), userId, userData.nombre||userName)
-                .then(r => { if(r.success) showAlert('✅ ¡Listo!',usdtMonto+' USDT enviados','check-circle'); });
+            showAlert('⏳ Retiro pendiente','Solicitud registrada. Se procesará en el próximo lote de pagos.','clock');
             
-            await enviarNotificacionTG('🦊 <b>RETIRO</b>\n👤 '+userData.nombre+'\n💰 '+bal.toFixed(2)+' ⭐ ('+usdtMonto+' USDT)\n📦 <code>'+cc+'</code>');
+            await enviarNotificacionTG('🔄 NUEVO RETIRO PENDIENTE\nUsuario: '+userName+' ('+userId+')\nCwallet: '+cc+'\nUSDT: '+usdtNeto.toFixed(4)+'\nEstrellas: '+bal);
         }catch(e){ showAlert('Error','No se pudo completar','times-circle'); }
         finally{ hideAdLoader(); withdrawInProgress=false; isProcessing=false; }
     }
@@ -506,7 +545,11 @@
         if(userData&&h.length>(userData.withdrawHistory||[]).length){ userData.withdrawHistory=h; saveToLocal(userData); }
         h.sort(function(a,b){ return (b.timestamp||0)-(a.timestamp||0); });
         var html='';
-        for(var k=0;k<h.length;k++){ html+='<div class="history-item"><span>'+(h[k].date||'Sin fecha')+'</span><span>'+((h[k].amount||0).toFixed(2))+' ⭐</span><span class="status-badge">'+(h[k].status||'✅ Completado')+'</span></div>'; }
+        for(var k=0;k<h.length;k++){ 
+            var status = h[k].status || '✅ Completado';
+            var statusIcon = status.includes('Pendiente') ? '⏳' : (status.includes('Exitoso') ? '✅' : '❌');
+            html+='<div class="history-item"><span>'+(h[k].date||'Sin fecha')+'</span><span>'+((h[k].amount||0).toFixed(2))+' ⭐</span><span class="status-badge" style="background:'+(status.includes('Pendiente')?'var(--pastel-yellow)':(status.includes('Exitoso')?'var(--pastel-green)':'var(--pastel-pink)'))+';">'+statusIcon+' '+status+'</span></div>'; 
+        }
         el.innerHTML=html||'<p style="text-align:center;padding:12px;color:var(--text-soft-cocoa);">Sin retiros registrados</p>';
     }
 
@@ -553,7 +596,10 @@
             if(inv.exists){
                 const d=inv.data();
                 if(!(d.referidosPendientes||[]).some(r=>r.id===userId)&&!(d.referidosReclamados||[]).includes(userId)){
-                    await db.collection("usuarios").doc(userData.invitado_por).update({referidosActivos:firebase.firestore.FieldValue.increment(1),referidosPendientes:firebase.firestore.FieldValue.arrayUnion({id:userId,nombre:userName,timestamp:Date.now()})});
+                    await db.collection("usuarios").doc(userData.invitado_por).update({
+                        referidosActivos:firebase.firestore.FieldValue.increment(1),
+                        referidosPendientes:firebase.firestore.FieldValue.arrayUnion({id:userId,nombre:userName,timestamp:Date.now()})
+                    });
                 }
             }
             userData.referidoActivoMarcado=true; saveToLocal({...userData,userId}); syncToFirebase({referidoActivoMarcado:true});
@@ -563,7 +609,7 @@
     function renderReferidosPendientes(){
         const c=document.getElementById('referidosPendientesList'); if(!c)return;
         const p=userData.referidosPendientes||[];
-        c.innerHTML=p.length?p.map(r=>`<div class="referido-card"><div><strong>${r.nombre||r.id}</strong><small>ID: ${r.id}</small></div><button style="background:var(--pastel-green);padding:6px 12px;border-radius:14px;border:2px solid var(--border-cocoa);" onclick="reclamarReferido('${r.id}')">RECLAMAR 150⭐</button></div>`).join(''):'<p style="text-align:center;">Sin amigos pendientes</p>';
+        c.innerHTML=p.length?p.map(r=>`<div class="referido-card"><div><strong>${r.nombre||r.id}</strong><small>ID: ${r.id}</small></div><button style="background:var(--pastel-green);padding:6px 12px;border-radius:14px;border:2px solid var(--border-cocoa);" onclick="reclamarReferido('${r.id}')">RECLAMAR ${REWARD_POR_REFERIDO}⭐</button></div>`).join(''):'<p style="text-align:center;">Sin amigos pendientes</p>';
     }
 
     async function reclamarReferido(refId){
@@ -573,9 +619,200 @@
         p.splice(i,1); userData.referidosReclamados=[...(userData.referidosReclamados||[]),refId];
         saveToLocal({...userData,userId}); await updateUI(); renderReferidosPendientes();
         syncToFirebase({balance:userData.balance,totalGanadoReferidos:userData.totalGanadoReferidos,referidosPendientes:p,referidosReclamados:userData.referidosReclamados});
-        showAlert('🎉 +150 ⭐','Recompensa','check-circle');
+        showAlert('🎉 +'+REWARD_POR_REFERIDO+' ⭐','Recompensa','check-circle');
     }
 
+    // ======================== PAGOS MASIVOS ========================
+    
+    function procesarCSV(texto) {
+        const lineas = texto.split('\n').filter(l => l.trim() !== '');
+        if (lineas.length < 2) { showAlert('Error','El CSV debe tener al menos 2 filas (encabezado + datos)','times-circle'); return; }
+        
+        // Detectar separador (coma o punto y coma)
+        let separador = ',';
+        if (lineas[0].includes(';')) separador = ';';
+        
+        const encabezados = lineas[0].split(separador).map(h => h.trim().toLowerCase());
+        
+        // Buscar columnas: Address/ENS/Cwallet_ID y Amount
+        const idxAddress = encabezados.findIndex(h => h.includes('address') || h.includes('cwallet') || h.includes('ens') || h.includes('id'));
+        const idxAmount = encabezados.findIndex(h => h.includes('amount') || h.includes('monto'));
+        const idxMemo = encabezados.findIndex(h => h.includes('memo') || h.includes('nota'));
+        
+        if (idxAddress === -1 || idxAmount === -1) {
+            showAlert('Error','El CSV debe tener columnas: Address/ENS/Cwallet_ID y Amount','times-circle');
+            return;
+        }
+        
+        const datos = [];
+        let totalUSDT = 0;
+        let totalStars = 0;
+        
+        for (let i = 1; i < lineas.length; i++) {
+            const cols = lineas[i].split(separador).map(c => c.trim());
+            if (cols.length <= Math.max(idxAddress, idxAmount)) continue;
+            
+            let cwallet = cols[idxAddress] || '';
+            let amountStr = cols[idxAmount] || '0';
+            let memo = (idxMemo !== -1 && cols[idxMemo]) ? cols[idxMemo] : '';
+            
+            // Limpiar amount (reemplazar comas por puntos si es necesario)
+            amountStr = amountStr.replace(/,/g, '.');
+            let amount = parseFloat(amountStr);
+            if (isNaN(amount) || amount <= 0) continue;
+            
+            // Convertir a USDT (si viene en estrellas, dividir por COINS_PER_USDT)
+            // Asumimos que el CSV viene en USDT (por la plantilla)
+            let usdt = amount;
+            let estrellas = Math.floor(amount * COINS_PER_USDT);
+            
+            // Si el monto es menor a 0.005 USDT, lo ignoramos
+            if (usdt < MINIMO_RETIRO_USDT) {
+                console.log('Monto menor a mínimo:', usdt);
+                continue;
+            }
+            
+            datos.push({
+                cwallet: cwallet,
+                usdt: usdt,
+                estrellas: estrellas,
+                memo: memo,
+                estado: 'pendiente'
+            });
+            
+            totalUSDT += usdt;
+            totalStars += estrellas;
+        }
+        
+        if (datos.length === 0) {
+            showAlert('Error','No se encontraron datos válidos. Monto mínimo: '+MINIMO_RETIRO_USDT+' USDT','times-circle');
+            return;
+        }
+        
+        pagosMasivosData = datos;
+        document.getElementById('totalPagoMasivo').textContent = totalUSDT.toFixed(4);
+        document.getElementById('cantidadPagosMasivos').textContent = datos.length;
+        document.getElementById('btnPagoMasivo').disabled = false;
+        document.getElementById('estadoPagoMasivo').textContent = '✅ Listo para procesar '+datos.length+' retiros';
+        
+        // Vista previa
+        const preview = document.getElementById('csvPreview');
+        preview.innerHTML = datos.slice(0, 10).map(d => 
+            `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #eee;font-size:10px;">
+                <span>${d.cwallet.substring(0,10)}...</span>
+                <span>${d.usdt.toFixed(4)} USDT</span>
+            </div>`
+        ).join('');
+        if (datos.length > 10) {
+            preview.innerHTML += `<div style="text-align:center;padding:4px;color:var(--text-soft-cocoa);">... y ${datos.length-10} más</div>`;
+        }
+    }
+    
+    async function ejecutarPagoMasivo() {
+        if (pagosMasivosData.length === 0) return;
+        if (pagosMasivosData.some(d => d.estado === 'procesado')) {
+            showAlert('Ya procesado','Estos pagos ya fueron procesados','times-circle');
+            return;
+        }
+        
+        const btn = document.getElementById('btnPagoMasivo');
+        btn.disabled = true;
+        btn.textContent = '⏳ Procesando...';
+        document.getElementById('estadoPagoMasivo').textContent = '⏳ Procesando pagos...';
+        
+        let exitosos = 0;
+        let fallidos = 0;
+        
+        for (const pago of pagosMasivosData) {
+            if (pago.estado === 'procesado') continue;
+            
+            try {
+                // Buscar usuario por Cwallet ID en withdrawHistory
+                const usuariosSnapshot = await db.collection("usuarios")
+                    .where("withdrawHistory", "array-contains", { cwallet: pago.cwallet, status: '⏳ Pendiente' })
+                    .get();
+                
+                if (usuariosSnapshot.empty) {
+                    // Buscar en todos los documentos con withdrawHistory
+                    const allUsers = await db.collection("usuarios").get();
+                    let encontrado = false;
+                    
+                    for (const doc of allUsers.docs) {
+                        const data = doc.data();
+                        if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
+                            for (const item of data.withdrawHistory) {
+                                if (item.cwallet === pago.cwallet && item.status === '⏳ Pendiente') {
+                                    // Actualizar a exitoso
+                                    const updatedHistory = data.withdrawHistory.map(h => {
+                                        if (h.cwallet === pago.cwallet && h.status === '⏳ Pendiente') {
+                                            return { ...h, status: '✅ Exitoso' };
+                                        }
+                                        return h;
+                                    });
+                                    await db.collection("usuarios").doc(doc.id).update({
+                                        withdrawHistory: updatedHistory
+                                    });
+                                    encontrado = true;
+                                    exitosos++;
+                                    break;
+                                }
+                            }
+                        }
+                        if (encontrado) break;
+                    }
+                    
+                    if (!encontrado) {
+                        fallidos++;
+                        console.log('No encontrado:', pago.cwallet);
+                    }
+                } else {
+                    // Actualizar cada usuario encontrado
+                    for (const doc of usuariosSnapshot.docs) {
+                        const data = doc.data();
+                        if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
+                            const updatedHistory = data.withdrawHistory.map(h => {
+                                if (h.cwallet === pago.cwallet && h.status === '⏳ Pendiente') {
+                                    return { ...h, status: '✅ Exitoso' };
+                                }
+                                return h;
+                            });
+                            await db.collection("usuarios").doc(doc.id).update({
+                                withdrawHistory: updatedHistory
+                            });
+                            exitosos++;
+                        }
+                    }
+                }
+                
+                pago.estado = 'procesado';
+                
+            } catch (e) {
+                console.error('Error procesando pago:', e);
+                fallidos++;
+            }
+        }
+        
+        // Guardar en local para no repetir
+        pagosMasivosProcesados = pagosMasivosData.filter(d => d.estado === 'procesado');
+        
+        document.getElementById('estadoPagoMasivo').textContent = `✅ Procesados: ${exitosos} exitosos, ${fallidos} fallidos`;
+        btn.textContent = '✅ Pagos Completados';
+        btn.disabled = true;
+        
+        showAlert('💰 Pago Masivo Completado',`${exitosos} retiros marcados como exitosos\n${fallidos} no encontrados`,'check-circle');
+        
+        // Limpiar datos procesados después de un tiempo
+        setTimeout(() => {
+            pagosMasivosData = pagosMasivosData.filter(d => d.estado !== 'procesado');
+            if (pagosMasivosData.length === 0) {
+                document.getElementById('btnPagoMasivo').disabled = true;
+                document.getElementById('btnPagoMasivo').textContent = 'PAGAR TODOS (Pendientes a Exitoso)';
+            }
+        }, 5000);
+    }
+
+    // ======================== EVENTOS ========================
+    
     for(let i=1;i<=TOTAL_VIDEOS;i++) document.getElementById('video'+i+'Btn').onclick=()=>watchVideo(i);
     document.getElementById('withdrawNavBtn').onclick=()=>navigate('withdraw-screen');
     document.getElementById('inviteNavBtn').onclick=()=>navigate('invite-screen');
@@ -603,16 +840,89 @@
         showAlert('🎁 +'+d.data().amount+' ⭐','Código','gift'); input.value='';
     };
 
+    // Admin - Tabs
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.onclick = function() {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            const tabId = this.dataset.tab;
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById('tab-' + tabId).style.display = 'block';
+        };
+    });
+
+    // Admin - Acceso
     const card=document.querySelector('.balance-card'); let t;
     card.addEventListener('mousedown',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000));
     card.addEventListener('mouseup',()=>clearTimeout(t));
     card.addEventListener('touchstart',()=>t=setTimeout(()=>document.getElementById('adminModal').style.display='flex',8000));
     card.addEventListener('touchend',()=>clearTimeout(t));
     document.getElementById('adminCancelBtn').onclick=()=>document.getElementById('adminModal').style.display='none';
+    
     document.getElementById('adminAddBalanceBtn').onclick=async()=>{
         if(document.getElementById('adminPassword').value!==ADMIN_SECRET)return;
         await db.collection("usuarios").doc(document.getElementById('adminUserId').value.trim()).update({balance:firebase.firestore.FieldValue.increment(parseFloat(document.getElementById('adminAmount').value))});
+        showAlert('✅ Saldo agregado','Operación completada','check-circle');
     };
+    
+    document.getElementById('loadPendientesBtn').onclick=async()=>{
+        if(document.getElementById('adminPassword').value!==ADMIN_SECRET)return;
+        const list = document.getElementById('pendientesList');
+        list.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-soft-cocoa);">Buscando...</div>';
+        
+        try {
+            const allUsers = await db.collection("usuarios").get();
+            let pendientes = [];
+            
+            for (const doc of allUsers.docs) {
+                const data = doc.data();
+                if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
+                    for (const item of data.withdrawHistory) {
+                        if (item.status === '⏳ Pendiente') {
+                            pendientes.push({
+                                userId: doc.id,
+                                userName: data.nombre || 'Anónimo',
+                                cwallet: item.cwallet || 'No especificado',
+                                usdt: item.usdtNeto || (item.amount/COINS_PER_USDT),
+                                estrellas: item.amount,
+                                fecha: item.date || 'Sin fecha'
+                            });
+                        }
+                    }
+                }
+            }
+            
+            if (pendientes.length === 0) {
+                list.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-soft-cocoa);">No hay retiros pendientes</div>';
+            } else {
+                list.innerHTML = pendientes.map(p => `
+                    <div class="pendiente-item">
+                        <div class="user">👤 ${p.userName} (${p.userId})</div>
+                        <div class="monto">${p.usdt.toFixed(4)} USDT (${p.estrellas} ⭐)</div>
+                        <div class="cc">${p.cwallet}</div>
+                        <div style="font-size:10px;color:var(--text-soft-cocoa);margin-top:4px;">📅 ${p.fecha}</div>
+                    </div>
+                `).join('');
+            }
+        } catch(e) {
+            list.innerHTML = '<div style="text-align:center;padding:12px;color:red;">Error al cargar</div>';
+        }
+    };
+    
+    // CSV Upload
+    document.getElementById('csvFileInput').onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const text = event.target.result;
+            procesarCSV(text);
+        };
+        reader.readAsText(file);
+    };
+    
+    document.getElementById('btnPagoMasivo').onclick = ejecutarPagoMasivo;
 
     initUser();
 </script>
