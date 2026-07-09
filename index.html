@@ -163,12 +163,10 @@
         .pago-masivo-btn { background: var(--pastel-coral); border: 3px solid var(--border-cocoa); padding: 14px; border-radius: 24px; font-weight: 700; font-size: 14px; cursor: pointer; width: 100%; box-shadow: 0 5px 0 var(--border-cocoa); transition: all 0.15s; margin-top: 10px; }
         .pago-masivo-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--border-cocoa); }
         .pago-masivo-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: translateY(3px); box-shadow: 0 2px 0 var(--border-cocoa); }
-        .csv-upload-area { border: 3px dashed var(--border-cocoa); border-radius: 20px; padding: 20px; text-align: center; margin: 10px 0; background: var(--bg-cream); }
-        .csv-upload-area input[type="file"] { display: none; }
-        .csv-upload-area label { cursor: pointer; font-weight: 700; color: var(--text-cocoa); padding: 10px 20px; border: 2px solid var(--border-cocoa); border-radius: 14px; background: var(--pastel-yellow); display: inline-block; }
-        .resumen-pagos { background: var(--pastel-purple); border-radius: 16px; padding: 12px; margin: 10px 0; border: 2px solid var(--border-cocoa); }
-        .resumen-pagos .total { font-size: 18px; font-weight: 700; }
-        .comision-ref { background: var(--pastel-yellow); border-radius: 12px; padding: 10px; margin: 8px 0; border: 2px solid var(--border-cocoa); font-size: 12px; }
+        .pago-masivo-btn-exitoso { background: var(--pastel-green) !important; }
+        .resumen-pagos { background: var(--pastel-purple); border-radius: 16px; padding: 15px; margin: 10px 0; border: 2px solid var(--border-cocoa); text-align: center; }
+        .resumen-pagos .total { font-size: 22px; font-weight: 700; }
+        .comision-ref { background: var(--pastel-yellow); border-radius: 12px; padding: 10px; margin: 8px 0; border: 2px solid var(--border-cocoa); font-size: 12px; text-align: center; }
     </style>
 </head>
 <body>
@@ -229,28 +227,42 @@
             <div id="giftCodesList" style="margin-top:15px; max-height:200px; overflow-y:auto;"></div>
         </div>
         <div id="tab-pendientes" class="admin-tab-content" style="display:none;">
-            <p style="font-size:11px; color:var(--text-soft-cocoa); margin-bottom:10px;">Retiros procesados desde el corte</p>
+            <p style="font-size:11px; color:var(--text-soft-cocoa); margin-bottom:10px;">Retiros pendientes por pagar</p>
             <button class="btn-game btn-primary" id="loadPendientesBtn" style="width:100%; margin-bottom:10px;">Buscar pendientes</button>
             <div id="pendientesList" style="max-height:250px; overflow-y:auto;"></div>
         </div>
         <div id="tab-pagos" class="admin-tab-content" style="display:none;">
-            <p style="font-size:11px; color:var(--text-soft-cocoa); margin-bottom:6px;">Sube archivo CSV con Cwallet IDs y montos</p>
-            <div class="csv-upload-area">
-                <input type="file" id="csvFileInput" accept=".csv">
-                <label for="csvFileInput"><i class="fas fa-upload"></i> Seleccionar CSV</label>
+            <div style="background:var(--pastel-yellow); border-radius:16px; padding:12px; margin-bottom:10px; border:2px solid var(--border-cocoa);">
+                <p style="font-size:11px; font-weight:700; margin-bottom:4px;">📋 INSTRUCCIONES</p>
+                <p style="font-size:10px; color:var(--text-soft-cocoa); line-height:1.4;">
+                    1. Presiona <b>"Descargar CSV"</b> para obtener los retiros pendientes<br>
+                    2. Paga manualmente en <b>Ccwallet</b> usando el archivo CSV<br>
+                    3. Vuelve aquí y presiona <b>"Marcar Todos Como Exitosos"</b>
+                </p>
             </div>
-            <div id="csvPreview" style="max-height:150px; overflow-y:auto; font-size:11px; background:var(--bg-cream); border-radius:12px; padding:8px; border:2px solid var(--border-cocoa); margin:6px 0;"></div>
-            <div class="resumen-pagos" id="resumenPagos">
-                <div>Total a pagar: <span class="total" id="totalPagoMasivo">0.0000</span> USDT</div>
-                <div style="font-size:11px; color:var(--text-soft-cocoa);">Cantidad de retiros: <span id="cantidadPagosMasivos">0</span></div>
+            
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                <button class="btn-game btn-primary" id="descargarCsvPendientes" style="flex:1; text-align:center; padding:12px; font-size:13px; min-width:140px;">
+                    <i class="fas fa-download"></i> Descargar CSV
+                </button>
+                <button class="btn-game btn-success" id="btnMarcarTodosExitosos" style="flex:1; text-align:center; padding:12px; font-size:13px; min-width:140px; background:var(--pastel-green);">
+                    <i class="fas fa-check-double"></i> Marcar Todos ✅
+                </button>
             </div>
+            
+            <div class="resumen-pagos">
+                <div style="font-size:12px; color:var(--text-soft-cocoa);">Retiros pendientes</div>
+                <div style="font-size:28px; font-weight:700;" id="cantidadPendientesTotal">0</div>
+                <div style="font-size:11px; color:var(--text-soft-cocoa);">Total: <span id="totalUSDTOPendientes">0.0000</span> USDT</div>
+            </div>
+            
             <div class="comision-ref">
                 <i class="fas fa-percent"></i> Comisión de referencia: <b>5%</b> | <i class="fas fa-coins"></i> 0.015 USDT por ref activo
             </div>
-            <button class="pago-masivo-btn" id="btnPagoMasivo" disabled>
-                <i class="fas fa-rocket"></i> PAGAR TODOS (Pendientes a Exitoso)
-            </button>
-            <div id="estadoPagoMasivo" style="font-size:11px; margin-top:8px; text-align:center; color:var(--text-soft-cocoa);"></div>
+            
+            <div id="estadoPagosCSV" style="font-size:11px; margin-top:10px; text-align:center; color:var(--text-soft-cocoa); padding:8px; background:var(--bg-cream); border-radius:12px; border:2px solid var(--border-cocoa);">
+                Esperando acción...
+            </div>
         </div>
         <div id="tab-stats" class="admin-tab-content" style="display:none;">
             <div style="text-align:center; padding:10px 0;">
@@ -342,23 +354,18 @@
     const ADSGRAM_REWARDS = [5, 5, 5, 5];
     const TOTAL_ADSGRAM = 4;
     const ADSGRAM_BLOCK_ID = '28418';
-    const FECHA_CORTE = new Date('2026-05-28T18:44:00-04:00');
     
-    // NUEVAS CONSTANTES
-    const MINIMO_RETIRO_USDT = 0.005; // 50 ⭐
-    const COMISION_REFERIDO_PORCENTAJE = 0.05; // 5%
-    const BONO_REFERIDO_USDT = 0.015; // 0.015 USDT por ref activo
-    const BONO_REFERIDO_STARS = BONO_REFERIDO_USDT * COINS_PER_USDT; // 150 ⭐
+    const MINIMO_RETIRO_USDT = 0.005;
+    const COMISION_REFERIDO_PORCENTAJE = 0.05;
+    const BONO_REFERIDO_USDT = 0.015;
+    const BONO_REFERIDO_STARS = BONO_REFERIDO_USDT * COINS_PER_USDT;
     
     let agTimer = null;
-    let retirosPagados = JSON.parse(localStorage.getItem('retirosPagados') || '[]');
-    const REWARD_POR_REFERIDO = BONO_REFERIDO_STARS; // 150 ⭐
+    const REWARD_POR_REFERIDO = BONO_REFERIDO_STARS;
     const COMISION_PORCIENTO = COMISION_REFERIDO_PORCENTAJE;
     const STORAGE_KEY = 'usdtgiftk_userdata';
     
-    // Variables para pagos masivos
-    let pagosMasivosData = [];
-    let pagosMasivosProcesados = [];
+    let totalPendientes = 0;
 
     const loadingBar = document.getElementById('loadingBar');
     const loadingFooter = document.getElementById('loadingFooter');
@@ -476,7 +483,6 @@
             const usdtBruto=saldoReal/COINS_PER_USDT;
             const usdtNeto=usdtBruto-COMISION_USDT;
             
-            // NUEVO: mínimo 0.005 USDT (50 ⭐)
             if(usdtNeto<=0){ showAlert('Saldo insuficiente','Necesitas más estrellas. Mínimo 0.005 USDT','coins'); return; }
             if(saldoReal < MINIMO_RETIRO_USDT * COINS_PER_USDT){ 
                 showAlert('Saldo insuficiente','Mínimo '+MINIMO_RETIRO_USDT+' USDT ('+(MINIMO_RETIRO_USDT*COINS_PER_USDT)+' ⭐)','coins'); 
@@ -490,7 +496,6 @@
             const fechaRetiro=new Date();
             const fechaStr=new Date().toLocaleDateString();
             
-            // Guardar como PENDIENTE en lugar de completado
             await db.collection("usuarios").doc(userId).update({
                 balance:0, hasWithdrawn:true,
                 withdrawHistory:firebase.firestore.FieldValue.arrayUnion({
@@ -622,194 +627,177 @@
         showAlert('🎉 +'+REWARD_POR_REFERIDO+' ⭐','Recompensa','check-circle');
     }
 
-    // ======================== PAGOS MASIVOS ========================
-    
-    function procesarCSV(texto) {
-        const lineas = texto.split('\n').filter(l => l.trim() !== '');
-        if (lineas.length < 2) { showAlert('Error','El CSV debe tener al menos 2 filas (encabezado + datos)','times-circle'); return; }
-        
-        // Detectar separador (coma o punto y coma)
-        let separador = ',';
-        if (lineas[0].includes(';')) separador = ';';
-        
-        const encabezados = lineas[0].split(separador).map(h => h.trim().toLowerCase());
-        
-        // Buscar columnas: Address/ENS/Cwallet_ID y Amount
-        const idxAddress = encabezados.findIndex(h => h.includes('address') || h.includes('cwallet') || h.includes('ens') || h.includes('id'));
-        const idxAmount = encabezados.findIndex(h => h.includes('amount') || h.includes('monto'));
-        const idxMemo = encabezados.findIndex(h => h.includes('memo') || h.includes('nota'));
-        
-        if (idxAddress === -1 || idxAmount === -1) {
-            showAlert('Error','El CSV debe tener columnas: Address/ENS/Cwallet_ID y Amount','times-circle');
-            return;
-        }
-        
-        const datos = [];
-        let totalUSDT = 0;
-        let totalStars = 0;
-        
-        for (let i = 1; i < lineas.length; i++) {
-            const cols = lineas[i].split(separador).map(c => c.trim());
-            if (cols.length <= Math.max(idxAddress, idxAmount)) continue;
+    // =============================================
+    // PAGOS MASIVOS - SOLO CWALLET ID
+    // =============================================
+
+    // 1. ACTUALIZAR RESUMEN DE PENDIENTES
+    async function actualizarResumenPendientes() {
+        try {
+            const allUsers = await db.collection("usuarios").get();
+            let pendientes = [];
+            let totalUSDT = 0;
             
-            let cwallet = cols[idxAddress] || '';
-            let amountStr = cols[idxAmount] || '0';
-            let memo = (idxMemo !== -1 && cols[idxMemo]) ? cols[idxMemo] : '';
-            
-            // Limpiar amount (reemplazar comas por puntos si es necesario)
-            amountStr = amountStr.replace(/,/g, '.');
-            let amount = parseFloat(amountStr);
-            if (isNaN(amount) || amount <= 0) continue;
-            
-            // Convertir a USDT (si viene en estrellas, dividir por COINS_PER_USDT)
-            // Asumimos que el CSV viene en USDT (por la plantilla)
-            let usdt = amount;
-            let estrellas = Math.floor(amount * COINS_PER_USDT);
-            
-            // Si el monto es menor a 0.005 USDT, lo ignoramos
-            if (usdt < MINIMO_RETIRO_USDT) {
-                console.log('Monto menor a mínimo:', usdt);
-                continue;
-            }
-            
-            datos.push({
-                cwallet: cwallet,
-                usdt: usdt,
-                estrellas: estrellas,
-                memo: memo,
-                estado: 'pendiente'
-            });
-            
-            totalUSDT += usdt;
-            totalStars += estrellas;
-        }
-        
-        if (datos.length === 0) {
-            showAlert('Error','No se encontraron datos válidos. Monto mínimo: '+MINIMO_RETIRO_USDT+' USDT','times-circle');
-            return;
-        }
-        
-        pagosMasivosData = datos;
-        document.getElementById('totalPagoMasivo').textContent = totalUSDT.toFixed(4);
-        document.getElementById('cantidadPagosMasivos').textContent = datos.length;
-        document.getElementById('btnPagoMasivo').disabled = false;
-        document.getElementById('estadoPagoMasivo').textContent = '✅ Listo para procesar '+datos.length+' retiros';
-        
-        // Vista previa
-        const preview = document.getElementById('csvPreview');
-        preview.innerHTML = datos.slice(0, 10).map(d => 
-            `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #eee;font-size:10px;">
-                <span>${d.cwallet.substring(0,10)}...</span>
-                <span>${d.usdt.toFixed(4)} USDT</span>
-            </div>`
-        ).join('');
-        if (datos.length > 10) {
-            preview.innerHTML += `<div style="text-align:center;padding:4px;color:var(--text-soft-cocoa);">... y ${datos.length-10} más</div>`;
-        }
-    }
-    
-    async function ejecutarPagoMasivo() {
-        if (pagosMasivosData.length === 0) return;
-        if (pagosMasivosData.some(d => d.estado === 'procesado')) {
-            showAlert('Ya procesado','Estos pagos ya fueron procesados','times-circle');
-            return;
-        }
-        
-        const btn = document.getElementById('btnPagoMasivo');
-        btn.disabled = true;
-        btn.textContent = '⏳ Procesando...';
-        document.getElementById('estadoPagoMasivo').textContent = '⏳ Procesando pagos...';
-        
-        let exitosos = 0;
-        let fallidos = 0;
-        
-        for (const pago of pagosMasivosData) {
-            if (pago.estado === 'procesado') continue;
-            
-            try {
-                // Buscar usuario por Cwallet ID en withdrawHistory
-                const usuariosSnapshot = await db.collection("usuarios")
-                    .where("withdrawHistory", "array-contains", { cwallet: pago.cwallet, status: '⏳ Pendiente' })
-                    .get();
-                
-                if (usuariosSnapshot.empty) {
-                    // Buscar en todos los documentos con withdrawHistory
-                    const allUsers = await db.collection("usuarios").get();
-                    let encontrado = false;
-                    
-                    for (const doc of allUsers.docs) {
-                        const data = doc.data();
-                        if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
-                            for (const item of data.withdrawHistory) {
-                                if (item.cwallet === pago.cwallet && item.status === '⏳ Pendiente') {
-                                    // Actualizar a exitoso
-                                    const updatedHistory = data.withdrawHistory.map(h => {
-                                        if (h.cwallet === pago.cwallet && h.status === '⏳ Pendiente') {
-                                            return { ...h, status: '✅ Exitoso' };
-                                        }
-                                        return h;
-                                    });
-                                    await db.collection("usuarios").doc(doc.id).update({
-                                        withdrawHistory: updatedHistory
-                                    });
-                                    encontrado = true;
-                                    exitosos++;
-                                    break;
-                                }
-                            }
-                        }
-                        if (encontrado) break;
-                    }
-                    
-                    if (!encontrado) {
-                        fallidos++;
-                        console.log('No encontrado:', pago.cwallet);
-                    }
-                } else {
-                    // Actualizar cada usuario encontrado
-                    for (const doc of usuariosSnapshot.docs) {
-                        const data = doc.data();
-                        if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
-                            const updatedHistory = data.withdrawHistory.map(h => {
-                                if (h.cwallet === pago.cwallet && h.status === '⏳ Pendiente') {
-                                    return { ...h, status: '✅ Exitoso' };
-                                }
-                                return h;
+            for (const doc of allUsers.docs) {
+                const data = doc.data();
+                if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
+                    for (const item of data.withdrawHistory) {
+                        if (item.status === '⏳ Pendiente') {
+                            pendientes.push({
+                                cwallet: item.cwallet || '',
+                                usdt: item.usdtNeto || (item.amount / 10000),
+                                estrellas: item.amount || 0,
+                                usuario: data.nombre || 'Anónimo',
+                                userId: doc.id
                             });
-                            await db.collection("usuarios").doc(doc.id).update({
-                                withdrawHistory: updatedHistory
-                            });
-                            exitosos++;
+                            totalUSDT += (item.usdtNeto || (item.amount / 10000));
                         }
                     }
                 }
-                
-                pago.estado = 'procesado';
-                
-            } catch (e) {
-                console.error('Error procesando pago:', e);
-                fallidos++;
             }
+            
+            totalPendientes = pendientes.length;
+            document.getElementById('cantidadPendientesTotal').textContent = pendientes.length;
+            document.getElementById('totalUSDTOPendientes').textContent = totalUSDT.toFixed(4);
+            
+            return pendientes;
+        } catch(e) {
+            console.error('Error contando pendientes:', e);
+            return [];
+        }
+    }
+
+    // 2. DESCARGAR CSV CON PENDIENTES (SOLO CWALLET Y MONTO)
+    document.getElementById('descargarCsvPendientes').onclick = async function() {
+        if (document.getElementById('adminPassword').value !== ADMIN_SECRET) {
+            showAlert('Error','Clave incorrecta','times-circle');
+            return;
         }
         
-        // Guardar en local para no repetir
-        pagosMasivosProcesados = pagosMasivosData.filter(d => d.estado === 'procesado');
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+        document.getElementById('estadoPagosCSV').textContent = '⏳ Generando archivo...';
         
-        document.getElementById('estadoPagoMasivo').textContent = `✅ Procesados: ${exitosos} exitosos, ${fallidos} fallidos`;
-        btn.textContent = '✅ Pagos Completados';
-        btn.disabled = true;
-        
-        showAlert('💰 Pago Masivo Completado',`${exitosos} retiros marcados como exitosos\n${fallidos} no encontrados`,'check-circle');
-        
-        // Limpiar datos procesados después de un tiempo
-        setTimeout(() => {
-            pagosMasivosData = pagosMasivosData.filter(d => d.estado !== 'procesado');
-            if (pagosMasivosData.length === 0) {
-                document.getElementById('btnPagoMasivo').disabled = true;
-                document.getElementById('btnPagoMasivo').textContent = 'PAGAR TODOS (Pendientes a Exitoso)';
+        try {
+            const allUsers = await db.collection("usuarios").get();
+            let pendientes = [];
+            
+            for (const doc of allUsers.docs) {
+                const data = doc.data();
+                if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
+                    for (const item of data.withdrawHistory) {
+                        if (item.status === '⏳ Pendiente') {
+                            const usdt = item.usdtNeto || (item.amount / 10000);
+                            pendientes.push({
+                                cwallet: item.cwallet || '',
+                                usdt: usdt,
+                                usuario: data.nombre || 'Anónimo'
+                            });
+                        }
+                    }
+                }
             }
-        }, 5000);
-    }
+            
+            if (pendientes.length === 0) {
+                showAlert('Sin pendientes','No hay retiros pendientes para pagar','info-circle');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-download"></i> Descargar CSV';
+                document.getElementById('estadoPagosCSV').textContent = '✅ No hay pendientes';
+                return;
+            }
+            
+            // CREAR CSV CON FORMATO PARA CCWALLET
+            let csv = 'Cwallet_ID,Amount_USDT\n';
+            for (const p of pendientes) {
+                csv += `${p.cwallet},${p.usdt.toFixed(4)}\n`;
+            }
+            
+            // Descargar
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `pagos_masivos_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            
+            const total = pendientes.reduce((sum,p) => sum + p.usdt, 0);
+            document.getElementById('estadoPagosCSV').textContent = `✅ CSV descargado con ${pendientes.length} retiros (Total: ${total.toFixed(4)} USDT)`;
+            showAlert('✅ CSV listo', `${pendientes.length} retiros para pagar en Ccwallet`, 'download');
+            
+        } catch(e) {
+            showAlert('Error','No se pudo generar el CSV','times-circle');
+            console.error(e);
+            document.getElementById('estadoPagosCSV').textContent = '❌ Error al generar';
+        }
+        
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-download"></i> Descargar CSV';
+    };
+
+    // 3. MARCAR TODOS LOS PENDIENTES COMO EXITOSOS
+    document.getElementById('btnMarcarTodosExitosos').onclick = async function() {
+        if (document.getElementById('adminPassword').value !== ADMIN_SECRET) {
+            showAlert('Error','Clave incorrecta','times-circle');
+            return;
+        }
+        
+        // Confirmar
+        const confirmar = confirm(`⚠️ ¿Seguro que quieres marcar TODOS los retiros pendientes como EXITOSOS?\n\nEsto afecta a ${totalPendientes} retiros.`);
+        if (!confirmar) return;
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        document.getElementById('estadoPagosCSV').textContent = '⏳ Marcando todos los pendientes como exitosos...';
+        
+        let actualizados = 0;
+        let errores = 0;
+        
+        try {
+            const allUsers = await db.collection("usuarios").get();
+            
+            for (const doc of allUsers.docs) {
+                const data = doc.data();
+                if (data.withdrawHistory && Array.isArray(data.withdrawHistory)) {
+                    let tienePendientes = false;
+                    const updatedHistory = data.withdrawHistory.map(item => {
+                        if (item.status === '⏳ Pendiente') {
+                            tienePendientes = true;
+                            return { ...item, status: '✅ Exitoso' };
+                        }
+                        return item;
+                    });
+                    
+                    if (tienePendientes) {
+                        try {
+                            await db.collection("usuarios").doc(doc.id).update({
+                                withdrawHistory: updatedHistory
+                            });
+                            actualizados++;
+                        } catch(e) {
+                            errores++;
+                            console.error('Error actualizando:', doc.id, e);
+                        }
+                    }
+                }
+            }
+            
+            // Actualizar resumen
+            await actualizarResumenPendientes();
+            
+            document.getElementById('estadoPagosCSV').textContent = `✅ Completado: ${actualizados} usuarios actualizados, ${errores} errores`;
+            showAlert('💰 Pago masivo completado', `${actualizados} retiros marcados como exitosos`, 'check-circle');
+            
+        } catch(e) {
+            showAlert('Error','Ocurrió un error al procesar','times-circle');
+            console.error(e);
+            document.getElementById('estadoPagosCSV').textContent = '❌ Error al procesar';
+        }
+        
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-check-double"></i> Marcar Todos ✅';
+    };
 
     // ======================== EVENTOS ========================
     
@@ -848,6 +836,12 @@
             const tabId = this.dataset.tab;
             document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
             document.getElementById('tab-' + tabId).style.display = 'block';
+            
+            // Si es la pestaña de pagos, actualizar resumen
+            if (tabId === 'pagos') {
+                actualizarResumenPendientes();
+                document.getElementById('estadoPagosCSV').textContent = '📊 Resumen actualizado';
+            }
         };
     });
 
@@ -908,21 +902,9 @@
             list.innerHTML = '<div style="text-align:center;padding:12px;color:red;">Error al cargar</div>';
         }
     };
-    
-    // CSV Upload
-    document.getElementById('csvFileInput').onchange = function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const text = event.target.result;
-            procesarCSV(text);
-        };
-        reader.readAsText(file);
-    };
-    
-    document.getElementById('btnPagoMasivo').onclick = ejecutarPagoMasivo;
+
+    // Inicializar resumen de pendientes
+    setTimeout(actualizarResumenPendientes, 2000);
 
     initUser();
 </script>
