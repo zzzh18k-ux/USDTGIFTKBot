@@ -167,6 +167,8 @@
         .resumen-pagos { background: var(--pastel-purple); border-radius: 16px; padding: 15px; margin: 10px 0; border: 2px solid var(--border-cocoa); text-align: center; }
         .resumen-pagos .total { font-size: 22px; font-weight: 700; }
         .comision-ref { background: var(--pastel-yellow); border-radius: 12px; padding: 10px; margin: 8px 0; border: 2px solid var(--border-cocoa); font-size: 12px; text-align: center; }
+        .cwallet-link { color: var(--text-cocoa); font-weight: 700; text-decoration: underline; }
+        .cwallet-link:hover { color: var(--text-soft-cocoa); }
     </style>
 </head>
 <body>
@@ -236,7 +238,7 @@
                 <p style="font-size:11px; font-weight:700; margin-bottom:4px;">📋 INSTRUCCIONES</p>
                 <p style="font-size:10px; color:var(--text-soft-cocoa); line-height:1.4;">
                     1. Presiona <b>"Descargar CSV"</b> para obtener los retiros pendientes<br>
-                    2. Paga manualmente en <b>Ccwallet</b> usando el archivo CSV<br>
+                    2. Paga manualmente en <b>Cwallet</b> usando el archivo CSV<br>
                     3. Vuelve aquí y presiona <b>"Marcar Todos Como Exitosos"</b>
                 </p>
             </div>
@@ -311,18 +313,38 @@
         </div>
     </div>
 
+    <!-- ====== PANTALLA DE RETIRO MODIFICADA ====== -->
     <div id="withdraw-screen" class="screen">
         <div class="back-circle" id="backHomeWithdraw"><i class="fas fa-arrow-left"></i></div>
         <div class="glass-card">
-            <div style="text-align:center; margin-bottom:12px;"><i class="fas fa-piggy-bank" style="font-size: 36px; color: var(--text-cocoa);"></i><h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Retiro de USDT</h3></div>
-            <div class="balance-available"><span style="font-size:11px; font-weight:700; color:var(--text-soft-cocoa);">Balance actual</span><div class="coins" id="withdraw-balance-coins">0.00 ⭐</div><div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div></div>
-            <div style="background: var(--pastel-pink); border-radius: 20px; padding: 14px; margin: 12px 0; font-size: 12px; border: 3px solid var(--border-cocoa); text-align: center;">
-                ⚡ <b>Comisión de red: $0.00392</b><br>Se descuenta de tu retiro
+            <div style="text-align:center; margin-bottom:12px;">
+                <i class="fas fa-id-card" style="font-size: 36px; color: var(--text-cocoa);"></i>
+                <h3 style="margin: 8px 0; font-size: 20px; font-weight: 700;">Retiro a Cwallet</h3>
             </div>
-            <textarea id="ccwallet-id" rows="2" placeholder="Pega tu dirección de Polygon (0x...)"></textarea>
-            <div class="warning-text"><i class="fas fa-check-circle"></i> Dirección de red Polygon (empieza con 0x)</div>
-            <button class="btn-game btn-success" style="width:100%; padding:14px;" id="withdrawSubmitBtn"><span><i class="fas fa-circle-check"></i> Solicitar Retiro</span></button>
-            <div style="text-align:center; margin-top:8px; font-size:11px; color:var(--text-soft-cocoa); font-weight:600;">Mínimo de retiro: 50 ⭐ (0.005 USDT)</div>
+            <div class="balance-available">
+                <span style="font-size:11px; font-weight:700; color:var(--text-soft-cocoa);">Balance actual</span>
+                <div class="coins" id="withdraw-balance-coins">0.00 ⭐</div>
+                <div class="usdt" id="withdraw-balance-usdt">≈ 0.0000 USDT</div>
+            </div>
+            
+            <div style="background: var(--pastel-yellow); border-radius: 16px; padding: 10px; margin: 8px 0; border: 2px solid var(--border-cocoa); text-align: center; font-size: 11px;">
+                <i class="fas fa-info-circle"></i> Usa tu <b>ID de Cwallet</b> (solo números)
+                <br>
+                <span style="font-size: 10px; color: var(--text-soft-cocoa);">
+                    ¿No tienes cuenta? 
+                    <a href="https://cwallet.com/referralweb/K9Bhzehl?type=signup" target="_blank" class="cwallet-link">Regístrate aquí</a>
+                </span>
+            </div>
+            
+            <input type="text" id="cwallet-id" placeholder="Ej: 123456789" style="text-align:center; font-size:18px; letter-spacing:2px;">
+            <div class="warning-text"><i class="fas fa-check-circle"></i> Ingresa solo el número de ID de Cwallet</div>
+            
+            <button class="btn-game btn-success" style="width:100%; padding:14px;" id="withdrawSubmitBtn">
+                <span><i class="fas fa-circle-check"></i> Solicitar Retiro</span>
+            </button>
+            <div style="text-align:center; margin-top:8px; font-size:11px; color:var(--text-soft-cocoa); font-weight:600;">
+                Mínimo: 50 ⭐ (0.005 USDT)
+            </div>
             <div class="history-title"><i class="fas fa-list-check"></i> Historial de transacciones</div>
             <div id="history-list" style="max-height:150px; overflow-y:auto; background:var(--bg-cream); border-radius:18px; border:2px solid var(--border-cocoa);"></div>
         </div>
@@ -470,13 +492,18 @@
     }
     
     let withdrawInProgress=false;
-    
+
+    // ====== FUNCIÓN DE RETIRO MODIFICADA - SOLO ID DE CWALLET ======
     async function handleWithdraw() {
         if(isProcessing||withdrawInProgress){ showAlert('Espera','Proceso en curso','clock'); return; }
         withdrawInProgress=true; isProcessing=true;
         try {
-            const cc=document.getElementById('ccwallet-id').value.trim();
-            if(!/^0x[a-fA-F0-9]{40}$/.test(cc)){ showAlert('Dirección inválida','Solo direcciones Polygon (0x...)','times-circle'); return; }
+            // 1. Obtener ID de Cwallet (solo números)
+            const cwalletId = document.getElementById('cwallet-id').value.trim();
+            if(!/^[0-9]+$/.test(cwalletId)){ 
+                showAlert('ID inválido','Ingresa solo el número de ID de Cwallet (sin letras ni espacios)','times-circle'); 
+                return; 
+            }
             
             const userDoc=await db.collection("usuarios").doc(userId).get();
             const saldoReal=userDoc.data()?.balance||0;
@@ -496,6 +523,7 @@
             const fechaRetiro=new Date();
             const fechaStr=new Date().toLocaleDateString();
             
+            // Guardar como PENDIENTE con el ID de Cwallet
             await db.collection("usuarios").doc(userId).update({
                 balance:0, hasWithdrawn:true,
                 withdrawHistory:firebase.firestore.FieldValue.arrayUnion({
@@ -503,7 +531,7 @@
                     date:fechaStr, 
                     timestamp:fechaRetiro.getTime(), 
                     status:'⏳ Pendiente',
-                    cwallet: cc,
+                    cwalletId: cwalletId,
                     usdtNeto: usdtNeto
                 })
             });
@@ -515,7 +543,7 @@
                 date:fechaStr, 
                 timestamp:fechaRetiro.getTime(), 
                 status:'⏳ Pendiente',
-                cwallet: cc,
+                cwalletId: cwalletId,
                 usdtNeto: usdtNeto
             });
             
@@ -524,11 +552,16 @@
             
             showAlert('⏳ Retiro pendiente','Solicitud registrada. Se procesará en el próximo lote de pagos.','clock');
             
-            await enviarNotificacionTG('🔄 NUEVO RETIRO PENDIENTE\nUsuario: '+userName+' ('+userId+')\nCwallet: '+cc+'\nUSDT: '+usdtNeto.toFixed(4)+'\nEstrellas: '+bal);
-        }catch(e){ showAlert('Error','No se pudo completar','times-circle'); }
+            await enviarNotificacionTG('🔄 NUEVO RETIRO PENDIENTE\nUsuario: '+userName+' ('+userId+')\nCwallet ID: '+cwalletId+'\nUSDT: '+usdtNeto.toFixed(4)+'\nEstrellas: '+bal);
+            
+        } catch(e){ 
+            console.error(e);
+            showAlert('Error','No se pudo completar','times-circle'); 
+        }
         finally{ hideAdLoader(); withdrawInProgress=false; isProcessing=false; }
     }
     
+    // ====== HISTORIAL MODIFICADO - MUESTRA ID DE CWALLET ======
     function loadHistory(){ 
         var el=document.getElementById('history-list');
         if(!el) return;
@@ -553,7 +586,13 @@
         for(var k=0;k<h.length;k++){ 
             var status = h[k].status || '✅ Completado';
             var statusIcon = status.includes('Pendiente') ? '⏳' : (status.includes('Exitoso') ? '✅' : '❌');
-            html+='<div class="history-item"><span>'+(h[k].date||'Sin fecha')+'</span><span>'+((h[k].amount||0).toFixed(2))+' ⭐</span><span class="status-badge" style="background:'+(status.includes('Pendiente')?'var(--pastel-yellow)':(status.includes('Exitoso')?'var(--pastel-green)':'var(--pastel-pink)'))+';">'+statusIcon+' '+status+'</span></div>'; 
+            var cwalletDisplay = h[k].cwalletId ? 'ID: '+h[k].cwalletId : 'Sin ID';
+            html+='<div class="history-item">'+
+                '<span>'+(h[k].date||'Sin fecha')+'</span>'+
+                '<span>'+((h[k].amount||0).toFixed(2))+' ⭐</span>'+
+                '<span style="font-size:9px;color:var(--text-soft-cocoa);">'+cwalletDisplay+'</span>'+
+                '<span class="status-badge" style="background:'+(status.includes('Pendiente')?'var(--pastel-yellow)':(status.includes('Exitoso')?'var(--pastel-green)':'var(--pastel-pink)'))+';">'+statusIcon+' '+status+'</span>'+
+            '</div>'; 
         }
         el.innerHTML=html||'<p style="text-align:center;padding:12px;color:var(--text-soft-cocoa);">Sin retiros registrados</p>';
     }
@@ -644,7 +683,7 @@
                     for (const item of data.withdrawHistory) {
                         if (item.status === '⏳ Pendiente') {
                             pendientes.push({
-                                cwallet: item.cwallet || '',
+                                cwalletId: item.cwalletId || '',
                                 usdt: item.usdtNeto || (item.amount / 10000),
                                 estrellas: item.amount || 0,
                                 usuario: data.nombre || 'Anónimo',
@@ -667,7 +706,7 @@
         }
     }
 
-    // 2. DESCARGAR CSV CON PENDIENTES (SOLO CWALLET Y MONTO)
+    // 2. DESCARGAR CSV CON PENDIENTES (SOLO CWALLET ID Y MONTO)
     document.getElementById('descargarCsvPendientes').onclick = async function() {
         if (document.getElementById('adminPassword').value !== ADMIN_SECRET) {
             showAlert('Error','Clave incorrecta','times-circle');
@@ -689,7 +728,7 @@
                         if (item.status === '⏳ Pendiente') {
                             const usdt = item.usdtNeto || (item.amount / 10000);
                             pendientes.push({
-                                cwallet: item.cwallet || '',
+                                cwalletId: item.cwalletId || '',
                                 usdt: usdt,
                                 usuario: data.nombre || 'Anónimo'
                             });
@@ -706,10 +745,10 @@
                 return;
             }
             
-            // CREAR CSV CON FORMATO PARA CCWALLET
+            // CREAR CSV CON FORMATO PARA CWALLET (SOLO ID Y MONTO)
             let csv = 'Cwallet_ID,Amount_USDT\n';
             for (const p of pendientes) {
-                csv += `${p.cwallet},${p.usdt.toFixed(4)}\n`;
+                csv += `${p.cwalletId},${p.usdt.toFixed(4)}\n`;
             }
             
             // Descargar
@@ -724,7 +763,7 @@
             
             const total = pendientes.reduce((sum,p) => sum + p.usdt, 0);
             document.getElementById('estadoPagosCSV').textContent = `✅ CSV descargado con ${pendientes.length} retiros (Total: ${total.toFixed(4)} USDT)`;
-            showAlert('✅ CSV listo', `${pendientes.length} retiros para pagar en Ccwallet`, 'download');
+            showAlert('✅ CSV listo', `${pendientes.length} retiros para pagar en Cwallet`, 'download');
             
         } catch(e) {
             showAlert('Error','No se pudo generar el CSV','times-circle');
@@ -876,7 +915,7 @@
                             pendientes.push({
                                 userId: doc.id,
                                 userName: data.nombre || 'Anónimo',
-                                cwallet: item.cwallet || 'No especificado',
+                                cwalletId: item.cwalletId || 'No especificado',
                                 usdt: item.usdtNeto || (item.amount/COINS_PER_USDT),
                                 estrellas: item.amount,
                                 fecha: item.date || 'Sin fecha'
@@ -893,7 +932,7 @@
                     <div class="pendiente-item">
                         <div class="user">👤 ${p.userName} (${p.userId})</div>
                         <div class="monto">${p.usdt.toFixed(4)} USDT (${p.estrellas} ⭐)</div>
-                        <div class="cc">${p.cwallet}</div>
+                        <div class="cc">ID Cwallet: ${p.cwalletId}</div>
                         <div style="font-size:10px;color:var(--text-soft-cocoa);margin-top:4px;">📅 ${p.fecha}</div>
                     </div>
                 `).join('');
