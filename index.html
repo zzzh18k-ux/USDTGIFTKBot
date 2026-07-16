@@ -1,1 +1,642 @@
-fin del airdrop
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⭐ StarGainCoins - @USDTSTARTKBot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <style>
+        :root {
+            --bg: #FFFDF6; --card: #FFFFFF; --text: #4E3629; --text2: #8D7365; --border: #5D4037;
+            --pink: #FFD3DA; --green: #C5EBE1; --purple: #E2DBF5; --coral: #FFCAB8; --yellow: #FFF0C2; --blue: #D3E5FF;
+            --shadow: 0 6px 0 #5D4037;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:'Fredoka',sans-serif; color:var(--text); }
+        body { background:var(--bg); min-height:100vh; display:flex; justify-content:center; background-image:radial-gradient(#F3EDE0 1.5px,transparent 1.5px),radial-gradient(#F3EDE0 1.5px,#FFFDF6 1.5px); background-size:24px 24px; background-position:0 0,12px 12px; }
+        .app { max-width:450px; width:100%; display:flex; flex-direction:column; min-height:100vh; }
+        .screen { display:none; flex-direction:column; padding:16px; gap:14px; padding-bottom:100px; }
+        .screen.active { display:flex; }
+        .card { background:var(--card); border-radius:26px; padding:18px; border:4px solid var(--border); box-shadow:var(--shadow); }
+        .card-center { text-align:center; }
+        .balance-display { font-size:36px; font-weight:700; line-height:1; margin:4px 0; }
+        .balance-label { font-size:11px; letter-spacing:1px; color:var(--text2); font-weight:700; background:var(--yellow); display:inline-block; padding:2px 12px; border-radius:12px; border:2px solid var(--border); }
+        .btn { width:100%; padding:14px; border:3px solid var(--border); border-radius:18px; font-weight:700; font-size:14px; cursor:pointer; box-shadow:0 5px 0 var(--border); transition:all 0.1s; text-align:center; margin-top:6px; background:var(--card); }
+        .btn:active { transform:translateY(3px); box-shadow:0 2px 0 var(--border); }
+        .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:0 2px 0 var(--border); }
+        .btn-pink { background:var(--pink); }
+        .btn-green { background:var(--green); }
+        .btn-coral { background:var(--coral); }
+        .btn-yellow { background:var(--yellow); }
+        .btn-purple { background:var(--purple); }
+        .btn-sm { padding:8px 16px; border-radius:14px; border:2px solid var(--border); font-weight:700; cursor:pointer; font-size:12px; box-shadow:0 3px 0 var(--border); background:var(--pink); }
+        .btn-sm:active { transform:translateY(2px); box-shadow:none; }
+        .btn-sm:disabled { opacity:0.5; cursor:not-allowed; box-shadow:0 2px 0 var(--border); background:#EAEAEA; }
+        input, textarea { width:100%; padding:14px 18px; border-radius:18px; border:3px solid var(--border); background:var(--card); font-size:13px; font-weight:600; outline:none; margin:6px 0; }
+        input:focus, textarea:focus { background:#FFFDF9; }
+        textarea { resize:vertical; min-height:60px; }
+        .fila { display:flex; justify-content:space-between; padding:8px 0; border-bottom:2px dashed #E5DCD5; font-size:13px; font-weight:600; }
+        .fila:last-child { border:none; }
+        .hist-item { display:flex; justify-content:space-between; padding:10px; border-bottom:2px dashed #E5DCD5; font-size:12px; flex-wrap:wrap; gap:4px; }
+        .badge-sm { padding:2px 10px; border-radius:10px; border:2px solid var(--border); font-size:10px; font-weight:700; }
+        .badge-green { background:var(--green); }
+        .badge-yellow { background:var(--yellow); }
+        .referido-item { background:#FFF; border-radius:16px; padding:12px; margin-bottom:6px; border:2px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:12px; box-shadow:0 3px 0 var(--border); }
+        .scroll { max-height:200px; overflow-y:auto; }
+        .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--text); color:#FFF; padding:12px 24px; border-radius:20px; font-size:13px; z-index:999; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; font-weight:600; }
+        .toast.show { opacity:1; }
+        .navbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:450px; width:100%; background:var(--card); border-top:4px solid var(--border); display:flex; justify-content:space-around; padding:10px 0; z-index:100; }
+        .nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:8px 16px; border-radius:14px; transition:all 0.15s; background:transparent; border:none; font-weight:700; font-size:11px; }
+        .nav-btn i { font-size:20px; }
+        .nav-btn.active { background:var(--pink); }
+        .admin-panel { background:var(--card); border-radius:26px; padding:18px; border:4px solid var(--border); box-shadow:var(--shadow); }
+        .admin-item { background:#FFF; border-radius:16px; padding:12px; margin-bottom:8px; border:3px solid var(--border); box-shadow:0 3px 0 var(--border); }
+        .admin-item .cmd-box { background:#FFFBF0; border:1px dashed var(--border); border-radius:8px; padding:6px 8px; margin:6px 0; font-size:11px; font-family:monospace; word-break:break-all; color:var(--text); }
+        .btn-xs { padding:5px 10px; border-radius:10px; border:2px solid var(--border); font-weight:700; cursor:pointer; font-size:10px; box-shadow:0 2px 0 var(--border); margin:2px; }
+        .btn-xs:active { transform:translateY(2px); box-shadow:none; }
+        .btn-copy { background:var(--blue); }
+        .btn-done { background:var(--green); }
+        .panel-login { display:flex; gap:8px; margin-bottom:12px; }
+        .panel-login input { flex:1; margin:0; }
+        .panel-login button { background:var(--pink); border:3px solid var(--border); padding:10px 20px; border-radius:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 0 var(--border); }
+        .oculto { display:none; }
+        .btn-group { display:flex; gap:8px; margin-top:10px; }
+        .btn-group .btn { flex:1; margin-top:0; }
+        .resumen-box { background:var(--yellow); border-radius:16px; padding:12px; text-align:center; border:2px solid var(--border); margin-bottom:12px; }
+        .resumen-box .total { font-size:26px; font-weight:700; }
+        .link-box { background:var(--purple); border-radius:14px; padding:10px; margin:8px 0; font-size:11px; font-weight:600; word-break:break-all; border:2px solid var(--border); text-align:center; }
+        .btn-copiar { background:var(--blue); border:2px solid var(--border); padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:12px; box-shadow:0 3px 0 var(--border); width:100%; margin-top:4px; }
+        .btn-copiar:active { transform:translateY(2px); box-shadow:none; }
+        .anuncio-card { background:var(--card); border-radius:20px; padding:14px; margin-bottom:8px; border:3px solid var(--border); box-shadow:0 4px 0 var(--border); display:flex; align-items:center; gap:12px; }
+        .anuncio-card .num { width:36px; height:36px; border-radius:12px; background:var(--yellow); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
+        .anuncio-card.done { background:#F4FAF7; }
+        .anuncio-card.done .num { background:var(--green); }
+        
+        .captcha-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:200; display:none; justify-content:center; align-items:center; flex-direction:column; gap:16px; }
+        .captcha-overlay.show { display:flex; }
+        .captcha-box { background:var(--card); border-radius:28px; padding:24px; text-align:center; border:4px solid var(--border); box-shadow:0 10px 0 var(--border); max-width:340px; width:90%; }
+        .captcha-box .robot-icon { font-size:70px; animation: float 2s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-15px);} }
+        .captcha-box .banner-soon { background:linear-gradient(135deg,#FFD3DA,#E2DBF5,#FFF0C2); border-radius:16px; padding:12px; margin:10px 0; border:3px solid var(--border); font-weight:700; font-size:12px; animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0%,100%{border-color:var(--border);} 50%{border-color:#E67E22;} }
+        .captcha-box .banner-soon .blink { animation: blink 1s infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .captcha-box .challenge { background:#FFFBF0; border-radius:14px; padding:14px; border:2px dashed var(--border); margin:12px 0; }
+        .captcha-box .challenge .question { font-size:15px; font-weight:700; margin-bottom:10px; }
+        .captcha-box .challenge .options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .captcha-box .challenge .option { padding:12px; border-radius:14px; border:3px solid var(--border); background:var(--card); cursor:pointer; font-weight:700; font-size:14px; transition:all 0.15s; }
+        .captcha-box .challenge .option:active { background:var(--green); transform:scale(0.95); }
+        .captcha-box .challenge .option.wrong { background:#FFD3DA; }
+        
+        .wait-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:200; display:none; justify-content:center; align-items:center; flex-direction:column; gap:12px; }
+        .wait-overlay.show { display:flex; }
+        .wait-box { background:var(--card); border-radius:28px; padding:24px; text-align:center; border:4px solid var(--border); box-shadow:0 10px 0 var(--border); max-width:320px; width:90%; }
+        .wait-box .timer-display { font-size:48px; font-weight:700; margin:12px 0; }
+        .wait-box .ad-label { font-size:12px; color:var(--text2); margin-top:6px; }
+        
+        .admin-section { margin-top:12px; padding:12px; border-radius:16px; border:2px dashed var(--border); background:#FFFBF0; }
+        .admin-section h4 { font-size:13px; margin-bottom:8px; }
+        .mensaje-global { background:var(--coral); border-radius:16px; padding:12px; margin-bottom:10px; border:3px solid var(--border); text-align:center; font-size:13px; font-weight:600; }
+        .admin-icon-trigger { cursor:pointer; user-select:none; }
+        form { width:100%; }
+        .loading-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:16px; }
+        .loading-screen .spinner { font-size:60px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+    </style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<div id="captchaOverlay" class="captcha-overlay">
+    <div class="captcha-box">
+        <div class="robot-icon">🤖</div>
+        <div style="font-size:16px;font-weight:700;">¿Eres humano?</div>
+        <div style="font-size:11px;color:var(--text2);">Resuelve para continuar</div>
+        <div class="banner-soon">
+            <span class="blink">🚀 ¡PRONTO!</span> Anuncios AdsGram & Monetag aquí <span class="blink">🚀</span>
+        </div>
+        <div class="challenge">
+            <div class="question" id="captchaQuestion">¿Cuánto es 3 + 4?</div>
+            <div class="options" id="captchaOptions"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text2);">Al verificar aceptas ver anuncios para ganar recompensas</div>
+    </div>
+</div>
+
+<div id="waitOverlay" class="wait-overlay">
+    <div class="wait-box">
+        <div style="font-size:40px;">🎬</div>
+        <div style="font-size:16px;font-weight:700;">Anuncio en progreso</div>
+        <div class="timer-display" id="waitTimer">10</div>
+        <div style="font-size:13px;">segundos restantes</div>
+        <div class="ad-label">Pronto: Anuncios de AdsGram / Monetag</div>
+        <div style="font-size:11px;color:#E67E22;margin-top:8px;">⚠️ No cierres esta ventana</div>
+    </div>
+</div>
+
+<div class="app">
+    <div id="loadingScreen" class="screen active loading-screen">
+        <div class="spinner">⭐</div>
+        <div style="font-weight:700;font-size:18px;">Cargando...</div>
+        <div style="font-size:12px;color:var(--text2);">@USDTSTARTKBot 🚀</div>
+    </div>
+
+    <div id="homeScreen" class="screen">
+        <div id="mensajeGlobalBox" class="mensaje-global oculto"></div>
+        <div class="card card-center">
+            <div style="font-size:12px;font-weight:700;color:var(--text2);">⭐ BALANCE</div>
+            <div class="balance-display" id="balanceHome">$0.00000</div>
+            <span class="balance-label">USDT RETIRABLE</span>
+        </div>
+        <div class="card">
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">🎬 ANUNCIOS (cada 1 hora)</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Recompensa: <strong>$0.00500</strong> por anuncio visto</div>
+            <div id="anunciosList"></div>
+            <div style="font-size:10px;color:var(--text2);margin-top:8px;text-align:center;">🔜 Pronto: Más anuncios de AdsGram & Monetag</div>
+        </div>
+    </div>
+
+    <div id="inviteScreen" class="screen">
+        <div class="card card-center"><div style="font-size:40px;">👥</div><div style="font-weight:700;font-size:18px;">INVITAR AMIGOS</div><div style="font-size:13px;color:var(--text2);">5% de comisión</div>
+            <div class="link-box" id="refLinkBox">Cargando...</div>
+            <button class="btn-copiar" id="btnCopiarLink"><i class="fas fa-copy"></i> COPIAR ENLACE</button>
+        </div>
+        <div class="card">
+            <div class="fila"><span>Amigos invitados</span><strong id="invitadosCount">0</strong></div>
+            <div class="fila"><span>Comisión acumulada</span><strong style="color:#B8860B;" id="comisionAcumulada">$0.0000</strong></div>
+            <button class="btn btn-yellow" id="btnReclamarComision">💰 RETIRAR COMISIÓN</button>
+        </div>
+        <div class="card"><div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 AMIGOS INVITADOS</div><div id="referidosList" class="scroll"></div></div>
+    </div>
+
+    <div id="withdrawScreen" class="screen">
+        <div class="card card-center"><div style="font-size:12px;font-weight:700;color:var(--text2);">BALANCE</div><div class="balance-display" id="balanceWithdraw">$0.00000</div></div>
+        <div class="card">
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px;"><span class="admin-icon-trigger" id="adminIconTrigger">💳</span> RETIRAR USDT</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: $0.01 USDT</div>
+            <input type="text" id="walletInput" placeholder="Dirección Polygon (0x...)">
+            <button class="btn btn-green" id="btnRetirar">📤 SOLICITAR RETIRO</button>
+            <div style="font-size:12px;margin-top:6px;min-height:18px;font-weight:600;" id="estadoRetiro"></div>
+        </div>
+        <div class="card"><div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 HISTORIAL</div><div id="historialList" class="scroll"></div></div>
+        
+        <div id="adminPanel" class="admin-panel oculto">
+            <h3 style="margin-bottom:10px;"><i class="fas fa-crown"></i> PANEL ADMIN</h3>
+            <div class="panel-login"><input type="password" id="adminPass" placeholder="Clave"><button id="btnAdminLogin">ENTRAR</button></div>
+            <div id="adminContent" class="oculto">
+                <div class="resumen-box"><div style="font-size:11px;">PENDIENTES</div><div class="total" id="totalPendientes">0</div></div>
+                <div id="pendientesList" class="scroll" style="max-height:200px;"></div>
+                <div class="admin-section" style="background:#F0FFF0;border-color:#27AE60;">
+                    <h4>💵 AGREGAR SALDO A USUARIO</h4>
+                    <input type="text" id="adminAddUser" placeholder="ID de Telegram del usuario">
+                    <input type="number" id="adminAddMonto" placeholder="Monto en USDT" step="0.00001">
+                    <button class="btn btn-green" id="btnAddSaldo">💵 AGREGAR SALDO</button>
+                </div>
+                <div class="admin-section" style="background:#FFF0F0;border-color:#E74C3C;">
+                    <h4>🔄 RESTABLECER ANUNCIOS PARA TODOS</h4>
+                    <button class="btn btn-coral" id="btnResetAnuncios">🔄 RESTABLECER AHORA</button>
+                </div>
+                <div class="admin-section">
+                    <h4>💰 PRECIO POR ANUNCIO</h4>
+                    <input type="number" id="adminPrecioAnuncio" placeholder="Ej: 0.005" step="0.00001" value="0.005">
+                    <button class="btn btn-yellow" id="btnGuardarPrecio">💾 GUARDAR PRECIO</button>
+                </div>
+                <div class="admin-section">
+                    <h4>📢 MENSAJE PARA TODOS</h4>
+                    <textarea id="adminMensajeGlobal" placeholder="Escribe un mensaje..."></textarea>
+                    <button class="btn btn-purple" id="btnGuardarMensaje">📢 PUBLICAR MENSAJE</button>
+                </div>
+                <button class="btn" id="btnCerrarAdmin" style="margin-top:10px;">❌ CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="navbar" class="navbar oculto">
+        <button class="nav-btn active" data-screen="homeScreen"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="nav-btn" data-screen="inviteScreen"><i class="fas fa-users"></i><span>Invitar</span></button>
+        <button class="nav-btn" data-screen="withdrawScreen"><i class="fas fa-wallet"></i><span>Retirar</span></button>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+    tg.MainButton.hide();
+    tg.BackButton.hide();
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyALWjB7Ut2s-jUcC7hhXODRzFHhuBoHZU",
+        authDomain: "usdt-8b129.firebaseapp.com",
+        projectId: "usdt-8b129",
+        storageBucket: "usdt-8b129.appspot.com",
+        messagingSenderId: "816855613636",
+        appId: "1:816855613636:web:7891ba3996acef2c91c991"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const MIN_RETIRO = 0.01;
+    const COMISION = 0.05;
+    const DOMINIO = 'https://t.me/USDTSTARTKBot/app';
+    const ANUNCIO_RECOMPENSA = 0.005;
+    const ANUNCIO_COOLDOWN_HORAS = 1;
+    const ANUNCIOS_POR_CICLO = 3;
+
+    let USER_ID = null, USER_DATA = null, PRECIO_ANUNCIO = ANUNCIO_RECOMPENSA, MENSAJE_GLOBAL = '';
+    let anuncioActivo = false, waitTimer = null;
+    let captchaCallback = null;
+    let adminTouchTimer = null, adminAbierto = false;
+
+    const captchaOverlay = document.getElementById('captchaOverlay');
+    const waitOverlay = document.getElementById('waitOverlay');
+    const waitTimerDisplay = document.getElementById('waitTimer');
+    const navbar = document.getElementById('navbar');
+    const loadingScreen = document.getElementById('loadingScreen');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let refCode = urlParams.get('startapp') || '';
+
+    const tgUser = tg.initDataUnsafe?.user;
+    const telegramId = tgUser?.id ? tgUser.id.toString() : null;
+    const telegramUsername = tgUser?.username || ('user' + (telegramId || 'unknown'));
+    const telegramFirstName = tgUser?.first_name || 'Usuario';
+
+    function toast(msg, tipo) {
+        const t = document.getElementById('toast'); t.textContent = msg; t.style.color = '#FFF';
+        t.style.background = tipo === 'success' ? '#2D6A4F' : tipo === 'error' ? '#C0392B' : '#4E3629';
+        t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function navigate(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+    async function cargarConfig() {
+        const doc = await db.collection('config').doc('global').get();
+        if (doc.exists) {
+            const data = doc.data();
+            PRECIO_ANUNCIO = parseFloat(data.precioAnuncio) || ANUNCIO_RECOMPENSA;
+            MENSAJE_GLOBAL = data.mensajeGlobal || '';
+        }
+        document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
+        const mb = document.getElementById('mensajeGlobalBox');
+        if (MENSAJE_GLOBAL) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
+        else { mb.classList.add('oculto'); }
+    }
+
+    function generarCaptcha() {
+        const a = Math.floor(Math.random() * 10) + 1;
+        const b = Math.floor(Math.random() * 10) + 1;
+        const op = Math.random() > 0.5 ? '+' : '-';
+        const real = op === '+' ? a + b : a - b;
+        let opciones = [real];
+        while (opciones.length < 4) {
+            let falso = real + (Math.floor(Math.random() * 6) - 3);
+            if (falso !== real && falso >= 0 && !opciones.includes(falso)) opciones.push(falso);
+        }
+        opciones = opciones.sort(() => Math.random() - 0.5);
+        document.getElementById('captchaQuestion').textContent = `¿Cuánto es ${a} ${op} ${b}?`;
+        const optDiv = document.getElementById('captchaOptions');
+        optDiv.innerHTML = opciones.map(o => `<div class="option" data-val="${o}" onclick="verificarCaptcha(${o},${real})">${o}</div>`).join('');
+    }
+
+    window.verificarCaptcha = function(sel, real) {
+        if (sel === real) {
+            captchaOverlay.classList.remove('show');
+            if (captchaCallback) { captchaCallback(); captchaCallback = null; }
+            toast('✅ Verificación exitosa', 'success');
+        } else {
+            const ops = document.querySelectorAll('#captchaOptions .option');
+            ops.forEach(o => { if (parseInt(o.dataset.val) === sel) o.classList.add('wrong'); });
+            toast('❌ Incorrecto, intenta de nuevo', 'error');
+            setTimeout(() => { ops.forEach(o => o.classList.remove('wrong')); generarCaptcha(); }, 1000);
+        }
+    };
+
+    function mostrarCaptcha(callback) {
+        captchaCallback = callback;
+        generarCaptcha();
+        captchaOverlay.classList.add('show');
+    }
+
+    function mostrarWaitAnuncio(segundos, callback) {
+        waitOverlay.classList.add('show');
+        waitTimerDisplay.textContent = segundos;
+        waitTimerDisplay.style.color = '#4E3629';
+        let restante = segundos;
+        if (waitTimer) clearInterval(waitTimer);
+        waitTimer = setInterval(() => {
+            restante--;
+            waitTimerDisplay.textContent = restante;
+            if (restante <= 3) waitTimerDisplay.style.color = '#E67E22';
+            if (restante <= 0) {
+                clearInterval(waitTimer);
+                waitTimer = null;
+                waitOverlay.classList.remove('show');
+                if (callback) callback();
+            }
+        }, 1000);
+    }
+
+    function puedeVerAnuncios() {
+        const ahora = Date.now();
+        const ultimoAnuncioTimestamp = USER_DATA.ultimoAnuncioTimestamp || 0;
+        const cooldownMs = ANUNCIO_COOLDOWN_HORAS * 60 * 60 * 1000;
+        return (ahora - ultimoAnuncioTimestamp) >= cooldownMs;
+    }
+
+    function tiempoRestanteCooldown() {
+        const ahora = Date.now();
+        const ultimoAnuncioTimestamp = USER_DATA.ultimoAnuncioTimestamp || 0;
+        const cooldownMs = ANUNCIO_COOLDOWN_HORAS * 60 * 60 * 1000;
+        const restante = cooldownMs - (ahora - ultimoAnuncioTimestamp);
+        if (restante <= 0) return 'Disponible ahora';
+        const mins = Math.floor(restante / 60000);
+        const segs = Math.floor((restante % 60000) / 1000);
+        return `Próximo en ${mins}m ${segs}s`;
+    }
+
+    async function completarAnuncioCiclo() {
+        const hoy = new Date().toLocaleDateString();
+        const ahora = Date.now();
+        let anunciosHoy = USER_DATA.anunciosHoy || 0;
+        if (USER_DATA.anunciosFecha !== hoy) anunciosHoy = 0;
+        anunciosHoy += ANUNCIOS_POR_CICLO;
+        const ganancia = PRECIO_ANUNCIO * ANUNCIOS_POR_CICLO;
+        const nuevoBalance = (USER_DATA.balance || 0) + ganancia;
+        await db.collection('usuarios').doc(USER_ID).update({
+            balance: nuevoBalance, anunciosHoy: anunciosHoy, anunciosFecha: hoy, ultimoAnuncioTimestamp: ahora
+        });
+        USER_DATA.balance = nuevoBalance;
+        USER_DATA.anunciosHoy = anunciosHoy;
+        USER_DATA.anunciosFecha = hoy;
+        USER_DATA.ultimoAnuncioTimestamp = ahora;
+        if (USER_DATA.referidoPor) {
+            const com = ganancia * COMISION;
+            await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(com) });
+        }
+        anuncioActivo = false;
+        toast('✅ +$' + ganancia.toFixed(5) + ' USDT', 'success');
+        actualizarUI();
+    }
+
+    window.iniciarAnuncio = function() {
+        if (anuncioActivo) return;
+        if (!puedeVerAnuncios()) {
+            toast('⏳ Debes esperar. ' + tiempoRestanteCooldown(), 'error');
+            actualizarUI();
+            return;
+        }
+        mostrarCaptcha(() => {
+            anuncioActivo = true;
+            actualizarUI();
+            mostrarWaitAnuncio(10, () => { completarAnuncioCiclo(); });
+        });
+    };
+
+    async function entrarApp() {
+        if (!telegramId) {
+            loadingScreen.innerHTML = '<div style="font-size:48px;">⚠️</div><div style="font-weight:700;font-size:16px;">Abre esta app desde Telegram</div><div style="font-size:12px;color:var(--text2);">@USDTSTARTKBot</div>';
+            return;
+        }
+        USER_ID = telegramId;
+        const doc = await db.collection('usuarios').doc(USER_ID).get();
+        if (!doc.exists) {
+            const data = {
+                telegramId: telegramId,
+                telegramUsername: telegramUsername,
+                telegramFirstName: telegramFirstName,
+                balance: 0,
+                referidoPor: refCode || null,
+                referidos: [],
+                comision: 0,
+                anunciosHoy: 0,
+                anunciosFecha: '',
+                ultimoAnuncioTimestamp: 0,
+                historial: [],
+                pendientes: [],
+                creado: Date.now()
+            };
+            await db.collection('usuarios').doc(USER_ID).set(data);
+            USER_DATA = data;
+            if (refCode && refCode !== USER_ID) {
+                const refDoc = await db.collection('usuarios').doc(refCode).get();
+                if (refDoc.exists) {
+                    await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
+                }
+            }
+        } else {
+            USER_DATA = doc.data();
+            if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
+                const refDoc = await db.collection('usuarios').doc(refCode).get();
+                if (refDoc.exists) {
+                    await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode });
+                    await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
+                    USER_DATA.referidoPor = refCode;
+                }
+            }
+        }
+        navigate('homeScreen');
+        navbar.classList.remove('oculto');
+        document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active'));
+        document.querySelector('[data-screen="homeScreen"]').classList.add('active');
+        document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
+        await cargarConfig();
+        actualizarUI();
+    }
+
+    document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            navigate(this.dataset.screen);
+            document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            actualizarUI();
+        });
+    });
+
+    async function actualizarUI() {
+        if (!USER_ID) return;
+        const doc = await db.collection('usuarios').doc(USER_ID).get();
+        if (!doc.exists) return;
+        USER_DATA = doc.data();
+        document.getElementById('balanceHome').textContent = '$' + (USER_DATA.balance || 0).toFixed(5);
+        document.getElementById('balanceWithdraw').textContent = '$' + (USER_DATA.balance || 0).toFixed(5);
+        document.getElementById('invitadosCount').textContent = (USER_DATA.referidos || []).length;
+        document.getElementById('comisionAcumulada').textContent = '$' + (USER_DATA.comision || 0).toFixed(5);
+        document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
+        document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
+        const mb = document.getElementById('mensajeGlobalBox');
+        if (MENSAJE_GLOBAL) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
+        else { mb.classList.add('oculto'); }
+        renderAnuncios(); renderReferidos(); renderHistorial();
+    }
+
+    function renderAnuncios() {
+        const l = document.getElementById('anunciosList');
+        const disponible = puedeVerAnuncios();
+        const tiempo = tiempoRestanteCooldown();
+        let html = '';
+        for (let i = 0; i < ANUNCIOS_POR_CICLO; i++) {
+            const done = !disponible && !anuncioActivo;
+            html += `<div class="anuncio-card ${done ? 'done' : ''}">
+                <div class="num">${done ? '✓' : i + 1}</div>
+                <div style="flex:1;font-size:13px;font-weight:600;">Anuncio #${i + 1} (+$${PRECIO_ANUNCIO.toFixed(5)})</div>
+            </div>`;
+        }
+        if (disponible) {
+            html += `<button class="btn btn-green" onclick="iniciarAnuncio()" ${anuncioActivo ? 'disabled' : ''}>
+                🎬 VER ${ANUNCIOS_POR_CICLO} ANUNCIOS (+$${(PRECIO_ANUNCIO * ANUNCIOS_POR_CICLO).toFixed(5)})
+            </button>`;
+        } else {
+            html += `<button class="btn btn-coral" disabled>⏳ ${tiempo}</button>`;
+        }
+        l.innerHTML = html;
+    }
+
+    document.getElementById('btnCopiarLink').addEventListener('click', () => {
+        const lk = DOMINIO + '?startapp=' + USER_ID;
+        navigator.clipboard.writeText(lk).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + lk, 'success'));
+    });
+
+    function renderReferidos() {
+        const l = document.getElementById('referidosList'), refs = USER_DATA.referidos || [];
+        l.innerHTML = refs.length ? refs.map(r => `<div class="referido-item"><strong>👤 ${r}</strong><span style="color:#B8860B;">+5%</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados</div>';
+    }
+
+    document.getElementById('btnReclamarComision').addEventListener('click', async () => {
+        const doc = await db.collection('usuarios').doc(USER_ID).get();
+        const c = doc.data().comision || 0;
+        if (c < 0.00001) return toast('⚠️ Sin comisiones acumuladas', 'error');
+        const nuevoBalance = (doc.data().balance || 0) + c;
+        await db.collection('usuarios').doc(USER_ID).update({ balance: nuevoBalance, comision: 0 });
+        USER_DATA.balance = nuevoBalance;
+        USER_DATA.comision = 0;
+        toast('💰 +$' + c.toFixed(5) + ' añadido a tu balance', 'success');
+        actualizarUI();
+    });
+
+    document.getElementById('btnRetirar').addEventListener('click', async () => {
+        const w = document.getElementById('walletInput').value.trim();
+        if (!w || !w.startsWith('0x')) return toast('⚠️ Dirección Polygon inválida', 'error');
+        const doc = await db.collection('usuarios').doc(USER_ID).get();
+        const bal = doc.data().balance || 0;
+        if (bal < 0.009) return toast('⚠️ Mínimo de retiro: $0.01 USDT. Tu balance: $' + bal.toFixed(5), 'error');
+        const hoy = new Date().toLocaleDateString();
+        const pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
+        await db.collection('usuarios').doc(USER_ID).update({
+            balance: 0,
+            historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }),
+            pendientes: firebase.firestore.FieldValue.arrayUnion(pg)
+        });
+        USER_DATA.balance = 0;
+        USER_DATA.historial = [...(USER_DATA.historial || []), { fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }];
+        document.getElementById('estadoRetiro').textContent = '✅ Retiro de $' + bal.toFixed(5) + ' solicitado';
+        toast('✅ Retiro solicitado: $' + bal.toFixed(5), 'success');
+        document.getElementById('walletInput').value = '';
+        actualizarUI();
+    });
+
+    function renderHistorial() {
+        const l = document.getElementById('historialList'), h = USER_DATA.historial || [];
+        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>$${x.monto.toFixed(2)}</span><span class="badge-sm ${x.estado === 'exitoso' ? 'badge-green' : 'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin retiros</div>';
+    }
+
+    const adminIconTrigger = document.getElementById('adminIconTrigger');
+    adminIconTrigger.addEventListener('touchstart', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
+    adminIconTrigger.addEventListener('touchend', function() { clearTimeout(adminTouchTimer); });
+    adminIconTrigger.addEventListener('touchmove', function() { clearTimeout(adminTouchTimer); });
+    adminIconTrigger.addEventListener('mousedown', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
+    adminIconTrigger.addEventListener('mouseup', function() { clearTimeout(adminTouchTimer); });
+    adminIconTrigger.addEventListener('mouseleave', function() { clearTimeout(adminTouchTimer); });
+
+    function mostrarAdmin() { document.getElementById('adminPanel').classList.remove('oculto'); document.getElementById('adminContent').classList.add('oculto'); document.getElementById('adminPass').value = ''; }
+
+    document.getElementById('btnAdminLogin').addEventListener('click', async () => {
+        const pass = document.getElementById('adminPass').value;
+        try {
+            const doc = await db.collection('config').doc('admin').get();
+            if (!doc.exists || doc.data().clave !== pass) return toast('❌ Clave incorrecta', 'error');
+            document.getElementById('adminContent').classList.remove('oculto');
+            document.getElementById('adminPrecioAnuncio').value = PRECIO_ANUNCIO;
+            document.getElementById('adminMensajeGlobal').value = MENSAJE_GLOBAL;
+            await cargarPendientes();
+        } catch (e) { toast('❌ Error al verificar', 'error'); }
+    });
+    document.getElementById('btnCerrarAdmin').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('oculto'); document.getElementById('adminContent').classList.add('oculto'); adminAbierto = false; });
+    document.getElementById('btnAddSaldo').addEventListener('click', async () => {
+        const user = document.getElementById('adminAddUser').value.trim();
+        const monto = parseFloat(document.getElementById('adminAddMonto').value);
+        if (!user || !monto || monto <= 0) return toast('⚠️ Datos inválidos', 'error');
+        const doc = await db.collection('usuarios').doc(user).get();
+        if (!doc.exists) return toast('❌ Usuario no existe', 'error');
+        await db.collection('usuarios').doc(user).update({ balance: firebase.firestore.FieldValue.increment(monto) });
+        toast('✅ +$' + monto.toFixed(5) + ' a ' + user, 'success');
+        document.getElementById('adminAddUser').value = '';
+        document.getElementById('adminAddMonto').value = '';
+    });
+    document.getElementById('btnResetAnuncios').addEventListener('click', async () => {
+        if (!confirm('¿Restablecer anuncios para TODOS?')) return;
+        try {
+            const snap = await db.collection('usuarios').get();
+            let count = 0;
+            const batch = db.batch();
+            snap.forEach(doc => { batch.update(doc.ref, { anunciosHoy: 0, anunciosFecha: '', ultimoAnuncioTimestamp: 0 }); count++; });
+            await batch.commit();
+            toast('✅ ' + count + ' usuarios restablecidos', 'success');
+        } catch (e) { toast('❌ Error: ' + e.message, 'error'); }
+    });
+
+    async function cargarPendientes() {
+        const snap = await db.collection('usuarios').get();
+        let all = [];
+        snap.forEach(doc => { (doc.data().pendientes || []).forEach(p => { if (p.estado === 'pendiente') all.push({ ...p, userId: doc.id }); }); });
+        document.getElementById('totalPendientes').textContent = all.length;
+        document.getElementById('pendientesList').innerHTML = all.length ? all.map(p => `<div class="admin-item"><div style="flex:1;"><strong>$${p.monto.toFixed(5)}</strong> | 👤 ${p.usuario}<div class="cmd-box">/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}</div></div><div style="display:flex;flex-direction:column;gap:4px;"><button class="btn-xs btn-copy" onclick="copiarCmd('/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}')">📋</button><button class="btn-xs btn-done" onclick="pagarAdm('${p.userId}',${p.id})">✅</button></div></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin pendientes</div>';
+    }
+    window.copiarCmd = function(c) { navigator.clipboard.writeText(c).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + c, 'success')); };
+    window.pagarAdm = async function(uid, pid) {
+        const d = (await db.collection('usuarios').doc(uid).get()).data();
+        let pe = d.pendientes || [], hi = d.historial || [];
+        const p = pe.find(x => x.id === pid);
+        if (p) p.estado = 'exitoso';
+        hi.forEach(h => { if (h.estado === 'pendiente' && h.wallet === p.wallet) h.estado = 'exitoso'; });
+        await db.collection('usuarios').doc(uid).update({ pendientes: pe, historial: hi });
+        toast('✅ Pagado', 'success');
+        cargarPendientes();
+    };
+
+    document.getElementById('btnGuardarPrecio').addEventListener('click', async () => {
+        const n = parseFloat(document.getElementById('adminPrecioAnuncio').value);
+        if (!n || n <= 0) return toast('⚠️ Precio inválido', 'error');
+        try {
+            await db.collection('config').doc('global').set({ precioAnuncio: n, mensajeGlobal: MENSAJE_GLOBAL }, { merge: true });
+            PRECIO_ANUNCIO = n;
+            document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
+            toast('✅ Precio: $' + n.toFixed(5), 'success');
+            actualizarUI();
+        } catch (e) { toast('❌ Error: ' + e.message, 'error'); }
+    });
+    document.getElementById('btnGuardarMensaje').addEventListener('click', async () => {
+        const m = document.getElementById('adminMensajeGlobal').value.trim();
+        try {
+            await db.collection('config').doc('global').set({ precioAnuncio: PRECIO_ANUNCIO, mensajeGlobal: m }, { merge: true });
+            MENSAJE_GLOBAL = m;
+            const mb = document.getElementById('mensajeGlobalBox');
+            if (m) { mb.innerHTML = '📢 ' + m; mb.classList.remove('oculto'); }
+            else { mb.classList.add('oculto'); }
+            toast('✅ Mensaje publicado', 'success');
+            actualizarUI();
+        } catch (e) { toast('❌ Error: ' + e.message, 'error'); }
+    });
+
+    (async function() {
+        await cargarConfig();
+        await entrarApp();
+    })();
+</script>
+</body>
+</html>
