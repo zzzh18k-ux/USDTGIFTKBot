@@ -224,11 +224,16 @@
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.ready();
-    tg.MainButton.hide();
-    tg.BackButton.hide();
+    // MODO DESARROLLO: Si no está en Telegram, usa datos de prueba
+    const ES_TELEGRAM = !!(window.Telegram?.WebApp?.initDataUnsafe?.user);
+    
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.expand();
+        tg.ready();
+        tg.MainButton.hide();
+        tg.BackButton.hide();
+    }
 
     const firebaseConfig = {
         apiKey: "AIzaSyALWjB7Ut2s-jUcC7hhXODRzFHhuBoHZU",
@@ -262,10 +267,15 @@
     const urlParams = new URLSearchParams(window.location.search);
     let refCode = urlParams.get('startapp') || '';
 
-    const tgUser = tg.initDataUnsafe?.user;
-    const telegramId = tgUser?.id ? tgUser.id.toString() : null;
-    const telegramUsername = tgUser?.username || ('user' + (telegramId || 'unknown'));
-    const telegramFirstName = tgUser?.first_name || 'Usuario';
+    // Obtener datos del usuario (Telegram o modo prueba)
+    let tgUser = null;
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        tgUser = tg.initDataUnsafe.user;
+    }
+    
+    const telegramId = tgUser?.id ? tgUser.id.toString() : (ES_TELEGRAM ? null : 'test_user_123');
+    const telegramUsername = tgUser?.username || (ES_TELEGRAM ? null : 'UsuarioPrueba');
+    const telegramFirstName = tgUser?.first_name || (ES_TELEGRAM ? null : 'Usuario');
 
     function toast(msg, tipo) {
         const t = document.getElementById('toast'); t.textContent = msg; t.style.color = '#FFF';
@@ -273,19 +283,27 @@
         t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    function navigate(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    function navigate(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
 
     async function cargarConfig() {
-        const doc = await db.collection('config').doc('global').get();
-        if (doc.exists) {
-            const data = doc.data();
-            PRECIO_ANUNCIO = parseFloat(data.precioAnuncio) || ANUNCIO_RECOMPENSA;
-            MENSAJE_GLOBAL = data.mensajeGlobal || '';
+        try {
+            const doc = await db.collection('config').doc('global').get();
+            if (doc.exists) {
+                const data = doc.data();
+                PRECIO_ANUNCIO = parseFloat(data.precioAnuncio) || ANUNCIO_RECOMPENSA;
+                MENSAJE_GLOBAL = data.mensajeGlobal || '';
+            }
+        } catch(e) {
+            console.log('Usando configuración por defecto');
         }
-        document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
+        const precioEl = document.getElementById('precioAnuncioHome');
+        if (precioEl) precioEl.textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
         const mb = document.getElementById('mensajeGlobalBox');
-        if (MENSAJE_GLOBAL) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
-        else { mb.classList.add('oculto'); }
+        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
+        else if (mb) { mb.classList.add('oculto'); }
     }
 
     function generarCaptcha() {
@@ -343,6 +361,7 @@
     }
 
     function puedeVerAnuncios() {
+        if (!USER_DATA) return false;
         const ahora = Date.now();
         const ultimoAnuncioTimestamp = USER_DATA.ultimoAnuncioTimestamp || 0;
         const cooldownMs = ANUNCIO_COOLDOWN_HORAS * 60 * 60 * 1000;
@@ -350,6 +369,7 @@
     }
 
     function tiempoRestanteCooldown() {
+        if (!USER_DATA) return 'Cargando...';
         const ahora = Date.now();
         const ultimoAnuncioTimestamp = USER_DATA.ultimoAnuncioTimestamp || 0;
         const cooldownMs = ANUNCIO_COOLDOWN_HORAS * 60 * 60 * 1000;
@@ -368,16 +388,25 @@
         anunciosHoy += ANUNCIOS_POR_CICLO;
         const ganancia = PRECIO_ANUNCIO * ANUNCIOS_POR_CICLO;
         const nuevoBalance = (USER_DATA.balance || 0) + ganancia;
-        await db.collection('usuarios').doc(USER_ID).update({
-            balance: nuevoBalance, anunciosHoy: anunciosHoy, anunciosFecha: hoy, ultimoAnuncioTimestamp: ahora
-        });
+        
+        try {
+            await db.collection('usuarios').doc(USER_ID).update({
+                balance: nuevoBalance, anunciosHoy: anunciosHoy, anunciosFecha: hoy, ultimoAnuncioTimestamp: ahora
+            });
+        } catch(e) {
+            console.log('Error Firestore, continuando localmente');
+        }
+        
         USER_DATA.balance = nuevoBalance;
         USER_DATA.anunciosHoy = anunciosHoy;
         USER_DATA.anunciosFecha = hoy;
         USER_DATA.ultimoAnuncioTimestamp = ahora;
+        
         if (USER_DATA.referidoPor) {
-            const com = ganancia * COMISION;
-            await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(com) });
+            try {
+                const com = ganancia * COMISION;
+                await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(com) });
+            } catch(e) {}
         }
         anuncioActivo = false;
         toast('✅ +$' + ganancia.toFixed(5) + ' USDT', 'success');
@@ -403,10 +432,53 @@
             loadingScreen.innerHTML = '<div style="font-size:48px;">⚠️</div><div style="font-weight:700;font-size:16px;">Abre esta app desde Telegram</div><div style="font-size:12px;color:var(--text2);">@USDTSTARTKBot</div>';
             return;
         }
+        
         USER_ID = telegramId;
-        const doc = await db.collection('usuarios').doc(USER_ID).get();
-        if (!doc.exists) {
-            const data = {
+        
+        try {
+            const doc = await db.collection('usuarios').doc(USER_ID).get();
+            if (!doc.exists) {
+                const data = {
+                    telegramId: telegramId,
+                    telegramUsername: telegramUsername,
+                    telegramFirstName: telegramFirstName,
+                    balance: 0,
+                    referidoPor: refCode || null,
+                    referidos: [],
+                    comision: 0,
+                    anunciosHoy: 0,
+                    anunciosFecha: '',
+                    ultimoAnuncioTimestamp: 0,
+                    historial: [],
+                    pendientes: [],
+                    creado: Date.now()
+                };
+                await db.collection('usuarios').doc(USER_ID).set(data);
+                USER_DATA = data;
+                if (refCode && refCode !== USER_ID) {
+                    try {
+                        const refDoc = await db.collection('usuarios').doc(refCode).get();
+                        if (refDoc.exists) {
+                            await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
+                        }
+                    } catch(e) {}
+                }
+            } else {
+                USER_DATA = doc.data();
+                if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
+                    try {
+                        const refDoc = await db.collection('usuarios').doc(refCode).get();
+                        if (refDoc.exists) {
+                            await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode });
+                            await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
+                            USER_DATA.referidoPor = refCode;
+                        }
+                    } catch(e) {}
+                }
+            }
+        } catch(e) {
+            console.log('Usando datos locales (Firestore no disponible)');
+            USER_DATA = {
                 telegramId: telegramId,
                 telegramUsername: telegramUsername,
                 telegramFirstName: telegramFirstName,
@@ -421,25 +493,11 @@
                 pendientes: [],
                 creado: Date.now()
             };
-            await db.collection('usuarios').doc(USER_ID).set(data);
-            USER_DATA = data;
-            if (refCode && refCode !== USER_ID) {
-                const refDoc = await db.collection('usuarios').doc(refCode).get();
-                if (refDoc.exists) {
-                    await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
-                }
-            }
-        } else {
-            USER_DATA = doc.data();
-            if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
-                const refDoc = await db.collection('usuarios').doc(refCode).get();
-                if (refDoc.exists) {
-                    await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode });
-                    await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
-                    USER_DATA.referidoPor = refCode;
-                }
-            }
         }
+        
+        // ✅ QUITAR PANTALLA DE CARGA
+        loadingScreen.classList.remove('active');
+        
         navigate('homeScreen');
         navbar.classList.remove('oculto');
         document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active'));
@@ -447,6 +505,10 @@
         document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
         await cargarConfig();
         actualizarUI();
+        
+        if (!ES_TELEGRAM) {
+            toast('🔧 Modo prueba web activado', 'success');
+        }
     }
 
     document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => {
@@ -459,10 +521,13 @@
     });
 
     async function actualizarUI() {
-        if (!USER_ID) return;
-        const doc = await db.collection('usuarios').doc(USER_ID).get();
-        if (!doc.exists) return;
-        USER_DATA = doc.data();
+        if (!USER_ID || !USER_DATA) return;
+        
+        try {
+            const doc = await db.collection('usuarios').doc(USER_ID).get();
+            if (doc.exists) USER_DATA = doc.data();
+        } catch(e) {}
+        
         document.getElementById('balanceHome').textContent = '$' + (USER_DATA.balance || 0).toFixed(5);
         document.getElementById('balanceWithdraw').textContent = '$' + (USER_DATA.balance || 0).toFixed(5);
         document.getElementById('invitadosCount').textContent = (USER_DATA.referidos || []).length;
@@ -470,13 +535,14 @@
         document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
         document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
         const mb = document.getElementById('mensajeGlobalBox');
-        if (MENSAJE_GLOBAL) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
-        else { mb.classList.add('oculto'); }
+        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
+        else if (mb) { mb.classList.add('oculto'); }
         renderAnuncios(); renderReferidos(); renderHistorial();
     }
 
     function renderAnuncios() {
         const l = document.getElementById('anunciosList');
+        if (!l) return;
         const disponible = puedeVerAnuncios();
         const tiempo = tiempoRestanteCooldown();
         let html = '';
@@ -503,55 +569,73 @@
     });
 
     function renderReferidos() {
-        const l = document.getElementById('referidosList'), refs = USER_DATA.referidos || [];
+        const l = document.getElementById('referidosList');
+        if (!l) return;
+        const refs = USER_DATA.referidos || [];
         l.innerHTML = refs.length ? refs.map(r => `<div class="referido-item"><strong>👤 ${r}</strong><span style="color:#B8860B;">+5%</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados</div>';
     }
 
     document.getElementById('btnReclamarComision').addEventListener('click', async () => {
-        const doc = await db.collection('usuarios').doc(USER_ID).get();
-        const c = doc.data().comision || 0;
-        if (c < 0.00001) return toast('⚠️ Sin comisiones acumuladas', 'error');
-        const nuevoBalance = (doc.data().balance || 0) + c;
-        await db.collection('usuarios').doc(USER_ID).update({ balance: nuevoBalance, comision: 0 });
-        USER_DATA.balance = nuevoBalance;
-        USER_DATA.comision = 0;
-        toast('💰 +$' + c.toFixed(5) + ' añadido a tu balance', 'success');
-        actualizarUI();
+        if (!USER_ID) return;
+        try {
+            const doc = await db.collection('usuarios').doc(USER_ID).get();
+            const c = doc.exists ? (doc.data().comision || 0) : (USER_DATA.comision || 0);
+            if (c < 0.00001) return toast('⚠️ Sin comisiones acumuladas', 'error');
+            const nuevoBalance = ((doc.exists ? doc.data().balance : USER_DATA.balance) || 0) + c;
+            if (doc.exists) await db.collection('usuarios').doc(USER_ID).update({ balance: nuevoBalance, comision: 0 });
+            USER_DATA.balance = nuevoBalance;
+            USER_DATA.comision = 0;
+            toast('💰 +$' + c.toFixed(5) + ' añadido a tu balance', 'success');
+            actualizarUI();
+        } catch(e) {
+            toast('⚠️ Error de conexión', 'error');
+        }
     });
 
     document.getElementById('btnRetirar').addEventListener('click', async () => {
         const w = document.getElementById('walletInput').value.trim();
         if (!w || !w.startsWith('0x')) return toast('⚠️ Dirección Polygon inválida', 'error');
-        const doc = await db.collection('usuarios').doc(USER_ID).get();
-        const bal = doc.data().balance || 0;
-        if (bal < 0.009) return toast('⚠️ Mínimo de retiro: $0.01 USDT. Tu balance: $' + bal.toFixed(5), 'error');
-        const hoy = new Date().toLocaleDateString();
-        const pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
-        await db.collection('usuarios').doc(USER_ID).update({
-            balance: 0,
-            historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }),
-            pendientes: firebase.firestore.FieldValue.arrayUnion(pg)
-        });
-        USER_DATA.balance = 0;
-        USER_DATA.historial = [...(USER_DATA.historial || []), { fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }];
-        document.getElementById('estadoRetiro').textContent = '✅ Retiro de $' + bal.toFixed(5) + ' solicitado';
-        toast('✅ Retiro solicitado: $' + bal.toFixed(5), 'success');
-        document.getElementById('walletInput').value = '';
-        actualizarUI();
+        if (!USER_ID) return;
+        try {
+            const doc = await db.collection('usuarios').doc(USER_ID).get();
+            const bal = doc.exists ? (doc.data().balance || 0) : (USER_DATA.balance || 0);
+            if (bal < 0.009) return toast('⚠️ Mínimo de retiro: $0.01 USDT. Tu balance: $' + bal.toFixed(5), 'error');
+            const hoy = new Date().toLocaleDateString();
+            const pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
+            if (doc.exists) {
+                await db.collection('usuarios').doc(USER_ID).update({
+                    balance: 0,
+                    historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }),
+                    pendientes: firebase.firestore.FieldValue.arrayUnion(pg)
+                });
+            }
+            USER_DATA.balance = 0;
+            USER_DATA.historial = [...(USER_DATA.historial || []), { fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }];
+            document.getElementById('estadoRetiro').textContent = '✅ Retiro de $' + bal.toFixed(5) + ' solicitado';
+            toast('✅ Retiro solicitado: $' + bal.toFixed(5), 'success');
+            document.getElementById('walletInput').value = '';
+            actualizarUI();
+        } catch(e) {
+            toast('⚠️ Error de conexión', 'error');
+        }
     });
 
     function renderHistorial() {
-        const l = document.getElementById('historialList'), h = USER_DATA.historial || [];
+        const l = document.getElementById('historialList');
+        if (!l) return;
+        const h = USER_DATA.historial || [];
         l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>$${x.monto.toFixed(2)}</span><span class="badge-sm ${x.estado === 'exitoso' ? 'badge-green' : 'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin retiros</div>';
     }
 
     const adminIconTrigger = document.getElementById('adminIconTrigger');
-    adminIconTrigger.addEventListener('touchstart', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
-    adminIconTrigger.addEventListener('touchend', function() { clearTimeout(adminTouchTimer); });
-    adminIconTrigger.addEventListener('touchmove', function() { clearTimeout(adminTouchTimer); });
-    adminIconTrigger.addEventListener('mousedown', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
-    adminIconTrigger.addEventListener('mouseup', function() { clearTimeout(adminTouchTimer); });
-    adminIconTrigger.addEventListener('mouseleave', function() { clearTimeout(adminTouchTimer); });
+    if (adminIconTrigger) {
+        adminIconTrigger.addEventListener('touchstart', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
+        adminIconTrigger.addEventListener('touchend', function() { clearTimeout(adminTouchTimer); });
+        adminIconTrigger.addEventListener('touchmove', function() { clearTimeout(adminTouchTimer); });
+        adminIconTrigger.addEventListener('mousedown', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
+        adminIconTrigger.addEventListener('mouseup', function() { clearTimeout(adminTouchTimer); });
+        adminIconTrigger.addEventListener('mouseleave', function() { clearTimeout(adminTouchTimer); });
+    }
 
     function mostrarAdmin() { document.getElementById('adminPanel').classList.remove('oculto'); document.getElementById('adminContent').classList.add('oculto'); document.getElementById('adminPass').value = ''; }
 
@@ -571,10 +655,12 @@
         const user = document.getElementById('adminAddUser').value.trim();
         const monto = parseFloat(document.getElementById('adminAddMonto').value);
         if (!user || !monto || monto <= 0) return toast('⚠️ Datos inválidos', 'error');
-        const doc = await db.collection('usuarios').doc(user).get();
-        if (!doc.exists) return toast('❌ Usuario no existe', 'error');
-        await db.collection('usuarios').doc(user).update({ balance: firebase.firestore.FieldValue.increment(monto) });
-        toast('✅ +$' + monto.toFixed(5) + ' a ' + user, 'success');
+        try {
+            const doc = await db.collection('usuarios').doc(user).get();
+            if (!doc.exists) return toast('❌ Usuario no existe', 'error');
+            await db.collection('usuarios').doc(user).update({ balance: firebase.firestore.FieldValue.increment(monto) });
+            toast('✅ +$' + monto.toFixed(5) + ' a ' + user, 'success');
+        } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
         document.getElementById('adminAddUser').value = '';
         document.getElementById('adminAddMonto').value = '';
     });
@@ -591,22 +677,26 @@
     });
 
     async function cargarPendientes() {
-        const snap = await db.collection('usuarios').get();
-        let all = [];
-        snap.forEach(doc => { (doc.data().pendientes || []).forEach(p => { if (p.estado === 'pendiente') all.push({ ...p, userId: doc.id }); }); });
-        document.getElementById('totalPendientes').textContent = all.length;
-        document.getElementById('pendientesList').innerHTML = all.length ? all.map(p => `<div class="admin-item"><div style="flex:1;"><strong>$${p.monto.toFixed(5)}</strong> | 👤 ${p.usuario}<div class="cmd-box">/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}</div></div><div style="display:flex;flex-direction:column;gap:4px;"><button class="btn-xs btn-copy" onclick="copiarCmd('/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}')">📋</button><button class="btn-xs btn-done" onclick="pagarAdm('${p.userId}',${p.id})">✅</button></div></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin pendientes</div>';
+        try {
+            const snap = await db.collection('usuarios').get();
+            let all = [];
+            snap.forEach(doc => { (doc.data().pendientes || []).forEach(p => { if (p.estado === 'pendiente') all.push({ ...p, userId: doc.id }); }); });
+            document.getElementById('totalPendientes').textContent = all.length;
+            document.getElementById('pendientesList').innerHTML = all.length ? all.map(p => `<div class="admin-item"><div style="flex:1;"><strong>$${p.monto.toFixed(5)}</strong> | 👤 ${p.usuario}<div class="cmd-box">/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}</div></div><div style="display:flex;flex-direction:column;gap:4px;"><button class="btn-xs btn-copy" onclick="copiarCmd('/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}')">📋</button><button class="btn-xs btn-done" onclick="pagarAdm('${p.userId}',${p.id})">✅</button></div></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin pendientes</div>';
+        } catch(e) {}
     }
     window.copiarCmd = function(c) { navigator.clipboard.writeText(c).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + c, 'success')); };
     window.pagarAdm = async function(uid, pid) {
-        const d = (await db.collection('usuarios').doc(uid).get()).data();
-        let pe = d.pendientes || [], hi = d.historial || [];
-        const p = pe.find(x => x.id === pid);
-        if (p) p.estado = 'exitoso';
-        hi.forEach(h => { if (h.estado === 'pendiente' && h.wallet === p.wallet) h.estado = 'exitoso'; });
-        await db.collection('usuarios').doc(uid).update({ pendientes: pe, historial: hi });
-        toast('✅ Pagado', 'success');
-        cargarPendientes();
+        try {
+            const d = (await db.collection('usuarios').doc(uid).get()).data();
+            let pe = d.pendientes || [], hi = d.historial || [];
+            const p = pe.find(x => x.id === pid);
+            if (p) p.estado = 'exitoso';
+            hi.forEach(h => { if (h.estado === 'pendiente' && h.wallet === p.wallet) h.estado = 'exitoso'; });
+            await db.collection('usuarios').doc(uid).update({ pendientes: pe, historial: hi });
+            toast('✅ Pagado', 'success');
+            cargarPendientes();
+        } catch(e) {}
     };
 
     document.getElementById('btnGuardarPrecio').addEventListener('click', async () => {
@@ -633,6 +723,7 @@
         } catch (e) { toast('❌ Error: ' + e.message, 'error'); }
     });
 
+    // Iniciar la app
     (async function() {
         await cargarConfig();
         await entrarApp();
