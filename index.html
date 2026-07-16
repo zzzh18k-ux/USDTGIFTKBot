@@ -103,9 +103,12 @@
         .mensaje-global { background:var(--coral); border-radius:16px; padding:12px; margin-bottom:10px; border:3px solid var(--border); text-align:center; font-size:13px; font-weight:600; }
         .admin-icon-trigger { cursor:pointer; user-select:none; }
         form { width:100%; }
-        .loading-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:16px; }
+        .loading-screen { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:16px; }
+        .loading-screen.active { display:flex; }
         .loading-screen .spinner { font-size:60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+        .banner-fijo { background:linear-gradient(135deg,#FFD3DA,#E2DBF5,#FFF0C2); border-radius:16px; padding:12px; margin-bottom:8px; border:3px solid var(--border); font-weight:700; font-size:13px; text-align:center; animation: pulse-border 2s infinite; }
+        .banner-fijo .blink { animation: blink 1s infinite; }
     </style>
 </head>
 <body>
@@ -157,7 +160,9 @@
             <div style="font-weight:700;font-size:16px;margin-bottom:4px;">🎬 ANUNCIOS (cada 1 hora)</div>
             <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Recompensa: <strong>$0.00500</strong> por anuncio visto</div>
             <div id="anunciosList"></div>
-            <div style="font-size:10px;color:var(--text2);margin-top:8px;text-align:center;">🔜 Pronto: Más anuncios de AdsGram & Monetag</div>
+            <div class="banner-fijo" style="margin-top:10px;">
+                <span class="blink">🚀 ¡PRONTO!</span> Anuncios AdsGram & Monetag aquí <span class="blink">🚀</span>
+            </div>
         </div>
     </div>
 
@@ -224,16 +229,9 @@
 </div>
 
 <script>
-    // MODO DESARROLLO: Si no está en Telegram, usa datos de prueba
     const ES_TELEGRAM = !!(window.Telegram?.WebApp?.initDataUnsafe?.user);
-    
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-        tg.expand();
-        tg.ready();
-        tg.MainButton.hide();
-        tg.BackButton.hide();
-    }
+    if (tg) { tg.expand(); tg.ready(); tg.MainButton.hide(); tg.BackButton.hide(); }
 
     const firebaseConfig = {
         apiKey: "AIzaSyALWjB7Ut2s-jUcC7hhXODRzFHhuBoHZU",
@@ -263,16 +261,11 @@
     const waitTimerDisplay = document.getElementById('waitTimer');
     const navbar = document.getElementById('navbar');
     const loadingScreen = document.getElementById('loadingScreen');
-
     const urlParams = new URLSearchParams(window.location.search);
     let refCode = urlParams.get('startapp') || '';
 
-    // Obtener datos del usuario (Telegram o modo prueba)
     let tgUser = null;
-    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        tgUser = tg.initDataUnsafe.user;
-    }
-    
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) tgUser = tg.initDataUnsafe.user;
     const telegramId = tgUser?.id ? tgUser.id.toString() : (ES_TELEGRAM ? null : 'test_user_123');
     const telegramUsername = tgUser?.username || (ES_TELEGRAM ? null : 'UsuarioPrueba');
     const telegramFirstName = tgUser?.first_name || (ES_TELEGRAM ? null : 'Usuario');
@@ -283,451 +276,140 @@
         t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    function navigate(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
+    function navigate(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
     async function cargarConfig() {
         try {
             const doc = await db.collection('config').doc('global').get();
-            if (doc.exists) {
-                const data = doc.data();
-                PRECIO_ANUNCIO = parseFloat(data.precioAnuncio) || ANUNCIO_RECOMPENSA;
-                MENSAJE_GLOBAL = data.mensajeGlobal || '';
-            }
-        } catch(e) {
-            console.log('Usando configuración por defecto');
-        }
-        const precioEl = document.getElementById('precioAnuncioHome');
-        if (precioEl) precioEl.textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
+            if (doc.exists) { const data = doc.data(); PRECIO_ANUNCIO = parseFloat(data.precioAnuncio) || ANUNCIO_RECOMPENSA; MENSAJE_GLOBAL = data.mensajeGlobal || ''; }
+        } catch(e) {}
+        const precioEl = document.getElementById('precioAnuncioHome'); if (precioEl) precioEl.textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
         const mb = document.getElementById('mensajeGlobalBox');
-        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
-        else if (mb) { mb.classList.add('oculto'); }
+        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); } else if (mb) { mb.classList.add('oculto'); }
     }
 
     function generarCaptcha() {
-        const a = Math.floor(Math.random() * 10) + 1;
-        const b = Math.floor(Math.random() * 10) + 1;
-        const op = Math.random() > 0.5 ? '+' : '-';
-        const real = op === '+' ? a + b : a - b;
+        const a = Math.floor(Math.random() * 10) + 1, b = Math.floor(Math.random() * 10) + 1;
+        const op = Math.random() > 0.5 ? '+' : '-', real = op === '+' ? a + b : a - b;
         let opciones = [real];
-        while (opciones.length < 4) {
-            let falso = real + (Math.floor(Math.random() * 6) - 3);
-            if (falso !== real && falso >= 0 && !opciones.includes(falso)) opciones.push(falso);
-        }
+        while (opciones.length < 4) { let falso = real + (Math.floor(Math.random() * 6) - 3); if (falso !== real && falso >= 0 && !opciones.includes(falso)) opciones.push(falso); }
         opciones = opciones.sort(() => Math.random() - 0.5);
         document.getElementById('captchaQuestion').textContent = `¿Cuánto es ${a} ${op} ${b}?`;
-        const optDiv = document.getElementById('captchaOptions');
-        optDiv.innerHTML = opciones.map(o => `<div class="option" data-val="${o}" onclick="verificarCaptcha(${o},${real})">${o}</div>`).join('');
+        document.getElementById('captchaOptions').innerHTML = opciones.map(o => `<div class="option" data-val="${o}" onclick="verificarCaptcha(${o},${real})">${o}</div>`).join('');
     }
 
     window.verificarCaptcha = function(sel, real) {
-        if (sel === real) {
-            captchaOverlay.classList.remove('show');
-            if (captchaCallback) { captchaCallback(); captchaCallback = null; }
-            toast('✅ Verificación exitosa', 'success');
-        } else {
-            const ops = document.querySelectorAll('#captchaOptions .option');
-            ops.forEach(o => { if (parseInt(o.dataset.val) === sel) o.classList.add('wrong'); });
-            toast('❌ Incorrecto, intenta de nuevo', 'error');
-            setTimeout(() => { ops.forEach(o => o.classList.remove('wrong')); generarCaptcha(); }, 1000);
-        }
+        if (sel === real) { captchaOverlay.classList.remove('show'); if (captchaCallback) { captchaCallback(); captchaCallback = null; } toast('✅ Verificación exitosa', 'success'); }
+        else { document.querySelectorAll('#captchaOptions .option').forEach(o => { if (parseInt(o.dataset.val) === sel) o.classList.add('wrong'); }); toast('❌ Incorrecto', 'error'); setTimeout(() => { document.querySelectorAll('#captchaOptions .option').forEach(o => o.classList.remove('wrong')); generarCaptcha(); }, 1000); }
     };
 
-    function mostrarCaptcha(callback) {
-        captchaCallback = callback;
-        generarCaptcha();
-        captchaOverlay.classList.add('show');
-    }
+    function mostrarCaptcha(callback) { captchaCallback = callback; generarCaptcha(); captchaOverlay.classList.add('show'); }
 
     function mostrarWaitAnuncio(segundos, callback) {
-        waitOverlay.classList.add('show');
-        waitTimerDisplay.textContent = segundos;
-        waitTimerDisplay.style.color = '#4E3629';
-        let restante = segundos;
+        waitOverlay.classList.add('show'); waitTimerDisplay.textContent = segundos; waitTimerDisplay.style.color = '#4E3629'; let restante = segundos;
         if (waitTimer) clearInterval(waitTimer);
-        waitTimer = setInterval(() => {
-            restante--;
-            waitTimerDisplay.textContent = restante;
-            if (restante <= 3) waitTimerDisplay.style.color = '#E67E22';
-            if (restante <= 0) {
-                clearInterval(waitTimer);
-                waitTimer = null;
-                waitOverlay.classList.remove('show');
-                if (callback) callback();
-            }
-        }, 1000);
+        waitTimer = setInterval(() => { restante--; waitTimerDisplay.textContent = restante; if (restante <= 3) waitTimerDisplay.style.color = '#E67E22'; if (restante <= 0) { clearInterval(waitTimer); waitTimer = null; waitOverlay.classList.remove('show'); if (callback) callback(); } }, 1000);
     }
 
-    function puedeVerAnuncios() {
-        if (!USER_DATA) return false;
-        const ahora = Date.now();
-        const ultimoAnuncioTimestamp = USER_DATA.ultimoAnuncioTimestamp || 0;
-        const cooldownMs = ANUNCIO_COOLDOWN_HORAS * 60 * 60 * 1000;
-        return (ahora - ultimoAnuncioTimestamp) >= cooldownMs;
-    }
-
-    function tiempoRestanteCooldown() {
-        if (!USER_DATA) return 'Cargando...';
-        const ahora = Date.now();
-        const ultimoAnuncioTimestamp = USER_DATA.ultimoAnuncioTimestamp || 0;
-        const cooldownMs = ANUNCIO_COOLDOWN_HORAS * 60 * 60 * 1000;
-        const restante = cooldownMs - (ahora - ultimoAnuncioTimestamp);
-        if (restante <= 0) return 'Disponible ahora';
-        const mins = Math.floor(restante / 60000);
-        const segs = Math.floor((restante % 60000) / 1000);
-        return `Próximo en ${mins}m ${segs}s`;
-    }
+    function puedeVerAnuncios() { return true; } // SIN COOLDOWN PARA PRUEBAS
+    function tiempoRestanteCooldown() { return 'Disponible ahora'; }
 
     async function completarAnuncioCiclo() {
-        const hoy = new Date().toLocaleDateString();
-        const ahora = Date.now();
-        let anunciosHoy = USER_DATA.anunciosHoy || 0;
-        if (USER_DATA.anunciosFecha !== hoy) anunciosHoy = 0;
+        const hoy = new Date().toLocaleDateString(), ahora = Date.now();
+        let anunciosHoy = USER_DATA.anunciosHoy || 0; if (USER_DATA.anunciosFecha !== hoy) anunciosHoy = 0;
         anunciosHoy += ANUNCIOS_POR_CICLO;
-        const ganancia = PRECIO_ANUNCIO * ANUNCIOS_POR_CICLO;
-        const nuevoBalance = (USER_DATA.balance || 0) + ganancia;
-        
-        try {
-            await db.collection('usuarios').doc(USER_ID).update({
-                balance: nuevoBalance, anunciosHoy: anunciosHoy, anunciosFecha: hoy, ultimoAnuncioTimestamp: ahora
-            });
-        } catch(e) {
-            console.log('Error Firestore, continuando localmente');
-        }
-        
-        USER_DATA.balance = nuevoBalance;
-        USER_DATA.anunciosHoy = anunciosHoy;
-        USER_DATA.anunciosFecha = hoy;
-        USER_DATA.ultimoAnuncioTimestamp = ahora;
-        
-        if (USER_DATA.referidoPor) {
-            try {
-                const com = ganancia * COMISION;
-                await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(com) });
-            } catch(e) {}
-        }
-        anuncioActivo = false;
-        toast('✅ +$' + ganancia.toFixed(5) + ' USDT', 'success');
-        actualizarUI();
+        const ganancia = PRECIO_ANUNCIO * ANUNCIOS_POR_CICLO, nuevoBalance = (USER_DATA.balance || 0) + ganancia;
+        try { await db.collection('usuarios').doc(USER_ID).update({ balance: nuevoBalance, anunciosHoy: anunciosHoy, anunciosFecha: hoy, ultimoAnuncioTimestamp: ahora }); } catch(e) {}
+        USER_DATA.balance = nuevoBalance; USER_DATA.anunciosHoy = anunciosHoy; USER_DATA.anunciosFecha = hoy; USER_DATA.ultimoAnuncioTimestamp = ahora;
+        if (USER_DATA.referidoPor) { try { await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(ganancia * COMISION) }); } catch(e) {} }
+        anuncioActivo = false; toast('✅ +$' + ganancia.toFixed(5) + ' USDT', 'success'); actualizarUI();
     }
 
     window.iniciarAnuncio = function() {
         if (anuncioActivo) return;
-        if (!puedeVerAnuncios()) {
-            toast('⏳ Debes esperar. ' + tiempoRestanteCooldown(), 'error');
-            actualizarUI();
-            return;
-        }
-        mostrarCaptcha(() => {
-            anuncioActivo = true;
-            actualizarUI();
-            mostrarWaitAnuncio(10, () => { completarAnuncioCiclo(); });
-        });
+        mostrarCaptcha(() => { anuncioActivo = true; actualizarUI(); mostrarWaitAnuncio(10, () => { completarAnuncioCiclo(); }); });
     };
 
     async function entrarApp() {
-        if (!telegramId) {
-            loadingScreen.innerHTML = '<div style="font-size:48px;">⚠️</div><div style="font-weight:700;font-size:16px;">Abre esta app desde Telegram</div><div style="font-size:12px;color:var(--text2);">@USDTSTARTKBot</div>';
-            return;
-        }
-        
+        if (!telegramId) { loadingScreen.innerHTML = '<div style="font-size:48px;">⚠️</div><div style="font-weight:700;font-size:16px;">Abre desde Telegram</div><div style="font-size:12px;">@USDTSTARTKBot</div>'; return; }
         USER_ID = telegramId;
-        
         try {
             const doc = await db.collection('usuarios').doc(USER_ID).get();
             if (!doc.exists) {
-                const data = {
-                    telegramId: telegramId,
-                    telegramUsername: telegramUsername,
-                    telegramFirstName: telegramFirstName,
-                    balance: 0,
-                    referidoPor: refCode || null,
-                    referidos: [],
-                    comision: 0,
-                    anunciosHoy: 0,
-                    anunciosFecha: '',
-                    ultimoAnuncioTimestamp: 0,
-                    historial: [],
-                    pendientes: [],
-                    creado: Date.now()
-                };
-                await db.collection('usuarios').doc(USER_ID).set(data);
-                USER_DATA = data;
-                if (refCode && refCode !== USER_ID) {
-                    try {
-                        const refDoc = await db.collection('usuarios').doc(refCode).get();
-                        if (refDoc.exists) {
-                            await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
-                        }
-                    } catch(e) {}
-                }
+                const data = { telegramId, telegramUsername, telegramFirstName, balance:0, referidoPor:refCode||null, referidos:[], comision:0, anunciosHoy:0, anunciosFecha:'', ultimoAnuncioTimestamp:0, historial:[], pendientes:[], creado:Date.now() };
+                await db.collection('usuarios').doc(USER_ID).set(data); USER_DATA = data;
+                if (refCode && refCode !== USER_ID) { try { const rd = await db.collection('usuarios').doc(refCode).get(); if (rd.exists) await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) }); } catch(e) {} }
             } else {
                 USER_DATA = doc.data();
-                if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
-                    try {
-                        const refDoc = await db.collection('usuarios').doc(refCode).get();
-                        if (refDoc.exists) {
-                            await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode });
-                            await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
-                            USER_DATA.referidoPor = refCode;
-                        }
-                    } catch(e) {}
-                }
+                if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) { try { const rd = await db.collection('usuarios').doc(refCode).get(); if (rd.exists) { await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode }); await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) }); USER_DATA.referidoPor = refCode; } } catch(e) {} }
             }
-        } catch(e) {
-            console.log('Usando datos locales (Firestore no disponible)');
-            USER_DATA = {
-                telegramId: telegramId,
-                telegramUsername: telegramUsername,
-                telegramFirstName: telegramFirstName,
-                balance: 0,
-                referidoPor: refCode || null,
-                referidos: [],
-                comision: 0,
-                anunciosHoy: 0,
-                anunciosFecha: '',
-                ultimoAnuncioTimestamp: 0,
-                historial: [],
-                pendientes: [],
-                creado: Date.now()
-            };
-        }
-        
-        // ✅ QUITAR PANTALLA DE CARGA
-        loadingScreen.classList.remove('active');
-        
-        navigate('homeScreen');
-        navbar.classList.remove('oculto');
+        } catch(e) { USER_DATA = { telegramId, telegramUsername, telegramFirstName, balance:0, referidoPor:refCode||null, referidos:[], comision:0, anunciosHoy:0, anunciosFecha:'', ultimoAnuncioTimestamp:0, historial:[], pendientes:[], creado:Date.now() }; }
+        loadingScreen.classList.remove('active'); navigate('homeScreen'); navbar.classList.remove('oculto');
         document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active'));
         document.querySelector('[data-screen="homeScreen"]').classList.add('active');
         document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
-        await cargarConfig();
-        actualizarUI();
-        
-        if (!ES_TELEGRAM) {
-            toast('🔧 Modo prueba web activado', 'success');
-        }
+        await cargarConfig(); actualizarUI();
+        if (!ES_TELEGRAM) toast('🔧 Modo prueba - Sin cooldown', 'success');
     }
 
-    document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            navigate(this.dataset.screen);
-            document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            actualizarUI();
-        });
-    });
+    document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => { btn.addEventListener('click', function() { navigate(this.dataset.screen); document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active')); this.classList.add('active'); actualizarUI(); }); });
 
     async function actualizarUI() {
         if (!USER_ID || !USER_DATA) return;
-        
-        try {
-            const doc = await db.collection('usuarios').doc(USER_ID).get();
-            if (doc.exists) USER_DATA = doc.data();
-        } catch(e) {}
-        
-        document.getElementById('balanceHome').textContent = '$' + (USER_DATA.balance || 0).toFixed(5);
-        document.getElementById('balanceWithdraw').textContent = '$' + (USER_DATA.balance || 0).toFixed(5);
-        document.getElementById('invitadosCount').textContent = (USER_DATA.referidos || []).length;
-        document.getElementById('comisionAcumulada').textContent = '$' + (USER_DATA.comision || 0).toFixed(5);
+        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); if (doc.exists) USER_DATA = doc.data(); } catch(e) {}
+        document.getElementById('balanceHome').textContent = '$' + (USER_DATA.balance||0).toFixed(5);
+        document.getElementById('balanceWithdraw').textContent = '$' + (USER_DATA.balance||0).toFixed(5);
+        document.getElementById('invitadosCount').textContent = (USER_DATA.referidos||[]).length;
+        document.getElementById('comisionAcumulada').textContent = '$' + (USER_DATA.comision||0).toFixed(5);
         document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
         document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
         const mb = document.getElementById('mensajeGlobalBox');
-        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); }
-        else if (mb) { mb.classList.add('oculto'); }
+        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); } else if (mb) mb.classList.add('oculto');
         renderAnuncios(); renderReferidos(); renderHistorial();
     }
 
     function renderAnuncios() {
-        const l = document.getElementById('anunciosList');
-        if (!l) return;
-        const disponible = puedeVerAnuncios();
-        const tiempo = tiempoRestanteCooldown();
+        const l = document.getElementById('anunciosList'); if (!l) return;
         let html = '';
-        for (let i = 0; i < ANUNCIOS_POR_CICLO; i++) {
-            const done = !disponible && !anuncioActivo;
-            html += `<div class="anuncio-card ${done ? 'done' : ''}">
-                <div class="num">${done ? '✓' : i + 1}</div>
-                <div style="flex:1;font-size:13px;font-weight:600;">Anuncio #${i + 1} (+$${PRECIO_ANUNCIO.toFixed(5)})</div>
-            </div>`;
-        }
-        if (disponible) {
-            html += `<button class="btn btn-green" onclick="iniciarAnuncio()" ${anuncioActivo ? 'disabled' : ''}>
-                🎬 VER ${ANUNCIOS_POR_CICLO} ANUNCIOS (+$${(PRECIO_ANUNCIO * ANUNCIOS_POR_CICLO).toFixed(5)})
-            </button>`;
-        } else {
-            html += `<button class="btn btn-coral" disabled>⏳ ${tiempo}</button>`;
-        }
+        for (let i = 0; i < ANUNCIOS_POR_CICLO; i++) { html += `<div class="anuncio-card"><div class="num">${i+1}</div><div style="flex:1;font-size:13px;font-weight:600;">Anuncio #${i+1} (+$${PRECIO_ANUNCIO.toFixed(5)})</div></div>`; }
+        html += `<button class="btn btn-green" onclick="iniciarAnuncio()" ${anuncioActivo?'disabled':''}>🎬 VER ${ANUNCIOS_POR_CICLO} ANUNCIOS (+$${(PRECIO_ANUNCIO*ANUNCIOS_POR_CICLO).toFixed(5)})</button>`;
         l.innerHTML = html;
     }
 
-    document.getElementById('btnCopiarLink').addEventListener('click', () => {
-        const lk = DOMINIO + '?startapp=' + USER_ID;
-        navigator.clipboard.writeText(lk).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + lk, 'success'));
-    });
-
-    function renderReferidos() {
-        const l = document.getElementById('referidosList');
-        if (!l) return;
-        const refs = USER_DATA.referidos || [];
-        l.innerHTML = refs.length ? refs.map(r => `<div class="referido-item"><strong>👤 ${r}</strong><span style="color:#B8860B;">+5%</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados</div>';
-    }
+    document.getElementById('btnCopiarLink').addEventListener('click', () => { const lk = DOMINIO + '?startapp=' + USER_ID; navigator.clipboard.writeText(lk).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + lk, 'success')); });
+    function renderReferidos() { const l = document.getElementById('referidosList'); if (!l) return; const refs = USER_DATA.referidos||[]; l.innerHTML = refs.length ? refs.map(r => `<div class="referido-item"><strong>👤 ${r}</strong><span style="color:#B8860B;">+5%</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados</div>'; }
 
     document.getElementById('btnReclamarComision').addEventListener('click', async () => {
         if (!USER_ID) return;
-        try {
-            const doc = await db.collection('usuarios').doc(USER_ID).get();
-            const c = doc.exists ? (doc.data().comision || 0) : (USER_DATA.comision || 0);
-            if (c < 0.00001) return toast('⚠️ Sin comisiones acumuladas', 'error');
-            const nuevoBalance = ((doc.exists ? doc.data().balance : USER_DATA.balance) || 0) + c;
-            if (doc.exists) await db.collection('usuarios').doc(USER_ID).update({ balance: nuevoBalance, comision: 0 });
-            USER_DATA.balance = nuevoBalance;
-            USER_DATA.comision = 0;
-            toast('💰 +$' + c.toFixed(5) + ' añadido a tu balance', 'success');
-            actualizarUI();
-        } catch(e) {
-            toast('⚠️ Error de conexión', 'error');
-        }
+        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const c = doc.exists ? (doc.data().comision||0) : (USER_DATA.comision||0); if (c < 0.00001) return toast('⚠️ Sin comisiones', 'error'); const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; if (doc.exists) await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); USER_DATA.balance = nb; USER_DATA.comision = 0; toast('💰 +$' + c.toFixed(5), 'success'); actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
     });
 
     document.getElementById('btnRetirar').addEventListener('click', async () => {
-        const w = document.getElementById('walletInput').value.trim();
-        if (!w || !w.startsWith('0x')) return toast('⚠️ Dirección Polygon inválida', 'error');
+        const w = document.getElementById('walletInput').value.trim(); if (!w || !w.startsWith('0x')) return toast('⚠️ Dirección Polygon inválida', 'error');
         if (!USER_ID) return;
-        try {
-            const doc = await db.collection('usuarios').doc(USER_ID).get();
-            const bal = doc.exists ? (doc.data().balance || 0) : (USER_DATA.balance || 0);
-            if (bal < 0.009) return toast('⚠️ Mínimo de retiro: $0.01 USDT. Tu balance: $' + bal.toFixed(5), 'error');
-            const hoy = new Date().toLocaleDateString();
-            const pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
-            if (doc.exists) {
-                await db.collection('usuarios').doc(USER_ID).update({
-                    balance: 0,
-                    historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }),
-                    pendientes: firebase.firestore.FieldValue.arrayUnion(pg)
-                });
-            }
-            USER_DATA.balance = 0;
-            USER_DATA.historial = [...(USER_DATA.historial || []), { fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }];
-            document.getElementById('estadoRetiro').textContent = '✅ Retiro de $' + bal.toFixed(5) + ' solicitado';
-            toast('✅ Retiro solicitado: $' + bal.toFixed(5), 'success');
-            document.getElementById('walletInput').value = '';
-            actualizarUI();
-        } catch(e) {
-            toast('⚠️ Error de conexión', 'error');
-        }
+        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); if (bal < 0.009) return toast('⚠️ Mínimo $0.01', 'error');
+        const hoy = new Date().toLocaleDateString(), pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
+        if (doc.exists) await db.collection('usuarios').doc(USER_ID).update({ balance:0, historial: firebase.firestore.FieldValue.arrayUnion({ fecha:hoy, monto:bal, wallet:w, estado:'pendiente' }), pendientes: firebase.firestore.FieldValue.arrayUnion(pg) });
+        USER_DATA.balance = 0; USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha:hoy, monto:bal, wallet:w, estado:'pendiente' }];
+        document.getElementById('estadoRetiro').textContent = '✅ Retiro de $' + bal.toFixed(5) + ' solicitado'; toast('✅ Retiro solicitado', 'success'); document.getElementById('walletInput').value = ''; actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
     });
 
-    function renderHistorial() {
-        const l = document.getElementById('historialList');
-        if (!l) return;
-        const h = USER_DATA.historial || [];
-        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>$${x.monto.toFixed(2)}</span><span class="badge-sm ${x.estado === 'exitoso' ? 'badge-green' : 'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin retiros</div>';
-    }
+    function renderHistorial() { const l = document.getElementById('historialList'); if (!l) return; const h = USER_DATA.historial||[]; l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>$${x.monto.toFixed(2)}</span><span class="badge-sm ${x.estado==='exitoso'?'badge-green':'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; }
 
     const adminIconTrigger = document.getElementById('adminIconTrigger');
-    if (adminIconTrigger) {
-        adminIconTrigger.addEventListener('touchstart', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
-        adminIconTrigger.addEventListener('touchend', function() { clearTimeout(adminTouchTimer); });
-        adminIconTrigger.addEventListener('touchmove', function() { clearTimeout(adminTouchTimer); });
-        adminIconTrigger.addEventListener('mousedown', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); });
-        adminIconTrigger.addEventListener('mouseup', function() { clearTimeout(adminTouchTimer); });
-        adminIconTrigger.addEventListener('mouseleave', function() { clearTimeout(adminTouchTimer); });
-    }
-
+    if (adminIconTrigger) { adminIconTrigger.addEventListener('touchstart', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); }); adminIconTrigger.addEventListener('touchend', function() { clearTimeout(adminTouchTimer); }); adminIconTrigger.addEventListener('touchmove', function() { clearTimeout(adminTouchTimer); }); adminIconTrigger.addEventListener('mousedown', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); }); adminIconTrigger.addEventListener('mouseup', function() { clearTimeout(adminTouchTimer); }); adminIconTrigger.addEventListener('mouseleave', function() { clearTimeout(adminTouchTimer); }); }
     function mostrarAdmin() { document.getElementById('adminPanel').classList.remove('oculto'); document.getElementById('adminContent').classList.add('oculto'); document.getElementById('adminPass').value = ''; }
-
-    document.getElementById('btnAdminLogin').addEventListener('click', async () => {
-        const pass = document.getElementById('adminPass').value;
-        try {
-            const doc = await db.collection('config').doc('admin').get();
-            if (!doc.exists || doc.data().clave !== pass) return toast('❌ Clave incorrecta', 'error');
-            document.getElementById('adminContent').classList.remove('oculto');
-            document.getElementById('adminPrecioAnuncio').value = PRECIO_ANUNCIO;
-            document.getElementById('adminMensajeGlobal').value = MENSAJE_GLOBAL;
-            await cargarPendientes();
-        } catch (e) { toast('❌ Error al verificar', 'error'); }
-    });
+    document.getElementById('btnAdminLogin').addEventListener('click', async () => { const pass = document.getElementById('adminPass').value; try { const doc = await db.collection('config').doc('admin').get(); if (!doc.exists || doc.data().clave !== pass) return toast('❌ Clave incorrecta', 'error'); document.getElementById('adminContent').classList.remove('oculto'); document.getElementById('adminPrecioAnuncio').value = PRECIO_ANUNCIO; document.getElementById('adminMensajeGlobal').value = MENSAJE_GLOBAL; await cargarPendientes(); } catch (e) { toast('❌ Error', 'error'); } });
     document.getElementById('btnCerrarAdmin').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('oculto'); document.getElementById('adminContent').classList.add('oculto'); adminAbierto = false; });
-    document.getElementById('btnAddSaldo').addEventListener('click', async () => {
-        const user = document.getElementById('adminAddUser').value.trim();
-        const monto = parseFloat(document.getElementById('adminAddMonto').value);
-        if (!user || !monto || monto <= 0) return toast('⚠️ Datos inválidos', 'error');
-        try {
-            const doc = await db.collection('usuarios').doc(user).get();
-            if (!doc.exists) return toast('❌ Usuario no existe', 'error');
-            await db.collection('usuarios').doc(user).update({ balance: firebase.firestore.FieldValue.increment(monto) });
-            toast('✅ +$' + monto.toFixed(5) + ' a ' + user, 'success');
-        } catch(e) { toast('❌ Error: ' + e.message, 'error'); }
-        document.getElementById('adminAddUser').value = '';
-        document.getElementById('adminAddMonto').value = '';
-    });
-    document.getElementById('btnResetAnuncios').addEventListener('click', async () => {
-        if (!confirm('¿Restablecer anuncios para TODOS?')) return;
-        try {
-            const snap = await db.collection('usuarios').get();
-            let count = 0;
-            const batch = db.batch();
-            snap.forEach(doc => { batch.update(doc.ref, { anunciosHoy: 0, anunciosFecha: '', ultimoAnuncioTimestamp: 0 }); count++; });
-            await batch.commit();
-            toast('✅ ' + count + ' usuarios restablecidos', 'success');
-        } catch (e) { toast('❌ Error: ' + e.message, 'error'); }
-    });
-
-    async function cargarPendientes() {
-        try {
-            const snap = await db.collection('usuarios').get();
-            let all = [];
-            snap.forEach(doc => { (doc.data().pendientes || []).forEach(p => { if (p.estado === 'pendiente') all.push({ ...p, userId: doc.id }); }); });
-            document.getElementById('totalPendientes').textContent = all.length;
-            document.getElementById('pendientesList').innerHTML = all.length ? all.map(p => `<div class="admin-item"><div style="flex:1;"><strong>$${p.monto.toFixed(5)}</strong> | 👤 ${p.usuario}<div class="cmd-box">/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}</div></div><div style="display:flex;flex-direction:column;gap:4px;"><button class="btn-xs btn-copy" onclick="copiarCmd('/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}')">📋</button><button class="btn-xs btn-done" onclick="pagarAdm('${p.userId}',${p.id})">✅</button></div></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin pendientes</div>';
-        } catch(e) {}
-    }
+    document.getElementById('btnAddSaldo').addEventListener('click', async () => { const user = document.getElementById('adminAddUser').value.trim(), monto = parseFloat(document.getElementById('adminAddMonto').value); if (!user || !monto || monto <= 0) return toast('⚠️ Datos inválidos', 'error'); try { const doc = await db.collection('usuarios').doc(user).get(); if (!doc.exists) return toast('❌ No existe', 'error'); await db.collection('usuarios').doc(user).update({ balance: firebase.firestore.FieldValue.increment(monto) }); toast('✅ +$' + monto.toFixed(5), 'success'); } catch(e) {} document.getElementById('adminAddUser').value = ''; document.getElementById('adminAddMonto').value = ''; });
+    document.getElementById('btnResetAnuncios').addEventListener('click', async () => { if (!confirm('¿Restablecer?')) return; try { const snap = await db.collection('usuarios').get(); let count = 0; const batch = db.batch(); snap.forEach(doc => { batch.update(doc.ref, { anunciosHoy:0, anunciosFecha:'', ultimoAnuncioTimestamp:0 }); count++; }); await batch.commit(); toast('✅ ' + count + ' usuarios', 'success'); } catch (e) {} });
+    async function cargarPendientes() { try { const snap = await db.collection('usuarios').get(); let all = []; snap.forEach(doc => { (doc.data().pendientes||[]).forEach(p => { if (p.estado==='pendiente') all.push({...p, userId:doc.id}); }); }); document.getElementById('totalPendientes').textContent = all.length; document.getElementById('pendientesList').innerHTML = all.length ? all.map(p => `<div class="admin-item"><div><strong>$${p.monto.toFixed(5)}</strong> | ${p.usuario}<div class="cmd-box">/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}</div></div><div><button class="btn-xs btn-copy" onclick="copiarCmd('/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}')">📋</button><button class="btn-xs btn-done" onclick="pagarAdm('${p.userId}',${p.id})">✅</button></div></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin pendientes</div>'; } catch(e) {} }
     window.copiarCmd = function(c) { navigator.clipboard.writeText(c).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + c, 'success')); };
-    window.pagarAdm = async function(uid, pid) {
-        try {
-            const d = (await db.collection('usuarios').doc(uid).get()).data();
-            let pe = d.pendientes || [], hi = d.historial || [];
-            const p = pe.find(x => x.id === pid);
-            if (p) p.estado = 'exitoso';
-            hi.forEach(h => { if (h.estado === 'pendiente' && h.wallet === p.wallet) h.estado = 'exitoso'; });
-            await db.collection('usuarios').doc(uid).update({ pendientes: pe, historial: hi });
-            toast('✅ Pagado', 'success');
-            cargarPendientes();
-        } catch(e) {}
-    };
+    window.pagarAdm = async function(uid, pid) { try { const d = (await db.collection('usuarios').doc(uid).get()).data(); let pe = d.pendientes||[], hi = d.historial||[]; const p = pe.find(x => x.id===pid); if (p) p.estado='exitoso'; hi.forEach(h => { if (h.estado==='pendiente' && h.wallet===p.wallet) h.estado='exitoso'; }); await db.collection('usuarios').doc(uid).update({ pendientes:pe, historial:hi }); toast('✅ Pagado', 'success'); cargarPendientes(); } catch(e) {} };
+    document.getElementById('btnGuardarPrecio').addEventListener('click', async () => { const n = parseFloat(document.getElementById('adminPrecioAnuncio').value); if (!n || n <= 0) return toast('⚠️ Precio inválido', 'error'); try { await db.collection('config').doc('global').set({ precioAnuncio:n, mensajeGlobal:MENSAJE_GLOBAL }, { merge:true }); PRECIO_ANUNCIO = n; document.getElementById('precioAnuncioHome').textContent = '$' + n.toFixed(5); toast('✅ Precio actualizado', 'success'); actualizarUI(); } catch (e) {} });
+    document.getElementById('btnGuardarMensaje').addEventListener('click', async () => { const m = document.getElementById('adminMensajeGlobal').value.trim(); try { await db.collection('config').doc('global').set({ precioAnuncio:PRECIO_ANUNCIO, mensajeGlobal:m }, { merge:true }); MENSAJE_GLOBAL = m; const mb = document.getElementById('mensajeGlobalBox'); if (m) { mb.innerHTML = '📢 ' + m; mb.classList.remove('oculto'); } else mb.classList.add('oculto'); toast('✅ Mensaje publicado', 'success'); actualizarUI(); } catch (e) {} });
 
-    document.getElementById('btnGuardarPrecio').addEventListener('click', async () => {
-        const n = parseFloat(document.getElementById('adminPrecioAnuncio').value);
-        if (!n || n <= 0) return toast('⚠️ Precio inválido', 'error');
-        try {
-            await db.collection('config').doc('global').set({ precioAnuncio: n, mensajeGlobal: MENSAJE_GLOBAL }, { merge: true });
-            PRECIO_ANUNCIO = n;
-            document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
-            toast('✅ Precio: $' + n.toFixed(5), 'success');
-            actualizarUI();
-        } catch (e) { toast('❌ Error: ' + e.message, 'error'); }
-    });
-    document.getElementById('btnGuardarMensaje').addEventListener('click', async () => {
-        const m = document.getElementById('adminMensajeGlobal').value.trim();
-        try {
-            await db.collection('config').doc('global').set({ precioAnuncio: PRECIO_ANUNCIO, mensajeGlobal: m }, { merge: true });
-            MENSAJE_GLOBAL = m;
-            const mb = document.getElementById('mensajeGlobalBox');
-            if (m) { mb.innerHTML = '📢 ' + m; mb.classList.remove('oculto'); }
-            else { mb.classList.add('oculto'); }
-            toast('✅ Mensaje publicado', 'success');
-            actualizarUI();
-        } catch (e) { toast('❌ Error: ' + e.message, 'error'); }
-    });
-
-    // Iniciar la app
-    (async function() {
-        await cargarConfig();
-        await entrarApp();
-    })();
+    (async function() { await cargarConfig(); await entrarApp(); })();
 </script>
 </body>
 </html>
