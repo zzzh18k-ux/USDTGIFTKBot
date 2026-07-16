@@ -246,7 +246,7 @@
 
     const MIN_RETIRO = 0.01;
     const COMISION = 0.05;
-    const DOMINIO = 'https://t.me/USDTSTARTKBot/app';
+    const DOMINIO = 'https://t.me/USDTSTARTKBot';
     const ANUNCIO_RECOMPENSA = 0.005;
     const ANUNCIO_COOLDOWN_HORAS = 1;
     const ANUNCIOS_POR_CICLO = 3;
@@ -311,7 +311,7 @@
         waitTimer = setInterval(() => { restante--; waitTimerDisplay.textContent = restante; if (restante <= 3) waitTimerDisplay.style.color = '#E67E22'; if (restante <= 0) { clearInterval(waitTimer); waitTimer = null; waitOverlay.classList.remove('show'); if (callback) callback(); } }, 1000);
     }
 
-    function puedeVerAnuncios() { return true; } // SIN COOLDOWN PARA PRUEBAS
+    function puedeVerAnuncios() { return true; }
     function tiempoRestanteCooldown() { return 'Disponible ahora'; }
 
     async function completarAnuncioCiclo() {
@@ -412,4 +412,4 @@
     (async function() { await cargarConfig(); await entrarApp(); })();
 </script>
 </body>
-</html>
+    </html>
