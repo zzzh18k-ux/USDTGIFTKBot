@@ -17,9 +17,9 @@
             --shadow: 0 6px 0 #5D4037;
         }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:'Fredoka',sans-serif; color:var(--text); }
-        body { background:var(--bg); min-height:100vh; display:flex; justify-content:center; background-image:radial-gradient(#F3EDE0 1.5px,transparent 1.5px),radial-gradient(#F3EDE0 1.5px,#FFFDF6 1.5px); background-size:24px 24px; background-position:0 0,12px 12px; }
-        .app { max-width:450px; width:100%; display:flex; flex-direction:column; min-height:100vh; }
-        .screen { display:none; flex-direction:column; padding:16px; gap:14px; padding-bottom:100px; }
+        body { background:var(--bg); min-height:100vh; display:flex; justify-content:center; background-image:radial-gradient(#F3EDE0 1.5px,transparent 1.5px),radial-gradient(#F3EDE0 1.5px,#FFFDF6 1.5px); background-size:24px 24px; background-position:0 0,12px 12px; overflow-x: hidden; }
+        .app { max-width:450px; width:100%; display:flex; flex-direction:column; min-height:100vh; position: relative; }
+        .screen { display:none; flex-direction:column; padding:16px; gap:14px; padding-bottom:100px; width: 100%; }
         .screen.active { display:flex; }
         .card { background:var(--card); border-radius:26px; padding:18px; border:4px solid var(--border); box-shadow:var(--shadow); }
         .card-center { text-align:center; }
@@ -34,11 +34,7 @@
         .btn-yellow { background:var(--yellow); }
         .btn-purple { background:var(--purple); }
         .btn-sm { padding:8px 16px; border-radius:14px; border:2px solid var(--border); font-weight:700; cursor:pointer; font-size:12px; box-shadow:0 3px 0 var(--border); background:var(--pink); }
-        .btn-sm:active { transform:translateY(2px); box-shadow:none; }
-        .btn-sm:disabled { opacity:0.5; cursor:not-allowed; box-shadow:0 2px 0 var(--border); background:#EAEAEA; }
         input, textarea { width:100%; padding:14px 18px; border-radius:18px; border:3px solid var(--border); background:var(--card); font-size:13px; font-weight:600; outline:none; margin:6px 0; }
-        input:focus, textarea:focus { background:#FFFDF9; }
-        textarea { resize:vertical; min-height:60px; }
         .fila { display:flex; justify-content:space-between; padding:8px 0; border-bottom:2px dashed #E5DCD5; font-size:13px; font-weight:600; }
         .fila:last-child { border:none; }
         .hist-item { display:flex; justify-content:space-between; padding:10px; border-bottom:2px dashed #E5DCD5; font-size:12px; flex-wrap:wrap; gap:4px; }
@@ -57,90 +53,37 @@
         .admin-item { background:#FFF; border-radius:16px; padding:12px; margin-bottom:8px; border:3px solid var(--border); box-shadow:0 3px 0 var(--border); }
         .admin-item .cmd-box { background:#FFFBF0; border:1px dashed var(--border); border-radius:8px; padding:6px 8px; margin:6px 0; font-size:11px; font-family:monospace; word-break:break-all; color:var(--text); }
         .btn-xs { padding:5px 10px; border-radius:10px; border:2px solid var(--border); font-weight:700; cursor:pointer; font-size:10px; box-shadow:0 2px 0 var(--border); margin:2px; }
-        .btn-xs:active { transform:translateY(2px); box-shadow:none; }
         .btn-copy { background:var(--blue); }
         .btn-done { background:var(--green); }
         .panel-login { display:flex; gap:8px; margin-bottom:12px; }
         .panel-login input { flex:1; margin:0; }
         .panel-login button { background:var(--pink); border:3px solid var(--border); padding:10px 20px; border-radius:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 0 var(--border); }
         .oculto { display:none; }
-        .btn-group { display:flex; gap:8px; margin-top:10px; }
-        .btn-group .btn { flex:1; margin-top:0; }
         .resumen-box { background:var(--yellow); border-radius:16px; padding:12px; text-align:center; border:2px solid var(--border); margin-bottom:12px; }
         .resumen-box .total { font-size:26px; font-weight:700; }
         .link-box { background:var(--purple); border-radius:14px; padding:10px; margin:8px 0; font-size:11px; font-weight:600; word-break:break-all; border:2px solid var(--border); text-align:center; }
         .btn-copiar { background:var(--blue); border:2px solid var(--border); padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:12px; box-shadow:0 3px 0 var(--border); width:100%; margin-top:4px; }
-        .btn-copiar:active { transform:translateY(2px); box-shadow:none; }
-        .anuncio-card { background:var(--card); border-radius:20px; padding:14px; margin-bottom:8px; border:3px solid var(--border); box-shadow:0 4px 0 var(--border); display:flex; align-items:center; gap:12px; }
-        .anuncio-card .num { width:36px; height:36px; border-radius:12px; background:var(--yellow); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0; }
-        .anuncio-card.done { background:#F4FAF7; }
-        .anuncio-card.done .num { background:var(--green); }
-        
-        .captcha-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:200; display:none; justify-content:center; align-items:center; flex-direction:column; gap:16px; }
-        .captcha-overlay.show { display:flex; }
-        .captcha-box { background:var(--card); border-radius:28px; padding:24px; text-align:center; border:4px solid var(--border); box-shadow:0 10px 0 var(--border); max-width:340px; width:90%; }
-        .captcha-box .robot-icon { font-size:70px; animation: float 2s ease-in-out infinite; }
-        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-15px);} }
-        .captcha-box .banner-soon { background:linear-gradient(135deg,#FFD3DA,#E2DBF5,#FFF0C2); border-radius:16px; padding:12px; margin:10px 0; border:3px solid var(--border); font-weight:700; font-size:12px; animation: pulse-border 2s infinite; }
-        @keyframes pulse-border { 0%,100%{border-color:var(--border);} 50%{border-color:#E67E22;} }
-        .captcha-box .banner-soon .blink { animation: blink 1s infinite; }
-        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-        .captcha-box .challenge { background:#FFFBF0; border-radius:14px; padding:14px; border:2px dashed var(--border); margin:12px 0; }
-        .captcha-box .challenge .question { font-size:15px; font-weight:700; margin-bottom:10px; }
-        .captcha-box .challenge .options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .captcha-box .challenge .option { padding:12px; border-radius:14px; border:3px solid var(--border); background:var(--card); cursor:pointer; font-weight:700; font-size:14px; transition:all 0.15s; }
-        .captcha-box .challenge .option:active { background:var(--green); transform:scale(0.95); }
-        .captcha-box .challenge .option.wrong { background:#FFD3DA; }
-        
-        .wait-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:200; display:none; justify-content:center; align-items:center; flex-direction:column; gap:12px; }
-        .wait-overlay.show { display:flex; }
-        .wait-box { background:var(--card); border-radius:28px; padding:24px; text-align:center; border:4px solid var(--border); box-shadow:0 10px 0 var(--border); max-width:320px; width:90%; }
-        .wait-box .timer-display { font-size:48px; font-weight:700; margin:12px 0; }
-        .wait-box .ad-label { font-size:12px; color:var(--text2); margin-top:6px; }
-        
         .admin-section { margin-top:12px; padding:12px; border-radius:16px; border:2px dashed var(--border); background:#FFFBF0; }
         .admin-section h4 { font-size:13px; margin-bottom:8px; }
         .mensaje-global { background:var(--coral); border-radius:16px; padding:12px; margin-bottom:10px; border:3px solid var(--border); text-align:center; font-size:13px; font-weight:600; }
         .admin-icon-trigger { cursor:pointer; user-select:none; }
-        form { width:100%; }
         .loading-screen { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:16px; }
         .loading-screen.active { display:flex; }
         .loading-screen .spinner { font-size:60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-        .banner-fijo { background:linear-gradient(135deg,#FFD3DA,#E2DBF5,#FFF0C2); border-radius:16px; padding:12px; margin-bottom:8px; border:3px solid var(--border); font-weight:700; font-size:13px; text-align:center; animation: pulse-border 2s infinite; }
-        .banner-fijo .blink { animation: blink 1s infinite; }
+
+        /* Estilos específicos del juego integrado */
+        #gameScreen { padding: 0; position: relative; height: calc(100vh - 70px); overflow: hidden; }
+        #gameCanvas { display: block; width: 100%; height: 100%; touch-action: none; background: #0f172a; }
+        .game-hud { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; pointer-events: none; z-index: 10; }
+        .game-score-box { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 2px solid #334155; color: white; padding: 6px 12px; border-radius: 14px; display: flex; align-items: center; gap: 8px; }
+        .game-overlay-menu { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+        .game-modal-card { background: #1e293b; border: 3px solid #475569; border-radius: 24px; padding: 24px; max-width: 320px; width: 100%; text-align: center; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
 <div id="toast" class="toast"></div>
-
-<div id="captchaOverlay" class="captcha-overlay">
-    <div class="captcha-box">
-        <div class="robot-icon">🤖</div>
-        <div style="font-size:16px;font-weight:700;">¿Eres humano?</div>
-        <div style="font-size:11px;color:var(--text2);">Resuelve para continuar</div>
-        <div class="banner-soon">
-            <span class="blink">🚀 ¡PRONTO!</span> Anuncios AdsGram & Monetag aquí <span class="blink">🚀</span>
-        </div>
-        <div class="challenge">
-            <div class="question" id="captchaQuestion">¿Cuánto es 3 + 4?</div>
-            <div class="options" id="captchaOptions"></div>
-        </div>
-        <div style="font-size:10px;color:var(--text2);">Al verificar aceptas ver anuncios para ganar recompensas</div>
-    </div>
-</div>
-
-<div id="waitOverlay" class="wait-overlay">
-    <div class="wait-box">
-        <div style="font-size:40px;">🎬</div>
-        <div style="font-size:16px;font-weight:700;">Anuncio en progreso</div>
-        <div class="timer-display" id="waitTimer">10</div>
-        <div style="font-size:13px;">segundos restantes</div>
-        <div class="ad-label">Pronto: Anuncios de AdsGram / Monetag</div>
-        <div style="font-size:11px;color:#E67E22;margin-top:8px;">⚠️ No cierres esta ventana</div>
-    </div>
-</div>
 
 <div class="app">
     <div id="loadingScreen" class="screen active loading-screen">
@@ -149,6 +92,7 @@
         <div style="font-size:12px;color:var(--text2);">@USDTSTARTKBot 🚀</div>
     </div>
 
+    <!-- Pantalla de Inicio -->
     <div id="homeScreen" class="screen">
         <div id="mensajeGlobalBox" class="mensaje-global oculto"></div>
         <div class="card card-center">
@@ -156,16 +100,52 @@
             <div class="balance-display" id="balanceHome">$0.00000</div>
             <span class="balance-label">USDT RETIRABLE</span>
         </div>
-        <div class="card">
-            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">🎬 ANUNCIOS (cada 1 hora)</div>
-            <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Recompensa: <strong>$0.00500</strong> por anuncio visto</div>
-            <div id="anunciosList"></div>
-            <div class="banner-fijo" style="margin-top:10px;">
-                <span class="blink">🚀 ¡PRONTO!</span> Anuncios AdsGram & Monetag aquí <span class="blink">🚀</span>
+        <div class="card card-center">
+            <div style="font-size:40px; margin-bottom: 8px;">🏀</div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">SLING BASKET HERO</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Juega, encesta y gana USDT directo a tu balance. ¡Cada punto suma!</div>
+            <button class="btn btn-green" onclick="irAlJuego()">🎮 JUGAR AHORA</button>
+        </div>
+    </div>
+
+    <!-- Pantalla del Juego de Basket -->
+    <div id="gameScreen" class="screen">
+        <div class="game-hud" id="gameHud">
+            <div class="game-score-box">
+                <span style="font-size: 11px; font-weight: 700; color: #fbbf24;">PUNTOS</span>
+                <span id="scoreText" style="font-size: 20px; font-weight: 900; color: #fbbf24;">0</span>
+            </div>
+            <div class="game-score-box">
+                <span style="font-size: 11px; font-weight: 700; color: #94a3b8;">VIDAS</span>
+                <span id="livesContainer" style="font-size: 16px;">❤️❤️❤️</span>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Menú Inicial del Juego -->
+        <div id="startMenu" class="game-overlay-menu">
+            <div class="game-modal-card">
+                <div style="font-size: 48px; margin-bottom: 8px;">🏀</div>
+                <h2 style="font-size: 22px; font-weight: 900; margin-bottom: 8px; color: #fbbf24;">Sling Basket</h2>
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 20px;">Estira la flecha, apunta bien y encesta para sumar a tu balance general.</p>
+                <button id="startBtn" class="btn btn-green" style="margin-top:0;">🚀 EMPEZAR</button>
+            </div>
+        </div>
+
+        <!-- Menú de Game Over -->
+        <div id="adModal" class="game-overlay-menu oculto">
+            <div class="game-modal-card">
+                <div style="font-size: 48px; margin-bottom: 8px;">💔</div>
+                <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 6px;">¡Juego Terminado!</h2>
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 16px;">Puntuación final: <span id="finalScoreText" style="color: #fbbf24; font-weight: bold;">0</span></p>
+                <p style="font-size: 11px; color: #22c55e; margin-bottom: 16px;" id="recompensaGanadaMsg">¡Tus puntos se sumaron al balance!</p>
+                <button id="restartBtn" class="btn btn-pink" style="margin-top:0;">🔄 JUGAR OTRA VEZ</button>
             </div>
         </div>
     </div>
 
+    <!-- Pantalla de Invitar -->
     <div id="inviteScreen" class="screen">
         <div class="card card-center"><div style="font-size:40px;">👥</div><div style="font-weight:700;font-size:18px;">INVITAR AMIGOS</div><div style="font-size:13px;color:var(--text2);">5% de comisión</div>
             <div class="link-box" id="refLinkBox">Cargando...</div>
@@ -179,11 +159,12 @@
         <div class="card"><div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 AMIGOS INVITADOS</div><div id="referidosList" class="scroll"></div></div>
     </div>
 
+    <!-- Pantalla de Retirar -->
     <div id="withdrawScreen" class="screen">
         <div class="card card-center"><div style="font-size:12px;font-weight:700;color:var(--text2);">BALANCE</div><div class="balance-display" id="balanceWithdraw">$0.00000</div></div>
         <div class="card">
             <div style="font-weight:700;font-size:15px;margin-bottom:8px;"><span class="admin-icon-trigger" id="adminIconTrigger">💳</span> RETIRAR USDT</div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: $0.01 USDT</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: $0.1 USDT</div>
             <input type="text" id="walletInput" placeholder="Dirección Polygon (0x...)">
             <button class="btn btn-green" id="btnRetirar">📤 SOLICITAR RETIRO</button>
             <div style="font-size:12px;margin-top:6px;min-height:18px;font-weight:600;" id="estadoRetiro"></div>
@@ -198,31 +179,19 @@
                 <div id="pendientesList" class="scroll" style="max-height:200px;"></div>
                 <div class="admin-section" style="background:#F0FFF0;border-color:#27AE60;">
                     <h4>💵 AGREGAR SALDO A USUARIO</h4>
-                    <input type="text" id="adminAddUser" placeholder="ID de Telegram del usuario">
+                    <input type="text" id="adminAddUser" placeholder="ID de Telegram">
                     <input type="number" id="adminAddMonto" placeholder="Monto en USDT" step="0.00001">
                     <button class="btn btn-green" id="btnAddSaldo">💵 AGREGAR SALDO</button>
-                </div>
-                <div class="admin-section" style="background:#FFF0F0;border-color:#E74C3C;">
-                    <h4>🔄 RESTABLECER ANUNCIOS PARA TODOS</h4>
-                    <button class="btn btn-coral" id="btnResetAnuncios">🔄 RESTABLECER AHORA</button>
-                </div>
-                <div class="admin-section">
-                    <h4>💰 PRECIO POR ANUNCIO</h4>
-                    <input type="number" id="adminPrecioAnuncio" placeholder="Ej: 0.005" step="0.00001" value="0.005">
-                    <button class="btn btn-yellow" id="btnGuardarPrecio">💾 GUARDAR PRECIO</button>
-                </div>
-                <div class="admin-section">
-                    <h4>📢 MENSAJE PARA TODOS</h4>
-                    <textarea id="adminMensajeGlobal" placeholder="Escribe un mensaje..."></textarea>
-                    <button class="btn btn-purple" id="btnGuardarMensaje">📢 PUBLICAR MENSAJE</button>
                 </div>
                 <button class="btn" id="btnCerrarAdmin" style="margin-top:10px;">❌ CERRAR</button>
             </div>
         </div>
     </div>
 
+    <!-- Menú de Navegación -->
     <div id="navbar" class="navbar oculto">
         <button class="nav-btn active" data-screen="homeScreen"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="nav-btn" data-screen="gameScreen" onclick="irAlJuego()"><i class="fas fa-basketball-ball"></i><span>Juego</span></button>
         <button class="nav-btn" data-screen="inviteScreen"><i class="fas fa-users"></i><span>Invitar</span></button>
         <button class="nav-btn" data-screen="withdrawScreen"><i class="fas fa-wallet"></i><span>Retirar</span></button>
     </div>
@@ -244,21 +213,13 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const MIN_RETIRO = 0.01;
+    const MIN_RETIRO = 0.1; // Configurado a 0.1$ como solicitado
     const COMISION = 0.05;
     const DOMINIO = 'https://t.me/USDTSTARTKBot';
-    const ANUNCIO_RECOMPENSA = 0.005;
-    const ANUNCIO_COOLDOWN_HORAS = 1;
-    const ANUNCIOS_POR_CICLO = 3;
 
-    let USER_ID = null, USER_DATA = null, PRECIO_ANUNCIO = ANUNCIO_RECOMPENSA, MENSAJE_GLOBAL = '';
-    let anuncioActivo = false, waitTimer = null;
-    let captchaCallback = null;
+    let USER_ID = null, USER_DATA = null, MENSAJE_GLOBAL = '';
     let adminTouchTimer = null, adminAbierto = false;
 
-    const captchaOverlay = document.getElementById('captchaOverlay');
-    const waitOverlay = document.getElementById('waitOverlay');
-    const waitTimerDisplay = document.getElementById('waitTimer');
     const navbar = document.getElementById('navbar');
     const loadingScreen = document.getElementById('loadingScreen');
     const urlParams = new URLSearchParams(window.location.search);
@@ -276,83 +237,55 @@
         t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    function navigate(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    function navigate(id) { 
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+        document.getElementById(id).classList.add('active'); 
+    }
+
+    window.irAlJuego = function() {
+        navigate('gameScreen');
+        document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active'));
+        const btn = document.querySelector('.nav-btn[data-screen="gameScreen"]');
+        if(btn) btn.classList.add('active');
+        resizeCanvas();
+    }
 
     async function cargarConfig() {
         try {
             const doc = await db.collection('config').doc('global').get();
-            if (doc.exists) { const data = doc.data(); PRECIO_ANUNCIO = parseFloat(data.precioAnuncio) || ANUNCIO_RECOMPENSA; MENSAJE_GLOBAL = data.mensajeGlobal || ''; }
+            if (doc.exists) { MENSAJE_GLOBAL = doc.data().mensajeGlobal || ''; }
         } catch(e) {}
-        const precioEl = document.getElementById('precioAnuncioHome'); if (precioEl) precioEl.textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
         const mb = document.getElementById('mensajeGlobalBox');
         if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); } else if (mb) { mb.classList.add('oculto'); }
     }
 
-    function generarCaptcha() {
-        const a = Math.floor(Math.random() * 10) + 1, b = Math.floor(Math.random() * 10) + 1;
-        const op = Math.random() > 0.5 ? '+' : '-', real = op === '+' ? a + b : a - b;
-        let opciones = [real];
-        while (opciones.length < 4) { let falso = real + (Math.floor(Math.random() * 6) - 3); if (falso !== real && falso >= 0 && !opciones.includes(falso)) opciones.push(falso); }
-        opciones = opciones.sort(() => Math.random() - 0.5);
-        document.getElementById('captchaQuestion').textContent = `¿Cuánto es ${a} ${op} ${b}?`;
-        document.getElementById('captchaOptions').innerHTML = opciones.map(o => `<div class="option" data-val="${o}" onclick="verificarCaptcha(${o},${real})">${o}</div>`).join('');
-    }
-
-    window.verificarCaptcha = function(sel, real) {
-        if (sel === real) { captchaOverlay.classList.remove('show'); if (captchaCallback) { captchaCallback(); captchaCallback = null; } toast('✅ Verificación exitosa', 'success'); }
-        else { document.querySelectorAll('#captchaOptions .option').forEach(o => { if (parseInt(o.dataset.val) === sel) o.classList.add('wrong'); }); toast('❌ Incorrecto', 'error'); setTimeout(() => { document.querySelectorAll('#captchaOptions .option').forEach(o => o.classList.remove('wrong')); generarCaptcha(); }, 1000); }
-    };
-
-    function mostrarCaptcha(callback) { captchaCallback = callback; generarCaptcha(); captchaOverlay.classList.add('show'); }
-
-    function mostrarWaitAnuncio(segundos, callback) {
-        waitOverlay.classList.add('show'); waitTimerDisplay.textContent = segundos; waitTimerDisplay.style.color = '#4E3629'; let restante = segundos;
-        if (waitTimer) clearInterval(waitTimer);
-        waitTimer = setInterval(() => { restante--; waitTimerDisplay.textContent = restante; if (restante <= 3) waitTimerDisplay.style.color = '#E67E22'; if (restante <= 0) { clearInterval(waitTimer); waitTimer = null; waitOverlay.classList.remove('show'); if (callback) callback(); } }, 1000);
-    }
-
-    function puedeVerAnuncios() { return true; }
-    function tiempoRestanteCooldown() { return 'Disponible ahora'; }
-
-    async function completarAnuncioCiclo() {
-        const hoy = new Date().toLocaleDateString(), ahora = Date.now();
-        let anunciosHoy = USER_DATA.anunciosHoy || 0; if (USER_DATA.anunciosFecha !== hoy) anunciosHoy = 0;
-        anunciosHoy += ANUNCIOS_POR_CICLO;
-        const ganancia = PRECIO_ANUNCIO * ANUNCIOS_POR_CICLO, nuevoBalance = (USER_DATA.balance || 0) + ganancia;
-        try { await db.collection('usuarios').doc(USER_ID).update({ balance: nuevoBalance, anunciosHoy: anunciosHoy, anunciosFecha: hoy, ultimoAnuncioTimestamp: ahora }); } catch(e) {}
-        USER_DATA.balance = nuevoBalance; USER_DATA.anunciosHoy = anunciosHoy; USER_DATA.anunciosFecha = hoy; USER_DATA.ultimoAnuncioTimestamp = ahora;
-        if (USER_DATA.referidoPor) { try { await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(ganancia * COMISION) }); } catch(e) {} }
-        anuncioActivo = false; toast('✅ +$' + ganancia.toFixed(5) + ' USDT', 'success'); actualizarUI();
-    }
-
-    window.iniciarAnuncio = function() {
-        if (anuncioActivo) return;
-        mostrarCaptcha(() => { anuncioActivo = true; actualizarUI(); mostrarWaitAnuncio(10, () => { completarAnuncioCiclo(); }); });
-    };
-
     async function entrarApp() {
-        if (!telegramId) { loadingScreen.innerHTML = '<div style="font-size:48px;">⚠️</div><div style="font-weight:700;font-size:16px;">Abre desde Telegram</div><div style="font-size:12px;">@USDTSTARTKBot</div>'; return; }
+        if (!telegramId) { loadingScreen.innerHTML = '<div style="font-size:48px;">⚠️</div><div style="font-weight:700;font-size:16px;">Abre desde Telegram</div>'; return; }
         USER_ID = telegramId;
         try {
             const doc = await db.collection('usuarios').doc(USER_ID).get();
             if (!doc.exists) {
-                const data = { telegramId, telegramUsername, telegramFirstName, balance:0, referidoPor:refCode||null, referidos:[], comision:0, anunciosHoy:0, anunciosFecha:'', ultimoAnuncioTimestamp:0, historial:[], pendientes:[], creado:Date.now() };
+                const data = { telegramId, telegramUsername, telegramFirstName, balance:0, referidoPor:refCode||null, referidos:[], comision:0, historial:[], pendientes:[], creado:Date.now() };
                 await db.collection('usuarios').doc(USER_ID).set(data); USER_DATA = data;
-                if (refCode && refCode !== USER_ID) { try { const rd = await db.collection('usuarios').doc(refCode).get(); if (rd.exists) await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) }); } catch(e) {} }
+                if (refCode && refCode !== USER_ID) { try { await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) }); } catch(e) {} }
             } else {
                 USER_DATA = doc.data();
-                if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) { try { const rd = await db.collection('usuarios').doc(refCode).get(); if (rd.exists) { await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode }); await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) }); USER_DATA.referidoPor = refCode; } } catch(e) {} }
             }
-        } catch(e) { USER_DATA = { telegramId, telegramUsername, telegramFirstName, balance:0, referidoPor:refCode||null, referidos:[], comision:0, anunciosHoy:0, anunciosFecha:'', ultimoAnuncioTimestamp:0, historial:[], pendientes:[], creado:Date.now() }; }
+        } catch(e) { USER_DATA = { balance: 0, historial: [], referidos: [] }; }
         loadingScreen.classList.remove('active'); navigate('homeScreen'); navbar.classList.remove('oculto');
-        document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active'));
-        document.querySelector('[data-screen="homeScreen"]').classList.add('active');
         document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
         await cargarConfig(); actualizarUI();
-        if (!ES_TELEGRAM) toast('🔧 Modo prueba - Sin cooldown', 'success');
     }
 
-    document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => { btn.addEventListener('click', function() { navigate(this.dataset.screen); document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active')); this.classList.add('active'); actualizarUI(); }); });
+    document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => { 
+        btn.addEventListener('click', function() { 
+            if(this.dataset.screen === 'gameScreen') { irAlJuego(); return; }
+            navigate(this.dataset.screen); 
+            document.querySelectorAll('.nav-btn[data-screen]').forEach(b => b.classList.remove('active')); 
+            this.classList.add('active'); 
+            actualizarUI(); 
+        }); 
+    });
 
     async function actualizarUI() {
         if (!USER_ID || !USER_DATA) return;
@@ -361,19 +294,7 @@
         document.getElementById('balanceWithdraw').textContent = '$' + (USER_DATA.balance||0).toFixed(5);
         document.getElementById('invitadosCount').textContent = (USER_DATA.referidos||[]).length;
         document.getElementById('comisionAcumulada').textContent = '$' + (USER_DATA.comision||0).toFixed(5);
-        document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
-        document.getElementById('precioAnuncioHome').textContent = '$' + PRECIO_ANUNCIO.toFixed(5);
-        const mb = document.getElementById('mensajeGlobalBox');
-        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = '📢 ' + MENSAJE_GLOBAL; mb.classList.remove('oculto'); } else if (mb) mb.classList.add('oculto');
-        renderAnuncios(); renderReferidos(); renderHistorial();
-    }
-
-    function renderAnuncios() {
-        const l = document.getElementById('anunciosList'); if (!l) return;
-        let html = '';
-        for (let i = 0; i < ANUNCIOS_POR_CICLO; i++) { html += `<div class="anuncio-card"><div class="num">${i+1}</div><div style="flex:1;font-size:13px;font-weight:600;">Anuncio #${i+1} (+$${PRECIO_ANUNCIO.toFixed(5)})</div></div>`; }
-        html += `<button class="btn btn-green" onclick="iniciarAnuncio()" ${anuncioActivo?'disabled':''}>🎬 VER ${ANUNCIOS_POR_CICLO} ANUNCIOS (+$${(PRECIO_ANUNCIO*ANUNCIOS_POR_CICLO).toFixed(5)})</button>`;
-        l.innerHTML = html;
+        renderReferidos(); renderHistorial();
     }
 
     document.getElementById('btnCopiarLink').addEventListener('click', () => { const lk = DOMINIO + '?startapp=' + USER_ID; navigator.clipboard.writeText(lk).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + lk, 'success')); });
@@ -381,35 +302,251 @@
 
     document.getElementById('btnReclamarComision').addEventListener('click', async () => {
         if (!USER_ID) return;
-        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const c = doc.exists ? (doc.data().comision||0) : (USER_DATA.comision||0); if (c < 0.00001) return toast('⚠️ Sin comisiones', 'error'); const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; if (doc.exists) await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); USER_DATA.balance = nb; USER_DATA.comision = 0; toast('💰 +$' + c.toFixed(5), 'success'); actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
+        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const c = doc.exists ? (doc.data().comision||0) : (USER_DATA.comision||0); if (c < 0.00001) return toast('⚠️ Sin comisiones', 'error'); const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); USER_DATA.balance = nb; USER_DATA.comision = 0; toast('💰 +$' + c.toFixed(5), 'success'); actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
     });
 
     document.getElementById('btnRetirar').addEventListener('click', async () => {
         const w = document.getElementById('walletInput').value.trim(); if (!w || !w.startsWith('0x')) return toast('⚠️ Dirección Polygon inválida', 'error');
         if (!USER_ID) return;
-        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); if (bal < 0.009) return toast('⚠️ Mínimo $0.01', 'error');
+        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); 
+        if (bal < MIN_RETIRO) return toast('⚠️ Mínimo $' + MIN_RETIRO, 'error');
         const hoy = new Date().toLocaleDateString(), pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
-        if (doc.exists) await db.collection('usuarios').doc(USER_ID).update({ balance:0, historial: firebase.firestore.FieldValue.arrayUnion({ fecha:hoy, monto:bal, wallet:w, estado:'pendiente' }), pendientes: firebase.firestore.FieldValue.arrayUnion(pg) });
+        await db.collection('usuarios').doc(USER_ID).update({ balance:0, historial: firebase.firestore.FieldValue.arrayUnion({ fecha:hoy, monto:bal, wallet:w, estado:'pendiente' }), pendientes: firebase.firestore.FieldValue.arrayUnion(pg) });
         USER_DATA.balance = 0; USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha:hoy, monto:bal, wallet:w, estado:'pendiente' }];
-        document.getElementById('estadoRetiro').textContent = '✅ Retiro de $' + bal.toFixed(5) + ' solicitado'; toast('✅ Retiro solicitado', 'success'); document.getElementById('walletInput').value = ''; actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
+        document.getElementById('estadoRetiro').textContent = '✅ Retiro solicitado'; toast('✅ Retiro solicitado', 'success'); document.getElementById('walletInput').value = ''; actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
     });
 
     function renderHistorial() { const l = document.getElementById('historialList'); if (!l) return; const h = USER_DATA.historial||[]; l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>$${x.monto.toFixed(2)}</span><span class="badge-sm ${x.estado==='exitoso'?'badge-green':'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; }
 
+    // Panel Admin simple
     const adminIconTrigger = document.getElementById('adminIconTrigger');
-    if (adminIconTrigger) { adminIconTrigger.addEventListener('touchstart', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); }); adminIconTrigger.addEventListener('touchend', function() { clearTimeout(adminTouchTimer); }); adminIconTrigger.addEventListener('touchmove', function() { clearTimeout(adminTouchTimer); }); adminIconTrigger.addEventListener('mousedown', function(e) { if (adminAbierto) return; clearTimeout(adminTouchTimer); adminTouchTimer = setTimeout(() => { adminAbierto = true; mostrarAdmin(); }, 5000); }); adminIconTrigger.addEventListener('mouseup', function() { clearTimeout(adminTouchTimer); }); adminIconTrigger.addEventListener('mouseleave', function() { clearTimeout(adminTouchTimer); }); }
-    function mostrarAdmin() { document.getElementById('adminPanel').classList.remove('oculto'); document.getElementById('adminContent').classList.add('oculto'); document.getElementById('adminPass').value = ''; }
-    document.getElementById('btnAdminLogin').addEventListener('click', async () => { const pass = document.getElementById('adminPass').value; try { const doc = await db.collection('config').doc('admin').get(); if (!doc.exists || doc.data().clave !== pass) return toast('❌ Clave incorrecta', 'error'); document.getElementById('adminContent').classList.remove('oculto'); document.getElementById('adminPrecioAnuncio').value = PRECIO_ANUNCIO; document.getElementById('adminMensajeGlobal').value = MENSAJE_GLOBAL; await cargarPendientes(); } catch (e) { toast('❌ Error', 'error'); } });
-    document.getElementById('btnCerrarAdmin').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('oculto'); document.getElementById('adminContent').classList.add('oculto'); adminAbierto = false; });
-    document.getElementById('btnAddSaldo').addEventListener('click', async () => { const user = document.getElementById('adminAddUser').value.trim(), monto = parseFloat(document.getElementById('adminAddMonto').value); if (!user || !monto || monto <= 0) return toast('⚠️ Datos inválidos', 'error'); try { const doc = await db.collection('usuarios').doc(user).get(); if (!doc.exists) return toast('❌ No existe', 'error'); await db.collection('usuarios').doc(user).update({ balance: firebase.firestore.FieldValue.increment(monto) }); toast('✅ +$' + monto.toFixed(5), 'success'); } catch(e) {} document.getElementById('adminAddUser').value = ''; document.getElementById('adminAddMonto').value = ''; });
-    document.getElementById('btnResetAnuncios').addEventListener('click', async () => { if (!confirm('¿Restablecer?')) return; try { const snap = await db.collection('usuarios').get(); let count = 0; const batch = db.batch(); snap.forEach(doc => { batch.update(doc.ref, { anunciosHoy:0, anunciosFecha:'', ultimoAnuncioTimestamp:0 }); count++; }); await batch.commit(); toast('✅ ' + count + ' usuarios', 'success'); } catch (e) {} });
-    async function cargarPendientes() { try { const snap = await db.collection('usuarios').get(); let all = []; snap.forEach(doc => { (doc.data().pendientes||[]).forEach(p => { if (p.estado==='pendiente') all.push({...p, userId:doc.id}); }); }); document.getElementById('totalPendientes').textContent = all.length; document.getElementById('pendientesList').innerHTML = all.length ? all.map(p => `<div class="admin-item"><div><strong>$${p.monto.toFixed(5)}</strong> | ${p.usuario}<div class="cmd-box">/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}</div></div><div><button class="btn-xs btn-copy" onclick="copiarCmd('/withdraw ${p.monto.toFixed(5)} usdt ${p.wallet}')">📋</button><button class="btn-xs btn-done" onclick="pagarAdm('${p.userId}',${p.id})">✅</button></div></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin pendientes</div>'; } catch(e) {} }
-    window.copiarCmd = function(c) { navigator.clipboard.writeText(c).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + c, 'success')); };
-    window.pagarAdm = async function(uid, pid) { try { const d = (await db.collection('usuarios').doc(uid).get()).data(); let pe = d.pendientes||[], hi = d.historial||[]; const p = pe.find(x => x.id===pid); if (p) p.estado='exitoso'; hi.forEach(h => { if (h.estado==='pendiente' && h.wallet===p.wallet) h.estado='exitoso'; }); await db.collection('usuarios').doc(uid).update({ pendientes:pe, historial:hi }); toast('✅ Pagado', 'success'); cargarPendientes(); } catch(e) {} };
-    document.getElementById('btnGuardarPrecio').addEventListener('click', async () => { const n = parseFloat(document.getElementById('adminPrecioAnuncio').value); if (!n || n <= 0) return toast('⚠️ Precio inválido', 'error'); try { await db.collection('config').doc('global').set({ precioAnuncio:n, mensajeGlobal:MENSAJE_GLOBAL }, { merge:true }); PRECIO_ANUNCIO = n; document.getElementById('precioAnuncioHome').textContent = '$' + n.toFixed(5); toast('✅ Precio actualizado', 'success'); actualizarUI(); } catch (e) {} });
-    document.getElementById('btnGuardarMensaje').addEventListener('click', async () => { const m = document.getElementById('adminMensajeGlobal').value.trim(); try { await db.collection('config').doc('global').set({ precioAnuncio:PRECIO_ANUNCIO, mensajeGlobal:m }, { merge:true }); MENSAJE_GLOBAL = m; const mb = document.getElementById('mensajeGlobalBox'); if (m) { mb.innerHTML = '📢 ' + m; mb.classList.remove('oculto'); } else mb.classList.add('oculto'); toast('✅ Mensaje publicado', 'success'); actualizarUI(); } catch (e) {} });
+    if (adminIconTrigger) {
+        adminIconTrigger.addEventListener('click', () => {
+            document.getElementById('adminPanel').classList.remove('oculto');
+            document.getElementById('adminContent').classList.add('oculto');
+        });
+    }
+    document.getElementById('btnAdminLogin').addEventListener('click', async () => { 
+        const pass = document.getElementById('adminPass').value; 
+        try { 
+            const doc = await db.collection('config').doc('admin').get(); 
+            if (!doc.exists || doc.data().clave !== pass) return toast('❌ Clave incorrecta', 'error'); 
+            document.getElementById('adminContent').classList.remove('oculto'); 
+        } catch (e) { toast('❌ Error', 'error'); } 
+    });
+    document.getElementById('btnCerrarAdmin').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('oculto'); });
 
-    (async function() { await cargarConfig(); await entrarApp(); })();
+    // ==========================================
+    // LÓGICA DEL JUEGO BASKETBALL INTEGRADO
+    // ==========================================
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = 0, height = 0, floorY = 0;
+
+    function resizeCanvas() {
+        const screenDiv = document.getElementById('gameScreen');
+        width = screenDiv.clientWidth || window.innerWidth;
+        height = screenDiv.clientHeight || (window.innerHeight - 70);
+        canvas.width = width;
+        canvas.height = height;
+        floorY = height * 0.82;
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    const gameStateGame = {
+        gameStarted: false, score: 0, lives: 3, comboStreak: 0,
+        isDragging: false, dragStart: {x:0, y:0}, dragCurrent: {x:0, y:0},
+        ballState: 'IDLE', gravity: 0.45
+    };
+
+    const mascot = { x: 50, y: 0 };
+    const ball = { x: 0, y: 0, vx: 0, vy: 0, radius: 16 };
+    const hoop = { x: 0, y: 0, width: 75, rimRadius: 6, moveSpeed: 1.5, moveDirection: 1, minY: 0, maxY: 0, isMoving: false };
+
+    function resetPositions() {
+        mascot.x = Math.max(40, width * 0.12);
+        mascot.y = height * 0.74;
+        ball.x = mascot.x + 25;
+        ball.y = mascot.y - 25;
+        ball.vx = 0; ball.vy = 0;
+        gameStateGame.ballState = 'IDLE';
+    }
+
+    function initHoop() {
+        hoop.x = Math.min(width - 40, width * 0.88);
+        hoop.y = height * 0.35;
+        hoop.minY = height * 0.2;
+        hoop.maxY = height * 0.55;
+        hoop.isMoving = gameStateGame.score >= 5;
+    }
+
+    function getEventPos(e) {
+        if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function handleStart(e) {
+        if (!gameStateGame.gameStarted || gameStateGame.ballState !== 'IDLE' || gameStateGame.lives <= 0) return;
+        const pos = getEventPos(e);
+        if (pos.x < width * 0.6) {
+            gameStateGame.isDragging = true;
+            gameStateGame.dragStart = pos;
+            gameStateGame.dragCurrent = pos;
+        }
+    }
+
+    function handleMove(e) {
+        if (!gameStateGame.isDragging) return;
+        gameStateGame.dragCurrent = getEventPos(e);
+    }
+
+    function handleEnd() {
+        if (!gameStateGame.isDragging) return;
+        gameStateGame.isDragging = false;
+        const dx = gameStateGame.dragStart.x - gameStateGame.dragCurrent.x;
+        const dy = gameStateGame.dragStart.y - gameStateGame.dragCurrent.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > 20) {
+            const power = Math.min(dist, 200) * 0.18;
+            const angle = Math.atan2(dy, dx);
+            ball.vx = Math.cos(angle) * power;
+            ball.vy = Math.sin(angle) * power;
+            gameStateGame.ballState = 'FLYING';
+        }
+    }
+
+    canvas.addEventListener('mousedown', handleStart);
+    canvas.addEventListener('mousemove', handleMove);
+    canvas.addEventListener('mouseup', handleEnd);
+    canvas.addEventListener('touchstart', handleStart, { passive: false });
+    canvas.addEventListener('touchmove', handleMove, { passive: false });
+    canvas.addEventListener('touchend', handleEnd);
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+        document.getElementById('startMenu').classList.add('oculto');
+        gameStateGame.gameStarted = true;
+        gameStateGame.score = 0;
+        gameStateGame.lives = 3;
+        resizeCanvas();
+        resetPositions();
+        initHoop();
+        updateGameHUD();
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+        document.getElementById('adModal').classList.add('oculto');
+        gameStateGame.score = 0;
+        gameStateGame.lives = 3;
+        resetPositions();
+        initHoop();
+        updateGameHUD();
+        gameStateGame.gameStarted = true;
+    });
+
+    function updateGameHUD() {
+        document.getElementById('scoreText').innerText = gameStateGame.score;
+        let hearts = '';
+        for (let i = 0; i < 3; i++) hearts += i < gameStateGame.lives ? '❤️' : '🖤';
+        document.getElementById('livesContainer').innerHTML = hearts;
+    }
+
+    async function sumarPuntoAlBalance(puntos) {
+        if (!USER_ID) return;
+        // Cada punto equivale a una pequeña fracción (ej: 0.0001 USDT o según prefieras)
+        const ganancia = puntos * 0.001; 
+        try {
+            await db.collection('usuarios').doc(USER_ID).update({
+                balance: firebase.firestore.FieldValue.increment(ganancia)
+            });
+            USER_DATA.balance = (USER_DATA.balance || 0) + ganancia;
+            document.getElementById('balanceHome').textContent = '$' + USER_DATA.balance.toFixed(5);
+        } catch(e) {}
+    }
+
+    function gameLoop() {
+        ctx.clearRect(0, 0, width, height);
+
+        if (gameStateGame.gameStarted) {
+            // Movimiento de la canasta
+            if (hoop.isMoving) {
+                hoop.y += hoop.moveSpeed * hoop.moveDirection;
+                if (hoop.y > hoop.maxY) { hoop.y = hoop.maxY; hoop.moveDirection = -1; }
+                else if (hoop.y < hoop.minY) { hoop.y = hoop.minY; hoop.moveDirection = 1; }
+            }
+
+            // Física del balón
+            if (gameStateGame.ballState === 'FLYING') {
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+                ball.vy += gameStateGame.gravity;
+
+                // Colisión con la canasta (aro)
+                const hoopLeft = hoop.x - hoop.width / 2;
+                const hoopRight = hoop.x + hoop.width / 2;
+                
+                if (ball.y >= hoop.y && ball.y <= hoop.y + 10 && ball.x >= hoopLeft && ball.x <= hoopRight && ball.vy > 0) {
+                    gameStateGame.score += 1;
+                    sumarPuntoAlBalance(1);
+                    updateGameHUD();
+                    gameStateGame.ballState = 'SCORED';
+                    setTimeout(resetPositions, 600);
+                }
+
+                // Fuera de pantalla
+                if (ball.y > height || ball.x > width || ball.x < 0) {
+                    gameStateGame.lives -= 1;
+                    updateGameHUD();
+                    if (gameStateGame.lives <= 0) {
+                        gameStateGame.gameStarted = false;
+                        document.getElementById('finalScoreText').innerText = gameStateGame.score;
+                        document.getElementById('adModal').classList.remove('oculto');
+                    } else {
+                        resetPositions();
+                    }
+                }
+            }
+
+            // Dibujar Canasta
+            ctx.fillStyle = '#f97316';
+            ctx.fillRect(hoop.x - hoop.width / 2, hoop.y, hoop.width, 6);
+            // Tablero
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(hoop.x + hoop.width / 2, hoop.y - 45, 8, 55);
+
+            // Dibujar Personaje
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.arc(mascot.x, mascot.y, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dibujar Balón
+            ctx.fillStyle = '#f97316';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Línea de tiro (Aiming line)
+            if (gameStateGame.isDragging) {
+                ctx.strokeStyle = '#fbbf24';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(ball.x, ball.y);
+                ctx.lineTo(ball.x + (gameStateGame.dragStart.x - gameStateGame.dragCurrent.x), ball.y + (gameStateGame.dragStart.y - gameStateGame.dragCurrent.y));
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+        requestAnimationFrame(gameLoop);
+    }
+
+    (async function() { 
+        await cargarConfig(); 
+        await entrarApp(); 
+        resizeCanvas();
+        requestAnimationFrame(gameLoop);
+    })();
 </script>
 </body>
-    </html>
+</html>
