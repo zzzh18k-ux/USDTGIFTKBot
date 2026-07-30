@@ -10,6 +10,8 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <!-- Script Oficial de Monetización de Anuncios -->
+    <script src="//libtl.com/sdk.js" data-zone="11463298" data-sdk="show_11463298"></script>
 
     <style>
         :root {
@@ -36,7 +38,7 @@
         .btn-purple { background:var(--purple); }
         .btn-sm { padding:8px 16px; border-radius:14px; border:2px solid var(--border); font-weight:700; cursor:pointer; font-size:12px; box-shadow:0 3px 0 var(--border); background:var(--pink); }
         input, textarea { width:100%; padding:14px 18px; border-radius:18px; border:3px solid var(--border); background:var(--card); font-size:13px; font-weight:600; outline:none; margin:6px 0; }
-        .fila { display:flex; justify-space-between; padding:8px 0; border-bottom:2px dashed #E5DCD5; font-size:13px; font-weight:600; }
+        .fila { display:flex; justify-content:space-between; padding:8px 0; border-bottom:2px dashed #E5DCD5; font-size:13px; font-weight:600; }
         .fila:last-child { border:none; }
         .hist-item { display:flex; justify-content:space-between; padding:10px; border-bottom:2px dashed #E5DCD5; font-size:12px; flex-wrap:wrap; gap:4px; }
         .badge-sm { padding:2px 10px; border-radius:10px; border:2px solid var(--border); font-size:10px; font-weight:700; }
@@ -46,7 +48,7 @@
         .scroll { max-height:200px; overflow-y:auto; }
         .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--text); color:#FFF; padding:12px 24px; border-radius:20px; font-size:13px; z-index:999; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; font-weight:600; }
         .toast.show { opacity:1; }
-        .navbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:450px; width:100%; background:var(--card); border-top:4px solid var(--border); display:flex; justify-around:space-around; padding:10px 0; z-index:100; }
+        .navbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:450px; width:100%; background:var(--card); border-top:4px solid var(--border); display:flex; justify-content:space-around; padding:10px 0; z-index:100; }
         .nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:8px 16px; border-radius:14px; transition:all 0.15s; background:transparent; border:none; font-weight:700; font-size:11px; }
         .nav-btn i { font-size:20px; }
         .nav-btn.active { background:var(--pink); }
@@ -73,9 +75,10 @@
         .loading-screen .spinner { font-size:60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
 
-        /* Estilos específicos del juego integrado */
         #gameScreen { padding: 0; position: relative; height: calc(100vh - 70px); overflow: hidden; background-color: #0f172a; }
         #gameCanvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        
+        .music-toggle-btn { position: absolute; top: 16px; right: 16px; z-index: 25; background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); color: white; padding: 8px 12px; border-radius: 14px; font-size: 14px; cursor: pointer; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 6px; }
     </style>
 </head>
 <body>
@@ -100,13 +103,18 @@
         <div class="card card-center">
             <div style="font-size:40px; margin-bottom: 8px;">🏀</div>
             <div style="font-weight:700;font-size:16px;margin-bottom:4px;">SLING BASKET HERO PRO</div>
-            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">¡Apunta, encesta y gana USDT directo a tu balance por cada canasta!</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">¡Apunta, encesta y acumula puntos convertibles a USDT!</div>
             <button class="btn btn-green" onclick="irAlJuego()">🎮 JUGAR AHORA</button>
         </div>
     </div>
 
     <!-- Pantalla del Juego de Basket -->
     <div id="gameScreen" class="screen">
+        <!-- Botón de Control de Música -->
+        <button id="musicBtn" class="music-toggle-btn" onclick="toggleMusic()">
+            <span id="musicIcon">🎵</span> <span id="musicText">Música: ON</span>
+        </button>
+
         <canvas id="gameCanvas"></canvas>
 
         <!-- Overlay HUD -->
@@ -147,28 +155,29 @@
             </div>
         </div>
 
-        <!-- Modal Game Over / Revivir -->
+        <!-- Modal Game Over / Reclamar Saldo / Revivir -->
         <div id="adModal" class="oculto absolute inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 z-20">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
                 <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💔</div>
-                <h2 class="text-2xl font-black text-white mb-2">¡Se acabaron las vidas!</h2>
-                <p class="text-slate-400 text-sm mb-6">Puntuación lograda: <span id="finalScoreText" class="text-amber-400 font-bold text-base">0</span></p>
+                <h2 class="text-2xl font-black text-white mb-2">¡Partida Finalizada!</h2>
+                <p class="text-slate-400 text-sm mb-2">Puntuación: <span id="finalScoreText" class="text-amber-400 font-bold text-base">0</span></p>
+                <p class="text-slate-300 text-sm mb-6">Ganancia acumulada: <span id="pendingUsdtText" class="text-green-400 font-bold text-base">$0.00000 USDT</span></p>
 
-                <button id="watchAdBtn" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black py-3.5 px-6 rounded-2xl shadow-lg shadow-orange-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 text-base mb-3">
-                    <span>🎬</span> Ver Anuncio para Revivir
+                <button id="claimRewardBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-slate-950 font-black py-3.5 px-6 rounded-2xl shadow-lg shadow-green-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 text-base mb-3">
+                    <span>🎬</span> Ver Anuncio y Reclamar Saldo
                 </button>
                 <button id="restartBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-6 rounded-2xl transition text-sm">
-                    Reiniciar desde 0
+                    Reintentar (Perder Saldo)
                 </button>
             </div>
         </div>
 
-        <!-- Simulación de Anuncio -->
+        <!-- Simulación / Buffer de Anuncio -->
         <div id="videoAdOverlay" class="oculto absolute inset-0 bg-black flex flex-col items-center justify-center z-30">
             <div class="text-center text-white px-6">
                 <div class="animate-spin text-5xl mb-4">📺</div>
-                <h3 class="text-xl font-bold mb-2">Simulando Anuncio publicitario...</h3>
-                <p class="text-slate-400 text-sm mb-6">Obtendrás 3 vidas al finalizar la cuenta regresiva.</p>
+                <h3 class="text-xl font-bold mb-2">Cargando Anuncio...</h3>
+                <p class="text-slate-400 text-sm mb-6">Tu saldo se acreditará al finalizar la publicidad.</p>
                 <div class="w-48 bg-slate-800 h-3 rounded-full overflow-hidden mx-auto mb-4">
                     <div id="adProgressBar" class="bg-amber-400 h-full w-0 transition-all duration-1000"></div>
                 </div>
@@ -248,8 +257,10 @@
     const MIN_RETIRO = 0.1;
     const COMISION = 0.05;
     const DOMINIO = 'https://t.me/USDTSTARTKBot';
+    const VALOR_PUNTO_USDT = 0.000005;
 
     let USER_ID = null, USER_DATA = null, MENSAJE_GLOBAL = '';
+    let gananciaPendienteSesion = 0;
 
     const navbar = document.getElementById('navbar');
     const loadingScreen = document.getElementById('loadingScreen');
@@ -279,6 +290,7 @@
         const btn = document.querySelector('.nav-btn[data-screen="gameScreen"]');
         if(btn) btn.classList.add('active');
         resizeCanvas();
+        startAmbientMusic();
     }
 
     async function cargarConfig() {
@@ -368,7 +380,7 @@
     document.getElementById('btnCerrarAdmin').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('oculto'); });
 
     // ===================================================
-    // LÓGICA DE CANCHA Y JUEGO PROFESIONAL
+    // LÓGICA DE MÚSICA AMBIENTAL Y EFECTOS DE SONIDO
     // ===================================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -385,8 +397,57 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // Sistema de Sonidos Sintetizados
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let isMusicPlaying = false;
+    let musicInterval = null;
+
+    function toggleMusic() {
+        if (isMusicPlaying) {
+            stopAmbientMusic();
+        } else {
+            startAmbientMusic();
+        }
+    }
+
+    function startAmbientMusic() {
+        if (isMusicPlaying) return;
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        isMusicPlaying = true;
+        document.getElementById('musicIcon').innerText = '🎵';
+        document.getElementById('musicText').innerText = 'Música: ON';
+
+        // Generador sintetizado de música relajante ambiental suave (432Hz Ambient Chill)
+        const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; // Escala pentatónica suave C
+        let noteIndex = 0;
+
+        musicInterval = setInterval(() => {
+            if (!isMusicPlaying) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            const freq = scale[Math.floor(Math.random() * scale.length)];
+            osc.frequency.setValueAtTime(freq / 2, now); // Octava baja suave
+
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.03, now + 1.2); // Volumen muy bajo y relajante
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(now);
+            osc.stop(now + 4.0);
+        }, 2200);
+    }
+
+    function stopAmbientMusic() {
+        isMusicPlaying = false;
+        if (musicInterval) clearInterval(musicInterval);
+        document.getElementById('musicIcon').innerText = '🔇';
+        document.getElementById('musicText').innerText = 'Música: OFF';
+    }
 
     function playSound(type) {
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
@@ -550,16 +611,19 @@
     const videoAdOverlay = document.getElementById('videoAdOverlay');
     const adProgressBar = document.getElementById('adProgressBar');
     const adTimerText = document.getElementById('adTimerText');
-    const watchAdBtn = document.getElementById('watchAdBtn');
+    const claimRewardBtn = document.getElementById('claimRewardBtn');
     const restartBtn = document.getElementById('restartBtn');
     const finalScoreText = document.getElementById('finalScoreText');
+    const pendingUsdtText = document.getElementById('pendingUsdtText');
 
     startBtn.addEventListener('click', () => {
         startMenu.classList.add('oculto');
         hud.classList.remove('oculto');
         gameState.gameStarted = true;
+        gananciaPendienteSesion = 0;
         resetPositions();
         initHoop();
+        startAmbientMusic();
     });
 
     function updateHUD() {
@@ -580,39 +644,88 @@
     }
 
     function showGameOverModal() {
+        gananciaPendienteSesion = gameState.score * VALOR_PUNTO_USDT;
         finalScoreText.innerText = gameState.score;
+        pendingUsdtText.innerText = '$' + gananciaPendienteSesion.toFixed(5) + ' USDT';
         adModal.classList.remove('oculto');
     }
 
-    watchAdBtn.addEventListener('click', () => {
+    // Acreditación de Saldo Integrada con Monetización Real (Rewarded Pop)
+    claimRewardBtn.addEventListener('click', () => {
         adModal.classList.add('oculto');
-        videoAdOverlay.classList.remove('oculto');
+
+        // Ejecutar Anuncio Recompensado Oficial
+        if (typeof show_11463298 === 'function') {
+            show_11463298('pop').then(async () => {
+                // Usuario completó la visualización del anuncio
+                await procesarPagoSesion(gananciaPendienteSesion);
+                reiniciarEstadoJuego();
+            }).catch(() => {
+                // Caída de respaldo por timeout o error en red publicitaria
+                videoAdOverlay.classList.remove('oculto');
+                ejecutarSimulacionPublicidad();
+            });
+        } else {
+            // Respaldo
+            videoAdOverlay.classList.remove('oculto');
+            ejecutarSimulacionPublicidad();
+        }
+    });
+
+    function ejecutarSimulacionPublicidad() {
         let timeLeft = 3;
         adTimerText.innerText = `${timeLeft}s`;
         adProgressBar.style.width = '0%';
         setTimeout(() => { adProgressBar.style.width = '33%'; }, 100);
-        const interval = setInterval(() => {
+        
+        const interval = setInterval(async () => {
             timeLeft--;
             adTimerText.innerText = `${timeLeft}s`;
             adProgressBar.style.width = `${((3 - timeLeft) / 3) * 100}%`;
+            
             if (timeLeft <= 0) {
                 clearInterval(interval);
                 videoAdOverlay.classList.add('oculto');
-                gameState.lives = 3;
-                updateHUD();
-                resetPositions();
+                await procesarPagoSesion(gananciaPendienteSesion);
+                reiniciarEstadoJuego();
             }
         }, 1000);
-    });
+    }
 
-    restartBtn.addEventListener('click', () => {
-        adModal.classList.add('oculto');
+    function reiniciarEstadoJuego() {
         gameState.score = 0;
         gameState.lives = 3;
         gameState.comboStreak = 0;
+        gananciaPendienteSesion = 0;
         updateHUD();
         resetPositions();
         initHoop();
+    }
+
+    async function procesarPagoSesion(monto) {
+        if (!USER_ID || monto <= 0) return;
+        try {
+            await db.collection('usuarios').doc(USER_ID).update({
+                balance: firebase.firestore.FieldValue.increment(monto)
+            });
+            USER_DATA.balance = (USER_DATA.balance || 0) + monto;
+            actualizarUI();
+            toast('💰 +$' + monto.toFixed(5) + ' acreditados', 'success');
+
+            if (USER_DATA.referidoPor) {
+                const comisionAnfitrion = monto * COMISION;
+                await db.collection('usuarios').doc(USER_DATA.referidoPor).update({
+                    comision: firebase.firestore.FieldValue.increment(comisionAnfitrion)
+                });
+            }
+        } catch(e){
+            toast('⚠️ Error al acreditar saldo', 'error');
+        }
+    }
+
+    restartBtn.addEventListener('click', () => {
+        adModal.classList.add('oculto');
+        reiniciarEstadoJuego();
     });
 
     function spawnConfetti(x, y, count) {
@@ -628,26 +741,6 @@
                 alpha: 1, decay: 0.01 + Math.random() * 0.01
             });
         }
-    }
-
-    async function sumarBalance(puntos) {
-        if (!USER_ID) return;
-        const ganancia = puntos * 0.0001;
-        try {
-            await db.collection('usuarios').doc(USER_ID).update({
-                balance: firebase.firestore.FieldValue.increment(ganancia)
-            });
-            USER_DATA.balance = (USER_DATA.balance || 0) + ganancia;
-            document.getElementById('balanceHome').textContent = '$' + USER_DATA.balance.toFixed(5);
-            document.getElementById('balanceWithdraw').textContent = '$' + USER_DATA.balance.toFixed(5);
-
-            if (USER_DATA.referidoPor) {
-                const comisionAnfitrion = ganancia * COMISION;
-                await db.collection('usuarios').doc(USER_DATA.referidoPor).update({
-                    comision: firebase.firestore.FieldValue.increment(comisionAnfitrion)
-                });
-            }
-        } catch(e){}
     }
 
     function update() {
@@ -734,9 +827,7 @@
                     spawnConfetti(hoop.x, hoop.y, 22);
                 }
 
-                sumarBalance(puntosObtenidos);
                 updateHUD();
-
                 setTimeout(() => { resetPositions(); initHoop(); }, 1100);
             }
 
@@ -763,11 +854,7 @@
         }
     }
 
-    // ===================================================
-    // DIBUJADO DE ESTÉTICA PROFESIONAL DE BASKETBOL
-    // ===================================================
     function drawBackground() {
-        // Fondo de Arena / Estadio difuminado
         const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
         bgGrad.addColorStop(0, '#0a0f1d'); 
         bgGrad.addColorStop(0.5, '#1e293b'); 
@@ -775,21 +862,18 @@
         ctx.fillStyle = bgGrad; 
         ctx.fillRect(0, 0, width, height);
 
-        // Focos / Luces del estadio cenitales
         ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
         ctx.beginPath();
         ctx.arc(width * 0.25, 0, width * 0.45, 0, Math.PI * 2);
         ctx.arc(width * 0.75, 0, width * 0.45, 0, Math.PI * 2);
         ctx.fill();
 
-        // Estructura de la pared del gimnasio con textura de paneles
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
         ctx.lineWidth = 1;
         for(let i = 0; i < width; i += 40) {
             ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, floorY); ctx.stroke();
         }
 
-        // --- PISO DE MADERA REAL (DUELA / PARQUET) ---
         const floorGrad = ctx.createLinearGradient(0, floorY, 0, height);
         floorGrad.addColorStop(0, '#c27803'); 
         floorGrad.addColorStop(0.3, '#d97706'); 
@@ -797,15 +881,12 @@
         ctx.fillStyle = floorGrad; 
         ctx.fillRect(0, floorY, width, height - floorY);
 
-        // Líneas de las tablas de madera (paralelas)
         ctx.strokeStyle = 'rgba(80, 30, 0, 0.25)';
         ctx.lineWidth = 2;
         for (let y = floorY + 6; y < height; y += 14) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
         }
 
-        // --- LÍNEAS OFICIALES DE CANCHA DE BÁSQUETBOL ---
-        // Línea de banda / fondo principal blanca brillante
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
         ctx.lineWidth = 4;
         ctx.beginPath();
@@ -813,14 +894,12 @@
         ctx.lineTo(width, floorY + 3);
         ctx.stroke();
 
-        // Línea de tiro libre / Triperi (Arco de la zona pintada)
         ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(width * 0.85, floorY, 110, Math.PI, Math.PI * 2);
         ctx.stroke();
 
-        // Sombra de contacto del piso
         ctx.fillStyle = 'rgba(0,0,0,0.35)';
         ctx.fillRect(0, floorY, width, 4);
     }
@@ -830,16 +909,13 @@
         const backboardX = hoop.x + hoop.width / 2 + 3;
         const backboardY = hoop.y;
 
-        // Soporte metálico superior / brazo del tablero
         ctx.strokeStyle = '#334155'; ctx.lineWidth = 8;
         ctx.beginPath(); ctx.moveTo(backboardX + hoop.backboardWidth, backboardY - 20);
         ctx.lineTo(width, backboardY - 20); ctx.stroke();
 
-        // Soporte de anclaje vertical
         ctx.lineWidth = 6;
         ctx.beginPath(); ctx.moveTo(width - 15, 0); ctx.lineTo(width - 15, backboardY - 20); ctx.stroke();
 
-        // Tablero de vidrio templado profesional con marco protector acolchado negro/rojo
         ctx.fillStyle = 'rgba(241, 245, 249, 0.85)'; 
         ctx.strokeStyle = '#0284c7'; 
         ctx.lineWidth = 4;
@@ -847,11 +923,9 @@
         ctx.roundRect(backboardX, backboardY - hoop.backboardHeight / 2, hoop.backboardWidth, hoop.backboardHeight, 6);
         ctx.fill(); ctx.stroke();
 
-        // Cuadro interior oficial del tablero (ayuda visual de tiro)
         ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3;
         ctx.strokeRect(backboardX, backboardY - 24, 4, 48);
 
-        // Red de nylon profesional con animación de movimiento (Wiggle)
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)'; ctx.lineWidth = 2.2;
         ctx.beginPath();
         const rimLeftX = hoop.x - hoop.width / 2, rimRightX = hoop.x + hoop.width / 2;
@@ -862,7 +936,6 @@
         ctx.lineTo(rimRightX - 10 + wiggle, hoop.y + hoop.netHeight);
         ctx.lineTo(rimRightX, hoop.y);
 
-        // Entramado de la red de básquet
         for (let i = 1; i < 7; i++) {
             const ratio = i / 7;
             const y = hoop.y + hoop.netHeight * ratio;
@@ -875,12 +948,9 @@
     function drawFrontRim() {
         ctx.save();
         const rimLeftX = hoop.x - hoop.width / 2, rimRightX = hoop.x + hoop.width / 2;
-        
-        // Aro metálico naranja tubular con brillo 3D
         ctx.strokeStyle = '#f97316'; ctx.lineWidth = 5.5;
         ctx.beginPath(); ctx.moveTo(rimLeftX, hoop.y); ctx.lineTo(rimRightX, hoop.y); ctx.stroke();
         
-        // Anclajes laterales del aro
         ctx.fillStyle = '#c2410c'; ctx.beginPath();
         ctx.arc(rimLeftX, hoop.y, hoop.rimRadius, 0, Math.PI * 2);
         ctx.arc(rimRightX, hoop.y, hoop.rimRadius, 0, Math.PI * 2);
@@ -897,22 +967,17 @@
 
         ctx.translate(0, bodyYOffset);
 
-        // Sombra en el piso de madera
         ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath();
         ctx.ellipse(0, 28 - bodyYOffset, 20, 6, 0, 0, Math.PI * 2); ctx.fill();
 
-        // Zapatillas deportivas
         ctx.fillStyle = '#0f172a'; ctx.beginPath();
         ctx.ellipse(-10, 25, 7, 4, 0, 0, Math.PI * 2); ctx.ellipse(10, 25, 7, 4, 0, 0, Math.PI * 2); ctx.fill();
 
-        // Cuerpo / Uniforme de básquetbol
         ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.roundRect(-18, -15, 36, 38, 16); ctx.fill();
 
-        // Detalles del jersey
         ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-13, 0, 26, 22, 6); ctx.fill();
         ctx.fillStyle = '#ffffff'; ctx.font = '900 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('7', 0, 15);
 
-        // Cabeza
         ctx.fillStyle = '#ffffff'; ctx.beginPath();
         ctx.arc(-7, -6, 6, 0, Math.PI * 2); ctx.arc(7, -6, 6, 0, Math.PI * 2); ctx.fill();
 
@@ -998,7 +1063,6 @@
         ctx.ellipse(0, shadowDistance, ball.radius * shadowScale, 3 * shadowScale, 0, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
 
-        // Balón de básquet profesional texturizado
         const ballGrad = ctx.createRadialGradient(-ball.radius * 0.3, -ball.radius * 0.3, ball.radius * 0.1, 0, 0, ball.radius);
         ballGrad.addColorStop(0, '#fb923c'); ballGrad.addColorStop(0.8, '#ea580c'); ballGrad.addColorStop(1, '#9a3412');
 
