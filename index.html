@@ -10,7 +10,8 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <!-- Script Oficial de Monetización de Anuncios -->
+    
+    <!-- Script Oficial de Monetización Monetag -->
     <script src="//libtl.com/sdk.js" data-zone="11463298" data-sdk="show_11463298"></script>
 
     <style>
@@ -77,8 +78,6 @@
 
         #gameScreen { padding: 0; position: relative; height: calc(100vh - 70px); overflow: hidden; background-color: #0f172a; }
         #gameCanvas { display: block; width: 100%; height: 100%; touch-action: none; }
-        
-        .music-toggle-btn { position: absolute; top: 16px; right: 16px; z-index: 25; background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(255, 255, 255, 0.2); color: white; padding: 8px 12px; border-radius: 14px; font-size: 14px; cursor: pointer; backdrop-filter: blur(4px); display: flex; align-items: center; gap: 6px; }
     </style>
 </head>
 <body>
@@ -110,11 +109,6 @@
 
     <!-- Pantalla del Juego de Basket -->
     <div id="gameScreen" class="screen">
-        <!-- Botón de Control de Música -->
-        <button id="musicBtn" class="music-toggle-btn" onclick="toggleMusic()">
-            <span id="musicIcon">🎵</span> <span id="musicText">Música: ON</span>
-        </button>
-
         <canvas id="gameCanvas"></canvas>
 
         <!-- Overlay HUD -->
@@ -155,29 +149,29 @@
             </div>
         </div>
 
-        <!-- Modal Game Over / Reclamar Saldo / Revivir -->
+        <!-- Modal Game Over / Reclamar Recompensa -->
         <div id="adModal" class="oculto absolute inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 z-20">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
                 <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💔</div>
-                <h2 class="text-2xl font-black text-white mb-2">¡Partida Finalizada!</h2>
+                <h2 class="text-2xl font-black text-white mb-2">¡Sin Vidas!</h2>
                 <p class="text-slate-400 text-sm mb-2">Puntuación: <span id="finalScoreText" class="text-amber-400 font-bold text-base">0</span></p>
                 <p class="text-slate-300 text-sm mb-6">Ganancia acumulada: <span id="pendingUsdtText" class="text-green-400 font-bold text-base">$0.00000 USDT</span></p>
 
-                <button id="claimRewardBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-slate-950 font-black py-3.5 px-6 rounded-2xl shadow-lg shadow-green-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 text-base mb-3">
-                    <span>🎬</span> Ver Anuncio y Reclamar Saldo
+                <button id="claimRewardBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-slate-950 font-black py-3.5 px-6 rounded-2xl shadow-lg shadow-green-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 text-sm mb-3">
+                    🎬 Ver un anuncio, reclama tu recompensa y recibe 3 vidas para volver a jugar
                 </button>
                 <button id="restartBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-6 rounded-2xl transition text-sm">
-                    Reintentar (Perder Saldo)
+                    Reintentar (Reiniciar Juego)
                 </button>
             </div>
         </div>
 
-        <!-- Simulación / Buffer de Anuncio -->
+        <!-- Buffer de Anuncio -->
         <div id="videoAdOverlay" class="oculto absolute inset-0 bg-black flex flex-col items-center justify-center z-30">
             <div class="text-center text-white px-6">
                 <div class="animate-spin text-5xl mb-4">📺</div>
                 <h3 class="text-xl font-bold mb-2">Cargando Anuncio...</h3>
-                <p class="text-slate-400 text-sm mb-6">Tu saldo se acreditará al finalizar la publicidad.</p>
+                <p class="text-slate-400 text-sm mb-6">Tu saldo se acreditará y tus vidas se restaurarán al finalizar.</p>
                 <div class="w-48 bg-slate-800 h-3 rounded-full overflow-hidden mx-auto mb-4">
                     <div id="adProgressBar" class="bg-amber-400 h-full w-0 transition-all duration-1000"></div>
                 </div>
@@ -273,6 +267,22 @@
     const telegramUsername = tgUser?.username || (ES_TELEGRAM ? null : 'UsuarioPrueba');
     const telegramFirstName = tgUser?.first_name || (ES_TELEGRAM ? null : 'Usuario');
 
+    // Cargar In-App Interstitial de Monetag al iniciar la aplicación
+    if (typeof show_11463298 === 'function') {
+        try {
+            show_11463298({
+                type: 'inApp',
+                inAppSettings: {
+                    frequency: 2,
+                    capping: 0.1,
+                    interval: 30,
+                    timeout: 5,
+                    everyPage: false
+                }
+            });
+        } catch(e){}
+    }
+
     function toast(msg, tipo) {
         const t = document.getElementById('toast'); t.textContent = msg; t.style.color = '#FFF';
         t.style.background = tipo === 'success' ? '#2D6A4F' : tipo === 'error' ? '#C0392B' : '#4E3629';
@@ -290,7 +300,6 @@
         const btn = document.querySelector('.nav-btn[data-screen="gameScreen"]');
         if(btn) btn.classList.add('active');
         resizeCanvas();
-        startAmbientMusic();
     }
 
     async function cargarConfig() {
@@ -380,7 +389,7 @@
     document.getElementById('btnCerrarAdmin').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('oculto'); });
 
     // ===================================================
-    // LÓGICA DE MÚSICA AMBIENTAL Y EFECTOS DE SONIDO
+    // EFECTOS DE SONIDO SUAVES (WEB AUDIO API REDISEÑADA)
     // ===================================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -398,122 +407,76 @@
     window.addEventListener('resize', resizeCanvas);
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let isMusicPlaying = false;
-    let musicInterval = null;
-
-    function toggleMusic() {
-        if (isMusicPlaying) {
-            stopAmbientMusic();
-        } else {
-            startAmbientMusic();
-        }
-    }
-
-    function startAmbientMusic() {
-        if (isMusicPlaying) return;
-        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-        isMusicPlaying = true;
-        document.getElementById('musicIcon').innerText = '🎵';
-        document.getElementById('musicText').innerText = 'Música: ON';
-
-        // Generador sintetizado de música relajante ambiental suave (432Hz Ambient Chill)
-        const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; // Escala pentatónica suave C
-        let noteIndex = 0;
-
-        musicInterval = setInterval(() => {
-            if (!isMusicPlaying) return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-
-            osc.type = 'sine';
-            const freq = scale[Math.floor(Math.random() * scale.length)];
-            osc.frequency.setValueAtTime(freq / 2, now); // Octava baja suave
-
-            gain.gain.setValueAtTime(0.001, now);
-            gain.gain.linearRampToValueAtTime(0.03, now + 1.2); // Volumen muy bajo y relajante
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            osc.start(now);
-            osc.stop(now + 4.0);
-        }, 2200);
-    }
-
-    function stopAmbientMusic() {
-        isMusicPlaying = false;
-        if (musicInterval) clearInterval(musicInterval);
-        document.getElementById('musicIcon').innerText = '🔇';
-        document.getElementById('musicText').innerText = 'Música: OFF';
-    }
 
     function playSound(type) {
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         const now = audioCtx.currentTime;
 
         if (type === 'shoot') {
+            // Sonido de estiramiento/lanzamiento suave
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(140, now);
-            osc.frequency.exponentialRampToValueAtTime(350, now + 0.12);
-            gain.gain.setValueAtTime(0.25, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-            osc.start(now); osc.stop(now + 0.12);
-        } else if (type === 'bounce') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(100, now);
-            osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+            osc.frequency.setValueAtTime(120, now);
+            osc.frequency.exponentialRampToValueAtTime(220, now + 0.1);
             gain.gain.setValueAtTime(0.12, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-            osc.start(now); osc.stop(now + 0.08);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+
+        } else if (type === 'bounce') {
+            // Impacto amortiguado (suave)
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(90, now);
+            osc.frequency.exponentialRampToValueAtTime(35, now + 0.07);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.07);
+            osc.start(now); osc.stop(now + 0.07);
+
         } else if (type === 'swish') {
-            const bufferSize = audioCtx.sampleRate * 0.18;
+            // Enceste fino y agradable
+            const bufferSize = audioCtx.sampleRate * 0.12;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+            for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.1;
             const whiteNoise = audioCtx.createBufferSource();
             whiteNoise.buffer = buffer;
             const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass'; filter.frequency.setValueAtTime(1100, now); filter.Q.setValueAtTime(2.5, now);
+            filter.type = 'bandpass'; 
+            filter.frequency.setValueAtTime(800, now); 
+            filter.Q.setValueAtTime(1.5, now);
             const gain = audioCtx.createGain();
-            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+            gain.gain.setValueAtTime(0.1, now); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
             whiteNoise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
             whiteNoise.start(now);
+
         } else if (type === 'cheer') {
-            const duration = 1.4;
-            const bufferSize = audioCtx.sampleRate * duration;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                const noise = Math.random() * 2 - 1;
-                const clapPattern = Math.pow(Math.sin(i * 0.005), 10) * (Math.random() > 0.6 ? 1.2 : 0.2);
-                data[i] = noise * 0.25 + clapPattern * 0.3;
-            }
-            const noiseSource = audioCtx.createBufferSource();
-            noiseSource.buffer = buffer;
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass'; filter.frequency.setValueAtTime(900, now);
-            filter.frequency.linearRampToValueAtTime(1400, now + 0.4);
-            filter.frequency.linearRampToValueAtTime(700, now + duration);
-            const gain = audioCtx.createGain();
-            gain.gain.setValueAtTime(0.01, now); gain.gain.linearRampToValueAtTime(0.35, now + 0.15); gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
-            noiseSource.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-            noiseSource.start(now);
-        } else if (type === 'fail') {
+            // Tono armónico suave para enceste/puntos
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine'; osc.frequency.setValueAtTime(160, now);
-            osc.frequency.linearRampToValueAtTime(80, now + 0.25);
-            gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-            osc.start(now); osc.stop(now + 0.25);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.exponentialRampToValueAtTime(520, now + 0.2);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+
+        } else if (type === 'fail') {
+            // Tono bajo no molesto al fallar
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(110, now);
+            osc.frequency.linearRampToValueAtTime(60, now + 0.2);
+            gain.gain.setValueAtTime(0.08, now); 
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
         }
     }
 
@@ -623,7 +586,6 @@
         gananciaPendienteSesion = 0;
         resetPositions();
         initHoop();
-        startAmbientMusic();
     });
 
     function updateHUD() {
@@ -650,23 +612,19 @@
         adModal.classList.remove('oculto');
     }
 
-    // Acreditación de Saldo Integrada con Monetización Real (Rewarded Pop)
+    // Acreditación de Saldo e Integración Rewarded Monetag
     claimRewardBtn.addEventListener('click', () => {
         adModal.classList.add('oculto');
 
-        // Ejecutar Anuncio Recompensado Oficial
         if (typeof show_11463298 === 'function') {
             show_11463298('pop').then(async () => {
-                // Usuario completó la visualización del anuncio
                 await procesarPagoSesion(gananciaPendienteSesion);
-                reiniciarEstadoJuego();
+                revivirYContinuar();
             }).catch(() => {
-                // Caída de respaldo por timeout o error en red publicitaria
                 videoAdOverlay.classList.remove('oculto');
                 ejecutarSimulacionPublicidad();
             });
         } else {
-            // Respaldo
             videoAdOverlay.classList.remove('oculto');
             ejecutarSimulacionPublicidad();
         }
@@ -687,12 +645,19 @@
                 clearInterval(interval);
                 videoAdOverlay.classList.add('oculto');
                 await procesarPagoSesion(gananciaPendienteSesion);
-                reiniciarEstadoJuego();
+                revivirYContinuar();
             }
         }, 1000);
     }
 
-    function reiniciarEstadoJuego() {
+    function revivirYContinuar() {
+        gameState.lives = 3;
+        updateHUD();
+        resetPositions();
+        initHoop();
+    }
+
+    function reiniciarJuegoCompleto() {
         gameState.score = 0;
         gameState.lives = 3;
         gameState.comboStreak = 0;
@@ -725,7 +690,7 @@
 
     restartBtn.addEventListener('click', () => {
         adModal.classList.add('oculto');
-        reiniciarEstadoJuego();
+        reiniciarJuegoCompleto();
     });
 
     function spawnConfetti(x, y, count) {
