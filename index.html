@@ -753,8 +753,7 @@
     function iniciarMusicaRelajante() {
         if (musicaAudio) return;
         
-        // URL directa de música relajante sin derechos (Bensound - Relaxing)
-        musicaAudio = new Audio('https://www.bensound.com/bensound-music/bensound-relaxing.mp3');
+        musicaAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/02/07/audio_8b242fcbe1.mp3');
         musicaAudio.loop = true;
         musicaAudio.volume = 0.3;
         musicaAudio.crossOrigin = 'anonymous';
@@ -767,21 +766,7 @@
                 btnMusica.style.background = 'rgba(34,197,94,0.3)'; 
             }
         }).catch(() => {
-            // Respaldo con otra URL
-            musicaAudio = new Audio('https://www.bensound.com/bensound-music/bensound-slowmotion.mp3');
-            musicaAudio.loop = true;
-            musicaAudio.volume = 0.3;
-            musicaAudio.crossOrigin = 'anonymous';
-            musicaAudio.play().then(() => {
-                musicaActiva = true;
-                const btnMusica = document.getElementById('btnMusica');
-                if (btnMusica) { 
-                    btnMusica.textContent = '🎵'; 
-                    btnMusica.style.background = 'rgba(34,197,94,0.3)'; 
-                }
-            }).catch(() => {
-                toast('⚠️ Activa el sonido de tu dispositivo', 'error');
-            });
+            toast('⚠️ Activa el sonido de tu dispositivo', 'error');
         });
     }
 
