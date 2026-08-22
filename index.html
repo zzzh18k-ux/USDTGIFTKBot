@@ -78,6 +78,41 @@
 
         #gameScreen { padding: 0; position: relative; height: calc(100vh - 70px); overflow: hidden; background-color: #0f172a; }
         #gameCanvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        
+        /* Nuevos estilos para el modal de anuncios mejorado */
+        .ad-option-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .ad-option-card:hover {
+            border-color: #22c55e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(34, 197, 94, 0.2);
+        }
+        .ad-option-card.selected {
+            border-color: #22c55e;
+            background: linear-gradient(135deg, #1a2e1a 0%, #0f172a 100%);
+        }
+        .reward-badge {
+            background: #22c55e;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+            margin: 4px;
+        }
+        .vida-icon {
+            font-size: 24px;
+            display: inline-block;
+            margin: 2px;
+        }
     </style>
 </head>
 <body>
@@ -96,13 +131,13 @@
         <div id="mensajeGlobalBox" class="mensaje-global oculto"></div>
         <div class="card card-center">
             <div style="font-size:12px;font-weight:700;color:var(--text2);">⭐ BALANCE</div>
-            <div class="balance-display" id="balanceHome">$0.00000</div>
-            <span class="balance-label">USDT RETIRABLE</span>
+            <div class="balance-display" id="balanceHome">0.00000 GRAM</div>
+            <span class="balance-label">GRAM RETIRABLE</span>
         </div>
         <div class="card card-center">
             <div style="font-size:40px; margin-bottom: 8px;">🏀</div>
             <div style="font-weight:700;font-size:16px;margin-bottom:4px;">SLING BASKET HERO PRO</div>
-            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">¡Apunta, encesta y acumula puntos convertibles a USDT!</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">¡Apunta, encesta y acumula puntos convertibles a GRAM!</div>
             <button class="btn btn-green" onclick="irAlJuego()">🎮 JUGAR AHORA</button>
         </div>
     </div>
@@ -149,20 +184,49 @@
             </div>
         </div>
 
-        <!-- Modal Game Over / Reclamar Recompensa -->
+        <!-- Modal Game Over MEJORADO -->
         <div id="adModal" class="oculto absolute inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 z-20">
             <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
                 <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💔</div>
-                <h2 class="text-2xl font-black text-white mb-2">¡Sin Vidas!</h2>
-                <p class="text-slate-400 text-sm mb-2">Puntuación: <span id="finalScoreText" class="text-amber-400 font-bold text-base">0</span></p>
-                <p class="text-slate-300 text-sm mb-6">Ganancia acumulada: <span id="pendingUsdtText" class="text-green-400 font-bold text-base">$0.00000 USDT</span></p>
+                <h2 class="text-2xl font-black text-white mb-2">¡Te quedaste sin vidas!</h2>
+                <p class="text-slate-400 text-sm mb-4">Tu puntuación: <span id="finalScoreText" class="text-amber-400 font-bold text-base">0</span> puntos</p>
+                
+                <div class="bg-slate-800/50 rounded-2xl p-4 mb-4">
+                    <p class="text-sm text-slate-300 mb-2">💰 Tu recompensa acumulada:</p>
+                    <p class="text-2xl font-black text-green-400" id="pendingUsdtText">0.00000 GRAM</p>
+                </div>
 
-                <button id="claimRewardBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-slate-950 font-black py-3.5 px-6 rounded-2xl shadow-lg shadow-green-500/25 transition transform active:scale-95 flex items-center justify-center gap-2 text-sm mb-3">
-                    🎬 Ver un anuncio, reclama tu recompensa y recibe 3 vidas para volver a jugar
-                </button>
-                <button id="restartBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-6 rounded-2xl transition text-sm">
-                    Reintentar (Reiniciar Juego)
-                </button>
+                <div class="text-left mb-4">
+                    <p class="text-sm font-bold text-white mb-3">🎁 Elige cómo continuar:</p>
+                    
+                    <div class="ad-option-card" onclick="mostrarAnuncio()">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-bold text-white">📺 Ver anuncio</p>
+                                <p class="text-xs text-slate-400">Recupera tus vidas y gana recompensa</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="reward-badge">+3 ❤️</div>
+                                <div class="reward-badge">+0.00045 GRAM</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ad-option-card" onclick="reiniciarJuegoCompleto()">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-bold text-white">🔄 Reiniciar gratis</p>
+                                <p class="text-xs text-slate-400">Empieza de nuevo sin anuncios</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="reward-badge" style="background:#64748b;">+3 ❤️</div>
+                                <div class="reward-badge" style="background:#64748b;">0 GRAM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-500 mb-2">💡 Consejo: Ver anuncios te permite mantener tu puntuación</p>
             </div>
         </div>
 
@@ -170,8 +234,8 @@
         <div id="videoAdOverlay" class="oculto absolute inset-0 bg-black flex flex-col items-center justify-center z-30">
             <div class="text-center text-white px-6">
                 <div class="animate-spin text-5xl mb-4">📺</div>
-                <h3 class="text-xl font-bold mb-2">Cargando Anuncio...</h3>
-                <p class="text-slate-400 text-sm mb-6">Tu saldo se acreditará y tus vidas se restaurarán al finalizar.</p>
+                <h3 class="text-xl font-bold mb-2">Viendo anuncio...</h3>
+                <p class="text-slate-400 text-sm mb-6">¡Gracias por apoyar el juego! Tu recompensa se acreditará al finalizar.</p>
                 <div class="w-48 bg-slate-800 h-3 rounded-full overflow-hidden mx-auto mb-4">
                     <div id="adProgressBar" class="bg-amber-400 h-full w-0 transition-all duration-1000"></div>
                 </div>
@@ -182,25 +246,25 @@
 
     <!-- Pantalla de Invitar -->
     <div id="inviteScreen" class="screen">
-        <div class="card card-center"><div style="font-size:40px;">👥</div><div style="font-weight:700;font-size:18px;">INVITAR AMIGOS</div><div style="font-size:13px;color:var(--text2);">5% de comisión</div>
+        <div class="card card-center"><div style="font-size:40px;">👥</div><div style="font-weight:700;font-size:18px;">INVITAR AMIGOS</div><div style="font-size:13px;color:var(--text2);">5% de comisión en GRAM</div>
             <div class="link-box" id="refLinkBox">Cargando...</div>
             <button class="btn-copiar" id="btnCopiarLink"><i class="fas fa-copy"></i> COPIAR ENLACE</button>
         </div>
         <div class="card">
             <div class="fila"><span>Amigos invitados</span><strong id="invitadosCount">0</strong></div>
-            <div class="fila"><span>Comisión acumulada</span><strong style="color:#B8860B;" id="comisionAcumulada">$0.0000</strong></div>
-            <button class="btn btn-yellow" id="btnReclamarComision">💰 RETIRAR COMISIÓN</button>
+            <div class="fila"><span>Comisión acumulada</span><strong style="color:#B8860B;" id="comisionAcumulada">0.0000 GRAM</strong></div>
+            <button class="btn btn-yellow" id="btnReclamarComision">💰 RECLAMAR COMISIÓN</button>
         </div>
         <div class="card"><div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 AMIGOS INVITADOS</div><div id="referidosList" class="scroll"></div></div>
     </div>
 
     <!-- Pantalla de Retirar -->
     <div id="withdrawScreen" class="screen">
-        <div class="card card-center"><div style="font-size:12px;font-weight:700;color:var(--text2);">BALANCE</div><div class="balance-display" id="balanceWithdraw">$0.00000</div></div>
+        <div class="card card-center"><div style="font-size:12px;font-weight:700;color:var(--text2);">BALANCE</div><div class="balance-display" id="balanceWithdraw">0.00000 GRAM</div></div>
         <div class="card">
-            <div style="font-weight:700;font-size:15px;margin-bottom:8px;"><span class="admin-icon-trigger" id="adminIconTrigger">💳</span> RETIRAR USDT</div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: $0.1 USDT</div>
-            <input type="text" id="walletInput" placeholder="Dirección Polygon (0x...)">
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px;"><span class="admin-icon-trigger" id="adminIconTrigger">💳</span> RETIRAR GRAM</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: 0.1 GRAM</div>
+            <input type="text" id="walletInput" placeholder="Dirección de billetera TON">
             <button class="btn btn-green" id="btnRetirar">📤 SOLICITAR RETIRO</button>
             <div style="font-size:12px;margin-top:6px;min-height:18px;font-weight:600;" id="estadoRetiro"></div>
         </div>
@@ -213,10 +277,10 @@
                 <div class="resumen-box"><div style="font-size:11px;">PENDIENTES</div><div class="total" id="totalPendientes">0</div></div>
                 <div id="pendientesList" class="scroll" style="max-height:200px;"></div>
                 <div class="admin-section" style="background:#F0FFF0;border-color:#27AE60;">
-                    <h4>💵 AGREGAR SALDO A USUARIO</h4>
+                    <h4>💎 AGREGAR GRAM A USUARIO</h4>
                     <input type="text" id="adminAddUser" placeholder="ID de Telegram">
-                    <input type="number" id="adminAddMonto" placeholder="Monto en USDT" step="0.00001">
-                    <button class="btn btn-green" id="btnAddSaldo">💵 AGREGAR SALDO</button>
+                    <input type="number" id="adminAddMonto" placeholder="Monto en GRAM" step="0.00001">
+                    <button class="btn btn-green" id="btnAddSaldo">💎 AGREGAR GRAM</button>
                 </div>
                 <button class="btn" id="btnCerrarAdmin" style="margin-top:10px;">❌ CERRAR</button>
             </div>
@@ -251,10 +315,12 @@
     const MIN_RETIRO = 0.1;
     const COMISION = 0.05;
     const DOMINIO = 'https://t.me/USDTSTARTKBot';
-    const VALOR_PUNTO_USDT = 0.000005;
+    const VALOR_PUNTO_GRAM = 0.000005;
+    const RECOMPENSA_ANUNCIO = 0.00015; // 15% de $0.001 por anuncio
 
     let USER_ID = null, USER_DATA = null, MENSAJE_GLOBAL = '';
     let gananciaPendienteSesion = 0;
+    let anunciosVistos = 0;
 
     const navbar = document.getElementById('navbar');
     const loadingScreen = document.getElementById('loadingScreen');
@@ -267,21 +333,8 @@
     const telegramUsername = tgUser?.username || (ES_TELEGRAM ? null : 'UsuarioPrueba');
     const telegramFirstName = tgUser?.first_name || (ES_TELEGRAM ? null : 'Usuario');
 
-    // Cargar In-App Interstitial de Monetag al iniciar la aplicación
-    if (typeof show_11463298 === 'function') {
-        try {
-            show_11463298({
-                type: 'inApp',
-                inAppSettings: {
-                    frequency: 2,
-                    capping: 0.1,
-                    interval: 30,
-                    timeout: 5,
-                    everyPage: false
-                }
-            });
-        } catch(e){}
-    }
+    // ELIMINADO: Ya no carga anuncios automáticamente al iniciar
+    // Esto arregla el problema de anuncios que se disparan solos
 
     function toast(msg, tipo) {
         const t = document.getElementById('toast'); t.textContent = msg; t.style.color = '#FFF';
@@ -317,16 +370,66 @@
         try {
             const doc = await db.collection('usuarios').doc(USER_ID).get();
             if (!doc.exists) {
-                const data = { telegramId, telegramUsername, telegramFirstName, balance:0, referidoPor:refCode||null, referidos:[], comision:0, historial:[], pendientes:[], creado:Date.now() };
-                await db.collection('usuarios').doc(USER_ID).set(data); USER_DATA = data;
-                if (refCode && refCode !== USER_ID) { try { await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) }); } catch(e) {} }
+                // CORREGIDO: Validar referencia antes de crear usuario
+                let referidoPorValido = null;
+                
+                if (refCode && refCode !== USER_ID) {
+                    const refDoc = await db.collection('usuarios').doc(refCode).get();
+                    if (refDoc.exists) {
+                        referidoPorValido = refCode;
+                        // Actualizar contador de referidos del que invitó
+                        await db.collection('usuarios').doc(refCode).update({
+                            referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID)
+                        });
+                        console.log('✅ Referencia registrada:', refCode);
+                    } else {
+                        console.log('❌ Código de referencia inválido:', refCode);
+                    }
+                }
+                
+                const data = { 
+                    telegramId, 
+                    telegramUsername, 
+                    telegramFirstName, 
+                    balance: 0, 
+                    referidoPor: referidoPorValido, 
+                    referidos: [], 
+                    comision: 0, 
+                    historial: [], 
+                    pendientes: [], 
+                    creado: Date.now() 
+                };
+                await db.collection('usuarios').doc(USER_ID).set(data);
+                USER_DATA = data;
+                toast('🎉 ¡Bienvenido a StarGainCoins!', 'success');
             } else {
                 USER_DATA = doc.data();
+                
+                // Si el usuario ya existe pero no tiene referidoPor
+                if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
+                    const refDoc = await db.collection('usuarios').doc(refCode).get();
+                    if (refDoc.exists) {
+                        await db.collection('usuarios').doc(USER_ID).update({
+                            referidoPor: refCode
+                        });
+                        await db.collection('usuarios').doc(refCode).update({
+                            referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID)
+                        });
+                        USER_DATA.referidoPor = refCode;
+                        toast('🎉 ¡Referencia registrada!', 'success');
+                    }
+                }
             }
-        } catch(e) { USER_DATA = { balance: 0, historial: [], referidos: [] }; }
-        loadingScreen.classList.remove('active'); navigate('homeScreen'); navbar.classList.remove('oculto');
+        } catch(e) { 
+            console.error('Error:', e);
+            USER_DATA = { balance: 0, historial: [], referidos: [] }; 
+        }
+        loadingScreen.classList.remove('active'); 
+        navigate('homeScreen'); 
+        navbar.classList.remove('oculto');
         document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
-        await cargarConfig(); actualizarUI();
+        await cargarConfig(); 
+        actualizarUI();
     }
 
     document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => { 
@@ -342,54 +445,71 @@
     async function actualizarUI() {
         if (!USER_ID || !USER_DATA) return;
         try { const doc = await db.collection('usuarios').doc(USER_ID).get(); if (doc.exists) USER_DATA = doc.data(); } catch(e) {}
-        document.getElementById('balanceHome').textContent = '$' + (USER_DATA.balance||0).toFixed(5);
-        document.getElementById('balanceWithdraw').textContent = '$' + (USER_DATA.balance||0).toFixed(5);
+        document.getElementById('balanceHome').textContent = (USER_DATA.balance||0).toFixed(5) + ' GRAM';
+        document.getElementById('balanceWithdraw').textContent = (USER_DATA.balance||0).toFixed(5) + ' GRAM';
         document.getElementById('invitadosCount').textContent = (USER_DATA.referidos||[]).length;
-        document.getElementById('comisionAcumulada').textContent = '$' + (USER_DATA.comision||0).toFixed(5);
+        document.getElementById('comisionAcumulada').textContent = (USER_DATA.comision||0).toFixed(5) + ' GRAM';
         renderReferidos(); renderHistorial();
     }
 
-    document.getElementById('btnCopiarLink').addEventListener('click', () => { const lk = DOMINIO + '?startapp=' + USER_ID; navigator.clipboard.writeText(lk).then(() => toast('📋 Copiado!', 'success')).catch(() => toast('📋 ' + lk, 'success')); });
-    function renderReferidos() { const l = document.getElementById('referidosList'); if (!l) return; const refs = USER_DATA.referidos||[]; l.innerHTML = refs.length ? refs.map(r => `<div class="referido-item"><strong>👤 ${r}</strong><span style="color:#B8860B;">+5%</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados</div>'; }
+    document.getElementById('btnCopiarLink').addEventListener('click', () => { 
+        const lk = DOMINIO + '?startapp=' + USER_ID; 
+        navigator.clipboard.writeText(lk).then(() => toast('📋 ¡Enlace copiado!', 'success')).catch(() => toast('📋 ' + lk, 'success')); 
+    });
+    
+    function renderReferidos() { 
+        const l = document.getElementById('referidosList'); 
+        if (!l) return; 
+        const refs = USER_DATA.referidos||[]; 
+        l.innerHTML = refs.length ? refs.map(r => `<div class="referido-item"><strong>👤 ${r}</strong><span style="color:#B8860B;">+5% GRAM</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados aún</div>'; 
+    }
 
     document.getElementById('btnReclamarComision').addEventListener('click', async () => {
         if (!USER_ID) return;
-        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const c = doc.exists ? (doc.data().comision||0) : (USER_DATA.comision||0); if (c < 0.00001) return toast('⚠️ Sin comisiones', 'error'); const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); USER_DATA.balance = nb; USER_DATA.comision = 0; toast('💰 +$' + c.toFixed(5), 'success'); actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
+        try { 
+            const doc = await db.collection('usuarios').doc(USER_ID).get(); 
+            const c = doc.exists ? (doc.data().comision||0) : (USER_DATA.comision||0); 
+            if (c < 0.00001) return toast('⚠️ Sin comisiones pendientes', 'error'); 
+            const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; 
+            await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); 
+            USER_DATA.balance = nb; USER_DATA.comision = 0; 
+            toast('💰 +' + c.toFixed(5) + ' GRAM reclamados', 'success'); 
+            actualizarUI(); 
+        } catch(e) { toast('⚠️ Error al reclamar', 'error'); }
     });
 
     document.getElementById('btnRetirar').addEventListener('click', async () => {
-        const w = document.getElementById('walletInput').value.trim(); if (!w || !w.startsWith('0x')) return toast('⚠️ Dirección Polygon inválida', 'error');
+        const w = document.getElementById('walletInput').value.trim(); 
+        if (!w) return toast('⚠️ Ingresa tu dirección de billetera', 'error');
         if (!USER_ID) return;
-        try { const doc = await db.collection('usuarios').doc(USER_ID).get(); const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); 
-        if (bal < MIN_RETIRO) return toast('⚠️ Mínimo $' + MIN_RETIRO, 'error');
-        const hoy = new Date().toLocaleDateString(), pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
-        await db.collection('usuarios').doc(USER_ID).update({ balance:0, historial: firebase.firestore.FieldValue.arrayUnion({ fecha:hoy, monto:bal, wallet:w, estado:'pendiente' }), pendientes: firebase.firestore.FieldValue.arrayUnion(pg) });
-        USER_DATA.balance = 0; USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha:hoy, monto:bal, wallet:w, estado:'pendiente' }];
-        document.getElementById('estadoRetiro').textContent = '✅ Retiro solicitado'; toast('✅ Retiro solicitado', 'success'); document.getElementById('walletInput').value = ''; actualizarUI(); } catch(e) { toast('⚠️ Error', 'error'); }
-    });
-
-    function renderHistorial() { const l = document.getElementById('historialList'); if (!l) return; const h = USER_DATA.historial||[]; l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>$${x.monto.toFixed(2)}</span><span class="badge-sm ${x.estado==='exitoso'?'badge-green':'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; }
-
-    // Panel Admin
-    const adminIconTrigger = document.getElementById('adminIconTrigger');
-    if (adminIconTrigger) {
-        adminIconTrigger.addEventListener('click', () => {
-            document.getElementById('adminPanel').classList.remove('oculto');
-            document.getElementById('adminContent').classList.add('oculto');
-        });
-    }
-    document.getElementById('btnAdminLogin').addEventListener('click', async () => { 
-        const pass = document.getElementById('adminPass').value; 
         try { 
-            const doc = await db.collection('config').doc('admin').get(); 
-            if (!doc.exists || doc.data().clave !== pass) return toast('❌ Clave incorrecta', 'error'); 
-            document.getElementById('adminContent').classList.remove('oculto'); 
-        } catch (e) { toast('❌ Error', 'error'); } 
+            const doc = await db.collection('usuarios').doc(USER_ID).get(); 
+            const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); 
+            if (bal < MIN_RETIRO) return toast('⚠️ Mínimo ' + MIN_RETIRO + ' GRAM', 'error');
+            const hoy = new Date().toLocaleDateString(), pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
+            await db.collection('usuarios').doc(USER_ID).update({ 
+                balance: 0, 
+                historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }), 
+                pendientes: firebase.firestore.FieldValue.arrayUnion(pg) 
+            });
+            USER_DATA.balance = 0; 
+            USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }];
+            document.getElementById('estadoRetiro').textContent = '✅ Retiro solicitado correctamente'; 
+            toast('✅ Retiro solicitado', 'success'); 
+            document.getElementById('walletInput').value = ''; 
+            actualizarUI(); 
+        } catch(e) { toast('⚠️ Error al solicitar retiro', 'error'); }
     });
-    document.getElementById('btnCerrarAdmin').addEventListener('click', () => { document.getElementById('adminPanel').classList.add('oculto'); });
+
+    function renderHistorial() { 
+        const l = document.getElementById('historialList'); 
+        if (!l) return; 
+        const h = USER_DATA.historial||[]; 
+        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>${x.monto.toFixed(2)} GRAM</span><span class="badge-sm ${x.estado==='exitoso'?'badge-green':'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
+    }
 
     // ===================================================
-    // EFECTOS DE SONIDO SUAVES (WEB AUDIO API REDISEÑADA)
+    // JUEGO DE BALONCESTO
     // ===================================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -413,7 +533,6 @@
         const now = audioCtx.currentTime;
 
         if (type === 'shoot') {
-            // Sonido de estiramiento/lanzamiento suave
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
@@ -423,9 +542,7 @@
             gain.gain.setValueAtTime(0.12, now);
             gain.gain.linearRampToValueAtTime(0.001, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
-
         } else if (type === 'bounce') {
-            // Impacto amortiguado (suave)
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
@@ -435,9 +552,7 @@
             gain.gain.setValueAtTime(0.08, now);
             gain.gain.linearRampToValueAtTime(0.001, now + 0.07);
             osc.start(now); osc.stop(now + 0.07);
-
         } else if (type === 'swish') {
-            // Enceste fino y agradable
             const bufferSize = audioCtx.sampleRate * 0.12;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = buffer.getChannelData(0);
@@ -453,9 +568,7 @@
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
             whiteNoise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
             whiteNoise.start(now);
-
         } else if (type === 'cheer') {
-            // Tono armónico suave para enceste/puntos
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
@@ -465,9 +578,7 @@
             gain.gain.setValueAtTime(0.1, now);
             gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
             osc.start(now); osc.stop(now + 0.2);
-
         } else if (type === 'fail') {
-            // Tono bajo no molesto al fallar
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
@@ -574,8 +685,6 @@
     const videoAdOverlay = document.getElementById('videoAdOverlay');
     const adProgressBar = document.getElementById('adProgressBar');
     const adTimerText = document.getElementById('adTimerText');
-    const claimRewardBtn = document.getElementById('claimRewardBtn');
-    const restartBtn = document.getElementById('restartBtn');
     const finalScoreText = document.getElementById('finalScoreText');
     const pendingUsdtText = document.getElementById('pendingUsdtText');
 
@@ -606,21 +715,21 @@
     }
 
     function showGameOverModal() {
-        gananciaPendienteSesion = gameState.score * VALOR_PUNTO_USDT;
+        gananciaPendienteSesion = gameState.score * VALOR_PUNTO_GRAM;
         finalScoreText.innerText = gameState.score;
-        pendingUsdtText.innerText = '$' + gananciaPendienteSesion.toFixed(5) + ' USDT';
+        pendingUsdtText.innerText = gananciaPendienteSesion.toFixed(5) + ' GRAM';
         adModal.classList.remove('oculto');
     }
 
-    // Acreditación de Saldo e Integración Rewarded Monetag
-    claimRewardBtn.addEventListener('click', () => {
+    // Función para mostrar anuncio (solo cuando el usuario lo solicita)
+    window.mostrarAnuncio = function() {
         adModal.classList.add('oculto');
-
+        
         if (typeof show_11463298 === 'function') {
             show_11463298('pop').then(async () => {
-                await procesarPagoSesion(gananciaPendienteSesion);
-                revivirYContinuar();
+                await procesarRecompensaAnuncio();
             }).catch(() => {
+                // Si falla el anuncio real, simular
                 videoAdOverlay.classList.remove('oculto');
                 ejecutarSimulacionPublicidad();
             });
@@ -628,7 +737,7 @@
             videoAdOverlay.classList.remove('oculto');
             ejecutarSimulacionPublicidad();
         }
-    });
+    };
 
     function ejecutarSimulacionPublicidad() {
         let timeLeft = 3;
@@ -644,20 +753,48 @@
             if (timeLeft <= 0) {
                 clearInterval(interval);
                 videoAdOverlay.classList.add('oculto');
-                await procesarPagoSesion(gananciaPendienteSesion);
-                revivirYContinuar();
+                await procesarRecompensaAnuncio();
             }
         }, 1000);
     }
 
-    function revivirYContinuar() {
+    async function procesarRecompensaAnuncio() {
+        // Dar recompensa por ver anuncio
+        const recompensa = RECOMPENSA_ANUNCIO + gananciaPendienteSesion;
+        
+        if (USER_ID) {
+            try {
+                await db.collection('usuarios').doc(USER_ID).update({
+                    balance: firebase.firestore.FieldValue.increment(recompensa)
+                });
+                USER_DATA.balance = (USER_DATA.balance || 0) + recompensa;
+                
+                // CORREGIDO: Comisión para el referidor
+                if (USER_DATA.referidoPor && USER_DATA.referidoPor !== USER_ID) {
+                    const comision = recompensa * COMISION;
+                    await db.collection('usuarios').doc(USER_DATA.referidoPor).update({
+                        comision: firebase.firestore.FieldValue.increment(comision)
+                    });
+                    console.log('✅ Comisión enviada a:', USER_DATA.referidoPor);
+                }
+                
+                actualizarUI();
+                toast('💰 +' + recompensa.toFixed(5) + ' GRAM acreditados', 'success');
+            } catch(e) {
+                console.error('Error al procesar:', e);
+                toast('⚠️ Error al acreditar', 'error');
+            }
+        }
+        
+        // Revivir al jugador
         gameState.lives = 3;
         updateHUD();
         resetPositions();
         initHoop();
     }
 
-    function reiniciarJuegoCompleto() {
+    window.reiniciarJuegoCompleto = function() {
+        adModal.classList.add('oculto');
         gameState.score = 0;
         gameState.lives = 3;
         gameState.comboStreak = 0;
@@ -665,33 +802,7 @@
         updateHUD();
         resetPositions();
         initHoop();
-    }
-
-    async function procesarPagoSesion(monto) {
-        if (!USER_ID || monto <= 0) return;
-        try {
-            await db.collection('usuarios').doc(USER_ID).update({
-                balance: firebase.firestore.FieldValue.increment(monto)
-            });
-            USER_DATA.balance = (USER_DATA.balance || 0) + monto;
-            actualizarUI();
-            toast('💰 +$' + monto.toFixed(5) + ' acreditados', 'success');
-
-            if (USER_DATA.referidoPor) {
-                const comisionAnfitrion = monto * COMISION;
-                await db.collection('usuarios').doc(USER_DATA.referidoPor).update({
-                    comision: firebase.firestore.FieldValue.increment(comisionAnfitrion)
-                });
-            }
-        } catch(e){
-            toast('⚠️ Error al acreditar saldo', 'error');
-        }
-    }
-
-    restartBtn.addEventListener('click', () => {
-        adModal.classList.add('oculto');
-        reiniciarJuegoCompleto();
-    });
+    };
 
     function spawnConfetti(x, y, count) {
         const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff'];
