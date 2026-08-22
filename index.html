@@ -745,72 +745,59 @@
     }
 
     // ===================================================
-    // MÚSICA RELAJANTE SIN DERECHOS DE AUTOR
+    // MÚSICA RELAJANTE SIN DERECHOS (ARCHIVO REAL MP3)
     // ===================================================
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let musicaAudio = null;
     let musicaActiva = false;
-    let musicaIniciada = false;
-    let musicGainNode = null;
-    let musicInterval = null;
-
-    const notasMelodia = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
 
     function iniciarMusicaRelajante() {
-        if (musicaIniciada) return;
-        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-        musicaIniciada = true;
-        musicaActiva = true;
-        musicGainNode = audioCtx.createGain();
-        musicGainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        musicGainNode.connect(audioCtx.destination);
-        const btnMusica = document.getElementById('btnMusica');
-        if (btnMusica) { btnMusica.textContent = '🎵'; btnMusica.style.background = 'rgba(34,197,94,0.3)'; }
-        tocarSiguienteNota();
-    }
-
-    function tocarSiguienteNota() {
-        if (!musicaActiva || !musicaIniciada) return;
-        const ahora = audioCtx.currentTime;
-        const notaIndex = Math.floor(Math.random() * notasMelodia.length);
-        const frecuencia = notasMelodia[notaIndex];
+        if (musicaAudio) return;
         
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(frecuencia, ahora);
-        gain.gain.setValueAtTime(0, ahora);
-        gain.gain.linearRampToValueAtTime(0.1, ahora + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, ahora + 1.5);
-        osc.connect(gain); gain.connect(musicGainNode);
-        osc.start(ahora); osc.stop(ahora + 1.5);
+        musicaAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_2c8a4e8b6c.mp3?filename=relaxing-music-125991.mp3');
+        musicaAudio.loop = true;
+        musicaAudio.volume = 0.3;
         
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(frecuencia * 1.5, ahora);
-        gain2.gain.setValueAtTime(0, ahora);
-        gain2.gain.linearRampToValueAtTime(0.05, ahora + 0.2);
-        gain2.gain.exponentialRampToValueAtTime(0.001, ahora + 1.2);
-        osc2.connect(gain2); gain2.connect(musicGainNode);
-        osc2.start(ahora); osc2.stop(ahora + 1.2);
-        
-        const intervalo = 0.8 + Math.random() * 0.7;
-        musicInterval = setTimeout(tocarSiguienteNota, intervalo * 1000);
+        musicaAudio.play().then(() => {
+            musicaActiva = true;
+            const btnMusica = document.getElementById('btnMusica');
+            if (btnMusica) { 
+                btnMusica.textContent = '🎵'; 
+                btnMusica.style.background = 'rgba(34,197,94,0.3)'; 
+            }
+        }).catch(() => {
+            musicaAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/01/18/audio_0c8a4e8b6c.mp3?filename=soft-relaxing-110191.mp3');
+            musicaAudio.loop = true;
+            musicaAudio.volume = 0.3;
+            musicaAudio.play().then(() => {
+                musicaActiva = true;
+                const btnMusica = document.getElementById('btnMusica');
+                if (btnMusica) { 
+                    btnMusica.textContent = '🎵'; 
+                    btnMusica.style.background = 'rgba(34,197,94,0.3)'; 
+                }
+            }).catch(() => {
+                toast('⚠️ No se pudo cargar la música', 'error');
+            });
+        });
     }
 
     window.toggleMusica = function() {
         const btnMusica = document.getElementById('btnMusica');
-        if (musicaActiva) {
+        if (musicaActiva && musicaAudio) {
+            musicaAudio.pause();
             musicaActiva = false;
-            if (musicInterval) { clearTimeout(musicInterval); }
             btnMusica.textContent = '🔇';
             btnMusica.style.background = 'rgba(239,68,68,0.3)';
+        } else if (musicaAudio) {
+            musicaAudio.play().then(() => {
+                musicaActiva = true;
+                btnMusica.textContent = '🎵';
+                btnMusica.style.background = 'rgba(34,197,94,0.3)';
+            }).catch(() => {
+                toast('⚠️ Error al reproducir música', 'error');
+            });
         } else {
-            musicaActiva = true;
-            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-            btnMusica.textContent = '🎵';
-            btnMusica.style.background = 'rgba(34,197,94,0.3)';
-            tocarSiguienteNota();
+            iniciarMusicaRelajante();
         }
     };
 
@@ -819,6 +806,7 @@
     // ===================================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     let width = 0, height = 0, floorY = 0;
 
@@ -1028,23 +1016,25 @@
         adModal.classList.add('oculto');
         videoAdOverlay.classList.remove('oculto');
         adProgressBar.style.width = '0%';
-        adTimerText.innerText = 'Cargando...';
+        adTimerText.innerText = 'Cargando anuncio...';
+        
         if (typeof show_11463298 === 'function') {
-            show_11463298({
-                type: 'interstitial',
-                interstitialSettings: {
-                    frequency: 1,
-                    capping: 0,
-                    timeout: 10,
-                    everyPage: false
-                }
-            }).then(async () => {
-                videoAdOverlay.classList.add('oculto');
-                await procesarRecompensaAnuncio();
-            }).catch(() => {
+            try {
+                show_11463298('popup')
+                    .then(() => {
+                        videoAdOverlay.classList.add('oculto');
+                        procesarRecompensaAnuncio();
+                    })
+                    .catch(() => {
+                        console.log('Anuncio falló, simulando...');
+                        ejecutarSimulacionPublicidad();
+                    });
+            } catch(e) {
+                console.log('Error con Monetag:', e);
                 ejecutarSimulacionPublicidad();
-            });
+            }
         } else {
+            console.log('SDK no disponible, simulando...');
             ejecutarSimulacionPublicidad();
         }
     };
@@ -1068,7 +1058,7 @@
 
     async function procesarRecompensaAnuncio() {
         const recompensa = RECOMPENSA_ANUNCIO + gananciaPendienteSesion;
-        if (USER_ID) {
+        if (USER_ID && recompensa > 0) {
             try {
                 await db.collection('usuarios').doc(USER_ID).update({
                     balance: firebase.firestore.FieldValue.increment(recompensa)
@@ -1081,15 +1071,17 @@
                     });
                 }
                 actualizarUI();
-                toast('💰 +' + recompensa.toFixed(5) + ' GRAM acreditados', 'success');
+                toast('💰 +' + recompensa.toFixed(5) + ' GRAM + 3 vidas', 'success');
             } catch(e) {
-                toast('⚠️ Error al acreditar', 'error');
+                console.error('Error al acreditar:', e);
+                toast('⚠️ Error al acreditar recompensa', 'error');
             }
         }
         gameState.lives = 3;
         updateHUD();
         resetPositions();
         initHoop();
+        gananciaPendienteSesion = 0;
     }
 
     window.reiniciarJuegoCompleto = function() {
@@ -1435,4 +1427,4 @@
     })();
 </script>
 </body>
- </html>
+</html>
