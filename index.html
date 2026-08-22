@@ -10,108 +10,369 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
-    <!-- Script Oficial de Monetización Monetag -->
     <script src="//libtl.com/sdk.js" data-zone="11463298" data-sdk="show_11463298"></script>
 
     <style>
         :root {
-            --bg: #FFFDF6; --card: #FFFFFF; --text: #4E3629; --text2: #8D7365; --border: #5D4037;
-            --pink: #FFD3DA; --green: #C5EBE1; --purple: #E2DBF5; --coral: #FFCAB8; --yellow: #FFF0C2; --blue: #D3E5FF;
-            --shadow: 0 6px 0 #5D4037;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #ffffff;
+            --text2: #94a3b8;
+            --border: #334155;
+            --amber: #f59e0b;
+            --orange: #f97316;
+            --red: #ef4444;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
         }
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:'Fredoka',sans-serif; color:var(--text); }
-        body { background:var(--bg); min-height:100vh; display:flex; justify-content:center; background-image:radial-gradient(#F3EDE0 1.5px,transparent 1.5px),radial-gradient(#F3EDE0 1.5px,#FFFDF6 1.5px); background-size:24px 24px; background-position:0 0,12px 12px; overflow-x: hidden; }
-        .app { max-width:450px; width:100%; display:flex; flex-direction:column; min-height:100vh; position: relative; }
-        .screen { display:none; flex-direction:column; padding:16px; gap:14px; padding-bottom:100px; width: 100%; }
-        .screen.active { display:flex; }
-        .card { background:var(--card); border-radius:26px; padding:18px; border:4px solid var(--border); box-shadow:var(--shadow); }
-        .card-center { text-align:center; }
-        .balance-display { font-size:36px; font-weight:700; line-height:1; margin:4px 0; }
-        .balance-label { font-size:11px; letter-spacing:1px; color:var(--text2); font-weight:700; background:var(--yellow); display:inline-block; padding:2px 12px; border-radius:12px; border:2px solid var(--border); }
-        .btn { width:100%; padding:14px; border:3px solid var(--border); border-radius:18px; font-weight:700; font-size:14px; cursor:pointer; box-shadow:0 5px 0 var(--border); transition:all 0.1s; text-align:center; margin-top:6px; background:var(--card); }
-        .btn:active { transform:translateY(3px); box-shadow:0 2px 0 var(--border); }
-        .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:0 2px 0 var(--border); }
-        .btn-pink { background:var(--pink); }
-        .btn-green { background:var(--green); }
-        .btn-coral { background:var(--coral); }
-        .btn-yellow { background:var(--yellow); }
-        .btn-purple { background:var(--purple); }
-        .btn-sm { padding:8px 16px; border-radius:14px; border:2px solid var(--border); font-weight:700; cursor:pointer; font-size:12px; box-shadow:0 3px 0 var(--border); background:var(--pink); }
-        input, textarea { width:100%; padding:14px 18px; border-radius:18px; border:3px solid var(--border); background:var(--card); font-size:13px; font-weight:600; outline:none; margin:6px 0; }
-        .fila { display:flex; justify-content:space-between; padding:8px 0; border-bottom:2px dashed #E5DCD5; font-size:13px; font-weight:600; }
-        .fila:last-child { border:none; }
-        .hist-item { display:flex; justify-content:space-between; padding:10px; border-bottom:2px dashed #E5DCD5; font-size:12px; flex-wrap:wrap; gap:4px; }
-        .badge-sm { padding:2px 10px; border-radius:10px; border:2px solid var(--border); font-size:10px; font-weight:700; }
-        .badge-green { background:var(--green); }
-        .badge-yellow { background:var(--yellow); }
-        .referido-item { background:#FFF; border-radius:16px; padding:12px; margin-bottom:6px; border:2px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:12px; box-shadow:0 3px 0 var(--border); }
-        .scroll { max-height:200px; overflow-y:auto; }
-        .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--text); color:#FFF; padding:12px 24px; border-radius:20px; font-size:13px; z-index:999; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; font-weight:600; }
-        .toast.show { opacity:1; }
-        .navbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:450px; width:100%; background:var(--card); border-top:4px solid var(--border); display:flex; justify-content:space-around; padding:10px 0; z-index:100; }
-        .nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:8px 16px; border-radius:14px; transition:all 0.15s; background:transparent; border:none; font-weight:700; font-size:11px; }
-        .nav-btn i { font-size:20px; }
-        .nav-btn.active { background:var(--pink); }
-        .admin-panel { background:var(--card); border-radius:26px; padding:18px; border:4px solid var(--border); box-shadow:var(--shadow); }
-        .admin-item { background:#FFF; border-radius:16px; padding:12px; margin-bottom:8px; border:3px solid var(--border); box-shadow:0 3px 0 var(--border); }
-        .admin-item .cmd-box { background:#FFFBF0; border:1px dashed var(--border); border-radius:8px; padding:6px 8px; margin:6px 0; font-size:11px; font-family:monospace; word-break:break-all; color:var(--text); }
-        .btn-xs { padding:5px 10px; border-radius:10px; border:2px solid var(--border); font-weight:700; cursor:pointer; font-size:10px; box-shadow:0 2px 0 var(--border); margin:2px; }
-        .btn-copy { background:var(--blue); }
-        .btn-done { background:var(--green); }
-        .panel-login { display:flex; gap:8px; margin-bottom:12px; }
-        .panel-login input { flex:1; margin:0; }
-        .panel-login button { background:var(--pink); border:3px solid var(--border); padding:10px 20px; border-radius:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 0 var(--border); }
-        .oculto { display:none !important; }
-        .resumen-box { background:var(--yellow); border-radius:16px; padding:12px; text-align:center; border:2px solid var(--border); margin-bottom:12px; }
-        .resumen-box .total { font-size:26px; font-weight:700; }
-        .link-box { background:var(--purple); border-radius:14px; padding:10px; margin:8px 0; font-size:11px; font-weight:600; word-break:break-all; border:2px solid var(--border); text-align:center; }
-        .btn-copiar { background:var(--blue); border:2px solid var(--border); padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer; font-size:12px; box-shadow:0 3px 0 var(--border); width:100%; margin-top:4px; }
-        .admin-section { margin-top:12px; padding:12px; border-radius:16px; border:2px dashed var(--border); background:#FFFBF0; }
-        .admin-section h4 { font-size:13px; margin-bottom:8px; }
-        .mensaje-global { background:var(--coral); border-radius:16px; padding:12px; margin-bottom:10px; border:3px solid var(--border); text-align:center; font-size:13px; font-weight:600; }
-        .admin-icon-trigger { cursor:pointer; user-select:none; }
-        .loading-screen { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:16px; }
-        .loading-screen.active { display:flex; }
-        .loading-screen .spinner { font-size:60px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
-
-        #gameScreen { padding: 0; position: relative; height: calc(100vh - 70px); overflow: hidden; background-color: #0f172a; }
-        #gameCanvas { display: block; width: 100%; height: 100%; touch-action: none; }
         
-        /* Nuevos estilos para el modal de anuncios mejorado */
-        .ad-option-card {
+        * { 
+            margin:0; 
+            padding:0; 
+            box-sizing:border-box; 
+            -webkit-tap-highlight-color:transparent; 
+            font-family:'Fredoka',sans-serif; 
+            color:var(--text); 
+        }
+        
+        body { 
+            background: var(--bg); 
+            min-height:100vh; 
+            display:flex; 
+            justify-content:center; 
+            background-image: radial-gradient(rgba(255,255,255,0.03) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            overflow-x: hidden; 
+        }
+        
+        .app { 
+            max-width:450px; 
+            width:100%; 
+            display:flex; 
+            flex-direction:column; 
+            min-height:100vh; 
+            position: relative; 
+        }
+        
+        .screen { 
+            display:none; 
+            flex-direction:column; 
+            padding:16px; 
+            gap:14px; 
+            padding-bottom:100px; 
+            width: 100%; 
+        }
+        
+        .screen.active { display:flex; }
+        
+        .card { 
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border: 2px solid #334155;
+            border-radius:26px; 
+            padding:18px; 
+            border:2px solid var(--border); 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        .card-center { text-align:center; }
+        
+        .balance-display { 
+            font-size:42px; 
+            font-weight:700; 
+            line-height:1; 
+            margin:4px 0;
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .balance-label { 
+            font-size:11px; 
+            letter-spacing:1px; 
+            color: var(--amber); 
+            font-weight:700; 
+            background: rgba(245,158,11,0.1);
+            display:inline-block; 
+            padding:4px 16px; 
+            border-radius:12px; 
+            border:1px solid rgba(245,158,11,0.3); 
+        }
+        
+        .btn { 
+            width:100%; 
+            padding:14px; 
+            border:2px solid var(--border); 
+            border-radius:18px; 
+            font-weight:700; 
+            font-size:14px; 
+            cursor:pointer; 
+            transition:all 0.3s; 
+            text-align:center; 
+            margin-top:6px; 
+            background: var(--card);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:active { transform:scale(0.95); }
+        .btn:disabled { opacity:0.5; cursor:not-allowed; }
+        
+        .btn-green { 
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-color: #16a34a;
+        }
+        
+        .btn-green:hover {
+            box-shadow: 0 0 20px rgba(34,197,94,0.3);
+        }
+        
+        .btn-purple { 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-color: #7c3aed;
+        }
+        
+        .btn-yellow { 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-color: #d97706;
+        }
+        
+        input, textarea { 
+            width:100%; 
+            padding:14px 18px; 
+            border-radius:18px; 
+            border:2px solid var(--border); 
+            background: rgba(15,23,42,0.8); 
+            font-size:13px; 
+            font-weight:600; 
+            outline:none; 
+            margin:6px 0; 
+            color: var(--text);
+        }
+        
+        input:focus {
+            border-color: var(--amber);
+            box-shadow: 0 0 10px rgba(245,158,11,0.2);
+        }
+        
+        .fila { 
+            display:flex; 
+            justify-content:space-between; 
+            padding:8px 0; 
+            border-bottom:1px solid rgba(255,255,255,0.1); 
+            font-size:13px; 
+            font-weight:600; 
+        }
+        
+        .fila:last-child { border:none; }
+        
+        .navbar { 
+            position:fixed; 
+            bottom:0; 
+            left:50%; 
+            transform:translateX(-50%); 
+            max-width:450px; 
+            width:100%; 
+            background: rgba(30,41,59,0.95);
+            backdrop-filter: blur(10px);
+            border-top:2px solid var(--border); 
+            display:flex; 
+            justify-content:space-around; 
+            padding:10px 0; 
+            z-index:100; 
+        }
+        
+        .nav-btn { 
+            display:flex; 
+            flex-direction:column; 
+            align-items:center; 
+            gap:3px; 
+            cursor:pointer; 
+            padding:8px 16px; 
+            border-radius:14px; 
+            transition:all 0.3s; 
+            background:transparent; 
+            border:none; 
+            font-weight:700; 
+            font-size:11px; 
+            color: var(--text2);
+        }
+        
+        .nav-btn i { font-size:20px; }
+        
+        .nav-btn.active { 
+            background: linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(239,68,68,0.2) 100%);
+            color: var(--amber);
+        }
+        
+        .toast { 
+            position:fixed; 
+            bottom:80px; 
+            left:50%; 
+            transform:translateX(-50%); 
+            background: var(--card); 
+            color:#FFF; 
+            padding:12px 24px; 
+            border-radius:20px; 
+            font-size:13px; 
+            z-index:999; 
+            opacity:0; 
+            transition:opacity 0.3s; 
+            pointer-events:none; 
+            white-space:nowrap; 
+            font-weight:600; 
+            border:1px solid var(--border);
+        }
+        
+        .toast.show { opacity:1; }
+        
+        .oculto { display:none !important; }
+        
+        #gameScreen { 
+            padding: 0; 
+            position: relative; 
+            height: calc(100vh - 70px); 
+            overflow: hidden; 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        #gameCanvas { 
+            display: block; 
+            width: 100%; 
+            height: 100%; 
+            touch-action: none; 
+        }
+        
+        .game-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(245,158,11,0.3);
+        }
+        
+        .game-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .game-banner h1 {
+            font-size: 36px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .game-banner p {
+            color: rgba(255,255,255,0.9);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 20;
+        }
+        
+        .modal-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid rgba(245,158,11,0.3);
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        
+        .modal-title {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+        
+        .option-card {
+            background: rgba(30,41,59,0.8);
+            border: 2px solid var(--border);
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.3s;
         }
-        .ad-option-card:hover {
-            border-color: #22c55e;
+        
+        .option-card:hover {
+            border-color: var(--amber);
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 8px 20px rgba(245,158,11,0.2);
         }
-        .ad-option-card.selected {
-            border-color: #22c55e;
-            background: linear-gradient(135deg, #1a2e1a 0%, #0f172a 100%);
-        }
+        
         .reward-badge {
-            background: #22c55e;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             display: inline-block;
-            margin: 4px;
+            margin: 2px;
         }
-        .vida-icon {
-            font-size: 24px;
+        
+        .reward-badge-gray {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
             display: inline-block;
             margin: 2px;
+        }
+        
+        .btn-musica {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            z-index: 15;
+            pointer-events: auto;
+            background: rgba(34,197,94,0.3);
+            border: 2px solid rgba(34,197,94,0.5);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -120,179 +381,177 @@
 <div id="toast" class="toast"></div>
 
 <div class="app">
-    <div id="loadingScreen" class="screen active loading-screen">
-        <div class="spinner">⭐</div>
+    <div id="loadingScreen" class="screen active" style="align-items:center; justify-content:center; min-height:100vh;">
+        <div style="font-size:60px; animation: spin 1s linear infinite;">⭐</div>
         <div style="font-weight:700;font-size:18px;">Cargando...</div>
         <div style="font-size:12px;color:var(--text2);">@USDTSTARTKBot 🚀</div>
     </div>
 
-    <!-- Pantalla de Inicio -->
     <div id="homeScreen" class="screen">
-        <div id="mensajeGlobalBox" class="mensaje-global oculto"></div>
+        <div id="mensajeGlobalBox" class="oculto" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius:16px; padding:12px; text-align:center; font-size:13px; font-weight:600;"></div>
+        
+        <div class="game-banner">
+            <div style="font-size:50px; margin-bottom: 8px;">🏀</div>
+            <h1>SLING BASKET HERO</h1>
+            <p>¡Apunta, encesta y gana GRAM!</p>
+        </div>
+        
         <div class="card card-center">
             <div style="font-size:12px;font-weight:700;color:var(--text2);">⭐ BALANCE</div>
-            <div class="balance-display" id="balanceHome">0.00000 GRAM</div>
+            <div class="balance-display" id="balanceHome">0.00000</div>
             <span class="balance-label">GRAM RETIRABLE</span>
         </div>
-        <div class="card card-center">
-            <div style="font-size:40px; margin-bottom: 8px;">🏀</div>
-            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">SLING BASKET HERO PRO</div>
-            <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">¡Apunta, encesta y acumula puntos convertibles a GRAM!</div>
-            <button class="btn btn-green" onclick="irAlJuego()">🎮 JUGAR AHORA</button>
-        </div>
+        
+        <button class="btn btn-green" onclick="irAlJuego()" style="font-size:18px; padding:18px;">
+            🎮 JUGAR AHORA
+        </button>
     </div>
 
-    <!-- Pantalla del Juego de Basket -->
     <div id="gameScreen" class="screen">
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Overlay HUD -->
-        <div id="hud" class="absolute top-0 left-0 w-full p-4 pointer-events-none flex justify-between items-start z-10 oculto">
-            <div class="flex flex-col gap-1">
-                <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/60 text-white px-4 py-2 rounded-2xl shadow-xl flex items-center gap-3">
-                    <span class="text-xs uppercase font-bold text-amber-400 tracking-wider">Puntos</span>
-                    <span id="scoreText" class="text-3xl font-black text-amber-400">0</span>
+        <div id="hud" class="oculto" style="position:absolute; top:0; left:0; width:100%; padding:16px; pointer-events:none; display:flex; justify-content:space-between; align-items:flex-start; z-index:10;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="background:rgba(30,41,59,0.9); border:1px solid rgba(245,158,11,0.3); padding:8px 16px; border-radius:16px;">
+                    <span style="font-size:10px; text-transform:uppercase; font-weight:bold; color:#f59e0b;">Puntos</span>
+                    <div id="scoreText" style="font-size:32px; font-weight:900; color:#f59e0b;">0</div>
                 </div>
-                <div id="comboContainer" class="oculto transition-all duration-300 transform scale-95">
-                    <span id="comboBadge" class="bg-gradient-to-r from-orange-500 to-red-600 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-lg border border-yellow-300/40 inline-block animate-pulse">
+                <div id="comboContainer" class="oculto">
+                    <span id="comboBadge" style="background:linear-gradient(135deg, #f97316 0%, #ef4444 100%); color:white; font-weight:900; font-size:12px; padding:4px 12px; border-radius:20px;">
                         🔥 LIMPIO! x2
                     </span>
                 </div>
             </div>
-
-            <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/60 px-4 py-2 rounded-2xl shadow-xl flex items-center gap-2">
-                <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">Vidas</span>
-                <div id="livesContainer" class="flex gap-1 text-xl">
-                    <span>❤️</span><span>❤️</span><span>❤️</span>
+            <div style="background:rgba(30,41,59,0.9); border:1px solid rgba(255,255,255,0.1); padding:8px 16px; border-radius:16px;">
+                <span style="font-size:10px; text-transform:uppercase; font-weight:bold; color:#94a3b8;">Vidas</span>
+                <div id="livesContainer" style="font-size:24px;">
+                    ❤️❤️❤️
                 </div>
             </div>
         </div>
 
-        <!-- Pantalla de Inicio del Juego -->
-        <div id="startMenu" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-20">
-            <div class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden flex flex-col items-center">
-                <div class="text-5xl mb-2 animate-bounce">🏀</div>
-                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 mb-2 drop-shadow-md">
-                    SLING BASKET HERO
-                </h1>
-                <p class="text-slate-300 text-sm mb-6 leading-relaxed">
-                    ¡Apunta, estira la flecha y encesta el balón en la canasta desde larga distancia!
+        <button id="btnMusica" class="btn-musica oculto" onclick="toggleMusica()">🎵</button>
+
+        <div id="startMenu" class="modal-overlay">
+            <div class="modal-card">
+                <div style="font-size:60px; margin-bottom: 16px; animation: bounce 2s infinite;">🏀</div>
+                <h1 class="modal-title">SLING BASKET HERO</h1>
+                <p style="color:#94a3b8; margin-bottom: 24px;">
+                    ¡Apunta, estira la flecha y encesta el balón!
                 </p>
-                <button id="startBtn" class="w-full bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 hover:from-amber-300 hover:to-red-400 text-slate-950 font-black py-4 px-8 rounded-2xl shadow-lg shadow-orange-500/30 transition transform active:scale-95 text-lg flex items-center justify-center gap-2 tracking-wide uppercase">
+                <button id="startBtn" class="btn btn-green" style="font-size:18px; padding:18px;">
                     🚀 ¡Empezar Juego!
                 </button>
             </div>
         </div>
 
-        <!-- Modal Game Over MEJORADO -->
-        <div id="adModal" class="oculto absolute inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 z-20">
-            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
-                <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💔</div>
-                <h2 class="text-2xl font-black text-white mb-2">¡Te quedaste sin vidas!</h2>
-                <p class="text-slate-400 text-sm mb-4">Tu puntuación: <span id="finalScoreText" class="text-amber-400 font-bold text-base">0</span> puntos</p>
+        <div id="adModal" class="oculto modal-overlay">
+            <div class="modal-card">
+                <div style="font-size:50px; margin-bottom: 8px;">💔</div>
+                <h2 class="modal-title">¡Sin Vidas!</h2>
+                <p style="color:#94a3b8; margin-bottom: 16px;">
+                    Puntuación: <span id="finalScoreText" style="color:#f59e0b; font-weight:bold;">0</span> puntos
+                </p>
+                <div style="background:rgba(15,23,42,0.8); border-radius:16px; padding:16px; margin-bottom:20px;">
+                    <p style="color:#94a3b8; font-size:14px;">💰 Tu recompensa:</p>
+                    <p id="pendingUsdtText" style="font-size:32px; font-weight:900; color:#22c55e;">0.00000 GRAM</p>
+                </div>
                 
-                <div class="bg-slate-800/50 rounded-2xl p-4 mb-4">
-                    <p class="text-sm text-slate-300 mb-2">💰 Tu recompensa acumulada:</p>
-                    <p class="text-2xl font-black text-green-400" id="pendingUsdtText">0.00000 GRAM</p>
-                </div>
-
-                <div class="text-left mb-4">
-                    <p class="text-sm font-bold text-white mb-3">🎁 Elige cómo continuar:</p>
-                    
-                    <div class="ad-option-card" onclick="mostrarAnuncio()">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-bold text-white">📺 Ver anuncio</p>
-                                <p class="text-xs text-slate-400">Recupera tus vidas y gana recompensa</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="reward-badge">+3 ❤️</div>
-                                <div class="reward-badge">+0.00045 GRAM</div>
-                            </div>
+                <p style="color:white; font-weight:bold; margin-bottom:12px; text-align:left;">🎁 Elige cómo continuar:</p>
+                
+                <div class="option-card" onclick="mostrarAnuncio()">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="text-align:left;">
+                            <p style="font-weight:bold; color:white;">📺 Ver anuncio</p>
+                            <p style="font-size:12px; color:#94a3b8;">Recupera vidas y gana recompensa</p>
                         </div>
-                    </div>
-                    
-                    <div class="ad-option-card" onclick="reiniciarJuegoCompleto()">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-bold text-white">🔄 Reiniciar gratis</p>
-                                <p class="text-xs text-slate-400">Empieza de nuevo sin anuncios</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="reward-badge" style="background:#64748b;">+3 ❤️</div>
-                                <div class="reward-badge" style="background:#64748b;">0 GRAM</div>
-                            </div>
+                        <div>
+                            <span class="reward-badge">+3 ❤️</span><br>
+                            <span class="reward-badge">+0.00045 GRAM</span>
                         </div>
                     </div>
                 </div>
-
-                <p class="text-xs text-slate-500 mb-2">💡 Consejo: Ver anuncios te permite mantener tu puntuación</p>
+                
+                <div class="option-card" onclick="reiniciarJuegoCompleto()">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="text-align:left;">
+                            <p style="font-weight:bold; color:white;">🔄 Reiniciar gratis</p>
+                            <p style="font-size:12px; color:#94a3b8;">Empieza de nuevo sin anuncios</p>
+                        </div>
+                        <div>
+                            <span class="reward-badge-gray">+3 ❤️</span><br>
+                            <span class="reward-badge-gray">0 GRAM</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Buffer de Anuncio -->
-        <div id="videoAdOverlay" class="oculto absolute inset-0 bg-black flex flex-col items-center justify-center z-30">
-            <div class="text-center text-white px-6">
-                <div class="animate-spin text-5xl mb-4">📺</div>
-                <h3 class="text-xl font-bold mb-2">Viendo anuncio...</h3>
-                <p class="text-slate-400 text-sm mb-6">¡Gracias por apoyar el juego! Tu recompensa se acreditará al finalizar.</p>
-                <div class="w-48 bg-slate-800 h-3 rounded-full overflow-hidden mx-auto mb-4">
-                    <div id="adProgressBar" class="bg-amber-400 h-full w-0 transition-all duration-1000"></div>
+        <div id="videoAdOverlay" class="oculto" style="position:absolute; inset:0; background:black; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:30;">
+            <div style="text-align:center; padding:20px;">
+                <div style="font-size:50px; margin-bottom:16px; animation: spin 1s linear infinite;">📺</div>
+                <h3 style="font-size:20px; font-weight:bold; margin-bottom:8px;">Cargando anuncio...</h3>
+                <p style="color:#94a3b8; font-size:14px; margin-bottom:24px;">Tu recompensa se acreditará al finalizar</p>
+                <div style="width:200px; background:#1e293b; height:8px; border-radius:10px; overflow:hidden; margin:0 auto 16px;">
+                    <div id="adProgressBar" style="background:#f59e0b; height:100%; width:0%; transition:width 0.3s;"></div>
                 </div>
-                <p id="adTimerText" class="text-2xl font-black text-amber-400">3s</p>
+                <p id="adTimerText" style="font-size:24px; font-weight:900; color:#f59e0b;">3s</p>
             </div>
         </div>
     </div>
 
-    <!-- Pantalla de Invitar -->
     <div id="inviteScreen" class="screen">
-        <div class="card card-center"><div style="font-size:40px;">👥</div><div style="font-weight:700;font-size:18px;">INVITAR AMIGOS</div><div style="font-size:13px;color:var(--text2);">5% de comisión en GRAM</div>
-            <div class="link-box" id="refLinkBox">Cargando...</div>
-            <button class="btn-copiar" id="btnCopiarLink"><i class="fas fa-copy"></i> COPIAR ENLACE</button>
+        <div class="card card-center">
+            <div style="font-size:40px;">👥</div>
+            <div style="font-weight:700;font-size:18px;">INVITAR AMIGOS</div>
+            <div style="font-size:13px;color:var(--text2);">5% de comisión en GRAM</div>
+            <div style="background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.3); border-radius:14px; padding:10px; margin:8px 0; font-size:11px; word-break:break-all;" id="refLinkBox">Cargando...</div>
+            <button class="btn btn-purple" id="btnCopiarLink">
+                <i class="fas fa-copy"></i> COPIAR ENLACE
+            </button>
         </div>
         <div class="card">
             <div class="fila"><span>Amigos invitados</span><strong id="invitadosCount">0</strong></div>
-            <div class="fila"><span>Comisión acumulada</span><strong style="color:#B8860B;" id="comisionAcumulada">0.0000 GRAM</strong></div>
+            <div class="fila"><span>Comisión acumulada</span><strong style="color:#f59e0b;" id="comisionAcumulada">0.0000 GRAM</strong></div>
             <button class="btn btn-yellow" id="btnReclamarComision">💰 RECLAMAR COMISIÓN</button>
         </div>
-        <div class="card"><div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 AMIGOS INVITADOS</div><div id="referidosList" class="scroll"></div></div>
+        <div class="card">
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 AMIGOS INVITADOS</div>
+            <div id="referidosList" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
     </div>
 
-    <!-- Pantalla de Retirar -->
     <div id="withdrawScreen" class="screen">
-        <div class="card card-center"><div style="font-size:12px;font-weight:700;color:var(--text2);">BALANCE</div><div class="balance-display" id="balanceWithdraw">0.00000 GRAM</div></div>
+        <div class="card card-center">
+            <div style="font-size:12px;font-weight:700;color:var(--text2);">BALANCE</div>
+            <div class="balance-display" id="balanceWithdraw">0.00000</div>
+        </div>
         <div class="card">
-            <div style="font-weight:700;font-size:15px;margin-bottom:8px;"><span class="admin-icon-trigger" id="adminIconTrigger">💳</span> RETIRAR GRAM</div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px;">💳 RETIRAR GRAM</div>
             <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: 0.1 GRAM</div>
             <input type="text" id="walletInput" placeholder="Dirección de billetera TON">
             <button class="btn btn-green" id="btnRetirar">📤 SOLICITAR RETIRO</button>
             <div style="font-size:12px;margin-top:6px;min-height:18px;font-weight:600;" id="estadoRetiro"></div>
         </div>
-        <div class="card"><div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 HISTORIAL</div><div id="historialList" class="scroll"></div></div>
-        
-        <div id="adminPanel" class="admin-panel oculto">
-            <h3 style="margin-bottom:10px;"><i class="fas fa-crown"></i> PANEL ADMIN</h3>
-            <div class="panel-login"><input type="password" id="adminPass" placeholder="Clave"><button id="btnAdminLogin">ENTRAR</button></div>
-            <div id="adminContent" class="oculto">
-                <div class="resumen-box"><div style="font-size:11px;">PENDIENTES</div><div class="total" id="totalPendientes">0</div></div>
-                <div id="pendientesList" class="scroll" style="max-height:200px;"></div>
-                <div class="admin-section" style="background:#F0FFF0;border-color:#27AE60;">
-                    <h4>💎 AGREGAR GRAM A USUARIO</h4>
-                    <input type="text" id="adminAddUser" placeholder="ID de Telegram">
-                    <input type="number" id="adminAddMonto" placeholder="Monto en GRAM" step="0.00001">
-                    <button class="btn btn-green" id="btnAddSaldo">💎 AGREGAR GRAM</button>
-                </div>
-                <button class="btn" id="btnCerrarAdmin" style="margin-top:10px;">❌ CERRAR</button>
-            </div>
+        <div class="card">
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 HISTORIAL</div>
+            <div id="historialList" style="max-height:200px; overflow-y:auto;"></div>
         </div>
     </div>
 
-    <!-- Menú de Navegación -->
     <div id="navbar" class="navbar oculto">
-        <button class="nav-btn active" data-screen="homeScreen"><i class="fas fa-home"></i><span>Inicio</span></button>
-        <button class="nav-btn" data-screen="gameScreen" onclick="irAlJuego()"><i class="fas fa-basketball-ball"></i><span>Juego</span></button>
-        <button class="nav-btn" data-screen="inviteScreen"><i class="fas fa-users"></i><span>Invitar</span></button>
-        <button class="nav-btn" data-screen="withdrawScreen"><i class="fas fa-wallet"></i><span>Retirar</span></button>
+        <button class="nav-btn active" data-screen="homeScreen">
+            <i class="fas fa-home"></i><span>Inicio</span>
+        </button>
+        <button class="nav-btn" data-screen="gameScreen" onclick="irAlJuego()">
+            <i class="fas fa-basketball-ball"></i><span>Juego</span>
+        </button>
+        <button class="nav-btn" data-screen="inviteScreen">
+            <i class="fas fa-users"></i><span>Invitar</span>
+        </button>
+        <button class="nav-btn" data-screen="withdrawScreen">
+            <i class="fas fa-wallet"></i><span>Retirar</span>
+        </button>
     </div>
 </div>
 
@@ -316,11 +575,10 @@
     const COMISION = 0.05;
     const DOMINIO = 'https://t.me/USDTSTARTKBot';
     const VALOR_PUNTO_GRAM = 0.000005;
-    const RECOMPENSA_ANUNCIO = 0.00015; // 15% de $0.001 por anuncio
+    const RECOMPENSA_ANUNCIO = 0.00015;
 
     let USER_ID = null, USER_DATA = null, MENSAJE_GLOBAL = '';
     let gananciaPendienteSesion = 0;
-    let anunciosVistos = 0;
 
     const navbar = document.getElementById('navbar');
     const loadingScreen = document.getElementById('loadingScreen');
@@ -333,12 +591,9 @@
     const telegramUsername = tgUser?.username || (ES_TELEGRAM ? null : 'UsuarioPrueba');
     const telegramFirstName = tgUser?.first_name || (ES_TELEGRAM ? null : 'Usuario');
 
-    // ELIMINADO: Ya no carga anuncios automáticamente al iniciar
-    // Esto arregla el problema de anuncios que se disparan solos
-
     function toast(msg, tipo) {
         const t = document.getElementById('toast'); t.textContent = msg; t.style.color = '#FFF';
-        t.style.background = tipo === 'success' ? '#2D6A4F' : tipo === 'error' ? '#C0392B' : '#4E3629';
+        t.style.background = tipo === 'success' ? '#16a34a' : tipo === 'error' ? '#dc2626' : '#334155';
         t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
@@ -370,48 +625,30 @@
         try {
             const doc = await db.collection('usuarios').doc(USER_ID).get();
             if (!doc.exists) {
-                // CORREGIDO: Validar referencia antes de crear usuario
                 let referidoPorValido = null;
-                
                 if (refCode && refCode !== USER_ID) {
                     const refDoc = await db.collection('usuarios').doc(refCode).get();
                     if (refDoc.exists) {
                         referidoPorValido = refCode;
-                        // Actualizar contador de referidos del que invitó
                         await db.collection('usuarios').doc(refCode).update({
                             referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID)
                         });
-                        console.log('✅ Referencia registrada:', refCode);
-                    } else {
-                        console.log('❌ Código de referencia inválido:', refCode);
                     }
                 }
-                
                 const data = { 
-                    telegramId, 
-                    telegramUsername, 
-                    telegramFirstName, 
-                    balance: 0, 
-                    referidoPor: referidoPorValido, 
-                    referidos: [], 
-                    comision: 0, 
-                    historial: [], 
-                    pendientes: [], 
-                    creado: Date.now() 
+                    telegramId, telegramUsername, telegramFirstName, balance: 0, 
+                    referidoPor: referidoPorValido, referidos: [], comision: 0, 
+                    historial: [], pendientes: [], creado: Date.now() 
                 };
                 await db.collection('usuarios').doc(USER_ID).set(data);
                 USER_DATA = data;
                 toast('🎉 ¡Bienvenido a StarGainCoins!', 'success');
             } else {
                 USER_DATA = doc.data();
-                
-                // Si el usuario ya existe pero no tiene referidoPor
                 if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
                     const refDoc = await db.collection('usuarios').doc(refCode).get();
                     if (refDoc.exists) {
-                        await db.collection('usuarios').doc(USER_ID).update({
-                            referidoPor: refCode
-                        });
+                        await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode });
                         await db.collection('usuarios').doc(refCode).update({
                             referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID)
                         });
@@ -421,7 +658,6 @@
                 }
             }
         } catch(e) { 
-            console.error('Error:', e);
             USER_DATA = { balance: 0, historial: [], referidos: [] }; 
         }
         loadingScreen.classList.remove('active'); 
@@ -445,8 +681,8 @@
     async function actualizarUI() {
         if (!USER_ID || !USER_DATA) return;
         try { const doc = await db.collection('usuarios').doc(USER_ID).get(); if (doc.exists) USER_DATA = doc.data(); } catch(e) {}
-        document.getElementById('balanceHome').textContent = (USER_DATA.balance||0).toFixed(5) + ' GRAM';
-        document.getElementById('balanceWithdraw').textContent = (USER_DATA.balance||0).toFixed(5) + ' GRAM';
+        document.getElementById('balanceHome').textContent = (USER_DATA.balance||0).toFixed(5);
+        document.getElementById('balanceWithdraw').textContent = (USER_DATA.balance||0).toFixed(5);
         document.getElementById('invitadosCount').textContent = (USER_DATA.referidos||[]).length;
         document.getElementById('comisionAcumulada').textContent = (USER_DATA.comision||0).toFixed(5) + ' GRAM';
         renderReferidos(); renderHistorial();
@@ -461,7 +697,7 @@
         const l = document.getElementById('referidosList'); 
         if (!l) return; 
         const refs = USER_DATA.referidos||[]; 
-        l.innerHTML = refs.length ? refs.map(r => `<div class="referido-item"><strong>👤 ${r}</strong><span style="color:#B8860B;">+5% GRAM</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados aún</div>'; 
+        l.innerHTML = refs.length ? refs.map(r => `<div style="background:rgba(30,41,59,0.8); border-radius:16px; padding:12px; margin-bottom:6px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:12px;"><strong>👤 ${r}</strong><span style="color:#f59e0b;">+5% GRAM</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados aún</div>'; 
     }
 
     document.getElementById('btnReclamarComision').addEventListener('click', async () => {
@@ -505,8 +741,78 @@
         const l = document.getElementById('historialList'); 
         if (!l) return; 
         const h = USER_DATA.historial||[]; 
-        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div class="hist-item"><span>${x.fecha}</span><span>${x.monto.toFixed(2)} GRAM</span><span class="badge-sm ${x.estado==='exitoso'?'badge-green':'badge-yellow'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
+        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); font-size:12px; flex-wrap:wrap; gap:4px;"><span>${x.fecha}</span><span>${x.monto.toFixed(2)} GRAM</span><span style="padding:2px 10px; border-radius:10px; border:1px solid var(--border); font-size:10px; font-weight:700; ${x.estado==='exitoso'?'background:rgba(34,197,94,0.2);color:#22c55e;':'background:rgba(245,158,11,0.2);color:#f59e0b;'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
     }
+
+    // ===================================================
+    // MÚSICA RELAJANTE SIN DERECHOS DE AUTOR
+    // ===================================================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let musicaActiva = false;
+    let musicaIniciada = false;
+    let musicGainNode = null;
+    let musicInterval = null;
+
+    const notasMelodia = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+
+    function iniciarMusicaRelajante() {
+        if (musicaIniciada) return;
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        musicaIniciada = true;
+        musicaActiva = true;
+        musicGainNode = audioCtx.createGain();
+        musicGainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        musicGainNode.connect(audioCtx.destination);
+        const btnMusica = document.getElementById('btnMusica');
+        if (btnMusica) { btnMusica.textContent = '🎵'; btnMusica.style.background = 'rgba(34,197,94,0.3)'; }
+        tocarSiguienteNota();
+    }
+
+    function tocarSiguienteNota() {
+        if (!musicaActiva || !musicaIniciada) return;
+        const ahora = audioCtx.currentTime;
+        const notaIndex = Math.floor(Math.random() * notasMelodia.length);
+        const frecuencia = notasMelodia[notaIndex];
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(frecuencia, ahora);
+        gain.gain.setValueAtTime(0, ahora);
+        gain.gain.linearRampToValueAtTime(0.1, ahora + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, ahora + 1.5);
+        osc.connect(gain); gain.connect(musicGainNode);
+        osc.start(ahora); osc.stop(ahora + 1.5);
+        
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(frecuencia * 1.5, ahora);
+        gain2.gain.setValueAtTime(0, ahora);
+        gain2.gain.linearRampToValueAtTime(0.05, ahora + 0.2);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ahora + 1.2);
+        osc2.connect(gain2); gain2.connect(musicGainNode);
+        osc2.start(ahora); osc2.stop(ahora + 1.2);
+        
+        const intervalo = 0.8 + Math.random() * 0.7;
+        musicInterval = setTimeout(tocarSiguienteNota, intervalo * 1000);
+    }
+
+    window.toggleMusica = function() {
+        const btnMusica = document.getElementById('btnMusica');
+        if (musicaActiva) {
+            musicaActiva = false;
+            if (musicInterval) { clearTimeout(musicInterval); }
+            btnMusica.textContent = '🔇';
+            btnMusica.style.background = 'rgba(239,68,68,0.3)';
+        } else {
+            musicaActiva = true;
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            btnMusica.textContent = '🎵';
+            btnMusica.style.background = 'rgba(34,197,94,0.3)';
+            tocarSiguienteNota();
+        }
+    };
 
     // ===================================================
     // JUEGO DE BALONCESTO
@@ -526,12 +832,9 @@
     }
     window.addEventListener('resize', resizeCanvas);
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
     function playSound(type) {
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         const now = audioCtx.currentTime;
-
         if (type === 'shoot') {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -599,7 +902,6 @@
 
     const mascot = { x: 0, y: 0, size: 34 };
     const ball = { x: 0, y: 0, vx: 0, vy: 0, radius: 12, rotation: 0, touchedRim: false };
-    
     const hoop = {
         x: 0, y: 0, width: 62, rimRadius: 5, backboardWidth: 10, backboardHeight: 140, netHeight: 80,
         moveSpeed: 1.8, moveDirection: 1, minY: 0, maxY: 0, isMoving: false
@@ -653,7 +955,6 @@
         const dx = gameState.dragStart.x - gameState.dragCurrent.x;
         const dy = gameState.dragStart.y - gameState.dragCurrent.y;
         const dist = Math.hypot(dx, dy);
-
         if (dist > 18) {
             const power = Math.min(dist, 260) * 0.165;
             const angle = Math.atan2(dy, dx);
@@ -687,14 +988,17 @@
     const adTimerText = document.getElementById('adTimerText');
     const finalScoreText = document.getElementById('finalScoreText');
     const pendingUsdtText = document.getElementById('pendingUsdtText');
+    const btnMusica = document.getElementById('btnMusica');
 
     startBtn.addEventListener('click', () => {
         startMenu.classList.add('oculto');
         hud.classList.remove('oculto');
+        btnMusica.classList.remove('oculto');
         gameState.gameStarted = true;
         gananciaPendienteSesion = 0;
         resetPositions();
         initHoop();
+        iniciarMusicaRelajante();
     });
 
     function updateHUD() {
@@ -702,7 +1006,6 @@
         let hearts = '';
         for (let i = 0; i < 3; i++) { hearts += i < gameState.lives ? '❤️' : '🖤'; }
         livesContainer.innerHTML = hearts;
-
         if (gameState.comboStreak > 1) {
             comboBadge.innerText = `🔥 LIMPIO x${gameState.comboStreak}! (+${gameState.comboStreak * 2})`;
             comboContainer.classList.remove('oculto');
@@ -721,20 +1024,27 @@
         adModal.classList.remove('oculto');
     }
 
-    // Función para mostrar anuncio (solo cuando el usuario lo solicita)
     window.mostrarAnuncio = function() {
         adModal.classList.add('oculto');
-        
+        videoAdOverlay.classList.remove('oculto');
+        adProgressBar.style.width = '0%';
+        adTimerText.innerText = 'Cargando...';
         if (typeof show_11463298 === 'function') {
-            show_11463298('pop').then(async () => {
+            show_11463298({
+                type: 'interstitial',
+                interstitialSettings: {
+                    frequency: 1,
+                    capping: 0,
+                    timeout: 10,
+                    everyPage: false
+                }
+            }).then(async () => {
+                videoAdOverlay.classList.add('oculto');
                 await procesarRecompensaAnuncio();
             }).catch(() => {
-                // Si falla el anuncio real, simular
-                videoAdOverlay.classList.remove('oculto');
                 ejecutarSimulacionPublicidad();
             });
         } else {
-            videoAdOverlay.classList.remove('oculto');
             ejecutarSimulacionPublicidad();
         }
     };
@@ -744,12 +1054,10 @@
         adTimerText.innerText = `${timeLeft}s`;
         adProgressBar.style.width = '0%';
         setTimeout(() => { adProgressBar.style.width = '33%'; }, 100);
-        
         const interval = setInterval(async () => {
             timeLeft--;
             adTimerText.innerText = `${timeLeft}s`;
             adProgressBar.style.width = `${((3 - timeLeft) / 3) * 100}%`;
-            
             if (timeLeft <= 0) {
                 clearInterval(interval);
                 videoAdOverlay.classList.add('oculto');
@@ -759,34 +1067,25 @@
     }
 
     async function procesarRecompensaAnuncio() {
-        // Dar recompensa por ver anuncio
         const recompensa = RECOMPENSA_ANUNCIO + gananciaPendienteSesion;
-        
         if (USER_ID) {
             try {
                 await db.collection('usuarios').doc(USER_ID).update({
                     balance: firebase.firestore.FieldValue.increment(recompensa)
                 });
                 USER_DATA.balance = (USER_DATA.balance || 0) + recompensa;
-                
-                // CORREGIDO: Comisión para el referidor
                 if (USER_DATA.referidoPor && USER_DATA.referidoPor !== USER_ID) {
                     const comision = recompensa * COMISION;
                     await db.collection('usuarios').doc(USER_DATA.referidoPor).update({
                         comision: firebase.firestore.FieldValue.increment(comision)
                     });
-                    console.log('✅ Comisión enviada a:', USER_DATA.referidoPor);
                 }
-                
                 actualizarUI();
                 toast('💰 +' + recompensa.toFixed(5) + ' GRAM acreditados', 'success');
             } catch(e) {
-                console.error('Error al procesar:', e);
                 toast('⚠️ Error al acreditar', 'error');
             }
         }
-        
-        // Revivir al jugador
         gameState.lives = 3;
         updateHUD();
         resetPositions();
@@ -821,15 +1120,12 @@
 
     function update() {
         if (!gameState.gameStarted) return;
-
         if (hoop.isMoving) {
             hoop.y += hoop.moveSpeed * hoop.moveDirection;
             if (hoop.y > hoop.maxY) { hoop.y = hoop.maxY; hoop.moveDirection = -1; }
             else if (hoop.y < hoop.minY) { hoop.y = hoop.minY; hoop.moveDirection = 1; }
         }
-
         if (gameState.netWiggle > 0) gameState.netWiggle -= 0.04;
-
         if (gameState.characterState === 'CELEBRATING') {
             gameState.celebrationTimer++;
             if (gameState.celebrationTimer > 60) {
@@ -837,12 +1133,10 @@
                 gameState.celebrationTimer = 0;
             }
         }
-
         if (gameState.ballState === 'FLYING' || gameState.ballState === 'SCORED') {
             ball.x += ball.vx; ball.y += ball.vy;
             ball.vy += gameState.gravity;
             ball.rotation += ball.vx * 0.03;
-
             if (ball.y + ball.radius > floorY) {
                 ball.y = floorY - ball.radius;
                 ball.vy = -ball.vy * 0.35;
@@ -850,11 +1144,9 @@
                 ball.touchedRim = true;
                 if (Math.abs(ball.vy) > 1.8) playSound('bounce');
             }
-
             const rimLeft = { x: hoop.x - hoop.width / 2, y: hoop.y };
             const rimRight = { x: hoop.x + hoop.width / 2, y: hoop.y };
             const backboardX = hoop.x + hoop.width / 2 + 5;
-
             if (ball.x + ball.radius > backboardX - 4 && 
                 ball.x - ball.radius < backboardX + hoop.backboardWidth &&
                 ball.y > hoop.y - hoop.backboardHeight / 2 && 
@@ -864,7 +1156,6 @@
                 ball.touchedRim = true;
                 playSound('bounce');
             }
-
             [rimLeft, rimRight].forEach(post => {
                 const dist = Math.hypot(ball.x - post.x, ball.y - post.y);
                 if (dist < ball.radius + hoop.rimRadius) {
@@ -878,17 +1169,13 @@
                     playSound('bounce');
                 }
             });
-
             if (gameState.ballState === 'FLYING' && ball.vy > 0 &&
                 ball.x > rimLeft.x + 3 && ball.x < rimRight.x - 3 &&
                 ball.y >= hoop.y - 2 && ball.y <= hoop.y + 20) {
-                
                 gameState.ballState = 'SCORED';
                 gameState.netWiggle = 1;
-
                 const isSwish = !ball.touchedRim;
                 let puntosObtenidos = 1;
-
                 if (isSwish) {
                     gameState.comboStreak++;
                     puntosObtenidos = gameState.comboStreak * 2;
@@ -902,18 +1189,15 @@
                     playSound('swish'); playSound('cheer');
                     spawnConfetti(hoop.x, hoop.y, 22);
                 }
-
                 updateHUD();
                 setTimeout(() => { resetPositions(); initHoop(); }, 1100);
             }
-
             if (gameState.ballState === 'FLYING' && (ball.x > width + 60 || (ball.y >= floorY - ball.radius - 2 && Math.abs(ball.vx) < 0.3))) {
                 gameState.ballState = 'MISSED';
                 gameState.lives--;
                 gameState.comboStreak = 0;
                 playSound('fail');
                 updateHUD();
-
                 if (gameState.lives <= 0) {
                     setTimeout(showGameOverModal, 500);
                 } else {
@@ -921,7 +1205,6 @@
                 }
             }
         }
-
         for (let i = confetti.length - 1; i >= 0; i--) {
             const c = confetti[i];
             c.x += c.vx; c.y += c.vy; c.vy += 0.22;
@@ -937,45 +1220,38 @@
         bgGrad.addColorStop(1, '#0f172a');
         ctx.fillStyle = bgGrad; 
         ctx.fillRect(0, 0, width, height);
-
         ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
         ctx.beginPath();
         ctx.arc(width * 0.25, 0, width * 0.45, 0, Math.PI * 2);
         ctx.arc(width * 0.75, 0, width * 0.45, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
         ctx.lineWidth = 1;
         for(let i = 0; i < width; i += 40) {
             ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, floorY); ctx.stroke();
         }
-
         const floorGrad = ctx.createLinearGradient(0, floorY, 0, height);
         floorGrad.addColorStop(0, '#c27803'); 
         floorGrad.addColorStop(0.3, '#d97706'); 
         floorGrad.addColorStop(1, '#92400e');
         ctx.fillStyle = floorGrad; 
         ctx.fillRect(0, floorY, width, height - floorY);
-
         ctx.strokeStyle = 'rgba(80, 30, 0, 0.25)';
         ctx.lineWidth = 2;
         for (let y = floorY + 6; y < height; y += 14) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
         }
-
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
         ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(0, floorY + 3);
         ctx.lineTo(width, floorY + 3);
         ctx.stroke();
-
         ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(width * 0.85, floorY, 110, Math.PI, Math.PI * 2);
         ctx.stroke();
-
         ctx.fillStyle = 'rgba(0,0,0,0.35)';
         ctx.fillRect(0, floorY, width, 4);
     }
@@ -984,34 +1260,27 @@
         ctx.save();
         const backboardX = hoop.x + hoop.width / 2 + 3;
         const backboardY = hoop.y;
-
         ctx.strokeStyle = '#334155'; ctx.lineWidth = 8;
         ctx.beginPath(); ctx.moveTo(backboardX + hoop.backboardWidth, backboardY - 20);
         ctx.lineTo(width, backboardY - 20); ctx.stroke();
-
         ctx.lineWidth = 6;
         ctx.beginPath(); ctx.moveTo(width - 15, 0); ctx.lineTo(width - 15, backboardY - 20); ctx.stroke();
-
         ctx.fillStyle = 'rgba(241, 245, 249, 0.85)'; 
         ctx.strokeStyle = '#0284c7'; 
         ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.roundRect(backboardX, backboardY - hoop.backboardHeight / 2, hoop.backboardWidth, hoop.backboardHeight, 6);
         ctx.fill(); ctx.stroke();
-
         ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3;
         ctx.strokeRect(backboardX, backboardY - 24, 4, 48);
-
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)'; ctx.lineWidth = 2.2;
         ctx.beginPath();
         const rimLeftX = hoop.x - hoop.width / 2, rimRightX = hoop.x + hoop.width / 2;
         const wiggle = Math.sin(Date.now() * 0.03) * (gameState.netWiggle * 14);
-
         ctx.moveTo(rimLeftX, hoop.y);
         ctx.lineTo(rimLeftX + 10 + wiggle, hoop.y + hoop.netHeight);
         ctx.lineTo(rimRightX - 10 + wiggle, hoop.y + hoop.netHeight);
         ctx.lineTo(rimRightX, hoop.y);
-
         for (let i = 1; i < 7; i++) {
             const ratio = i / 7;
             const y = hoop.y + hoop.netHeight * ratio;
@@ -1026,7 +1295,6 @@
         const rimLeftX = hoop.x - hoop.width / 2, rimRightX = hoop.x + hoop.width / 2;
         ctx.strokeStyle = '#f97316'; ctx.lineWidth = 5.5;
         ctx.beginPath(); ctx.moveTo(rimLeftX, hoop.y); ctx.lineTo(rimRightX, hoop.y); ctx.stroke();
-        
         ctx.fillStyle = '#c2410c'; ctx.beginPath();
         ctx.arc(rimLeftX, hoop.y, hoop.rimRadius, 0, Math.PI * 2);
         ctx.arc(rimRightX, hoop.y, hoop.rimRadius, 0, Math.PI * 2);
@@ -1040,23 +1308,16 @@
         if (gameState.characterState === 'CROUCHING') bodyYOffset = 8;
         else if (gameState.characterState === 'EXTENDED') bodyYOffset = -6;
         else if (gameState.characterState === 'CELEBRATING') bodyYOffset = -Math.abs(Math.sin(Date.now() * 0.015)) * 18;
-
         ctx.translate(0, bodyYOffset);
-
         ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath();
         ctx.ellipse(0, 28 - bodyYOffset, 20, 6, 0, 0, Math.PI * 2); ctx.fill();
-
         ctx.fillStyle = '#0f172a'; ctx.beginPath();
         ctx.ellipse(-10, 25, 7, 4, 0, 0, Math.PI * 2); ctx.ellipse(10, 25, 7, 4, 0, 0, Math.PI * 2); ctx.fill();
-
         ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.roundRect(-18, -15, 36, 38, 16); ctx.fill();
-
         ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-13, 0, 26, 22, 6); ctx.fill();
         ctx.fillStyle = '#ffffff'; ctx.font = '900 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('7', 0, 15);
-
         ctx.fillStyle = '#ffffff'; ctx.beginPath();
         ctx.arc(-7, -6, 6, 0, Math.PI * 2); ctx.arc(7, -6, 6, 0, Math.PI * 2); ctx.fill();
-
         let lookX = 2, lookY = -1;
         if (gameState.isDragging) {
             const dx = gameState.dragStart.x - gameState.dragCurrent.x;
@@ -1064,14 +1325,11 @@
             lookX = Math.cos(Math.atan2(dy, dx)) * 3;
             lookY = Math.sin(Math.atan2(dy, dx)) * 3;
         }
-
         ctx.fillStyle = '#0f172a'; ctx.beginPath();
         ctx.arc(-7 + lookX, -6 + lookY, 2.5, 0, Math.PI * 2);
         ctx.arc(7 + lookX, -6 + lookY, 2.5, 0, Math.PI * 2); ctx.fill();
-
         ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2; ctx.beginPath();
         ctx.arc(0, 2, 5, 0.1, Math.PI - 0.1); ctx.stroke();
-
         ctx.fillStyle = '#2563eb';
         if (gameState.characterState === 'CELEBRATING') {
             ctx.beginPath(); ctx.arc(-22, -12, 5, 0, Math.PI * 2); ctx.arc(22, -12, 5, 0, Math.PI * 2); ctx.fill();
@@ -1087,12 +1345,10 @@
         const dy = gameState.dragStart.y - gameState.dragCurrent.y;
         const dist = Math.hypot(dx, dy);
         if (dist < 12) return;
-
         const power = Math.min(dist, 260) * 0.165;
         const angle = Math.atan2(dy, dx);
         let simX = ball.x, simY = ball.y;
         let simVX = Math.cos(angle) * power, simVY = Math.sin(angle) * power;
-
         ctx.save();
         for (let i = 0; i < 34; i++) {
             simX += simVX; simY += simVY; simVY += gameState.gravity;
@@ -1102,7 +1358,6 @@
             ctx.arc(simX, simY, radius, 0, Math.PI * 2); ctx.fill();
         }
         ctx.restore();
-
         ctx.save();
         ctx.translate(ball.x, ball.y); ctx.rotate(angle);
         const arrowLength = Math.min(dist, 160);
@@ -1110,7 +1365,6 @@
         grad.addColorStop(0, 'rgba(239, 68, 68, 0.2)'); grad.addColorStop(1, 'rgba(245, 158, 11, 0.9)');
         ctx.strokeStyle = grad; ctx.lineWidth = 5; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(arrowLength, 0); ctx.stroke();
-
         ctx.fillStyle = '#f59e0b'; ctx.beginPath();
         ctx.moveTo(arrowLength + 8, 0); ctx.lineTo(arrowLength - 4, -6); ctx.lineTo(arrowLength - 4, 6);
         ctx.closePath(); ctx.fill(); ctx.restore();
@@ -1127,10 +1381,8 @@
                 ball.x = mascot.x + 18; ball.y = mascot.y - 12;
             }
         }
-
         ctx.save();
         ctx.translate(ball.x, ball.y); ctx.rotate(ball.rotation);
-
         ctx.save();
         ctx.rotate(-ball.rotation); ctx.fillStyle = 'rgba(0,0,0,0.3)';
         const shadowDistance = floorY - ball.y;
@@ -1138,20 +1390,15 @@
         ctx.beginPath();
         ctx.ellipse(0, shadowDistance, ball.radius * shadowScale, 3 * shadowScale, 0, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
-
         const ballGrad = ctx.createRadialGradient(-ball.radius * 0.3, -ball.radius * 0.3, ball.radius * 0.1, 0, 0, ball.radius);
         ballGrad.addColorStop(0, '#fb923c'); ballGrad.addColorStop(0.8, '#ea580c'); ballGrad.addColorStop(1, '#9a3412');
-
         ctx.fillStyle = ballGrad; ctx.beginPath(); ctx.arc(0, 0, ball.radius, 0, Math.PI * 2); ctx.fill();
-
         ctx.strokeStyle = '#431407'; ctx.lineWidth = 1.6;
         ctx.beginPath();
         ctx.moveTo(-ball.radius, 0); ctx.lineTo(ball.radius, 0);
         ctx.moveTo(0, -ball.radius); ctx.lineTo(0, ball.radius); ctx.stroke();
-
         ctx.beginPath(); ctx.arc(-ball.radius * 0.55, 0, ball.radius * 0.75, -Math.PI * 0.4, Math.PI * 0.4); ctx.stroke();
         ctx.beginPath(); ctx.arc(ball.radius * 0.55, 0, ball.radius * 0.75, Math.PI * 0.6, Math.PI * 1.4); ctx.stroke();
-
         ctx.restore();
     }
 
@@ -1167,7 +1414,6 @@
     function gameLoop() {
         update();
         ctx.clearRect(0, 0, width, height);
-
         drawBackground();
         drawBackboardAndNet();
         drawMascot();
@@ -1175,7 +1421,6 @@
         drawBall();
         drawFrontRim();
         drawConfetti();
-
         requestAnimationFrame(gameLoop);
     }
 
@@ -1190,4 +1435,4 @@
     })();
 </script>
 </body>
-</html>
+ </html>
