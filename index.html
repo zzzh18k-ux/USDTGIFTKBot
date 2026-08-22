@@ -467,7 +467,7 @@
                         </div>
                         <div>
                             <span class="reward-badge">+3 ❤️</span><br>
-                            <span class="reward-badge">+0.00045 GRAM</span>
+                            <span class="reward-badge">+0.00015 GRAM</span>
                         </div>
                     </div>
                 </div>
@@ -745,7 +745,7 @@
     }
 
     // ===================================================
-    // MÚSICA RELAJANTE SIN DERECHOS (ARCHIVO REAL MP3)
+    // MÚSICA RELAJANTE SIN DERECHOS (URL DIRECTA FUNCIONAL)
     // ===================================================
     let musicaAudio = null;
     let musicaActiva = false;
@@ -753,9 +753,11 @@
     function iniciarMusicaRelajante() {
         if (musicaAudio) return;
         
-        musicaAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_2c8a4e8b6c.mp3?filename=relaxing-music-125991.mp3');
+        // URL directa de música relajante sin derechos (Bensound - Relaxing)
+        musicaAudio = new Audio('https://www.bensound.com/bensound-music/bensound-relaxing.mp3');
         musicaAudio.loop = true;
         musicaAudio.volume = 0.3;
+        musicaAudio.crossOrigin = 'anonymous';
         
         musicaAudio.play().then(() => {
             musicaActiva = true;
@@ -765,9 +767,11 @@
                 btnMusica.style.background = 'rgba(34,197,94,0.3)'; 
             }
         }).catch(() => {
-            musicaAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/01/18/audio_0c8a4e8b6c.mp3?filename=soft-relaxing-110191.mp3');
+            // Respaldo con otra URL
+            musicaAudio = new Audio('https://www.bensound.com/bensound-music/bensound-slowmotion.mp3');
             musicaAudio.loop = true;
             musicaAudio.volume = 0.3;
+            musicaAudio.crossOrigin = 'anonymous';
             musicaAudio.play().then(() => {
                 musicaActiva = true;
                 const btnMusica = document.getElementById('btnMusica');
@@ -776,7 +780,7 @@
                     btnMusica.style.background = 'rgba(34,197,94,0.3)'; 
                 }
             }).catch(() => {
-                toast('⚠️ No se pudo cargar la música', 'error');
+                toast('⚠️ Activa el sonido de tu dispositivo', 'error');
             });
         });
     }
@@ -1026,15 +1030,12 @@
                         procesarRecompensaAnuncio();
                     })
                     .catch(() => {
-                        console.log('Anuncio falló, simulando...');
                         ejecutarSimulacionPublicidad();
                     });
             } catch(e) {
-                console.log('Error con Monetag:', e);
                 ejecutarSimulacionPublicidad();
             }
         } else {
-            console.log('SDK no disponible, simulando...');
             ejecutarSimulacionPublicidad();
         }
     };
@@ -1057,7 +1058,7 @@
     }
 
     async function procesarRecompensaAnuncio() {
-        const recompensa = RECOMPENSA_ANUNCIO + gananciaPendienteSesion;
+        const recompensa = RECOMPENSA_ANUNCIO;
         if (USER_ID && recompensa > 0) {
             try {
                 await db.collection('usuarios').doc(USER_ID).update({
@@ -1071,10 +1072,9 @@
                     });
                 }
                 actualizarUI();
-                toast('💰 +' + recompensa.toFixed(5) + ' GRAM + 3 vidas', 'success');
+                toast('💰 +0.00015 GRAM + 3 vidas', 'success');
             } catch(e) {
-                console.error('Error al acreditar:', e);
-                toast('⚠️ Error al acreditar recompensa', 'error');
+                toast('⚠️ Error al acreditar', 'error');
             }
         }
         gameState.lives = 3;
