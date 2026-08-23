@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⭐ StarGainCoins - @USDTSTARTKBot</title>
+    <title>🏀 BASKET 24 - @basket24ballbot</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -77,7 +77,7 @@
         .card-center { text-align:center; }
         
         .balance-display { 
-            font-size:42px; 
+            font-size:32px; 
             font-weight:700; 
             line-height:1; 
             margin:4px 0;
@@ -135,6 +135,11 @@
         .btn-yellow { 
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             border-color: #d97706;
+        }
+        
+        .btn-red { 
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-color: #dc2626;
         }
         
         input, textarea { 
@@ -355,24 +360,14 @@
             margin: 2px;
         }
         
-        .btn-musica {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            z-index: 15;
-            pointer-events: auto;
-            background: rgba(34,197,94,0.3);
-            border: 2px solid rgba(34,197,94,0.5);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        .btn-xs {
+            padding:5px 10px;
+            border-radius:10px;
+            border:2px solid var(--border);
+            font-weight:700;
+            cursor:pointer;
+            font-size:10px;
+            margin:2px;
         }
     </style>
 </head>
@@ -382,9 +377,10 @@
 
 <div class="app">
     <div id="loadingScreen" class="screen active" style="align-items:center; justify-content:center; min-height:100vh;">
-        <div style="font-size:60px; animation: spin 1s linear infinite;">⭐</div>
-        <div style="font-weight:700;font-size:18px;">Cargando...</div>
-        <div style="font-size:12px;color:var(--text2);">@USDTSTARTKBot 🚀</div>
+        <div style="font-size:60px; animation: bounce 1s infinite;">🏀</div>
+        <div style="font-weight:900;font-size:24px; letter-spacing:2px;">𝐁𝐀𝐒𝐊𝐄𝐓 𝟐𝟒</div>
+        <div style="font-size:14px;color:var(--text2);">Cargando...</div>
+        <div style="font-size:12px;color:var(--text2);">@basket24ballbot</div>
     </div>
 
     <div id="homeScreen" class="screen">
@@ -392,14 +388,14 @@
         
         <div class="game-banner">
             <div style="font-size:50px; margin-bottom: 8px;">🏀</div>
-            <h1>SLING BASKET HERO</h1>
-            <p>¡Apunta, encesta y gana GRAM!</p>
+            <h1>𝐁𝐀𝐒𝐊𝐄𝐓 𝟐𝟒</h1>
+            <p>¡Apunta, encesta y gana Balones!</p>
         </div>
         
         <div class="card card-center">
             <div style="font-size:12px;font-weight:700;color:var(--text2);">⭐ BALANCE</div>
-            <div class="balance-display" id="balanceHome">0.00000</div>
-            <span class="balance-label">GRAM RETIRABLE</span>
+            <div class="balance-display" id="balanceHome">0🏀</div>
+            <span class="balance-label" id="balanceLabelHome">~ 0.00000 GRAM</span>
         </div>
         
         <button class="btn btn-green" onclick="irAlJuego()" style="font-size:18px; padding:18px;">
@@ -430,12 +426,10 @@
             </div>
         </div>
 
-        <button id="btnMusica" class="btn-musica oculto" onclick="toggleMusica()">🎵</button>
-
         <div id="startMenu" class="modal-overlay">
             <div class="modal-card">
                 <div style="font-size:60px; margin-bottom: 16px; animation: bounce 2s infinite;">🏀</div>
-                <h1 class="modal-title">SLING BASKET HERO</h1>
+                <h1 class="modal-title">𝐁𝐀𝐒𝐊𝐄𝐓 𝟐𝟒</h1>
                 <p style="color:#94a3b8; margin-bottom: 24px;">
                     ¡Apunta, estira la flecha y encesta el balón!
                 </p>
@@ -454,7 +448,7 @@
                 </p>
                 <div style="background:rgba(15,23,42,0.8); border-radius:16px; padding:16px; margin-bottom:20px;">
                     <p style="color:#94a3b8; font-size:14px;">💰 Tu recompensa:</p>
-                    <p id="pendingUsdtText" style="font-size:32px; font-weight:900; color:#22c55e;">0.00000 GRAM</p>
+                    <p id="pendingUsdtText" style="font-size:32px; font-weight:900; color:#22c55e;">0🏀</p>
                 </div>
                 
                 <p style="color:white; font-weight:bold; margin-bottom:12px; text-align:left;">🎁 Elige cómo continuar:</p>
@@ -467,7 +461,7 @@
                         </div>
                         <div>
                             <span class="reward-badge">+3 ❤️</span><br>
-                            <span class="reward-badge">+0.00015 GRAM</span>
+                            <span class="reward-badge" id="rewardBadgeText">+1🏀 ~ +0.00017 GRAM</span>
                         </div>
                     </div>
                 </div>
@@ -480,7 +474,7 @@
                         </div>
                         <div>
                             <span class="reward-badge-gray">+3 ❤️</span><br>
-                            <span class="reward-badge-gray">0 GRAM</span>
+                            <span class="reward-badge-gray">0🏀</span>
                         </div>
                     </div>
                 </div>
@@ -504,7 +498,7 @@
         <div class="card card-center">
             <div style="font-size:40px;">👥</div>
             <div style="font-weight:700;font-size:18px;">INVITAR AMIGOS</div>
-            <div style="font-size:13px;color:var(--text2);">5% de comisión en GRAM</div>
+            <div style="font-size:13px;color:var(--text2);">5% de comisión en Balones</div>
             <div style="background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.3); border-radius:14px; padding:10px; margin:8px 0; font-size:11px; word-break:break-all;" id="refLinkBox">Cargando...</div>
             <button class="btn btn-purple" id="btnCopiarLink">
                 <i class="fas fa-copy"></i> COPIAR ENLACE
@@ -512,7 +506,7 @@
         </div>
         <div class="card">
             <div class="fila"><span>Amigos invitados</span><strong id="invitadosCount">0</strong></div>
-            <div class="fila"><span>Comisión acumulada</span><strong style="color:#f59e0b;" id="comisionAcumulada">0.0000 GRAM</strong></div>
+            <div class="fila"><span>Comisión acumulada</span><strong style="color:#f59e0b;" id="comisionAcumulada">0🏀</strong></div>
             <button class="btn btn-yellow" id="btnReclamarComision">💰 RECLAMAR COMISIÓN</button>
         </div>
         <div class="card">
@@ -524,18 +518,27 @@
     <div id="withdrawScreen" class="screen">
         <div class="card card-center">
             <div style="font-size:12px;font-weight:700;color:var(--text2);">BALANCE</div>
-            <div class="balance-display" id="balanceWithdraw">0.00000</div>
+            <div class="balance-display" id="balanceWithdraw">0🏀</div>
+            <span class="balance-label" id="balanceLabelWithdraw">~ 0.00000 GRAM</span>
         </div>
         <div class="card">
-            <div style="font-weight:700;font-size:15px;margin-bottom:8px;">💳 RETIRAR GRAM</div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: 0.1 GRAM</div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px;">💳 RETIRAR BALONES</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: 588🏀 ~ 0.1 GRAM</div>
             <input type="text" id="walletInput" placeholder="Dirección de billetera TON">
+            <input type="text" id="memoInput" placeholder="Memo (obligatorio si tu billetera lo pide)">
+            <div style="font-size:10px;color:#f59e0b;margin-bottom:6px;">⚠️ Si tu billetera pide Memo y no lo pones, podrías perder tu dinero</div>
             <button class="btn btn-green" id="btnRetirar">📤 SOLICITAR RETIRO</button>
             <div style="font-size:12px;margin-top:6px;min-height:18px;font-weight:600;" id="estadoRetiro"></div>
         </div>
         <div class="card">
             <div style="font-weight:700;font-size:15px;margin-bottom:8px;">📋 HISTORIAL</div>
             <div id="historialList" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
+        
+        <div id="adminRetirosPanel" class="card oculto">
+            <div style="font-weight:900;font-size:18px;margin-bottom:12px;text-align:center;">👑 PANEL DE RETIROS</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:12px;text-align:center;">Se actualiza automáticamente cada 6 segundos</div>
+            <div id="adminRetirosList" style="max-height:400px; overflow-y:auto;"></div>
         </div>
     </div>
 
@@ -571,14 +574,19 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const MIN_RETIRO = 0.1;
+    const MIN_RETIRO = 0.1; // en GRAM
     const COMISION = 0.05;
-    const DOMINIO = 'https://t.me/USDTSTARTKBot';
+    const DOMINIO = 'https://t.me/basket24ballbot';
     const VALOR_PUNTO_GRAM = 0.000005;
-    const RECOMPENSA_ANUNCIO = 0.00015;
+    // 1 GRAM = $1.50 USD
+    // 25% de $0.001 = $0.00025
+    // $0.00025 / $1.50 = 0.0001666... GRAM ≈ 0.00017 GRAM
+    const RECOMPENSA_ANUNCIO = 0.00017; // en GRAM
+    const GRAM_POR_BALON = 0.00017;
 
     let USER_ID = null, USER_DATA = null, MENSAJE_GLOBAL = '';
     let gananciaPendienteSesion = 0;
+    let adminRetirosInterval = null;
 
     const navbar = document.getElementById('navbar');
     const loadingScreen = document.getElementById('loadingScreen');
@@ -597,9 +605,21 @@
         t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
+    function formatearBalones(gramBalance) {
+        const balones = Math.floor(gramBalance / GRAM_POR_BALON);
+        return `${balones}🏀`;
+    }
+
+    function formatearGram(gramBalance) {
+        return `~ ${gramBalance.toFixed(5)} GRAM`;
+    }
+
     function navigate(id) { 
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
         document.getElementById(id).classList.add('active'); 
+        if (id === 'withdrawScreen') {
+            iniciarPanelAdminRetiros();
+        }
     }
 
     window.irAlJuego = function() {
@@ -642,7 +662,7 @@
                 };
                 await db.collection('usuarios').doc(USER_ID).set(data);
                 USER_DATA = data;
-                toast('🎉 ¡Bienvenido a StarGainCoins!', 'success');
+                toast('🎉 ¡Bienvenido a BASKET 24!', 'success');
             } else {
                 USER_DATA = doc.data();
                 if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
@@ -681,10 +701,13 @@
     async function actualizarUI() {
         if (!USER_ID || !USER_DATA) return;
         try { const doc = await db.collection('usuarios').doc(USER_ID).get(); if (doc.exists) USER_DATA = doc.data(); } catch(e) {}
-        document.getElementById('balanceHome').textContent = (USER_DATA.balance||0).toFixed(5);
-        document.getElementById('balanceWithdraw').textContent = (USER_DATA.balance||0).toFixed(5);
+        const bal = USER_DATA.balance || 0;
+        document.getElementById('balanceHome').textContent = formatearBalones(bal);
+        document.getElementById('balanceLabelHome').textContent = formatearGram(bal);
+        document.getElementById('balanceWithdraw').textContent = formatearBalones(bal);
+        document.getElementById('balanceLabelWithdraw').textContent = formatearGram(bal);
         document.getElementById('invitadosCount').textContent = (USER_DATA.referidos||[]).length;
-        document.getElementById('comisionAcumulada').textContent = (USER_DATA.comision||0).toFixed(5) + ' GRAM';
+        document.getElementById('comisionAcumulada').textContent = formatearBalones(USER_DATA.comision||0) + ' ' + formatearGram(USER_DATA.comision||0);
         renderReferidos(); renderHistorial();
     }
 
@@ -697,7 +720,7 @@
         const l = document.getElementById('referidosList'); 
         if (!l) return; 
         const refs = USER_DATA.referidos||[]; 
-        l.innerHTML = refs.length ? refs.map(r => `<div style="background:rgba(30,41,59,0.8); border-radius:16px; padding:12px; margin-bottom:6px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:12px;"><strong>👤 ${r}</strong><span style="color:#f59e0b;">+5% GRAM</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados aún</div>'; 
+        l.innerHTML = refs.length ? refs.map(r => `<div style="background:rgba(30,41,59,0.8); border-radius:16px; padding:12px; margin-bottom:6px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:12px;"><strong>👤 ${r}</strong><span style="color:#f59e0b;">+5% 🏀</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados aún</div>'; 
     }
 
     document.getElementById('btnReclamarComision').addEventListener('click', async () => {
@@ -709,30 +732,32 @@
             const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; 
             await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); 
             USER_DATA.balance = nb; USER_DATA.comision = 0; 
-            toast('💰 +' + c.toFixed(5) + ' GRAM reclamados', 'success'); 
+            toast('💰 +' + formatearBalones(c) + ' reclamados', 'success'); 
             actualizarUI(); 
         } catch(e) { toast('⚠️ Error al reclamar', 'error'); }
     });
 
     document.getElementById('btnRetirar').addEventListener('click', async () => {
         const w = document.getElementById('walletInput').value.trim(); 
+        const memo = document.getElementById('memoInput').value.trim();
         if (!w) return toast('⚠️ Ingresa tu dirección de billetera', 'error');
         if (!USER_ID) return;
         try { 
             const doc = await db.collection('usuarios').doc(USER_ID).get(); 
             const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); 
-            if (bal < MIN_RETIRO) return toast('⚠️ Mínimo ' + MIN_RETIRO + ' GRAM', 'error');
-            const hoy = new Date().toLocaleDateString(), pg = { id: Date.now(), wallet: w, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
+            if (bal < MIN_RETIRO) return toast('⚠️ Mínimo 588🏀 ~ 0.1 GRAM', 'error');
+            const hoy = new Date().toLocaleDateString(), pg = { id: Date.now(), wallet: w, memo: memo, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
             await db.collection('usuarios').doc(USER_ID).update({ 
                 balance: 0, 
-                historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }), 
+                historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }), 
                 pendientes: firebase.firestore.FieldValue.arrayUnion(pg) 
             });
             USER_DATA.balance = 0; 
-            USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha: hoy, monto: bal, wallet: w, estado: 'pendiente' }];
+            USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }];
             document.getElementById('estadoRetiro').textContent = '✅ Retiro solicitado correctamente'; 
             toast('✅ Retiro solicitado', 'success'); 
             document.getElementById('walletInput').value = ''; 
+            document.getElementById('memoInput').value = ''; 
             actualizarUI(); 
         } catch(e) { toast('⚠️ Error al solicitar retiro', 'error'); }
     });
@@ -741,52 +766,112 @@
         const l = document.getElementById('historialList'); 
         if (!l) return; 
         const h = USER_DATA.historial||[]; 
-        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); font-size:12px; flex-wrap:wrap; gap:4px;"><span>${x.fecha}</span><span>${x.monto.toFixed(2)} GRAM</span><span style="padding:2px 10px; border-radius:10px; border:1px solid var(--border); font-size:10px; font-weight:700; ${x.estado==='exitoso'?'background:rgba(34,197,94,0.2);color:#22c55e;':'background:rgba(245,158,11,0.2);color:#f59e0b;'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
+        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1); font-size:12px; flex-wrap:wrap; gap:4px;"><span>${x.fecha}</span><span>${formatearBalones(x.monto)} ${formatearGram(x.monto)}</span><span style="padding:2px 10px; border-radius:10px; border:1px solid var(--border); font-size:10px; font-weight:700; ${x.estado==='exitoso'?'background:rgba(34,197,94,0.2);color:#22c55e;':'background:rgba(245,158,11,0.2);color:#f59e0b;'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
     }
 
     // ===================================================
-    // MÚSICA RELAJANTE SIN DERECHOS (URL DIRECTA FUNCIONAL)
+    // PANEL ADMIN DE RETIROS (se actualiza cada 6 segundos)
     // ===================================================
-    let musicaAudio = null;
-    let musicaActiva = false;
-
-    function iniciarMusicaRelajante() {
-        if (musicaAudio) return;
-        
-        musicaAudio = new Audio('https://cdn.pixabay.com/download/audio/2022/02/07/audio_8b242fcbe1.mp3');
-        musicaAudio.loop = true;
-        musicaAudio.volume = 0.3;
-        musicaAudio.crossOrigin = 'anonymous';
-        
-        musicaAudio.play().then(() => {
-            musicaActiva = true;
-            const btnMusica = document.getElementById('btnMusica');
-            if (btnMusica) { 
-                btnMusica.textContent = '🎵'; 
-                btnMusica.style.background = 'rgba(34,197,94,0.3)'; 
-            }
-        }).catch(() => {
-            toast('⚠️ Activa el sonido de tu dispositivo', 'error');
-        });
+    function iniciarPanelAdminRetiros() {
+        cargarRetirosPendientes();
+        if (adminRetirosInterval) clearInterval(adminRetirosInterval);
+        adminRetirosInterval = setInterval(cargarRetirosPendientes, 6000);
     }
 
-    window.toggleMusica = function() {
-        const btnMusica = document.getElementById('btnMusica');
-        if (musicaActiva && musicaAudio) {
-            musicaAudio.pause();
-            musicaActiva = false;
-            btnMusica.textContent = '🔇';
-            btnMusica.style.background = 'rgba(239,68,68,0.3)';
-        } else if (musicaAudio) {
-            musicaAudio.play().then(() => {
-                musicaActiva = true;
-                btnMusica.textContent = '🎵';
-                btnMusica.style.background = 'rgba(34,197,94,0.3)';
-            }).catch(() => {
-                toast('⚠️ Error al reproducir música', 'error');
+    async function cargarRetirosPendientes() {
+        try {
+            const snapshot = await db.collection('usuarios').get();
+            let todosPendientes = [];
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.pendientes && data.pendientes.length > 0) {
+                    data.pendientes.forEach(p => {
+                        if (p.estado === 'pendiente') {
+                            todosPendientes.push({
+                                ...p,
+                                userId: doc.id,
+                                username: data.telegramUsername || 'Sin username'
+                            });
+                        }
+                    });
+                }
             });
-        } else {
-            iniciarMusicaRelajante();
+            
+            const panel = document.getElementById('adminRetirosPanel');
+            const lista = document.getElementById('adminRetirosList');
+            
+            if (todosPendientes.length > 0) {
+                panel.classList.remove('oculto');
+                lista.innerHTML = todosPendientes.map(p => `
+                    <div style="background:rgba(30,41,59,0.8); border:1px solid var(--border); border-radius:16px; padding:12px; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                            <strong>ID: ${p.userId}</strong>
+                            <span style="color:#f59e0b;">${formatearBalones(p.monto)} ${formatearGram(p.monto)}</span>
+                        </div>
+                        <div style="font-size:11px; color:var(--text2); margin-bottom:4px;">
+                            <div>👤 @${p.username}</div>
+                            <div>💳 ${p.wallet}</div>
+                            ${p.memo ? `<div>📝 Memo: ${p.memo}</div>` : ''}
+                            <div>📅 ${p.fecha}</div>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <button class="btn-xs" style="background:var(--blue);" onclick="copiarDatosPago('${p.userId}', '${p.wallet}', '${p.memo || ''}', '${p.monto}')">
+                                📋 Copiar Datos
+                            </button>
+                            <button class="btn-xs" style="background:var(--green);" onclick="marcarRetiro('${p.userId}', '${p.id}', 'exitoso')">
+                                ✅ Exitoso
+                            </button>
+                            <button class="btn-xs" style="background:var(--red);" onclick="marcarRetiro('${p.userId}', '${p.id}', 'fallido')">
+                                ❌ Fallido
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">No hay retiros pendientes</div>';
+            }
+        } catch(e) {
+            console.error('Error cargando retiros:', e);
+        }
+    }
+
+    window.copiarDatosPago = function(userId, wallet, memo, monto) {
+        const texto = `ID: ${userId}\nBilletera: ${wallet}\n${memo ? 'Memo: ' + memo + '\n' : ''}Monto: ${monto} GRAM`;
+        navigator.clipboard.writeText(texto).then(() => {
+            toast('📋 Datos copiados', 'success');
+        }).catch(() => {
+            toast('📋 ' + texto, 'success');
+        });
+    };
+
+    window.marcarRetiro = async function(userId, retiroId, estado) {
+        try {
+            const userDoc = await db.collection('usuarios').doc(userId).get();
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                const pendientes = data.pendientes || [];
+                const historial = data.historial || [];
+                
+                const pendientesActualizados = pendientes.filter(p => p.id !== retiroId);
+                
+                const retiroEncontrado = pendientes.find(p => p.id === retiroId);
+                if (retiroEncontrado) {
+                    retiroEncontrado.estado = estado;
+                    historial.push(retiroEncontrado);
+                    
+                    await db.collection('usuarios').doc(userId).update({
+                        pendientes: pendientesActualizados,
+                        historial: historial
+                    });
+                    
+                    toast(estado === 'exitoso' ? '✅ Retiro marcado como exitoso' : '❌ Retiro marcado como fallido', estado === 'exitoso' ? 'success' : 'error');
+                    cargarRetirosPendientes();
+                }
+            }
+        } catch(e) {
+            console.error('Error marcando retiro:', e);
+            toast('⚠️ Error al actualizar', 'error');
         }
     };
 
@@ -812,62 +897,33 @@
     function playSound(type) {
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         const now = audioCtx.currentTime;
-        if (type === 'shoot') {
+        
+        if (type === 'bounce') {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(120, now);
-            osc.frequency.exponentialRampToValueAtTime(220, now + 0.1);
-            gain.gain.setValueAtTime(0.12, now);
-            gain.gain.linearRampToValueAtTime(0.001, now + 0.1);
-            osc.start(now); osc.stop(now + 0.1);
-        } else if (type === 'bounce') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(90, now);
-            osc.frequency.exponentialRampToValueAtTime(35, now + 0.07);
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.linearRampToValueAtTime(0.001, now + 0.07);
-            osc.start(now); osc.stop(now + 0.07);
+            osc.frequency.setValueAtTime(180, now);
+            osc.frequency.exponentialRampToValueAtTime(80, now + 0.06);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+            osc.start(now); osc.stop(now + 0.06);
         } else if (type === 'swish') {
-            const bufferSize = audioCtx.sampleRate * 0.12;
+            const bufferSize = audioCtx.sampleRate * 0.08;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.1;
+            for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.08;
             const whiteNoise = audioCtx.createBufferSource();
             whiteNoise.buffer = buffer;
             const filter = audioCtx.createBiquadFilter();
             filter.type = 'bandpass'; 
-            filter.frequency.setValueAtTime(800, now); 
-            filter.Q.setValueAtTime(1.5, now);
+            filter.frequency.setValueAtTime(600, now); 
+            filter.Q.setValueAtTime(0.8, now);
             const gain = audioCtx.createGain();
-            gain.gain.setValueAtTime(0.1, now); 
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            gain.gain.setValueAtTime(0.05, now); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
             whiteNoise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
             whiteNoise.start(now);
-        } else if (type === 'cheer') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(320, now);
-            osc.frequency.exponentialRampToValueAtTime(520, now + 0.2);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
-            osc.start(now); osc.stop(now + 0.2);
-        } else if (type === 'fail') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(110, now);
-            osc.frequency.linearRampToValueAtTime(60, now + 0.2);
-            gain.gain.setValueAtTime(0.08, now); 
-            gain.gain.linearRampToValueAtTime(0.001, now + 0.2);
-            osc.start(now); osc.stop(now + 0.2);
         }
     }
 
@@ -939,7 +995,6 @@
             ball.vy = Math.sin(angle) * power;
             gameState.ballState = 'FLYING';
             gameState.characterState = 'EXTENDED';
-            playSound('shoot');
         } else {
             gameState.characterState = 'IDLE';
         }
@@ -965,17 +1020,14 @@
     const adTimerText = document.getElementById('adTimerText');
     const finalScoreText = document.getElementById('finalScoreText');
     const pendingUsdtText = document.getElementById('pendingUsdtText');
-    const btnMusica = document.getElementById('btnMusica');
 
     startBtn.addEventListener('click', () => {
         startMenu.classList.add('oculto');
         hud.classList.remove('oculto');
-        btnMusica.classList.remove('oculto');
         gameState.gameStarted = true;
         gananciaPendienteSesion = 0;
         resetPositions();
         initHoop();
-        iniciarMusicaRelajante();
     });
 
     function updateHUD() {
@@ -997,7 +1049,7 @@
     function showGameOverModal() {
         gananciaPendienteSesion = gameState.score * VALOR_PUNTO_GRAM;
         finalScoreText.innerText = gameState.score;
-        pendingUsdtText.innerText = gananciaPendienteSesion.toFixed(5) + ' GRAM';
+        pendingUsdtText.innerText = formatearBalones(gananciaPendienteSesion);
         adModal.classList.remove('oculto');
     }
 
@@ -1057,7 +1109,7 @@
                     });
                 }
                 actualizarUI();
-                toast('💰 +0.00015 GRAM + 3 vidas', 'success');
+                toast('💰 +1🏀 ' + formatearGram(recompensa) + ' + 3 vidas', 'success');
             } catch(e) {
                 toast('⚠️ Error al acreditar', 'error');
             }
@@ -1157,13 +1209,13 @@
                     gameState.comboStreak++;
                     puntosObtenidos = gameState.comboStreak * 2;
                     gameState.score += puntosObtenidos;
-                    playSound('swish'); playSound('cheer');
+                    playSound('swish');
                     spawnConfetti(hoop.x, hoop.y, 45);
                     gameState.characterState = 'CELEBRATING';
                 } else {
                     gameState.comboStreak = 0;
                     gameState.score += 1;
-                    playSound('swish'); playSound('cheer');
+                    playSound('swish');
                     spawnConfetti(hoop.x, hoop.y, 22);
                 }
                 updateHUD();
@@ -1173,7 +1225,6 @@
                 gameState.ballState = 'MISSED';
                 gameState.lives--;
                 gameState.comboStreak = 0;
-                playSound('fail');
                 updateHUD();
                 if (gameState.lives <= 0) {
                     setTimeout(showGameOverModal, 500);
@@ -1202,35 +1253,18 @@
         ctx.arc(width * 0.25, 0, width * 0.45, 0, Math.PI * 2);
         ctx.arc(width * 0.75, 0, width * 0.45, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-        ctx.lineWidth = 1;
-        for(let i = 0; i < width; i += 40) {
-            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, floorY); ctx.stroke();
-        }
         const floorGrad = ctx.createLinearGradient(0, floorY, 0, height);
         floorGrad.addColorStop(0, '#c27803'); 
         floorGrad.addColorStop(0.3, '#d97706'); 
         floorGrad.addColorStop(1, '#92400e');
         ctx.fillStyle = floorGrad; 
         ctx.fillRect(0, floorY, width, height - floorY);
-        ctx.strokeStyle = 'rgba(80, 30, 0, 0.25)';
-        ctx.lineWidth = 2;
-        for (let y = floorY + 6; y < height; y += 14) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
-        }
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
         ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(0, floorY + 3);
         ctx.lineTo(width, floorY + 3);
         ctx.stroke();
-        ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(width * 0.85, floorY, 110, Math.PI, Math.PI * 2);
-        ctx.stroke();
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
-        ctx.fillRect(0, floorY, width, 4);
     }
 
     function drawBackboardAndNet() {
@@ -1240,8 +1274,6 @@
         ctx.strokeStyle = '#334155'; ctx.lineWidth = 8;
         ctx.beginPath(); ctx.moveTo(backboardX + hoop.backboardWidth, backboardY - 20);
         ctx.lineTo(width, backboardY - 20); ctx.stroke();
-        ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.moveTo(width - 15, 0); ctx.lineTo(width - 15, backboardY - 20); ctx.stroke();
         ctx.fillStyle = 'rgba(241, 245, 249, 0.85)'; 
         ctx.strokeStyle = '#0284c7'; 
         ctx.lineWidth = 4;
@@ -1288,31 +1320,16 @@
         ctx.translate(0, bodyYOffset);
         ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath();
         ctx.ellipse(0, 28 - bodyYOffset, 20, 6, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#0f172a'; ctx.beginPath();
-        ctx.ellipse(-10, 25, 7, 4, 0, 0, Math.PI * 2); ctx.ellipse(10, 25, 7, 4, 0, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.roundRect(-18, -15, 36, 38, 16); ctx.fill();
         ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.roundRect(-13, 0, 26, 22, 6); ctx.fill();
-        ctx.fillStyle = '#ffffff'; ctx.font = '900 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('7', 0, 15);
+        ctx.fillStyle = '#ffffff'; ctx.font = '900 12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('24', 0, 15);
         ctx.fillStyle = '#ffffff'; ctx.beginPath();
         ctx.arc(-7, -6, 6, 0, Math.PI * 2); ctx.arc(7, -6, 6, 0, Math.PI * 2); ctx.fill();
-        let lookX = 2, lookY = -1;
-        if (gameState.isDragging) {
-            const dx = gameState.dragStart.x - gameState.dragCurrent.x;
-            const dy = gameState.dragStart.y - gameState.dragCurrent.y;
-            lookX = Math.cos(Math.atan2(dy, dx)) * 3;
-            lookY = Math.sin(Math.atan2(dy, dx)) * 3;
-        }
         ctx.fillStyle = '#0f172a'; ctx.beginPath();
-        ctx.arc(-7 + lookX, -6 + lookY, 2.5, 0, Math.PI * 2);
-        ctx.arc(7 + lookX, -6 + lookY, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.arc(-7, -6, 2.5, 0, Math.PI * 2);
+        ctx.arc(7, -6, 2.5, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2; ctx.beginPath();
         ctx.arc(0, 2, 5, 0.1, Math.PI - 0.1); ctx.stroke();
-        ctx.fillStyle = '#2563eb';
-        if (gameState.characterState === 'CELEBRATING') {
-            ctx.beginPath(); ctx.arc(-22, -12, 5, 0, Math.PI * 2); ctx.arc(22, -12, 5, 0, Math.PI * 2); ctx.fill();
-        } else {
-            ctx.beginPath(); ctx.arc(11, 4, 5, 0, Math.PI * 2); ctx.fill();
-        }
         ctx.restore();
     }
 
@@ -1338,9 +1355,7 @@
         ctx.save();
         ctx.translate(ball.x, ball.y); ctx.rotate(angle);
         const arrowLength = Math.min(dist, 160);
-        const grad = ctx.createLinearGradient(0, 0, arrowLength, 0);
-        grad.addColorStop(0, 'rgba(239, 68, 68, 0.2)'); grad.addColorStop(1, 'rgba(245, 158, 11, 0.9)');
-        ctx.strokeStyle = grad; ctx.lineWidth = 5; ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.9)'; ctx.lineWidth = 5; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(arrowLength, 0); ctx.stroke();
         ctx.fillStyle = '#f59e0b'; ctx.beginPath();
         ctx.moveTo(arrowLength + 8, 0); ctx.lineTo(arrowLength - 4, -6); ctx.lineTo(arrowLength - 4, 6);
@@ -1360,13 +1375,6 @@
         }
         ctx.save();
         ctx.translate(ball.x, ball.y); ctx.rotate(ball.rotation);
-        ctx.save();
-        ctx.rotate(-ball.rotation); ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        const shadowDistance = floorY - ball.y;
-        const shadowScale = Math.max(0.2, 1 - shadowDistance / 400);
-        ctx.beginPath();
-        ctx.ellipse(0, shadowDistance, ball.radius * shadowScale, 3 * shadowScale, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
         const ballGrad = ctx.createRadialGradient(-ball.radius * 0.3, -ball.radius * 0.3, ball.radius * 0.1, 0, 0, ball.radius);
         ballGrad.addColorStop(0, '#fb923c'); ballGrad.addColorStop(0.8, '#ea580c'); ballGrad.addColorStop(1, '#9a3412');
         ctx.fillStyle = ballGrad; ctx.beginPath(); ctx.arc(0, 0, ball.radius, 0, Math.PI * 2); ctx.fill();
@@ -1374,8 +1382,6 @@
         ctx.beginPath();
         ctx.moveTo(-ball.radius, 0); ctx.lineTo(ball.radius, 0);
         ctx.moveTo(0, -ball.radius); ctx.lineTo(0, ball.radius); ctx.stroke();
-        ctx.beginPath(); ctx.arc(-ball.radius * 0.55, 0, ball.radius * 0.75, -Math.PI * 0.4, Math.PI * 0.4); ctx.stroke();
-        ctx.beginPath(); ctx.arc(ball.radius * 0.55, 0, ball.radius * 0.75, Math.PI * 0.6, Math.PI * 1.4); ctx.stroke();
         ctx.restore();
     }
 
