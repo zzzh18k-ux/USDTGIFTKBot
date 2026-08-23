@@ -27,344 +27,45 @@
             --purple: #8b5cf6;
         }
         
-        * { 
-            margin:0; 
-            padding:0; 
-            box-sizing:border-box; 
-            -webkit-tap-highlight-color:transparent; 
-            font-family:'Fredoka',sans-serif; 
-            color:var(--text); 
-        }
-        
-        body { 
-            background: var(--bg); 
-            min-height:100vh; 
-            display:flex; 
-            justify-content:center; 
-            overflow-x: hidden; 
-        }
-        
-        .app { 
-            max-width:450px; 
-            width:100%; 
-            display:flex; 
-            flex-direction:column; 
-            min-height:100vh; 
-            position: relative; 
-        }
-        
-        .screen { 
-            display:none; 
-            flex-direction:column; 
-            padding:16px; 
-            gap:14px; 
-            padding-bottom:100px; 
-            width: 100%; 
-        }
-        
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family:'Fredoka',sans-serif; color:var(--text); }
+        body { background: var(--bg); min-height:100vh; display:flex; justify-content:center; overflow-x: hidden; }
+        .app { max-width:450px; width:100%; display:flex; flex-direction:column; min-height:100vh; position: relative; }
+        .screen { display:none; flex-direction:column; padding:16px; gap:14px; padding-bottom:100px; width: 100%; }
         .screen.active { display:flex; }
-        
-        .card { 
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-radius:20px; 
-            padding:20px; 
-            border:1px solid rgba(255,255,255,0.08); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
-        
+        .card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius:20px; padding:20px; border:1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         .card-center { text-align:center; }
-        
-        .balance-display { 
-            font-size:36px; 
-            font-weight:700; 
-            line-height:1.2; 
-            margin:4px 0;
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .balance-label { 
-            font-size:11px; 
-            letter-spacing:1px; 
-            color: var(--amber); 
-            font-weight:600; 
-            background: rgba(245,158,11,0.08);
-            display:inline-block; 
-            padding:4px 14px; 
-            border-radius:20px; 
-        }
-        
-        .btn { 
-            width:100%; 
-            padding:14px; 
-            border:none; 
-            border-radius:14px; 
-            font-weight:600; 
-            font-size:14px; 
-            cursor:pointer; 
-            transition:all 0.2s; 
-            text-align:center; 
-            margin-top:6px; 
-            background: var(--card);
-            letter-spacing: 0.5px;
-        }
-        
+        .balance-display { font-size:36px; font-weight:700; line-height:1.2; margin:4px 0; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .balance-label { font-size:11px; letter-spacing:1px; color: var(--amber); font-weight:600; background: rgba(245,158,11,0.08); display:inline-block; padding:4px 14px; border-radius:20px; }
+        .btn { width:100%; padding:14px; border:none; border-radius:14px; font-weight:600; font-size:14px; cursor:pointer; transition:all 0.2s; text-align:center; margin-top:6px; background: var(--card); letter-spacing: 0.5px; }
         .btn:active { transform:scale(0.97); }
-        .btn:disabled { opacity:0.5; cursor:not-allowed; }
-        
-        .btn-green { 
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-        }
-        
-        .btn-green:hover {
-            box-shadow: 0 4px 15px rgba(34,197,94,0.3);
-        }
-        
-        .btn-purple { 
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-        }
-        
-        .btn-yellow { 
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-        
-        .input-field {
-            width:100%; 
-            padding:14px 16px; 
-            border-radius:12px; 
-            border:1px solid rgba(255,255,255,0.1); 
-            background: rgba(15,23,42,0.5); 
-            font-size:13px; 
-            font-weight:500; 
-            outline:none; 
-            margin:6px 0; 
-            color: var(--text);
-            transition: all 0.3s;
-        }
-        
-        .input-field:focus {
-            border-color: var(--amber);
-            background: rgba(15,23,42,0.7);
-            box-shadow: 0 0 12px rgba(245,158,11,0.15);
-        }
-        
-        .input-field::placeholder {
-            color: rgba(148,163,184,0.5);
-        }
-        
-        .fila { 
-            display:flex; 
-            justify-content:space-between; 
-            padding:8px 0; 
-            border-bottom:1px solid rgba(255,255,255,0.06); 
-            font-size:13px; 
-            font-weight:500; 
-        }
-        
+        .btn-green { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; }
+        .btn-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
+        .btn-yellow { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .input-field { width:100%; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background: rgba(15,23,42,0.5); font-size:13px; font-weight:500; outline:none; margin:6px 0; color: var(--text); transition: all 0.3s; }
+        .input-field:focus { border-color: var(--amber); background: rgba(15,23,42,0.7); }
+        .fila { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:13px; font-weight:500; }
         .fila:last-child { border:none; }
-        
-        .navbar { 
-            position:fixed; 
-            bottom:0; 
-            left:50%; 
-            transform:translateX(-50%); 
-            max-width:450px; 
-            width:100%; 
-            background: rgba(30,41,59,0.98);
-            backdrop-filter: blur(10px);
-            border-top:1px solid rgba(255,255,255,0.08); 
-            display:flex; 
-            justify-content:space-around; 
-            padding:10px 0; 
-            z-index:100; 
-        }
-        
-        .nav-btn { 
-            display:flex; 
-            flex-direction:column; 
-            align-items:center; 
-            gap:3px; 
-            cursor:pointer; 
-            padding:8px 16px; 
-            border-radius:12px; 
-            transition:all 0.2s; 
-            background:transparent; 
-            border:none; 
-            font-weight:600; 
-            font-size:10px; 
-            color: var(--text2);
-            letter-spacing: 0.3px;
-        }
-        
+        .navbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:450px; width:100%; background: rgba(30,41,59,0.98); border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-around; padding:10px 0; z-index:100; }
+        .nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:8px 16px; border-radius:12px; transition:all 0.2s; background:transparent; border:none; font-weight:600; font-size:10px; color: var(--text2); }
         .nav-btn i { font-size:18px; }
-        
-        .nav-btn.active { 
-            background: rgba(245,158,11,0.12);
-            color: var(--amber);
-        }
-        
-        .toast { 
-            position:fixed; 
-            bottom:80px; 
-            left:50%; 
-            transform:translateX(-50%); 
-            background: var(--card); 
-            color:#FFF; 
-            padding:12px 24px; 
-            border-radius:14px; 
-            font-size:12px; 
-            z-index:999; 
-            opacity:0; 
-            transition:opacity 0.3s; 
-            pointer-events:none; 
-            white-space:nowrap; 
-            font-weight:600; 
-            border:1px solid rgba(255,255,255,0.1);
-        }
-        
+        .nav-btn.active { background: rgba(245,158,11,0.12); color: var(--amber); }
+        .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background: var(--card); color:#FFF; padding:12px 24px; border-radius:14px; font-size:12px; z-index:999; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; font-weight:600; border:1px solid rgba(255,255,255,0.1); }
         .toast.show { opacity:1; }
-        
         .oculto { display:none !important; }
-        
-        #gameScreen { 
-            padding: 0; 
-            position: relative; 
-            height: calc(100vh - 70px); 
-            overflow: hidden; 
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        }
-        
-        #gameCanvas { 
-            display: block; 
-            width: 100%; 
-            height: 100%; 
-            touch-action: none; 
-        }
-        
-        .game-banner {
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            border-radius: 20px;
-            padding: 30px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(245,158,11,0.25);
-        }
-        
-        .game-banner h1 {
-            font-size: 34px;
-            font-weight: 900;
-            color: white;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 1;
-            letter-spacing: 1px;
-        }
-        
-        .game-banner p {
-            color: rgba(255,255,255,0.9);
-            position: relative;
-            z-index: 1;
-            font-weight: 500;
-        }
-        
-        .modal-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            z-index: 20;
-        }
-        
-        .modal-card {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border: 1px solid rgba(245,158,11,0.2);
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        
-        .modal-title {
-            font-size: 26px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        }
-        
-        .option-card {
-            background: rgba(30,41,59,0.6);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .option-card:hover {
-            border-color: rgba(245,158,11,0.4);
-            transform: translateY(-1px);
-        }
-        
-        .reward-badge {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-            display: inline-block;
-            margin: 2px;
-            letter-spacing: 0.3px;
-        }
-        
-        .reward-badge-gray {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-            display: inline-block;
-            margin: 2px;
-        }
-        
-        .admin-btn {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 10px;
-            letter-spacing: 0.3px;
-            transition: all 0.2s;
-        }
-        
-        .admin-btn:active { transform: scale(0.95); }
-        
-        .memo-info {
-            background: rgba(59,130,246,0.08);
-            border-left: 3px solid #3b82f6;
-            padding: 10px 14px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-        }
+        #gameScreen { padding: 0; position: relative; height: calc(100vh - 70px); overflow: hidden; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        #gameCanvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        .game-banner { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); border-radius: 20px; padding: 30px 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(245,158,11,0.25); }
+        .game-banner h1 { font-size: 34px; font-weight: 900; color: white; position: relative; z-index: 1; letter-spacing: 1px; }
+        .game-banner p { color: rgba(255,255,255,0.9); position: relative; z-index: 1; font-weight: 500; }
+        .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+        .modal-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(245,158,11,0.2); border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; text-align: center; }
+        .modal-title { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; }
+        .option-card { background: rgba(30,41,59,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .reward-badge { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; display: inline-block; margin: 2px; }
+        .reward-badge-gray { background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; display: inline-block; margin: 2px; }
+        .admin-btn { padding: 6px 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 10px; }
+        .memo-info { background: rgba(59,130,246,0.08); border-left: 3px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 8px; }
+        .mensaje-global-profesional { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
@@ -380,7 +81,7 @@
     </div>
 
     <div id="homeScreen" class="screen">
-        <div id="mensajeGlobalBox" class="oculto" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius:12px; padding:12px; text-align:center; font-size:12px; font-weight:500;"></div>
+        <div id="mensajeGlobalBox" class="oculto mensaje-global-profesional"></div>
         
         <div class="game-banner">
             <i class="fas fa-basketball-ball" style="font-size:50px; margin-bottom: 8px; color: white;"></i>
@@ -390,7 +91,7 @@
         
         <div class="card card-center">
             <div style="font-size:11px;font-weight:600;color:var(--text2); letter-spacing:1px;">BALANCE</div>
-            <div class="balance-display" id="balanceHome">0</div>
+            <div class="balance-display" id="balanceHome"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> 0</div>
             <span class="balance-label" id="balanceLabelHome">~ 0.00000 GRAM</span>
         </div>
         
@@ -405,12 +106,12 @@
         <div id="hud" class="oculto" style="position:absolute; top:0; left:0; width:100%; padding:16px; pointer-events:none; display:flex; justify-content:space-between; align-items:flex-start; z-index:10;">
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <div style="background:rgba(30,41,59,0.9); border:1px solid rgba(245,158,11,0.2); padding:8px 14px; border-radius:12px;">
-                    <span style="font-size:9px; text-transform:uppercase; font-weight:600; color:#f59e0b; letter-spacing:1px;">Puntos</span>
+                    <span style="font-size:9px; text-transform:uppercase; font-weight:600; color:#f59e0b;">Puntos</span>
                     <div id="scoreText" style="font-size:28px; font-weight:800; color:#f59e0b;">0</div>
                 </div>
             </div>
             <div style="background:rgba(30,41,59,0.9); border:1px solid rgba(255,255,255,0.1); padding:8px 14px; border-radius:12px;">
-                <span style="font-size:9px; text-transform:uppercase; font-weight:600; color:#94a3b8; letter-spacing:1px;">Vidas</span>
+                <span style="font-size:9px; text-transform:uppercase; font-weight:600; color:#94a3b8;">Vidas</span>
                 <div id="livesContainer" style="font-size:20px;">
                     <i class="fas fa-heart" style="color:#ef4444;"></i>
                     <i class="fas fa-heart" style="color:#ef4444;"></i>
@@ -423,12 +124,8 @@
             <div class="modal-card">
                 <i class="fas fa-basketball-ball" style="font-size:60px; margin-bottom: 16px; animation: bounce 2s infinite; color: #f59e0b;"></i>
                 <h1 class="modal-title">BASKET 24</h1>
-                <p style="color:#94a3b8; margin-bottom: 24px; font-size: 13px;">
-                    Apunta, estira y encesta el balón
-                </p>
-                <button id="startBtn" class="btn btn-green" style="font-size:16px; padding:16px;">
-                    <i class="fas fa-rocket"></i> Empezar Juego
-                </button>
+                <p style="color:#94a3b8; margin-bottom: 24px; font-size: 13px;">Apunta, estira y encesta el balón</p>
+                <button id="startBtn" class="btn btn-green" style="font-size:16px; padding:16px;"><i class="fas fa-rocket"></i> Empezar Juego</button>
             </div>
         </div>
 
@@ -436,16 +133,12 @@
             <div class="modal-card">
                 <i class="fas fa-heart-broken" style="font-size:40px; margin-bottom: 8px; color:#ef4444;"></i>
                 <h2 class="modal-title">Sin Vidas</h2>
-                <p style="color:#94a3b8; margin-bottom: 16px; font-size: 13px;">
-                    Puntuación: <span id="finalScoreText" style="color:#f59e0b; font-weight:700;">0</span> puntos
-                </p>
+                <p style="color:#94a3b8; margin-bottom: 16px; font-size: 13px;">Puntuación: <span id="finalScoreText" style="color:#f59e0b; font-weight:700;">0</span> puntos</p>
                 <div style="background:rgba(15,23,42,0.6); border-radius:12px; padding:16px; margin-bottom:20px;">
                     <p style="color:#94a3b8; font-size:12px;">Tu recompensa</p>
                     <p id="pendingUsdtText" style="font-size:28px; font-weight:800; color:#22c55e;">0</p>
                 </div>
-                
                 <p style="color:white; font-weight:600; margin-bottom:12px; text-align:left; font-size:13px;">Elige cómo continuar:</p>
-                
                 <div class="option-card" onclick="mostrarAnuncio()">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="text-align:left;">
@@ -454,11 +147,10 @@
                         </div>
                         <div>
                             <span class="reward-badge"><i class="fas fa-heart"></i> +3</span><br>
-                            <span class="reward-badge" id="rewardBadgeText">+1 ~ +0.00017 GRAM</span>
+                            <span class="reward-badge" id="rewardBadgeText"><i class="fas fa-basketball-ball"></i> +1 ~ +0.00017 GRAM</span>
                         </div>
                     </div>
                 </div>
-                
                 <div class="option-card" onclick="reiniciarJuegoCompleto()">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="text-align:left;">
@@ -479,9 +171,7 @@
                 <i class="fas fa-video" style="font-size:50px; margin-bottom:16px; animation: spin 1s linear infinite; color:#f59e0b;"></i>
                 <h3 style="font-size:18px; font-weight:600; margin-bottom:8px;">Cargando anuncio...</h3>
                 <p style="color:#94a3b8; font-size:13px; margin-bottom:24px;">Tu recompensa se acreditará al finalizar</p>
-                <div style="width:200px; background:#1e293b; height:6px; border-radius:10px; overflow:hidden; margin:0 auto 16px;">
-                    <div id="adProgressBar" style="background:#f59e0b; height:100%; width:0%; transition:width 0.3s;"></div>
-                </div>
+                <div style="width:200px; background:#1e293b; height:6px; border-radius:10px; overflow:hidden; margin:0 auto 16px;"><div id="adProgressBar" style="background:#f59e0b; height:100%; width:0%; transition:width 0.3s;"></div></div>
                 <p id="adTimerText" style="font-size:22px; font-weight:700; color:#f59e0b;">3s</p>
             </div>
         </div>
@@ -493,9 +183,7 @@
             <div style="font-weight:700;font-size:16px; margin-top:4px;">INVITAR AMIGOS</div>
             <div style="font-size:12px;color:var(--text2);">5% de comisión</div>
             <div style="background:rgba(139,92,246,0.08); border:1px solid rgba(139,92,246,0.2); border-radius:12px; padding:10px; margin:8px 0; font-size:10px; word-break:break-all;" id="refLinkBox">Cargando...</div>
-            <button class="btn btn-purple" id="btnCopiarLink">
-                <i class="fas fa-copy"></i> Copiar Enlace
-            </button>
+            <button class="btn btn-purple" id="btnCopiarLink"><i class="fas fa-copy"></i> Copiar Enlace</button>
         </div>
         <div class="card">
             <div class="fila"><span>Amigos invitados</span><strong id="invitadosCount">0</strong></div>
@@ -510,20 +198,26 @@
 
     <div id="withdrawScreen" class="screen">
         <div class="card card-center">
-            <div style="font-size:11px;font-weight:600;color:var(--text2); letter-spacing:1px;">BALANCE</div>
-            <div class="balance-display" id="balanceWithdraw">0</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text2);">BALANCE</div>
+            <div class="balance-display" id="balanceWithdraw"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> 0</div>
             <span class="balance-label" id="balanceLabelWithdraw">~ 0.00000 GRAM</span>
         </div>
         <div class="card">
             <div style="font-weight:600;font-size:14px;margin-bottom:8px;"><i class="fas fa-wallet" style="color:#f59e0b;"></i> Retirar Fondos</div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Mínimo: 588 balones ~ 0.1 GRAM</div>
+            <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.15); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <i class="fas fa-clock" style="color: #f59e0b; margin-right: 8px; font-size: 13px;"></i>
+                    <span style="font-size: 12px; font-weight: 600; color: #fbbf24;">Tiempo de procesamiento: 24 horas a 1 semana</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <i class="fas fa-coins" style="color: #f59e0b; margin-right: 8px; font-size: 13px;"></i>
+                    <span style="font-size: 11px; color: #94a3b8;">Mínimo de retiro: 588 balones ~ 0.1 GRAM</span>
+                </div>
+            </div>
             <input type="text" id="walletInput" class="input-field" placeholder="Dirección de billetera TON">
             <input type="text" id="memoInput" class="input-field" placeholder="Memo (solo si tu billetera lo requiere)">
             <div class="memo-info">
-                <p style="font-size:10px; color:#93c5fd; margin:0;">
-                    <i class="fas fa-info-circle"></i> 
-                    <strong>Importante:</strong> Si tu billetera requiere Memo, es obligatorio incluirlo para no perder los fondos.
-                </p>
+                <p style="font-size:10px; color:#93c5fd; margin:0;"><i class="fas fa-info-circle"></i> <strong>Importante:</strong> Si tu billetera requiere Memo, es obligatorio incluirlo para no perder los fondos.</p>
             </div>
             <button class="btn btn-green" id="btnRetirar"><i class="fas fa-paper-plane"></i> Solicitar Retiro</button>
             <div style="font-size:11px;margin-top:6px;min-height:18px;font-weight:500;" id="estadoRetiro"></div>
@@ -532,7 +226,6 @@
             <div style="font-weight:600;font-size:14px;margin-bottom:8px;">Historial</div>
             <div id="historialList" style="max-height:200px; overflow-y:auto;"></div>
         </div>
-        
         <div id="adminRetirosPanel" class="card oculto">
             <div style="font-weight:700;font-size:16px;margin-bottom:12px;text-align:center;"><i class="fas fa-crown" style="color:#f59e0b;"></i> Panel de Retiros</div>
             <div style="font-size:10px;color:var(--text2);margin-bottom:12px;text-align:center;">Actualización automática cada 6 segundos</div>
@@ -541,18 +234,10 @@
     </div>
 
     <div id="navbar" class="navbar oculto">
-        <button class="nav-btn active" data-screen="homeScreen">
-            <i class="fas fa-home"></i><span>Inicio</span>
-        </button>
-        <button class="nav-btn" data-screen="gameScreen" onclick="irAlJuego()">
-            <i class="fas fa-basketball-ball"></i><span>Juego</span>
-        </button>
-        <button class="nav-btn" data-screen="inviteScreen">
-            <i class="fas fa-users"></i><span>Invitar</span>
-        </button>
-        <button class="nav-btn" data-screen="withdrawScreen">
-            <i class="fas fa-wallet"></i><span>Retirar</span>
-        </button>
+        <button class="nav-btn active" data-screen="homeScreen"><i class="fas fa-home"></i><span>Inicio</span></button>
+        <button class="nav-btn" data-screen="gameScreen" onclick="irAlJuego()"><i class="fas fa-basketball-ball"></i><span>Juego</span></button>
+        <button class="nav-btn" data-screen="inviteScreen"><i class="fas fa-users"></i><span>Invitar</span></button>
+        <button class="nav-btn" data-screen="withdrawScreen"><i class="fas fa-wallet"></i><span>Retirar</span></button>
     </div>
 </div>
 
@@ -612,9 +297,7 @@
     function navigate(id) { 
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
         document.getElementById(id).classList.add('active'); 
-        if (id === 'withdrawScreen') {
-            iniciarPanelAdminRetiros();
-        }
+        if (id === 'withdrawScreen') { iniciarPanelAdminRetiros(); }
     }
 
     window.irAlJuego = function() {
@@ -631,7 +314,10 @@
             if (doc.exists) { MENSAJE_GLOBAL = doc.data().mensajeGlobal || ''; }
         } catch(e) {}
         const mb = document.getElementById('mensajeGlobalBox');
-        if (MENSAJE_GLOBAL && mb) { mb.innerHTML = MENSAJE_GLOBAL; mb.classList.remove('oculto'); } else if (mb) { mb.classList.add('oculto'); }
+        if (MENSAJE_GLOBAL && mb) { 
+            mb.innerHTML = '<i class="fas fa-clock" style="color:#f59e0b; font-size:16px;"></i><div><p style="font-size:11px; font-weight:600; color:#fbbf24; margin:0;">' + MENSAJE_GLOBAL + '</p></div>'; 
+            mb.classList.remove('oculto'); 
+        } else if (mb) { mb.classList.add('oculto'); }
     }
 
     async function entrarApp() {
@@ -645,16 +331,10 @@
                     const refDoc = await db.collection('usuarios').doc(refCode).get();
                     if (refDoc.exists) {
                         referidoPorValido = refCode;
-                        await db.collection('usuarios').doc(refCode).update({
-                            referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID)
-                        });
+                        await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
                     }
                 }
-                const data = { 
-                    telegramId, telegramUsername, telegramFirstName, balance: 0, 
-                    referidoPor: referidoPorValido, referidos: [], comision: 0, 
-                    historial: [], pendientes: [], creado: Date.now() 
-                };
+                const data = { telegramId, telegramUsername, telegramFirstName, balance: 0, referidoPor: referidoPorValido, referidos: [], comision: 0, historial: [], pendientes: [], creado: Date.now() };
                 await db.collection('usuarios').doc(USER_ID).set(data);
                 USER_DATA = data;
                 toast('Bienvenido a BASKET 24', 'success');
@@ -664,17 +344,13 @@
                     const refDoc = await db.collection('usuarios').doc(refCode).get();
                     if (refDoc.exists) {
                         await db.collection('usuarios').doc(USER_ID).update({ referidoPor: refCode });
-                        await db.collection('usuarios').doc(refCode).update({
-                            referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID)
-                        });
+                        await db.collection('usuarios').doc(refCode).update({ referidos: firebase.firestore.FieldValue.arrayUnion(USER_ID) });
                         USER_DATA.referidoPor = refCode;
                         toast('Referencia registrada', 'success');
                     }
                 }
             }
-        } catch(e) { 
-            USER_DATA = { balance: 0, historial: [], referidos: [] }; 
-        }
+        } catch(e) { USER_DATA = { balance: 0, historial: [], referidos: [] }; }
         loadingScreen.classList.remove('active'); 
         navigate('homeScreen'); 
         navbar.classList.remove('oculto');
@@ -697,12 +373,12 @@
         if (!USER_ID || !USER_DATA) return;
         try { const doc = await db.collection('usuarios').doc(USER_ID).get(); if (doc.exists) USER_DATA = doc.data(); } catch(e) {}
         const bal = USER_DATA.balance || 0;
-        document.getElementById('balanceHome').textContent = formatearBalones(bal) + ' 🏀';
+        document.getElementById('balanceHome').innerHTML = '<i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> ' + formatearBalones(bal);
         document.getElementById('balanceLabelHome').textContent = formatearGram(bal);
-        document.getElementById('balanceWithdraw').textContent = formatearBalones(bal) + ' 🏀';
+        document.getElementById('balanceWithdraw').innerHTML = '<i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> ' + formatearBalones(bal);
         document.getElementById('balanceLabelWithdraw').textContent = formatearGram(bal);
         document.getElementById('invitadosCount').textContent = (USER_DATA.referidos||[]).length;
-        document.getElementById('comisionAcumulada').textContent = formatearBalones(USER_DATA.comision||0) + ' 🏀';
+        document.getElementById('comisionAcumulada').innerHTML = '<i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:12px;"></i> ' + formatearBalones(USER_DATA.comision||0);
         renderReferidos(); renderHistorial();
     }
 
@@ -715,7 +391,7 @@
         const l = document.getElementById('referidosList'); 
         if (!l) return; 
         const refs = USER_DATA.referidos||[]; 
-        l.innerHTML = refs.length ? refs.map(r => `<div style="background:rgba(30,41,59,0.6); border-radius:12px; padding:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;"><strong><i class="fas fa-user" style="color:#8b5cf6;"></i> ${r}</strong><span style="color:#f59e0b;">+5%</span></div>`).join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados aún</div>'; 
+        l.innerHTML = refs.length ? refs.map(r => '<div style="background:rgba(30,41,59,0.6); border-radius:12px; padding:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:11px;"><strong><i class="fas fa-user" style="color:#8b5cf6;"></i> ' + r + '</strong><span style="color:#f59e0b;">+5%</span></div>').join('') : '<div style="text-align:center;padding:14px;color:var(--text2);">Sin invitados aún</div>'; 
     }
 
     document.getElementById('btnReclamarComision').addEventListener('click', async () => {
@@ -727,7 +403,7 @@
             const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; 
             await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); 
             USER_DATA.balance = nb; USER_DATA.comision = 0; 
-            toast('+' + formatearBalones(c) + ' 🏀 reclamados', 'success'); 
+            toast('+ balones reclamados', 'success'); 
             actualizarUI(); 
         } catch(e) { toast('Error al reclamar', 'error'); }
     });
@@ -740,13 +416,9 @@
         try { 
             const doc = await db.collection('usuarios').doc(USER_ID).get(); 
             const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); 
-            if (bal < MIN_RETIRO) return toast('Mínimo 588 🏀 ~ 0.1 GRAM', 'error');
+            if (bal < MIN_RETIRO) return toast('Mínimo 588 balones ~ 0.1 GRAM', 'error');
             const hoy = new Date().toLocaleDateString(), pg = { id: Date.now().toString(), wallet: w, memo: memo, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
-            await db.collection('usuarios').doc(USER_ID).update({ 
-                balance: 0, 
-                historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }), 
-                pendientes: firebase.firestore.FieldValue.arrayUnion(pg) 
-            });
+            await db.collection('usuarios').doc(USER_ID).update({ balance: 0, historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }), pendientes: firebase.firestore.FieldValue.arrayUnion(pg) });
             USER_DATA.balance = 0; 
             USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }];
             document.getElementById('estadoRetiro').textContent = 'Retiro solicitado correctamente'; 
@@ -761,12 +433,9 @@
         const l = document.getElementById('historialList'); 
         if (!l) return; 
         const h = USER_DATA.historial||[]; 
-        l.innerHTML = h.length ? h.slice().reverse().map(x => `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:11px; flex-wrap:wrap; gap:4px;"><span>${x.fecha}</span><span>${formatearBalones(x.monto)} 🏀</span><span style="padding:2px 8px; border-radius:8px; font-size:9px; font-weight:600; ${x.estado==='exitoso'?'background:rgba(34,197,94,0.15);color:#22c55e;':'background:rgba(245,158,11,0.15);color:#f59e0b;'}">${x.estado.toUpperCase()}</span></div>`).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
+        l.innerHTML = h.length ? h.slice().reverse().map(x => '<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:11px; flex-wrap:wrap; gap:4px;"><span>' + x.fecha + '</span><span><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:10px;"></i> ' + formatearBalones(x.monto) + '</span><span style="padding:2px 8px; border-radius:8px; font-size:9px; font-weight:600; ' + (x.estado==='exitoso'?'background:rgba(34,197,94,0.15);color:#22c55e;':'background:rgba(245,158,11,0.15);color:#f59e0b;') + '">' + x.estado.toUpperCase() + '</span></div>').join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
     }
 
-    // ===================================================
-    // PANEL ADMIN DE RETIROS
-    // ===================================================
     function iniciarPanelAdminRetiros() {
         cargarRetirosPendientes();
         if (adminRetirosInterval) clearInterval(adminRetirosInterval);
@@ -777,32 +446,25 @@
         try {
             const snapshot = await db.collection('usuarios').get();
             let todosPendientes = [];
-            
             snapshot.forEach(doc => {
                 const data = doc.data();
                 if (data.pendientes && data.pendientes.length > 0) {
                     data.pendientes.forEach(p => {
                         if (p.estado === 'pendiente') {
-                            todosPendientes.push({
-                                ...p,
-                                userId: doc.id,
-                                username: data.telegramUsername || 'Sin username'
-                            });
+                            todosPendientes.push({ ...p, userId: doc.id, username: data.telegramUsername || 'Sin username' });
                         }
                     });
                 }
             });
-            
             const panel = document.getElementById('adminRetirosPanel');
             const lista = document.getElementById('adminRetirosList');
-            
             if (todosPendientes.length > 0) {
                 panel.classList.remove('oculto');
                 lista.innerHTML = todosPendientes.map(p => `
                     <div style="background:rgba(30,41,59,0.6); border-radius:12px; padding:12px; margin-bottom:8px;">
                         <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
                             <strong style="font-size:11px;">ID: ${p.userId}</strong>
-                            <span style="color:#f59e0b; font-size:11px;">${formatearBalones(p.monto)} 🏀</span>
+                            <span style="color:#f59e0b; font-size:11px;"><i class="fas fa-basketball-ball"></i> ${formatearBalones(p.monto)}</span>
                         </div>
                         <div style="font-size:10px; color:var(--text2); margin-bottom:4px;">
                             <div><i class="fas fa-user"></i> @${p.username}</div>
@@ -811,33 +473,21 @@
                             <div><i class="fas fa-calendar"></i> ${p.fecha}</div>
                         </div>
                         <div style="display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;">
-                            <button class="admin-btn" style="background:#3b82f6; color:white;" onclick="copiarDatosPago('${p.userId}', '${p.wallet}', '${p.memo || ''}', '${p.monto}')">
-                                <i class="fas fa-copy"></i> Copiar
-                            </button>
-                            <button class="admin-btn" style="background:#22c55e; color:white;" onclick="marcarRetiro('${p.userId}', '${p.id}', 'exitoso')">
-                                <i class="fas fa-check"></i> Aprobar
-                            </button>
-                            <button class="admin-btn" style="background:#ef4444; color:white;" onclick="marcarRetiro('${p.userId}', '${p.id}', 'fallido')">
-                                <i class="fas fa-times"></i> Rechazar
-                            </button>
+                            <button class="admin-btn" style="background:#3b82f6; color:white;" onclick="copiarDatosPago('${p.userId}', '${p.wallet}', '${p.memo || ''}', '${p.monto}')"><i class="fas fa-copy"></i> Copiar</button>
+                            <button class="admin-btn" style="background:#22c55e; color:white;" onclick="marcarRetiro('${p.userId}', '${p.id}', 'exitoso')"><i class="fas fa-check"></i> Aprobar</button>
+                            <button class="admin-btn" style="background:#ef4444; color:white;" onclick="marcarRetiro('${p.userId}', '${p.id}', 'fallido')"><i class="fas fa-times"></i> Rechazar</button>
                         </div>
                     </div>
                 `).join('');
             } else {
                 lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">No hay retiros pendientes</div>';
             }
-        } catch(e) {
-            console.error('Error cargando retiros:', e);
-        }
+        } catch(e) { console.error('Error cargando retiros:', e); }
     }
 
     window.copiarDatosPago = function(userId, wallet, memo, monto) {
-        const texto = `ID: ${userId}\nBilletera: ${wallet}\n${memo ? 'Memo: ' + memo + '\n' : ''}Monto: ${monto} GRAM`;
-        navigator.clipboard.writeText(texto).then(() => {
-            toast('Datos copiados', 'success');
-        }).catch(() => {
-            toast(texto, 'success');
-        });
+        const texto = 'ID: ' + userId + '\nBilletera: ' + wallet + '\n' + (memo ? 'Memo: ' + memo + '\n' : '') + 'Monto: ' + monto + ' GRAM';
+        navigator.clipboard.writeText(texto).then(() => toast('Datos copiados', 'success')).catch(() => toast(texto, 'success'));
     };
 
     window.marcarRetiro = async function(userId, retiroId, estado) {
@@ -847,39 +497,23 @@
                 const data = userDoc.data();
                 const pendientes = data.pendientes || [];
                 const historial = data.historial || [];
-                
                 const retiroEncontrado = pendientes.find(p => p.id === retiroId);
-                
                 if (retiroEncontrado) {
                     retiroEncontrado.estado = estado;
-                    
                     const pendientesActualizados = pendientes.filter(p => p.id !== retiroId);
-                    
                     historial.push(retiroEncontrado);
-                    
-                    await db.collection('usuarios').doc(userId).update({
-                        pendientes: pendientesActualizados,
-                        historial: historial
-                    });
-                    
+                    await db.collection('usuarios').doc(userId).update({ pendientes: pendientesActualizados, historial: historial });
                     toast(estado === 'exitoso' ? 'Retiro aprobado' : 'Retiro rechazado', estado === 'exitoso' ? 'success' : 'error');
-                    
                     await cargarRetirosPendientes();
                 }
             }
-        } catch(e) {
-            console.error('Error marcando retiro:', e);
-            toast('Error al actualizar', 'error');
-        }
+        } catch(e) { console.error('Error marcando retiro:', e); toast('Error al actualizar', 'error'); }
     };
 
-    // ===================================================
-    // JUEGO DE BALONCESTO
-    // ===================================================
+    // ==================== JUEGO ====================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
     let width = 0, height = 0, floorY = 0;
 
     function resizeCanvas() {
@@ -895,7 +529,6 @@
     function playSound(type) {
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         const now = audioCtx.currentTime;
-        
         if (type === 'bounce') {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -930,13 +563,9 @@
         isDragging: false, dragStart: { x: 0, y: 0 }, dragCurrent: { x: 0, y: 0 },
         ballState: 'IDLE', characterState: 'IDLE', celebrationTimer: 0, gravity: 0.38, netWiggle: 0
     };
-
     const mascot = { x: 0, y: 0, size: 34 };
     const ball = { x: 0, y: 0, vx: 0, vy: 0, radius: 12, rotation: 0, touchedRim: false };
-    const hoop = {
-        x: 0, y: 0, width: 62, rimRadius: 5, backboardWidth: 10, backboardHeight: 140, netHeight: 80,
-        moveSpeed: 1.8, moveDirection: 1, minY: 0, maxY: 0, isMoving: false
-    };
+    const hoop = { x: 0, y: 0, width: 62, rimRadius: 5, backboardWidth: 10, backboardHeight: 140, netHeight: 80, moveSpeed: 1.8, moveDirection: 1, minY: 0, maxY: 0, isMoving: false };
     const confetti = [];
 
     function resetPositions() {
@@ -958,9 +587,7 @@
 
     function getEventPos(e) {
         const rect = canvas.getBoundingClientRect();
-        if (e.touches && e.touches.length > 0) {
-            return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-        }
+        if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
         return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
@@ -975,10 +602,7 @@
         }
     }
 
-    function handleMove(e) {
-        if (!gameState.isDragging) return;
-        gameState.dragCurrent = getEventPos(e);
-    }
+    function handleMove(e) { if (!gameState.isDragging) return; gameState.dragCurrent = getEventPos(e); }
 
     function handleEnd() {
         if (!gameState.isDragging) return;
@@ -993,9 +617,7 @@
             ball.vy = Math.sin(angle) * power;
             gameState.ballState = 'FLYING';
             gameState.characterState = 'EXTENDED';
-        } else {
-            gameState.characterState = 'IDLE';
-        }
+        } else { gameState.characterState = 'IDLE'; }
     }
 
     canvas.addEventListener('mousedown', handleStart);
@@ -1036,7 +658,7 @@
     function showGameOverModal() {
         gananciaPendienteSesion = gameState.score * VALOR_PUNTO_GRAM;
         finalScoreText.innerText = gameState.score;
-        pendingUsdtText.innerText = formatearBalones(gananciaPendienteSesion) + ' 🏀';
+        pendingUsdtText.innerHTML = '<i class="fas fa-basketball-ball" style="color:#22c55e; font-size:22px;"></i> ' + formatearBalones(gananciaPendienteSesion);
         adModal.classList.remove('oculto');
     }
 
@@ -1045,23 +667,11 @@
         videoAdOverlay.classList.remove('oculto');
         adProgressBar.style.width = '0%';
         adTimerText.innerText = 'Cargando...';
-        
         if (typeof show_11463298 === 'function') {
             try {
-                show_11463298('popup')
-                    .then(() => {
-                        videoAdOverlay.classList.add('oculto');
-                        procesarRecompensaAnuncio();
-                    })
-                    .catch(() => {
-                        ejecutarSimulacionPublicidad();
-                    });
-            } catch(e) {
-                ejecutarSimulacionPublicidad();
-            }
-        } else {
-            ejecutarSimulacionPublicidad();
-        }
+                show_11463298('popup').then(() => { videoAdOverlay.classList.add('oculto'); procesarRecompensaAnuncio(); }).catch(() => { ejecutarSimulacionPublicidad(); });
+            } catch(e) { ejecutarSimulacionPublicidad(); }
+        } else { ejecutarSimulacionPublicidad(); }
     };
 
     function ejecutarSimulacionPublicidad() {
@@ -1073,11 +683,7 @@
             timeLeft--;
             adTimerText.innerText = timeLeft + 's';
             adProgressBar.style.width = ((3 - timeLeft) / 3) * 100 + '%';
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                videoAdOverlay.classList.add('oculto');
-                await procesarRecompensaAnuncio();
-            }
+            if (timeLeft <= 0) { clearInterval(interval); videoAdOverlay.classList.add('oculto'); await procesarRecompensaAnuncio(); }
         }, 1000);
     }
 
@@ -1085,21 +691,15 @@
         const recompensa = RECOMPENSA_ANUNCIO;
         if (USER_ID && recompensa > 0) {
             try {
-                await db.collection('usuarios').doc(USER_ID).update({
-                    balance: firebase.firestore.FieldValue.increment(recompensa)
-                });
+                await db.collection('usuarios').doc(USER_ID).update({ balance: firebase.firestore.FieldValue.increment(recompensa) });
                 USER_DATA.balance = (USER_DATA.balance || 0) + recompensa;
                 if (USER_DATA.referidoPor && USER_DATA.referidoPor !== USER_ID) {
                     const comision = recompensa * COMISION;
-                    await db.collection('usuarios').doc(USER_DATA.referidoPor).update({
-                        comision: firebase.firestore.FieldValue.increment(comision)
-                    });
+                    await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(comision) });
                 }
                 actualizarUI();
-                toast('+1 🏀 + 3 vidas', 'success');
-            } catch(e) {
-                toast('Error al acreditar', 'error');
-            }
+                toast('+1 balón + 3 vidas', 'success');
+            } catch(e) { toast('Error al acreditar', 'error'); }
         }
         gameState.lives = 3;
         updateHUD();
@@ -1124,13 +724,7 @@
         for (let i = 0; i < count; i++) {
             const angle = -Math.PI / 2 + (Math.random() * 1.4 - 0.7);
             const speed = 5 + Math.random() * 10;
-            confetti.push({
-                x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-                width: 5 + Math.random() * 5, height: 8 + Math.random() * 6,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.15,
-                alpha: 1, decay: 0.01 + Math.random() * 0.01
-            });
+            confetti.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, width: 5 + Math.random() * 5, height: 8 + Math.random() * 6, color: colors[Math.floor(Math.random() * colors.length)], rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.15, alpha: 1, decay: 0.01 + Math.random() * 0.01 });
         }
     }
 
@@ -1144,10 +738,7 @@
         if (gameState.netWiggle > 0) gameState.netWiggle -= 0.04;
         if (gameState.characterState === 'CELEBRATING') {
             gameState.celebrationTimer++;
-            if (gameState.celebrationTimer > 60) {
-                gameState.characterState = 'IDLE';
-                gameState.celebrationTimer = 0;
-            }
+            if (gameState.celebrationTimer > 60) { gameState.characterState = 'IDLE'; gameState.celebrationTimer = 0; }
         }
         if (gameState.ballState === 'FLYING' || gameState.ballState === 'SCORED') {
             ball.x += ball.vx; ball.y += ball.vy;
@@ -1163,10 +754,7 @@
             const rimLeft = { x: hoop.x - hoop.width / 2, y: hoop.y };
             const rimRight = { x: hoop.x + hoop.width / 2, y: hoop.y };
             const backboardX = hoop.x + hoop.width / 2 + 5;
-            if (ball.x + ball.radius > backboardX - 4 && 
-                ball.x - ball.radius < backboardX + hoop.backboardWidth &&
-                ball.y > hoop.y - hoop.backboardHeight / 2 && 
-                ball.y < hoop.y + hoop.backboardHeight / 2) {
+            if (ball.x + ball.radius > backboardX - 4 && ball.x - ball.radius < backboardX + hoop.backboardWidth && ball.y > hoop.y - hoop.backboardHeight / 2 && ball.y < hoop.y + hoop.backboardHeight / 2) {
                 ball.vx = -ball.vx * 0.5;
                 ball.x = backboardX - 4 - ball.radius;
                 ball.touchedRim = true;
@@ -1185,9 +773,7 @@
                     playSound('bounce');
                 }
             });
-            if (gameState.ballState === 'FLYING' && ball.vy > 0 &&
-                ball.x > rimLeft.x + 3 && ball.x < rimRight.x - 3 &&
-                ball.y >= hoop.y - 2 && ball.y <= hoop.y + 20) {
+            if (gameState.ballState === 'FLYING' && ball.vy > 0 && ball.x > rimLeft.x + 3 && ball.x < rimRight.x - 3 && ball.y >= hoop.y - 2 && ball.y <= hoop.y + 20) {
                 gameState.ballState = 'SCORED';
                 gameState.netWiggle = 1;
                 const isSwish = !ball.touchedRim;
@@ -1213,11 +799,7 @@
                 gameState.lives--;
                 gameState.comboStreak = 0;
                 updateHUD();
-                if (gameState.lives <= 0) {
-                    setTimeout(showGameOverModal, 500);
-                } else {
-                    setTimeout(resetPositions, 600);
-                }
+                if (gameState.lives <= 0) { setTimeout(showGameOverModal, 500); } else { setTimeout(resetPositions, 600); }
             }
         }
         for (let i = confetti.length - 1; i >= 0; i--) {
@@ -1310,8 +892,6 @@
         ctx.fillStyle = '#0f172a'; ctx.beginPath();
         ctx.arc(-7, -6, 2, 0, Math.PI * 2);
         ctx.arc(7, -6, 2, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 1.5; ctx.beginPath();
-        ctx.arc(0, 2, 4, 0.1, Math.PI - 0.1); ctx.stroke();
         ctx.restore();
     }
 
@@ -1343,9 +923,7 @@
                 const dy = gameState.dragCurrent.y - gameState.dragStart.y;
                 ball.x = (mascot.x + 18) + Math.min(Math.max(dx, -50), 50) * 0.3;
                 ball.y = (mascot.y - 12) + Math.min(Math.max(dy, -50), 50) * 0.3;
-            } else {
-                ball.x = mascot.x + 18; ball.y = mascot.y - 12;
-            }
+            } else { ball.x = mascot.x + 18; ball.y = mascot.y - 12; }
         }
         ctx.save();
         ctx.translate(ball.x, ball.y); ctx.rotate(ball.rotation);
@@ -1393,6 +971,3 @@
 </script>
 </body>
 </html>
-
-
-Pon el mensaje de lo retiro demora 24 en 1 semana más profesional por favor 
