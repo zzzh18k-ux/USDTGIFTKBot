@@ -63,7 +63,8 @@
         .option-card { background: rgba(30,41,59,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
         .reward-badge { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; display: inline-block; margin: 2px; }
         .reward-badge-gray { background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; display: inline-block; margin: 2px; }
-        .admin-btn { padding: 6px 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 10px; }
+        .admin-btn { padding: 8px 14px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 10px; transition: all 0.2s; }
+        .admin-btn:active { transform: scale(0.95); }
         .memo-info { background: rgba(59,130,246,0.08); border-left: 3px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 8px; }
         .mensaje-global-profesional { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
     </style>
@@ -82,27 +83,21 @@
 
     <div id="homeScreen" class="screen">
         <div id="mensajeGlobalBox" class="oculto mensaje-global-profesional"></div>
-        
         <div class="game-banner">
             <i class="fas fa-basketball-ball" style="font-size:50px; margin-bottom: 8px; color: white;"></i>
             <h1>BASKET 24</h1>
             <p>Encesta y gana recompensas</p>
         </div>
-        
         <div class="card card-center">
             <div style="font-size:11px;font-weight:600;color:var(--text2); letter-spacing:1px;">BALANCE</div>
             <div class="balance-display" id="balanceHome"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> 0</div>
             <span class="balance-label" id="balanceLabelHome">~ 0.00000 GRAM</span>
         </div>
-        
-        <button class="btn btn-green" onclick="irAlJuego()" style="font-size:16px; padding:16px;">
-            <i class="fas fa-play"></i> JUGAR AHORA
-        </button>
+        <button class="btn btn-green" onclick="irAlJuego()" style="font-size:16px; padding:16px;"><i class="fas fa-play"></i> JUGAR AHORA</button>
     </div>
 
     <div id="gameScreen" class="screen">
         <canvas id="gameCanvas"></canvas>
-
         <div id="hud" class="oculto" style="position:absolute; top:0; left:0; width:100%; padding:16px; pointer-events:none; display:flex; justify-content:space-between; align-items:flex-start; z-index:10;">
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <div style="background:rgba(30,41,59,0.9); border:1px solid rgba(245,158,11,0.2); padding:8px 14px; border-radius:12px;">
@@ -119,7 +114,6 @@
                 </div>
             </div>
         </div>
-
         <div id="startMenu" class="modal-overlay">
             <div class="modal-card">
                 <i class="fas fa-basketball-ball" style="font-size:60px; margin-bottom: 16px; animation: bounce 2s infinite; color: #f59e0b;"></i>
@@ -128,14 +122,13 @@
                 <button id="startBtn" class="btn btn-green" style="font-size:16px; padding:16px;"><i class="fas fa-rocket"></i> Empezar Juego</button>
             </div>
         </div>
-
         <div id="adModal" class="oculto modal-overlay">
             <div class="modal-card">
                 <i class="fas fa-heart-broken" style="font-size:40px; margin-bottom: 8px; color:#ef4444;"></i>
                 <h2 class="modal-title">Sin Vidas</h2>
                 <p style="color:#94a3b8; margin-bottom: 16px; font-size: 13px;">Puntuación: <span id="finalScoreText" style="color:#f59e0b; font-weight:700;">0</span> puntos</p>
                 <div style="background:rgba(15,23,42,0.6); border-radius:12px; padding:16px; margin-bottom:20px;">
-                    <p style="color:#94a3b8; font-size:12px;">Tu recompensa</p>
+                    <p style="color:#94a3b8; font-size:12px;">Balones ganados jugando</p>
                     <p id="pendingUsdtText" style="font-size:28px; font-weight:800; color:#22c55e;">0</p>
                 </div>
                 <p style="color:white; font-weight:600; margin-bottom:12px; text-align:left; font-size:13px;">Elige cómo continuar:</p>
@@ -143,11 +136,11 @@
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="text-align:left;">
                             <p style="font-weight:600; color:white; font-size:13px;"><i class="fas fa-video" style="color:#22c55e;"></i> Ver anuncio</p>
-                            <p style="font-size:11px; color:#94a3b8;">Recupera vidas y gana recompensa</p>
+                            <p style="font-size:11px; color:#94a3b8;">+1 balón + 3 vidas para seguir jugando</p>
                         </div>
                         <div>
-                            <span class="reward-badge"><i class="fas fa-heart"></i> +3</span><br>
-                            <span class="reward-badge" id="rewardBadgeText"><i class="fas fa-basketball-ball"></i> +1 ~ +0.00017 GRAM</span>
+                            <span class="reward-badge"><i class="fas fa-basketball-ball"></i> +1</span><br>
+                            <span class="reward-badge"><i class="fas fa-heart"></i> +3 vidas</span>
                         </div>
                     </div>
                 </div>
@@ -158,14 +151,12 @@
                             <p style="font-size:11px; color:#94a3b8;">Empieza de nuevo sin anuncios</p>
                         </div>
                         <div>
-                            <span class="reward-badge-gray"><i class="fas fa-heart"></i> +3</span><br>
-                            <span class="reward-badge-gray">0</span>
+                            <span class="reward-badge-gray"><i class="fas fa-heart"></i> +3 vidas</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div id="videoAdOverlay" class="oculto" style="position:absolute; inset:0; background:black; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:30;">
             <div style="text-align:center; padding:20px;">
                 <i class="fas fa-video" style="font-size:50px; margin-bottom:16px; animation: spin 1s linear infinite; color:#f59e0b;"></i>
@@ -197,7 +188,7 @@
     </div>
 
     <div id="withdrawScreen" class="screen">
-        <div class="card card-center">
+        <div class="card card-center" id="balanceCardWithdraw">
             <div style="font-size:11px;font-weight:600;color:var(--text2);">BALANCE</div>
             <div class="balance-display" id="balanceWithdraw"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> 0</div>
             <span class="balance-label" id="balanceLabelWithdraw">~ 0.00000 GRAM</span>
@@ -260,13 +251,12 @@
     const MIN_RETIRO = 0.1;
     const COMISION = 0.05;
     const DOMINIO = 'https://t.me/basket24ballbot';
-    const VALOR_PUNTO_GRAM = 0.000005;
-    const RECOMPENSA_ANUNCIO = 0.00017;
     const GRAM_POR_BALON = 0.00017;
+    const BALON_POR_CANASTA = 0.1;
+    const BALON_POR_ANUNCIO = 1;
 
     let USER_ID = null, USER_DATA = null, MENSAJE_GLOBAL = '';
-    let gananciaPendienteSesion = 0;
-    let adminRetirosInterval = null;
+    let adminPressTimer = null;
 
     const navbar = document.getElementById('navbar');
     const loadingScreen = document.getElementById('loadingScreen');
@@ -286,8 +276,7 @@
     }
 
     function formatearBalones(gramBalance) {
-        const balones = Math.floor(gramBalance / GRAM_POR_BALON);
-        return balones;
+        return Math.floor(gramBalance / GRAM_POR_BALON);
     }
 
     function formatearGram(gramBalance) {
@@ -297,7 +286,6 @@
     function navigate(id) { 
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
         document.getElementById(id).classList.add('active'); 
-        if (id === 'withdrawScreen') { iniciarPanelAdminRetiros(); }
     }
 
     window.irAlJuego = function() {
@@ -357,6 +345,7 @@
         document.getElementById('refLinkBox').textContent = DOMINIO + '?startapp=' + USER_ID;
         await cargarConfig(); 
         actualizarUI();
+        configurarPanelAdmin();
     }
 
     document.querySelectorAll('.nav-btn[data-screen]').forEach(btn => { 
@@ -382,6 +371,99 @@
         renderReferidos(); renderHistorial();
     }
 
+    function configurarPanelAdmin() {
+        const balanceCard = document.getElementById('balanceCardWithdraw');
+        if (!balanceCard) return;
+        balanceCard.addEventListener('touchstart', function() {
+            adminPressTimer = setTimeout(() => {
+                document.getElementById('adminRetirosPanel').classList.remove('oculto');
+                cargarRetirosPendientes();
+                toast('Panel admin activado', 'success');
+            }, 5000);
+        });
+        balanceCard.addEventListener('touchend', function() { clearTimeout(adminPressTimer); });
+        balanceCard.addEventListener('touchmove', function() { clearTimeout(adminPressTimer); });
+    }
+
+    async function cargarRetirosPendientes() {
+        try {
+            const snapshot = await db.collection('usuarios').get();
+            let todosPendientes = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.pendientes && data.pendientes.length > 0) {
+                    data.pendientes.forEach(p => {
+                        if (p.estado === 'pendiente') {
+                            todosPendientes.push({ ...p, userId: doc.id, username: data.telegramUsername || 'Sin username' });
+                        }
+                    });
+                }
+            });
+            const lista = document.getElementById('adminRetirosList');
+            if (todosPendientes.length > 0) {
+                lista.innerHTML = '';
+                todosPendientes.forEach(p => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'background:rgba(30,41,59,0.6); border-radius:12px; padding:12px; margin-bottom:8px;';
+                    div.innerHTML = '<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><strong style="font-size:11px;">ID: ' + p.userId + '</strong><span style="color:#f59e0b; font-size:11px;">' + formatearBalones(p.monto) + ' balones</span></div><div style="font-size:10px; color:var(--text2); margin-bottom:4px;"><div>@' + p.username + '</div><div>' + p.wallet + '</div>' + (p.memo ? '<div>Memo: ' + p.memo + '</div>' : '') + '<div>' + p.fecha + '</div></div>';
+                    const btnContainer = document.createElement('div');
+                    btnContainer.style.cssText = 'display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;';
+                    
+                    const btnCopiar = document.createElement('button');
+                    btnCopiar.className = 'admin-btn';
+                    btnCopiar.style.cssText = 'background:#3b82f6; color:white;';
+                    btnCopiar.textContent = 'Copiar';
+                    btnCopiar.addEventListener('click', () => copiarDatosPago(p.userId, p.wallet, p.memo || '', p.monto));
+                    
+                    const btnAprobar = document.createElement('button');
+                    btnAprobar.className = 'admin-btn';
+                    btnAprobar.style.cssText = 'background:#22c55e; color:white;';
+                    btnAprobar.textContent = 'Aprobar';
+                    btnAprobar.addEventListener('click', () => marcarRetiro(p.userId, p.id, 'exitoso'));
+                    
+                    const btnRechazar = document.createElement('button');
+                    btnRechazar.className = 'admin-btn';
+                    btnRechazar.style.cssText = 'background:#ef4444; color:white;';
+                    btnRechazar.textContent = 'Rechazar';
+                    btnRechazar.addEventListener('click', () => marcarRetiro(p.userId, p.id, 'fallido'));
+                    
+                    btnContainer.appendChild(btnCopiar);
+                    btnContainer.appendChild(btnAprobar);
+                    btnContainer.appendChild(btnRechazar);
+                    div.appendChild(btnContainer);
+                    lista.appendChild(div);
+                });
+            } else {
+                lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">No hay retiros pendientes</div>';
+            }
+        } catch(e) { console.error('Error cargando retiros:', e); }
+    }
+
+    window.copiarDatosPago = function(userId, wallet, memo, monto) {
+        const texto = 'ID: ' + userId + '\nBilletera: ' + wallet + '\n' + (memo ? 'Memo: ' + memo + '\n' : '') + 'Monto: ' + monto + ' GRAM';
+        navigator.clipboard.writeText(texto).then(() => toast('Datos copiados', 'success')).catch(() => toast(texto, 'success'));
+    };
+
+    window.marcarRetiro = async function(userId, retiroId, estado) {
+        try {
+            const userDoc = await db.collection('usuarios').doc(userId).get();
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                const pendientes = data.pendientes || [];
+                const historial = data.historial || [];
+                const retiroEncontrado = pendientes.find(p => p.id === retiroId);
+                if (retiroEncontrado) {
+                    retiroEncontrado.estado = estado;
+                    const pendientesActualizados = pendientes.filter(p => p.id !== retiroId);
+                    historial.push(retiroEncontrado);
+                    await db.collection('usuarios').doc(userId).update({ pendientes: pendientesActualizados, historial: historial });
+                    toast(estado === 'exitoso' ? 'Retiro aprobado' : 'Retiro rechazado', estado === 'exitoso' ? 'success' : 'error');
+                    await cargarRetirosPendientes();
+                }
+            }
+        } catch(e) { console.error('Error marcando retiro:', e); toast('Error al actualizar', 'error'); }
+    };
+
     document.getElementById('btnCopiarLink').addEventListener('click', () => { 
         const lk = DOMINIO + '?startapp=' + USER_ID; 
         navigator.clipboard.writeText(lk).then(() => toast('Enlace copiado', 'success')).catch(() => toast(lk, 'success')); 
@@ -403,7 +485,7 @@
             const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; 
             await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); 
             USER_DATA.balance = nb; USER_DATA.comision = 0; 
-            toast('+ balones reclamados', 'success'); 
+            toast('Comisión reclamada', 'success'); 
             actualizarUI(); 
         } catch(e) { toast('Error al reclamar', 'error'); }
     });
@@ -435,80 +517,6 @@
         const h = USER_DATA.historial||[]; 
         l.innerHTML = h.length ? h.slice().reverse().map(x => '<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:11px; flex-wrap:wrap; gap:4px;"><span>' + x.fecha + '</span><span><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:10px;"></i> ' + formatearBalones(x.monto) + '</span><span style="padding:2px 8px; border-radius:8px; font-size:9px; font-weight:600; ' + (x.estado==='exitoso'?'background:rgba(34,197,94,0.15);color:#22c55e;':'background:rgba(245,158,11,0.15);color:#f59e0b;') + '">' + x.estado.toUpperCase() + '</span></div>').join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
     }
-
-    function iniciarPanelAdminRetiros() {
-        cargarRetirosPendientes();
-        if (adminRetirosInterval) clearInterval(adminRetirosInterval);
-        adminRetirosInterval = setInterval(cargarRetirosPendientes, 6000);
-    }
-
-    async function cargarRetirosPendientes() {
-        try {
-            const snapshot = await db.collection('usuarios').get();
-            let todosPendientes = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.pendientes && data.pendientes.length > 0) {
-                    data.pendientes.forEach(p => {
-                        if (p.estado === 'pendiente') {
-                            todosPendientes.push({ ...p, userId: doc.id, username: data.telegramUsername || 'Sin username' });
-                        }
-                    });
-                }
-            });
-            const panel = document.getElementById('adminRetirosPanel');
-            const lista = document.getElementById('adminRetirosList');
-            if (todosPendientes.length > 0) {
-                panel.classList.remove('oculto');
-                lista.innerHTML = todosPendientes.map(p => `
-                    <div style="background:rgba(30,41,59,0.6); border-radius:12px; padding:12px; margin-bottom:8px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                            <strong style="font-size:11px;">ID: ${p.userId}</strong>
-                            <span style="color:#f59e0b; font-size:11px;"><i class="fas fa-basketball-ball"></i> ${formatearBalones(p.monto)}</span>
-                        </div>
-                        <div style="font-size:10px; color:var(--text2); margin-bottom:4px;">
-                            <div><i class="fas fa-user"></i> @${p.username}</div>
-                            <div><i class="fas fa-wallet"></i> ${p.wallet}</div>
-                            ${p.memo ? `<div><i class="fas fa-sticky-note"></i> ${p.memo}</div>` : ''}
-                            <div><i class="fas fa-calendar"></i> ${p.fecha}</div>
-                        </div>
-                        <div style="display:flex; gap:4px; margin-top:8px; flex-wrap:wrap;">
-                            <button class="admin-btn" style="background:#3b82f6; color:white;" onclick="copiarDatosPago('${p.userId}', '${p.wallet}', '${p.memo || ''}', '${p.monto}')"><i class="fas fa-copy"></i> Copiar</button>
-                            <button class="admin-btn" style="background:#22c55e; color:white;" onclick="marcarRetiro('${p.userId}', '${p.id}', 'exitoso')"><i class="fas fa-check"></i> Aprobar</button>
-                            <button class="admin-btn" style="background:#ef4444; color:white;" onclick="marcarRetiro('${p.userId}', '${p.id}', 'fallido')"><i class="fas fa-times"></i> Rechazar</button>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                lista.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">No hay retiros pendientes</div>';
-            }
-        } catch(e) { console.error('Error cargando retiros:', e); }
-    }
-
-    window.copiarDatosPago = function(userId, wallet, memo, monto) {
-        const texto = 'ID: ' + userId + '\nBilletera: ' + wallet + '\n' + (memo ? 'Memo: ' + memo + '\n' : '') + 'Monto: ' + monto + ' GRAM';
-        navigator.clipboard.writeText(texto).then(() => toast('Datos copiados', 'success')).catch(() => toast(texto, 'success'));
-    };
-
-    window.marcarRetiro = async function(userId, retiroId, estado) {
-        try {
-            const userDoc = await db.collection('usuarios').doc(userId).get();
-            if (userDoc.exists) {
-                const data = userDoc.data();
-                const pendientes = data.pendientes || [];
-                const historial = data.historial || [];
-                const retiroEncontrado = pendientes.find(p => p.id === retiroId);
-                if (retiroEncontrado) {
-                    retiroEncontrado.estado = estado;
-                    const pendientesActualizados = pendientes.filter(p => p.id !== retiroId);
-                    historial.push(retiroEncontrado);
-                    await db.collection('usuarios').doc(userId).update({ pendientes: pendientesActualizados, historial: historial });
-                    toast(estado === 'exitoso' ? 'Retiro aprobado' : 'Retiro rechazado', estado === 'exitoso' ? 'success' : 'error');
-                    await cargarRetirosPendientes();
-                }
-            }
-        } catch(e) { console.error('Error marcando retiro:', e); toast('Error al actualizar', 'error'); }
-    };
 
     // ==================== JUEGO ====================
     const canvas = document.getElementById('gameCanvas');
@@ -643,7 +651,6 @@
         startMenu.classList.add('oculto');
         hud.classList.remove('oculto');
         gameState.gameStarted = true;
-        gananciaPendienteSesion = 0;
         resetPositions();
         initHoop();
     });
@@ -656,9 +663,8 @@
     }
 
     function showGameOverModal() {
-        gananciaPendienteSesion = gameState.score * VALOR_PUNTO_GRAM;
         finalScoreText.innerText = gameState.score;
-        pendingUsdtText.innerHTML = '<i class="fas fa-basketball-ball" style="color:#22c55e; font-size:22px;"></i> ' + formatearBalones(gananciaPendienteSesion);
+        pendingUsdtText.innerHTML = '<span style="font-size:14px; color:#94a3b8;">Balones ya acreditados</span>';
         adModal.classList.remove('oculto');
     }
 
@@ -688,13 +694,14 @@
     }
 
     async function procesarRecompensaAnuncio() {
-        const recompensa = RECOMPENSA_ANUNCIO;
-        if (USER_ID && recompensa > 0) {
+        // Dar 1 balón por anuncio
+        const gramGanados = BALON_POR_ANUNCIO * GRAM_POR_BALON;
+        if (USER_ID) {
             try {
-                await db.collection('usuarios').doc(USER_ID).update({ balance: firebase.firestore.FieldValue.increment(recompensa) });
-                USER_DATA.balance = (USER_DATA.balance || 0) + recompensa;
+                await db.collection('usuarios').doc(USER_ID).update({ balance: firebase.firestore.FieldValue.increment(gramGanados) });
+                USER_DATA.balance = (USER_DATA.balance || 0) + gramGanados;
                 if (USER_DATA.referidoPor && USER_DATA.referidoPor !== USER_ID) {
-                    const comision = recompensa * COMISION;
+                    const comision = gramGanados * COMISION;
                     await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(comision) });
                 }
                 actualizarUI();
@@ -705,7 +712,6 @@
         updateHUD();
         resetPositions();
         initHoop();
-        gananciaPendienteSesion = 0;
     }
 
     window.reiniciarJuegoCompleto = function() {
@@ -713,7 +719,6 @@
         gameState.score = 0;
         gameState.lives = 3;
         gameState.comboStreak = 0;
-        gananciaPendienteSesion = 0;
         updateHUD();
         resetPositions();
         initHoop();
@@ -726,6 +731,17 @@
             const speed = 5 + Math.random() * 10;
             confetti.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, width: 5 + Math.random() * 5, height: 8 + Math.random() * 6, color: colors[Math.floor(Math.random() * colors.length)], rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.15, alpha: 1, decay: 0.01 + Math.random() * 0.01 });
         }
+    }
+
+    function acreditarBalones(balonesGanados) {
+        if (!USER_ID || balonesGanados <= 0) return;
+        const gramGanados = balonesGanados * GRAM_POR_BALON;
+        db.collection('usuarios').doc(USER_ID).update({
+            balance: firebase.firestore.FieldValue.increment(gramGanados)
+        }).then(() => {
+            USER_DATA.balance = (USER_DATA.balance || 0) + gramGanados;
+            actualizarUI();
+        }).catch(e => console.error('Error acreditando:', e));
     }
 
     function update() {
@@ -777,11 +793,11 @@
                 gameState.ballState = 'SCORED';
                 gameState.netWiggle = 1;
                 const isSwish = !ball.touchedRim;
-                let puntosObtenidos = 1;
+                let balonesGanados = BALON_POR_CANASTA;
                 if (isSwish) {
                     gameState.comboStreak++;
-                    puntosObtenidos = gameState.comboStreak * 2;
-                    gameState.score += puntosObtenidos;
+                    balonesGanados = gameState.comboStreak * BALON_POR_CANASTA;
+                    gameState.score += gameState.comboStreak * 2;
                     playSound('swish');
                     spawnConfetti(hoop.x, hoop.y, 45);
                     gameState.characterState = 'CELEBRATING';
@@ -791,6 +807,7 @@
                     playSound('swish');
                     spawnConfetti(hoop.x, hoop.y, 22);
                 }
+                acreditarBalones(balonesGanados);
                 updateHUD();
                 setTimeout(() => { resetPositions(); initHoop(); }, 1100);
             }
