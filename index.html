@@ -88,7 +88,7 @@
         </div>
         <div class="card card-center">
             <div style="font-size:11px;font-weight:600;color:var(--text2);">BALANCE</div>
-            <div class="balance-display" id="balanceHome"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> <span id="balanceHomeNum">0</span></div>
+            <div class="balance-display" id="balanceHome"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> <span id="balanceHomeNum">0.0</span></div>
             <span class="balance-label" id="balanceLabelHome">~ 0.00000 GRAM</span>
         </div>
         <button class="btn btn-green" onclick="irAlJuego()" style="font-size:16px; padding:16px;"><i class="fas fa-play"></i> JUGAR AHORA</button>
@@ -169,7 +169,7 @@
         </div>
         <div class="card">
             <div class="fila"><span>Amigos invitados</span><strong id="invitadosCount">0</strong></div>
-            <div class="fila"><span>Comisión acumulada</span><strong style="color:#f59e0b;" id="comisionAcumulada">0</strong></div>
+            <div class="fila"><span>Comisión acumulada</span><strong style="color:#f59e0b;" id="comisionAcumulada">0.0</strong></div>
             <button class="btn btn-yellow" id="btnReclamarComision"><i class="fas fa-coins"></i> Reclamar Comisión</button>
         </div>
         <div class="card">
@@ -181,7 +181,7 @@
     <div id="withdrawScreen" class="screen">
         <div class="card card-center" id="balanceCardWithdraw">
             <div style="font-size:11px;font-weight:600;color:var(--text2);">BALANCE</div>
-            <div class="balance-display" id="balanceWithdraw"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> <span id="balanceWithdrawNum">0</span></div>
+            <div class="balance-display" id="balanceWithdraw"><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:28px; -webkit-text-fill-color: #f59e0b;"></i> <span id="balanceWithdrawNum">0.0</span></div>
             <span class="balance-label" id="balanceLabelWithdraw">~ 0.00000 GRAM</span>
         </div>
         <div class="card">
@@ -267,7 +267,7 @@
     }
 
     function formatearBalones(gramBalance) {
-        return Math.floor(gramBalance / GRAM_POR_BALON);
+        return (gramBalance / GRAM_POR_BALON).toFixed(1);
     }
 
     function formatearGram(gramBalance) {
@@ -359,7 +359,7 @@
         document.getElementById('balanceWithdrawNum').textContent = balones;
         document.getElementById('balanceLabelWithdraw').textContent = formatearGram(bal);
         document.getElementById('invitadosCount').textContent = (USER_DATA.referidos||[]).length;
-        document.getElementById('comisionAcumulada').innerHTML = '<i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:12px;"></i> ' + formatearBalones(USER_DATA.comision||0);
+        document.getElementById('comisionAcumulada').textContent = formatearBalones(USER_DATA.comision||0);
         renderReferidos(); renderHistorial();
     }
 
@@ -573,7 +573,7 @@
     }
 
     function initHoop() {
-        hoop.x = Math.min(width - 40, width * 0.90);
+        hoop.x = Math.min(width - 20, width * 0.97);
         const minY = height * 0.18;
         const maxY = height * 0.50;
         hoop.y = minY + Math.random() * (maxY - minY);
@@ -685,7 +685,6 @@
     }
 
     async function procesarRecompensaAnuncio() {
-        // Acreditar balones de la sesión
         if (USER_ID && balonesSesion > 0) {
             const gramGanados = balonesSesion * GRAM_POR_BALON;
             try {
