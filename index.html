@@ -267,7 +267,7 @@
     }
 
     function formatearBalones(gramBalance) {
-        return (gramBalance / GRAM_POR_BALON).toFixed(1);
+        return (gramBalance / GRAM_POR_BALON).toFixed(2);
     }
 
     function formatearGram(gramBalance) {
@@ -329,7 +329,7 @@
                     }
                 }
             }
-        } catch(e) { USER_DATA = { balance: 0, historial: [], referidos: [] }; }
+        } catch(e) { USER_DATA = { balance: 0, historial: [], referidos: [], referidoPor: null, comision: 0 }; }
         loadingScreen.classList.remove('active'); 
         navigate('homeScreen'); 
         navbar.classList.remove('oculto');
@@ -645,7 +645,7 @@
     });
 
     function updateSessionBalones() {
-        sessionBalonesDisplay.textContent = balonesSesion.toFixed(1);
+        sessionBalonesDisplay.textContent = balonesSesion.toFixed(2);
     }
 
     function updateHUD() {
@@ -655,7 +655,7 @@
     }
 
     function showGameOverModal() {
-        pendingBalones.textContent = balonesSesion.toFixed(1);
+        pendingBalones.textContent = balonesSesion.toFixed(2);
         adModal.classList.remove('oculto');
     }
 
@@ -695,7 +695,7 @@
                     await db.collection('usuarios').doc(USER_DATA.referidoPor).update({ comision: firebase.firestore.FieldValue.increment(comision) });
                 }
                 actualizarUI();
-                toast('+' + balonesSesion.toFixed(1) + ' balones acreditados', 'success');
+                toast('+' + balonesSesion.toFixed(2) + ' balones acreditados', 'success');
             } catch(e) { toast('Error al acreditar', 'error'); }
         }
         balonesSesion = 0;
