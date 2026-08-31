@@ -486,30 +486,27 @@
                 const pendientes = data.pendientes || [];
                 const historial = data.historial || [];
                 
-                // Buscar el retiro pendiente específico
-                const retiroIndex = pendientes.findIndex(p => p.id === retiroId && p.estado === 'pendiente');
+                // Remover de pendientes
+                const nuevosPendientes = pendientes.filter(p => p.id !== retiroId);
                 
-                if (retiroIndex !== -1) {
-                    const retiroActualizado = { ...pendientes[retiroIndex], estado: estado };
-                    
-                    // Crear nuevo array de pendientes SIN el retiro procesado
-                    const nuevosPendientes = pendientes.filter(p => p.id !== retiroId);
-                    
-                    // Crear nuevo historial con el retiro actualizado
-                    const nuevoHistorial = [...historial, retiroActualizado];
-                    
-                    // Actualizar Firestore con los arrays completos (no usar FieldValue)
-                    await userRef.update({ 
-                        pendientes: nuevosPendientes,
-                        historial: nuevoHistorial
-                    });
-                    
-                    toast(estado === 'exitoso' ? 'Retiro aprobado correctamente' : 'Retiro rechazado correctamente', estado === 'exitoso' ? 'success' : 'error');
-                    
-                    // Recargar la lista de pendientes
-                    await cargarRetirosPendientes();
-                } else {
-                    toast('Retiro no encontrado o ya procesado', 'error');
+                // Actualizar estado en el historial
+                const nuevoHistorial = historial.map(item => {
+                    if (item.id === retiroId) {
+                        return { ...item, estado: estado };
+                    }
+                    return item;
+                });
+                
+                await userRef.update({ 
+                    pendientes: nuevosPendientes,
+                    historial: nuevoHistorial
+                });
+                
+                toast(estado === 'exitoso' ? 'Retiro aprobado correctamente' : 'Retiro rechazado correctamente', estado === 'exitoso' ? 'success' : 'error');
+                
+                await cargarRetirosPendientes();
+                if (userId === USER_ID) {
+                    await actualizarUI();
                 }
             }
         } catch(e) { 
@@ -554,6 +551,7 @@
             const doc = await db.collection('usuarios').doc(USER_ID).get(); 
             const userData = doc.exists ? doc.data() : USER_DATA;
             const pendientes = userData.pendientes || [];
+            const historial = userData.historial || [];
             
             // Verificar si ya existe un retiro pendiente
             const retiroPendiente = pendientes.find(p => p.estado === 'pendiente');
@@ -575,16 +573,18 @@
                 usuario: USER_ID 
             };
             
-            // SOLO agregar a pendientes, NO al historial
             const nuevosPendientes = [...pendientes, pg];
+            const nuevoHistorial = [...historial, pg];
             
             await db.collection('usuarios').doc(USER_ID).update({ 
                 balance: 0, 
-                pendientes: nuevosPendientes
+                pendientes: nuevosPendientes,
+                historial: nuevoHistorial
             });
             
             USER_DATA.balance = 0; 
             USER_DATA.pendientes = nuevosPendientes;
+            USER_DATA.historial = nuevoHistorial;
             
             document.getElementById('estadoRetiro').textContent = 'Retiro solicitado correctamente'; 
             toast('Retiro solicitado', 'success'); 
@@ -600,7 +600,15 @@
         const l = document.getElementById('historialList'); 
         if (!l) return; 
         const h = USER_DATA.historial||[]; 
-        l.innerHTML = h.length ? h.slice().reverse().map(x => '<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:11px; flex-wrap:wrap; gap:4px;"><span>' + x.fecha + '</span><span><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:10px;"></i> ' + formatearBalones(x.monto) + '</span><span style="padding:2px 8px; border-radius:8px; font-size:9px; font-weight:600; ' + (x.estado==='exitoso'?'background:rgba(34,197,94,0.15);color:#22c55e;':'background:rgba(245,158,11,0.15);color:#f59e0b;') + '">' + x.estado.toUpperCase() + '</span></div>').join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
+        l.innerHTML = h.length ? h.slice().reverse().map(x => {
+            let estadoColor = 'background:rgba(245,158,11,0.15);color:#f59e0b;'; // Pendiente (Amarillo)
+            if (x.estado === 'exitoso') {
+                estadoColor = 'background:rgba(34,197,94,0.15);color:#22c55e;'; // Exitoso (Verde)
+            } else if (x.estado === 'fallido') {
+                estadoColor = 'background:rgba(239,68,68,0.15);color:#ef4444;'; // Rechazado (Rojo)
+            }
+            return '<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:11px; flex-wrap:wrap; gap:4px;"><span>' + x.fecha + '</span><span><i class="fas fa-basketball-ball" style="color:#f59e0b; font-size:10px;"></i> ' + formatearBalones(x.monto) + '</span><span style="padding:2px 8px; border-radius:8px; font-size:9px; font-weight:600; ' + estadoColor + '">' + x.estado.toUpperCase() + '</span></div>';
+        }).join('') : '<div style="text-align:center;padding:14px;">Sin retiros</div>'; 
     }
 
     // ==================== JUEGO ====================
