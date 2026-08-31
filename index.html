@@ -196,7 +196,7 @@
                     <span style="font-size: 11px; color: #94a3b8;">Mínimo de retiro: 588 balones ~ 0.1 GRAM</span>
                 </div>
             </div>
-            <input type="text" id="walletInput" class="input-field" placeholder="Dirección de billetera TON">
+            <input type="text" id="walletInput" class="input-field" placeholder="Dirección de billetera GRAM">
             <input type="text" id="memoInput" class="input-field" placeholder="Memo (solo si tu billetera lo requiere)">
             <div class="memo-info">
                 <p style="font-size:10px; color:#93c5fd; margin:0;"><i class="fas fa-info-circle"></i> <strong>Importante:</strong> Si tu billetera requiere Memo, es obligatorio incluirlo para no perder los fondos.</p>
@@ -311,7 +311,6 @@
         if (!telegramId) { loadingScreen.innerHTML = '<div style="font-size:40px;">Error</div><div style="font-weight:600;font-size:16px;">Abre desde Telegram</div>'; return; }
         USER_ID = telegramId;
         
-        // Capturar referencia de múltiples formas
         if (!refCode && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
             refCode = tg.initDataUnsafe.start_param;
         }
@@ -395,7 +394,6 @@
         balanceCard.addEventListener('touchmove', function() { clearTimeout(adminPressTimer); });
     }
 
-    // Agregar saldo desde panel admin
     document.getElementById('btnAgregarSaldo').addEventListener('click', async () => {
         const userId = document.getElementById('adminUserId').value.trim();
         const monto = parseFloat(document.getElementById('adminMonto').value);
@@ -438,8 +436,8 @@
                 }
             });
             const lista = document.getElementById('adminRetirosList');
+            lista.innerHTML = '';
             if (todosPendientes.length > 0) {
-                lista.innerHTML = '';
                 todosPendientes.forEach(p => {
                     const div = document.createElement('div');
                     div.style.cssText = 'background:rgba(30,41,59,0.6); border-radius:12px; padding:12px; margin-bottom:8px;';
@@ -492,6 +490,7 @@
                     historial.push(retiroEncontrado);
                     await db.collection('usuarios').doc(userId).update({ pendientes: pendientesActualizados, historial: historial });
                     toast(estado === 'exitoso' ? 'Retiro aprobado' : 'Retiro rechazado', estado === 'exitoso' ? 'success' : 'error');
+                    document.getElementById('adminRetirosList').innerHTML = '';
                     await cargarRetirosPendientes();
                 }
             }
