@@ -575,18 +575,15 @@
                 usuario: USER_ID 
             };
             
-            // Actualizar usando los arrays completos
+            // SOLO agregar a pendientes, NO al historial
             const nuevosPendientes = [...pendientes, pg];
-            const nuevoHistorial = [...(userData.historial || []), { fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }];
             
             await db.collection('usuarios').doc(USER_ID).update({ 
                 balance: 0, 
-                pendientes: nuevosPendientes,
-                historial: nuevoHistorial
+                pendientes: nuevosPendientes
             });
             
             USER_DATA.balance = 0; 
-            USER_DATA.historial = nuevoHistorial;
             USER_DATA.pendientes = nuevosPendientes;
             
             document.getElementById('estadoRetiro').textContent = 'Retiro solicitado correctamente'; 
