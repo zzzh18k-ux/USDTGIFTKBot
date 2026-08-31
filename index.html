@@ -515,11 +515,11 @@
         try { 
             const doc = await db.collection('usuarios').doc(USER_ID).get(); 
             const c = doc.exists ? (doc.data().comision||0) : (USER_DATA.comision||0); 
-            if (c < 0.00001) return toast('Sin comisiones pendientes', 'error'); 
+            if (c < 0.00000001) return toast('Sin comisiones pendientes', 'error'); 
             const nb = ((doc.exists?doc.data().balance:USER_DATA.balance)||0) + c; 
             await db.collection('usuarios').doc(USER_ID).update({ balance: nb, comision: 0 }); 
             USER_DATA.balance = nb; USER_DATA.comision = 0; 
-            toast('Comisión reclamada', 'success'); 
+            toast('Comisión reclamada: ' + formatearBalones(c) + ' balones', 'success'); 
             actualizarUI(); 
         } catch(e) { toast('Error al reclamar', 'error'); }
     });
