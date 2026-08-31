@@ -478,23 +478,44 @@
 
     window.marcarRetiro = async function(userId, retiroId, estado) {
         try {
-            const userDoc = await db.collection('usuarios').doc(userId).get();
+            const userRef = db.collection('usuarios').doc(userId);
+            const userDoc = await userRef.get();
+            
             if (userDoc.exists) {
                 const data = userDoc.data();
                 const pendientes = data.pendientes || [];
                 const historial = data.historial || [];
-                const retiroEncontrado = pendientes.find(p => p.id === retiroId);
-                if (retiroEncontrado) {
-                    retiroEncontrado.estado = estado;
-                    const pendientesActualizados = pendientes.filter(p => p.id !== retiroId);
-                    historial.push(retiroEncontrado);
-                    await db.collection('usuarios').doc(userId).update({ pendientes: pendientesActualizados, historial: historial });
-                    toast(estado === 'exitoso' ? 'Retiro aprobado' : 'Retiro rechazado', estado === 'exitoso' ? 'success' : 'error');
-                    document.getElementById('adminRetirosList').innerHTML = '';
+                
+                // Buscar el retiro pendiente específico
+                const retiroIndex = pendientes.findIndex(p => p.id === retiroId && p.estado === 'pendiente');
+                
+                if (retiroIndex !== -1) {
+                    const retiroActualizado = { ...pendientes[retiroIndex], estado: estado };
+                    
+                    // Crear nuevo array de pendientes SIN el retiro procesado
+                    const nuevosPendientes = pendientes.filter(p => p.id !== retiroId);
+                    
+                    // Crear nuevo historial con el retiro actualizado
+                    const nuevoHistorial = [...historial, retiroActualizado];
+                    
+                    // Actualizar Firestore con los arrays completos (no usar FieldValue)
+                    await userRef.update({ 
+                        pendientes: nuevosPendientes,
+                        historial: nuevoHistorial
+                    });
+                    
+                    toast(estado === 'exitoso' ? 'Retiro aprobado correctamente' : 'Retiro rechazado correctamente', estado === 'exitoso' ? 'success' : 'error');
+                    
+                    // Recargar la lista de pendientes
                     await cargarRetirosPendientes();
+                } else {
+                    toast('Retiro no encontrado o ya procesado', 'error');
                 }
             }
-        } catch(e) { console.error('Error marcando retiro:', e); toast('Error al actualizar', 'error'); }
+        } catch(e) { 
+            console.error('Error marcando retiro:', e); 
+            toast('Error al actualizar', 'error'); 
+        }
     };
 
     document.getElementById('btnCopiarLink').addEventListener('click', () => { 
@@ -528,20 +549,54 @@
         const memo = document.getElementById('memoInput').value.trim();
         if (!w) return toast('Ingresa tu dirección de billetera', 'error');
         if (!USER_ID) return;
+        
         try { 
             const doc = await db.collection('usuarios').doc(USER_ID).get(); 
-            const bal = doc.exists ? (doc.data().balance||0) : (USER_DATA.balance||0); 
+            const userData = doc.exists ? doc.data() : USER_DATA;
+            const pendientes = userData.pendientes || [];
+            
+            // Verificar si ya existe un retiro pendiente
+            const retiroPendiente = pendientes.find(p => p.estado === 'pendiente');
+            if (retiroPendiente) {
+                return toast('Ya tienes un retiro pendiente', 'error');
+            }
+            
+            const bal = userData.balance || 0; 
             if (bal < MIN_RETIRO) return toast('Mínimo 588 balones ~ 0.1 GRAM', 'error');
-            const hoy = new Date().toLocaleDateString(), pg = { id: Date.now().toString(), wallet: w, memo: memo, monto: bal, fecha: hoy, estado: 'pendiente', usuario: USER_ID };
-            await db.collection('usuarios').doc(USER_ID).update({ balance: 0, historial: firebase.firestore.FieldValue.arrayUnion({ fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }), pendientes: firebase.firestore.FieldValue.arrayUnion(pg) });
+            
+            const hoy = new Date().toLocaleDateString(); 
+            const pg = { 
+                id: Date.now().toString(), 
+                wallet: w, 
+                memo: memo, 
+                monto: bal, 
+                fecha: hoy, 
+                estado: 'pendiente', 
+                usuario: USER_ID 
+            };
+            
+            // Actualizar usando los arrays completos
+            const nuevosPendientes = [...pendientes, pg];
+            const nuevoHistorial = [...(userData.historial || []), { fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }];
+            
+            await db.collection('usuarios').doc(USER_ID).update({ 
+                balance: 0, 
+                pendientes: nuevosPendientes,
+                historial: nuevoHistorial
+            });
+            
             USER_DATA.balance = 0; 
-            USER_DATA.historial = [...(USER_DATA.historial||[]), { fecha: hoy, monto: bal, wallet: w, memo: memo, estado: 'pendiente' }];
+            USER_DATA.historial = nuevoHistorial;
+            USER_DATA.pendientes = nuevosPendientes;
+            
             document.getElementById('estadoRetiro').textContent = 'Retiro solicitado correctamente'; 
             toast('Retiro solicitado', 'success'); 
             document.getElementById('walletInput').value = ''; 
             document.getElementById('memoInput').value = ''; 
             actualizarUI(); 
-        } catch(e) { toast('Error al solicitar retiro', 'error'); }
+        } catch(e) { 
+            toast('Error al solicitar retiro', 'error'); 
+        }
     });
 
     function renderHistorial() { 
