@@ -209,9 +209,17 @@
             <div id="historialList" style="max-height:200px; overflow-y:auto;"></div>
         </div>
         <div id="adminRetirosPanel" class="card oculto">
-            <div style="font-weight:700;font-size:16px;margin-bottom:12px;text-align:center;"><i class="fas fa-crown" style="color:#f59e0b;"></i> Panel de Retiros</div>
-            <div style="font-size:10px;color:var(--text2);margin-bottom:12px;text-align:center;">Actualización automática cada 6 segundos</div>
-            <div id="adminRetirosList" style="max-height:400px; overflow-y:auto;"></div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:12px;text-align:center;"><i class="fas fa-crown" style="color:#f59e0b;"></i> Panel Admin</div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:12px;text-align:center;">Retiros pendientes y agregar saldo</div>
+            
+            <div style="background:rgba(30,41,59,0.6); border-radius:12px; padding:12px; margin-bottom:12px;">
+                <p style="font-size:11px; font-weight:600; margin-bottom:6px;"><i class="fas fa-plus-circle" style="color:#22c55e;"></i> Agregar Saldo</p>
+                <input type="text" id="adminUserId" class="input-field" placeholder="ID de usuario">
+                <input type="number" id="adminMonto" class="input-field" placeholder="Balones a agregar" step="0.01">
+                <button class="btn btn-green" id="btnAgregarSaldo" style="font-size:12px; padding:10px;">Agregar Balones</button>
+            </div>
+            
+            <div id="adminRetirosList" style="max-height:300px; overflow-y:auto;"></div>
         </div>
     </div>
 
@@ -302,6 +310,12 @@
     async function entrarApp() {
         if (!telegramId) { loadingScreen.innerHTML = '<div style="font-size:40px;">Error</div><div style="font-weight:600;font-size:16px;">Abre desde Telegram</div>'; return; }
         USER_ID = telegramId;
+        
+        // Capturar referencia de múltiples formas
+        if (!refCode && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+            refCode = tg.initDataUnsafe.start_param;
+        }
+        
         try {
             const doc = await db.collection('usuarios').doc(USER_ID).get();
             if (!doc.exists) {
@@ -316,7 +330,11 @@
                 const data = { telegramId, telegramUsername, telegramFirstName, balance: 0, referidoPor: referidoPorValido, referidos: [], comision: 0, historial: [], pendientes: [], creado: Date.now() };
                 await db.collection('usuarios').doc(USER_ID).set(data);
                 USER_DATA = data;
-                toast('Bienvenido a BASKET 24', 'success');
+                if (referidoPorValido) {
+                    toast('🎉 Fuiste invitado por un amigo', 'success');
+                } else {
+                    toast('Bienvenido a BASKET 24', 'success');
+                }
             } else {
                 USER_DATA = doc.data();
                 if (!USER_DATA.referidoPor && refCode && refCode !== USER_ID) {
@@ -376,6 +394,34 @@
         balanceCard.addEventListener('touchend', function() { clearTimeout(adminPressTimer); });
         balanceCard.addEventListener('touchmove', function() { clearTimeout(adminPressTimer); });
     }
+
+    // Agregar saldo desde panel admin
+    document.getElementById('btnAgregarSaldo').addEventListener('click', async () => {
+        const userId = document.getElementById('adminUserId').value.trim();
+        const monto = parseFloat(document.getElementById('adminMonto').value);
+        
+        if (!userId) return toast('Ingresa ID de usuario', 'error');
+        if (!monto || monto <= 0) return toast('Ingresa monto válido', 'error');
+        
+        try {
+            const gramMonto = monto * GRAM_POR_BALON;
+            const userRef = db.collection('usuarios').doc(userId);
+            const userDoc = await userRef.get();
+            
+            if (!userDoc.exists) return toast('Usuario no encontrado', 'error');
+            
+            await userRef.update({
+                balance: firebase.firestore.FieldValue.increment(gramMonto)
+            });
+            
+            toast('+' + monto + ' balones agregados a ' + userId, 'success');
+            document.getElementById('adminUserId').value = '';
+            document.getElementById('adminMonto').value = '';
+        } catch(e) {
+            console.error('Error agregando saldo:', e);
+            toast('Error al agregar saldo', 'error');
+        }
+    });
 
     async function cargarRetirosPendientes() {
         try {
