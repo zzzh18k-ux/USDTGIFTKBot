@@ -10,6 +10,8 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <!-- SDK Monetag con la Zona 11698149 -->
     <script src="//libtl.com/sdk.js" data-zone="11698149" data-sdk="show_11698149"></script>
 
     <style>
@@ -44,7 +46,7 @@
         .input-field:focus { border-color: var(--amber); background: rgba(15,23,42,0.7); }
         .fila { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:13px; font-weight:500; }
         .fila:last-child { border:none; }
-        .navbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:450px; width:100%; background: rgba(30,41,59,0.98); border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-around; padding:10px 0; z-index:100; }
+        .navbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:450px; width:100%; background: rgba(30,41,59,0.98); border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-around; padding:10px 0; z-index:100; }
         .nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:8px 16px; border-radius:12px; transition:all 0.2s; background:transparent; border:none; font-weight:600; font-size:10px; color: var(--text2); }
         .nav-btn i { font-size:18px; }
         .nav-btn.active { background: rgba(245,158,11,0.12); color: var(--amber); }
@@ -766,17 +768,19 @@
 
     window.mostrarAnuncio = function() {
         adModal.classList.add('oculto');
-        videoAdOverlay.classList.remove('oculto');
-        adProgressBar.style.width = '0%';
-        adTimerText.innerText = 'Cargando...';
         if (typeof show_11698149 === 'function') {
-            try {
-                show_11698149('pop').then(() => { videoAdOverlay.classList.add('oculto'); procesarRecompensaAnuncio(); }).catch(() => { ejecutarSimulacionPublicidad(); });
-            } catch(e) { ejecutarSimulacionPublicidad(); }
-        } else { ejecutarSimulacionPublicidad(); }
+            show_11698149().then(() => {
+                procesarRecompensaAnuncio();
+            }).catch(e => {
+                ejecutarSimulacionPublicidad();
+            });
+        } else {
+            ejecutarSimulacionPublicidad();
+        }
     };
 
     function ejecutarSimulacionPublicidad() {
+        videoAdOverlay.classList.remove('oculto');
         let timeLeft = 3;
         adTimerText.innerText = timeLeft + 's';
         adProgressBar.style.width = '0%';
